@@ -70,9 +70,25 @@ class Ledger:
         self.conn = sqlite3.connect(self.path)
         self.conn.row_factory = sqlite3.Row
         schema = resources.files("lpswarm.ledger").joinpath("schema.sql").read_text(encoding="utf-8")
+        self._migrate()
         self.conn.executescript(schema)
         self.conn.execute("PRAGMA journal_mode = WAL" if self.path != ":memory:" else "PRAGMA journal_mode = MEMORY")
         self._key_ids: dict[str, int] = {}
+
+    _COLUMNS = {"key_candidate": {"value_json": "TEXT"},
+                "result": {"unreachable": "INTEGER NOT NULL DEFAULT 0"}}
+
+    def _migrate(self) -> None:
+        """Add columns introduced after a ledger was created (tables are created by the
+        schema script; this only extends existing ones)."""
+        for table, cols in self._COLUMNS.items():
+            have = {r[1] for r in self.conn.execute(f"PRAGMA table_info({table})")}
+            if not have:
+                continue  # new ledger: the schema creates the table complete
+            for col, decl in cols.items():
+                if col not in have:
+                    self.conn.execute(f"ALTER TABLE {table} ADD COLUMN {col} {decl}")
+        self.conn.commit()
 
     def close(self) -> None:
         self.conn.commit()
@@ -151,15 +167,16 @@ class Ledger:
         self.conn.execute("UPDATE hypothesis SET status=? WHERE id=?", (status, hypothesis_id))
 
     def key_candidate_id(self, value_hash: str, derivation: str, preview: str | None = None,
-                         corpus_item_id: int | None = None, edition_id: str | None = None) -> int:
+                         corpus_item_id: int | None = None, edition_id: str | None = None,
+                         value_json: str | None = None) -> int:
         ck = (value_hash, derivation)
         kid = self._key_ids.get(ck)
         if kid is not None:
             return kid
         self.conn.execute(
             "INSERT OR IGNORE INTO key_candidate (corpus_item_id, derivation, value_hash,"
-            " value_preview, edition_id) VALUES (?,?,?,?,?)",
-            (corpus_item_id, derivation, value_hash, preview, edition_id))
+            " value_preview, value_json, edition_id) VALUES (?,?,?,?,?,?)",
+            (corpus_item_id, derivation, value_hash, preview, value_json, edition_id))
         kid = int(self.conn.execute(
             "SELECT id FROM key_candidate WHERE value_hash=? AND derivation=?",
             (value_hash, derivation)).fetchone()["id"])
@@ -224,6 +241,12 @@ class Ledger:
             " JOIN result r ON r.attempt_id=a.id WHERE a.target_id=? AND r.stage='full'"
             " AND r.verdict IN ('pass','near_miss')", (target_id,)).fetchall()
         return [dict(r) for r in rows]
+
+    def attempt_detail(self, attempt_id: int) -> dict | None:
+        row = self.conn.execute(
+            "SELECT a.*, k.value_json, k.value_preview, k.derivation FROM attempt a"
+            " JOIN key_candidate k ON k.id=a.key_candidate_id WHERE a.id=?", (attempt_id,)).fetchone()
+        return dict(row) if row else None
 
     def target_info(self, target_id: str) -> dict | None:
         row = self.conn.execute("SELECT * FROM target WHERE id=?", (target_id,)).fetchone()

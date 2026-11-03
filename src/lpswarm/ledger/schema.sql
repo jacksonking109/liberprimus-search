@@ -45,6 +45,7 @@ CREATE TABLE IF NOT EXISTS key_candidate (
     derivation TEXT NOT NULL,          -- e.g. 'wordlist:<name>', 'enumerate', 'synthetic'
     value_hash TEXT NOT NULL,          -- sha256(family, key); same key from two sources = two rows
     value_preview TEXT,
+    value_json TEXT,                   -- full key as canonical JSON when small enough
     edition_id TEXT,
     UNIQUE (value_hash, derivation)
 );

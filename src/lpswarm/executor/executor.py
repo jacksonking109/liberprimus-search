@@ -8,6 +8,7 @@ and work the same on Windows and POSIX.
 """
 from __future__ import annotations
 
+import json
 import threading
 import time
 from dataclasses import dataclass, field
@@ -24,6 +25,7 @@ from lpswarm.ledger import Ledger, dedupe_hash
 from lpswarm.oracle import FullOracle, ScoreReport
 
 PREVIEW_CHARS = 80
+MAX_KEY_JSON = 4096   # keys longer than this (e.g. running-key texts) keep only hash + preview
 
 
 @dataclass
@@ -134,8 +136,10 @@ class Executor:
                         continue
                     if kid is None:
                         preview = kc.label or fam.key_preview(kc.key)
+                        kj = json.dumps(fam.key_json(kc.key), sort_keys=True, separators=(",", ":"))
                         kid = self.ledger.key_candidate_id(khash, kc.derivation, preview,
-                                                           kc.corpus_item_id, kc.edition_id)
+                                                           kc.corpus_item_id, kc.edition_id,
+                                                           kj if len(kj) <= MAX_KEY_JSON else None)
                     ts = time.perf_counter()
                     pt = fam.decrypt(ct, kc.key, n, **params)
                     rep = self.oracle.score(pt, attempt_count=count + 1)

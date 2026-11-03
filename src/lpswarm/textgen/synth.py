@@ -87,6 +87,17 @@ def _make(family: str, length: int, difficulty: str, language: str, alphabet: Al
         key = _window(rng, text, length + RUNNING_KEY_WINDOW)
         params = fam.random_params(rng, length, key)
         extra["key_text_len"] = len(key)
+    elif family == "program":
+        # Resample until the program decrypts unambiguously (a skip symbol produced by
+        # encryption elsewhere would make the answer unrecoverable by design).
+        for attempt in range(100):
+            key = fam.random_key(rng, alphabet.size, difficulty, words=words, length=length)
+            if attempt == 99:
+                key["skip"] = []
+            from lpswarm.programs.spec import roundtrips
+            if roundtrips(pt, key, alphabet.size):
+                break
+        params = {}
     else:
         key = fam.random_key(rng, alphabet.size, difficulty, words=words, length=length)
         params = fam.random_params(rng, length, key)

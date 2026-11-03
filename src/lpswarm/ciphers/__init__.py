@@ -10,12 +10,22 @@ REGISTRY: dict[str, CipherFamily] = {
 }
 
 
+def _register_programs() -> None:
+    # Imported lazily: programs depends on ciphers.base.
+    from lpswarm.programs.family import ProgramFamily
+    REGISTRY.setdefault(ProgramFamily.name, ProgramFamily())
+
+
 def get_family(name: str) -> CipherFamily:
+    if name not in REGISTRY:
+        _register_programs()
     try:
         return REGISTRY[name]
     except KeyError:
         raise ValueError(f"unknown cipher family {name!r}; known: {sorted(REGISTRY)}") from None
 
+
+_register_programs()
 
 __all__ = ["CipherFamily", "DIFFICULTIES", "VARIANTS", "REGISTRY", "get_family",
            "Caesar", "Vigenere", "Autokey", "RunningKey", "Substitution", "Columnar"]

@@ -15,7 +15,7 @@ def _rand_pt(rng, n, L):
 
 
 @pytest.mark.parametrize("alpha", ALPHABETS, ids=lambda a: a.name)
-@pytest.mark.parametrize("name", sorted(REGISTRY))
+@pytest.mark.parametrize("name", sorted(set(REGISTRY) - {"program"}))
 @pytest.mark.parametrize("difficulty", ["easy", "medium", "hard"])
 def test_round_trip(alpha, name, difficulty):
     fam = get_family(name)

@@ -1,6 +1,7 @@
-"""Model router interface (Phase 3). STUB: nothing here calls a model.
+"""Model router types and config loading. Adapters live in adapters.py, the
+router itself in router.py.
 
-Planned shape, so later phases slot in without touching the oracle/ledger:
+Design:
 
   - Model IDs and endpoints live in a config file (see
     config/models.example.toml), never in code.
@@ -55,17 +56,24 @@ class ModelRouter(Protocol):
 
 
 class NullRouter:
-    """Phase 1 router: refuses every call."""
+    """Router that refuses every call (for runs that must not use models)."""
 
     def propose(self, role: Role, context: dict) -> list[Proposal]:
-        raise NotImplementedError("model router is not implemented in Phase 1")
+        raise NotImplementedError("this run has no model router")
 
 
 def load_model_specs(path: str | Path) -> list[ModelSpec]:
     """Parse a models TOML file. Reads no environment variables and opens no connections."""
-    data = tomllib.loads(Path(path).read_text(encoding="utf-8"))
+    from lpswarm.textio import read_text
+    data = tomllib.loads(read_text(path))
     specs = []
     for name, d in data.get("models", {}).items():
+        if "api_key" in d or "key" in d:
+            raise ValueError(f"model {name}: put the NAME of an environment variable in "
+                             "api_key_env; never put a key in the config file")
+        for req in ("provider", "model"):
+            if req not in d:
+                raise ValueError(f"model {name}: missing {req!r}")
         specs.append(ModelSpec(
             name=name, provider=d["provider"], model=d["model"],
             roles=tuple(Role(r) for r in d.get("roles", ["proposer"])),

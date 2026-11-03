@@ -1,0 +1,231 @@
+"""Hypothesis generators.
+
+A generator sees a GenContext (ciphertext, alphabet, statistics, its own past
+proposals with *coarse* verdicts, validation errors) and returns raw cipher
+program specs. It never sees oracle scores, thresholds, or decrypted text.
+
+- RandomProgramGenerator: non-LLM control, samples the program language.
+- LLMGenerator:           asks a model (via the Router) for specs as JSON.
+- ModelRanker:            optional cheap model that orders proposals (weighting role).
+"""
+from __future__ import annotations
+
+import json
+import re
+from collections import Counter
+from dataclasses import dataclass, field
+from typing import Any, Sequence
+
+import numpy as np
+
+from lpswarm.alphabet import Alphabet
+from lpswarm.oracle.signals import index_of_coincidence
+from lpswarm.programs import SEQUENCES
+from lpswarm.programs.sampler import sample_spec
+
+
+@dataclass
+class Feedback:
+    description: str
+    verdict: str          # "fail" | "near_miss" | "pass" | "duplicate:<verdict>" | "invalid"
+
+
+@dataclass
+class GenContext:
+    label: str
+    alphabet: Alphabet
+    ciphertext: np.ndarray
+    round: int
+    k: int
+    history: list[Feedback] = field(default_factory=list)
+    errors: list[str] = field(default_factory=list)
+    already_ruled_out: list[str] = field(default_factory=list)   # e.g. Phase 1 families tried
+    alphabet_values: list[int] | None = None
+
+    def stats(self) -> dict:
+        c = self.ciphertext
+        n = self.alphabet.size
+        counts = np.bincount(c.astype(int), minlength=n)
+        top = sorted(range(n), key=lambda i: -counts[i])[:8]
+        doubles = int(np.sum(c[1:] == c[:-1])) if len(c) > 1 else 0
+        return {"length": int(len(c)), "ic_normalised": round(index_of_coincidence(c, n), 3),
+                "most_common": [(self.alphabet.tokens[i], int(counts[i])) for i in top],
+                "adjacent_doubles": doubles,
+                "expected_doubles_if_random": round((len(c) - 1) / n, 1)}
+
+
+@dataclass
+class RawProposal:
+    spec: Any
+    why: str = ""
+
+
+class RandomProgramGenerator:
+    """Control arm: random specs from the same language the models use."""
+    role = "proposer"
+
+    def __init__(self, seed: int = 0, difficulty: str = "hard", name: str = "random_program"):
+        self.rng = np.random.default_rng(seed)
+        self.difficulty = difficulty
+        self.model = name
+
+    def propose(self, ctx: GenContext) -> list[RawProposal]:
+        n = ctx.alphabet.size
+        return [RawProposal(sample_spec(self.rng, n, None, self.difficulty, len(ctx.ciphertext)))
+                for _ in range(ctx.k)]
+
+
+# ------------------------------------------------------------------ prompting
+LANGUAGE_DOC = """You propose ciphers in a small JSON language. A deterministic program decrypts
+the ciphertext with each proposal and an independent statistical test judges the result.
+You only learn a coarse verdict per proposal: "fail", "near_miss" or "pass".
+
+Decryption of ciphertext symbols c (integers 0..N-1), in this order:
+  1. "transpose": {"columnar": [order]}  undo a columnar transposition (optional)
+  2. "reverse_text": true                 read the text backwards (optional)
+  3. "skip": [symbols]                    ciphertext symbols left as plaintext; the key
+                                          stream does NOT advance there (optional)
+  4. "map": "identity" | "reverse"        reverse maps symbol i to N-1-i before combining
+  5. "combine": "sub" | "add" | "beaufort"  p = c - k | c + k | k - c   (mod N)
+  6. "stream": the key stream k_0, k_1, ... over non-skipped positions, one of
+       {"kind": "constant", "value": 3}
+       {"kind": "repeat", "key": [1, 2, 3]}  or  {"kind": "repeat", "word": "SOMEWORD"}
+       {"kind": "autokey", "primer": [..] or "word": "..", "source": "plaintext"|"ciphertext"}
+       {"kind": "sequence", "name": NAME, "offset": 0, "scale": 1, "add": 0}
+          k_t = (scale * NAME[offset + t] + add) mod N, NAME in: %(sequences)s
+  Optional "offset_range": [lo, hi] (at most 2000 values) tries every start offset of a
+  repeat/sequence stream in one proposal.
+Symbols may be given as integers or as alphabet tokens (strings); words are spelled with tokens.
+"""
+
+SYSTEM_PROMPT = ("You are a cryptanalysis assistant proposing hypotheses for an unsolved "
+                 "historical-style cipher. Be concrete and diverse; do not repeat proposals that "
+                 "already failed. Reply with JSON only.")
+
+
+def build_prompt(ctx: GenContext, max_symbols: int = 300) -> list[dict]:
+    a = ctx.alphabet
+    vals = ctx.alphabet_values
+    table = ", ".join(f"{i}={t}" + (f"({vals[i]})" if vals else "") for i, t in enumerate(a.tokens))
+    shown = ctx.ciphertext[:max_symbols]
+    ct_tokens = " ".join(a.tokens[int(x)] for x in shown)
+    ct_ints = " ".join(str(int(x)) for x in shown)
+    st = ctx.stats()
+    lines = [
+        LANGUAGE_DOC % {"sequences": ", ".join(sorted(SEQUENCES))},
+        f"Alphabet (N={a.size}, index=token" + ("(value)" if vals else "") + f"): {table}",
+        f"Target: {ctx.label}. Length {st['length']} symbols"
+        + (f" (first {len(shown)} shown)" if len(shown) < st["length"] else "") + ".",
+        f"Ciphertext as tokens: {ct_tokens}",
+        f"Ciphertext as integers: {ct_ints}",
+        f"Statistics: {json.dumps(st)}",
+    ]
+    if ctx.already_ruled_out:
+        lines.append("Already searched without success (do not repeat): "
+                     + "; ".join(ctx.already_ruled_out[:30]))
+    if ctx.history:
+        lines.append("Your earlier proposals and verdicts (most recent last):")
+        lines += [f"  - {f.description} -> {f.verdict}" for f in ctx.history[-40:]]
+    if ctx.errors:
+        lines.append("These earlier proposals were invalid and were not run:")
+        lines += [f"  - {e}" for e in ctx.errors[-10:]]
+    lines.append(
+        f'Round {ctx.round}. Propose {ctx.k} NEW, diverse hypotheses as JSON: '
+        '{"proposals": [{"spec": {...}, "why": "one short sentence"}, ...]}')
+    return [{"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": "\n".join(lines)}]
+
+
+_FENCE = re.compile(r"```(?:json)?\s*(.*?)```", re.S)
+
+
+def parse_proposals(text: str) -> tuple[list[RawProposal], list[str]]:
+    """Extract proposals from a model reply. Tolerates code fences and chatter."""
+    errors: list[str] = []
+    candidates = [m.group(1) for m in _FENCE.finditer(text)] + [text]
+    dec = json.JSONDecoder()
+    data = None
+    for chunk in candidates:
+        for i, ch in enumerate(chunk):
+            if ch in "{[":
+                try:
+                    data, _ = dec.raw_decode(chunk[i:])
+                    break
+                except json.JSONDecodeError:
+                    continue
+        if data is not None:
+            break
+    if data is None:
+        return [], ["reply contained no JSON"]
+    if isinstance(data, dict) and "proposals" in data:
+        items = data["proposals"]
+    elif isinstance(data, dict) and "stream" in data:
+        items = [data]
+    elif isinstance(data, list):
+        items = data
+    else:
+        return [], ['expected {"proposals": [...]}']
+    out = []
+    for it in items if isinstance(items, list) else []:
+        if isinstance(it, dict) and "spec" in it:
+            out.append(RawProposal(it["spec"], str(it.get("why", ""))[:200]))
+        elif isinstance(it, dict) and "stream" in it:
+            out.append(RawProposal(it, ""))
+        else:
+            errors.append(f"unrecognised proposal item: {str(it)[:80]}")
+    return out, errors
+
+
+class LLMGenerator:
+    role = "proposer"
+
+    def __init__(self, router, model: str, temperature: float = 0.8, max_tokens: int = 3000):
+        self.router, self.model = router, model
+        self.temperature, self.max_tokens = temperature, max_tokens
+        self.last_errors: list[str] = []
+
+    def propose(self, ctx: GenContext) -> list[RawProposal]:
+        msgs = build_prompt(ctx)
+        c = self.router.complete(self.model, msgs, role="proposer",
+                                 task_id=f"{ctx.label}#r{ctx.round}",
+                                 temperature=self.temperature, max_tokens=self.max_tokens)
+        props, errs = parse_proposals(c.text)
+        self.last_errors = errs
+        return props[: max(ctx.k, 1) * 2]
+
+
+class ModelRanker:
+    """Weighting role: a small model orders proposals by plausibility (0-10)."""
+
+    def __init__(self, router, model: str):
+        self.router, self.model = router, model
+
+    def rank(self, ctx: GenContext, descriptions: Sequence[str]) -> list[int]:
+        if len(descriptions) < 2:
+            return list(range(len(descriptions)))
+        st = ctx.stats()
+        prompt = ("Score each cipher hypothesis 0-10 for how plausible it is for this ciphertext "
+                  f"(length {st['length']}, normalised IC {st['ic_normalised']}, adjacent doubles "
+                  f"{st['adjacent_doubles']} vs {st['expected_doubles_if_random']} expected if "
+                  "random). Reply with JSON {\"scores\": [numbers in the same order]}.\n"
+                  + "\n".join(f"{i}. {d}" for i, d in enumerate(descriptions)))
+        try:
+            c = self.router.complete(self.model, [{"role": "user", "content": prompt}],
+                                     role="weighting", task_id=f"{ctx.label}#rank{ctx.round}",
+                                     temperature=0.0, max_tokens=400)
+            m = re.search(r"\{.*\}", c.text, re.S)
+            scores = json.loads(m.group(0))["scores"] if m else None
+            if not isinstance(scores, list) or len(scores) != len(descriptions):
+                raise ValueError
+            scores = [float(s) for s in scores]
+        except Exception:  # noqa: BLE001 - ranking is best-effort; keep proposal order
+            return list(range(len(descriptions)))
+        return sorted(range(len(descriptions)), key=lambda i: -scores[i])
+
+
+def summarise_ruled_out(rows: Sequence[dict]) -> list[str]:
+    """Compact 'already tried' lines from Ledger.ruled_out rows for one target."""
+    c: Counter = Counter()
+    for r in rows:
+        c[(r["cipher_family"], r["description"])] += int(r["attempts"])
+    return [f"{fam}: {desc} ({n} attempts)" for (fam, desc), n in c.most_common(30)]

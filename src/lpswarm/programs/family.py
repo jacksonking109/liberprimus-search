@@ -1,0 +1,73 @@
+"""The `program` cipher family: a compiled cipher-program spec as the key."""
+from __future__ import annotations
+
+import hashlib
+import json
+from typing import Any
+
+import numpy as np
+
+from lpswarm.ciphers.base import CipherFamily
+from lpswarm.programs import spec as S
+
+
+class ProgramFamily(CipherFamily):
+    """Key = compiled spec (dict with integers only, see programs.spec).
+
+    Params: {"offset": o} when the spec has an offset_range, else {}. Specs must be
+    compiled with `compile_spec` (validated, words resolved) before use.
+    """
+    name = "program"
+    word_keys = False
+
+    def _resolve(self, key: dict, params: dict) -> dict:
+        if not isinstance(key, dict) or key.get("v") != S.SPEC_VERSION:
+            raise ValueError("program key must be a compiled spec (use programs.compile_spec)")
+        if "offset" in params:
+            return S.with_offset(key, params["offset"])
+        return key
+
+    def encrypt(self, pt, key, n, **params):
+        return S.encrypt(pt, self._resolve(key, params), n)
+
+    def decrypt(self, ct, key, n, **params):
+        return S.decrypt(ct, self._resolve(key, params), n)
+
+    def param_grid(self, length, key=None, **limits):
+        if isinstance(key, dict) and key.get("offset_range"):
+            lo, hi = key["offset_range"]
+            return [{"offset": o} for o in range(lo, hi + 1)]
+        return [{}]
+
+    def random_key(self, rng, n, difficulty="medium", words=None, length=None):
+        from lpswarm.programs.sampler import sample_spec
+        raw = sample_spec(rng, n, words, difficulty, length)
+        # Integers only, so any alphabet of size n compiles it identically.
+        return S.compile_spec(raw, _IntAlphabet(n))
+
+    def random_params(self, rng, length, key=None):
+        return {}
+
+    def key_json(self, key: Any) -> Any:
+        return json.loads(S.canonical(key))
+
+    def key_hash(self, key: Any) -> str:
+        payload = json.dumps([self.name, self.key_json(key)], sort_keys=True, separators=(",", ":"))
+        return hashlib.sha256(payload.encode()).hexdigest()
+
+    def key_preview(self, key: Any, max_len: int = 200) -> str:
+        s = S.describe(key)
+        return s if len(s) <= max_len else s[: max_len - 3] + "..."
+
+
+class _IntAlphabet:
+    """Minimal stand-in so integer-only specs compile without a real alphabet."""
+
+    def __init__(self, n: int):
+        self.size = n
+
+    def encode(self, text: str) -> np.ndarray:
+        raise S.SpecError("words are not allowed here; use integer symbols")
+
+    def decode(self, arr) -> str:
+        return " ".join(str(int(x)) for x in arr)

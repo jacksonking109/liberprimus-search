@@ -69,13 +69,15 @@ def test_cli_errors(tmp_path):
         main(["ruled-out", "--ledger", str(tmp_path / "missing.sqlite")])
 
 
-def test_no_network_imports_in_package():
+def test_network_only_in_router_adapters():
+    """Only the model adapters may open connections; everything else stays offline."""
     import pathlib
     import re
     root = pathlib.Path(__file__).resolve().parent.parent / "src" / "lpswarm"
     pat = re.compile(r"^\s*(import|from)\s+(urllib|http|socket|requests|httpx|ssl)\b", re.M)
-    offenders = [p.name for p in root.rglob("*.py") if pat.search(p.read_text(encoding="utf-8"))]
-    assert offenders == []
+    offenders = sorted(str(p.relative_to(root)).replace("\\", "/") for p in root.rglob("*.py")
+                       if pat.search(p.read_text(encoding="utf-8")))
+    assert offenders == ["router/adapters.py"]
 
 
 def test_model_config_parses_without_env():
