@@ -1,5 +1,7 @@
 # lpswarm: Liber Primus research harness (Phase 1)
 
+> **First run on Windows: see [START_HERE.md](START_HERE.md).**
+
 A test bench for attacking unsolved sections of the Cicada 3301 *Liber Primus*. Hobby /
 portfolio proof of concept: a well-documented negative result counts as success.
 
