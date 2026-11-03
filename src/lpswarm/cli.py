@@ -286,7 +286,11 @@ def cmd_doctor(args) -> int:
     models = args.models
     if models is None and Path("config/models.toml").is_file():
         models = "config/models.toml"
-    return print_report(run_checks(models, ping=args.ping))
+    ledgers = list(args.ledger or [])
+    if not ledgers:
+        ledgers = [p for p in ("reports/model_spend.sqlite", "ledger.sqlite", "lp.sqlite")
+                   if Path(p).is_file()]
+    return print_report(run_checks(models, ping=args.ping, ledgers=ledgers))
 
 
 def cmd_ruled_out(args) -> int:
@@ -446,6 +450,8 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--models", help="models TOML (default config/models.toml if present)")
     p.add_argument("--ping", action="store_true",
                    help="send one tiny prompt to each healthy model (costs a little on paid APIs)")
+    p.add_argument("--ledger", nargs="*", help="ledgers to read call counts and pauses from "
+                   "(default: reports/model_spend.sqlite, ledger.sqlite, lp.sqlite if present)")
     p.set_defaults(func=cmd_doctor)
 
     for name, fn in (("ruled-out", cmd_ruled_out), ("leads", cmd_leads)):

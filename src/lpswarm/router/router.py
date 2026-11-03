@@ -16,10 +16,14 @@ from typing import Sequence
 from lpswarm.router.adapters import (AdapterError, CommandAdapter, Completion,
                                      OllamaAdapter, OpenAICompatibleAdapter, ScriptedAdapter)
 from lpswarm.router.base import ModelSpec, Role
+from lpswarm.router.limits import RateLimited
 
 
 class BudgetExceeded(RuntimeError):
     pass
+
+
+SUBSCRIPTION_PROVIDERS = ("claude_code", "codex")
 
 
 def make_adapter(spec: ModelSpec):
@@ -45,6 +49,16 @@ def make_adapter(spec: ModelSpec):
         if not replies:
             raise ValueError(f"model {spec.name}: scripted provider needs replies or replies_file")
         return ScriptedAdapter(spec.name, list(replies))
+    if spec.provider == "claude_code":
+        from lpswarm.router.cli_adapters import ClaudeCodeAdapter
+        return ClaudeCodeAdapter(spec.model, exe=str(x.get("exe", "claude")),
+                                 timeout=float(x.get("timeout", 600)),
+                                 extra_args=list(x.get("extra_args") or []))
+    if spec.provider == "codex":
+        from lpswarm.router.cli_adapters import CodexAdapter
+        return CodexAdapter(spec.model, exe=str(x.get("exe", "codex")),
+                            timeout=float(x.get("timeout", 600)),
+                            extra_args=list(x.get("extra_args") or []))
     if spec.provider == "command":
         return CommandAdapter(spec.model, list(x.get("command") or []),
                               timeout=float(x.get("timeout", 600)))
@@ -66,6 +80,8 @@ class Router:
         self._models: dict[str, _Entry] = {}
         if ledger is None and (global_max_usd is not None or any(s.max_usd is not None for s in specs)):
             raise ValueError("USD caps need a ledger to count spending; pass ledger=...")
+        if ledger is None and any(s.extra.get("max_calls_per_window") for s in specs):
+            raise ValueError("max_calls_per_window needs a ledger to count calls; pass ledger=...")
         for s in specs:
             if (s.provider == "openai_compatible" and s.max_usd is not None
                     and not s.extra.get("price_in_per_mtok") and not s.extra.get("price_out_per_mtok")):
@@ -109,6 +125,33 @@ class Router:
         if self.global_max_usd is not None and self.spent() >= self.global_max_usd:
             raise BudgetExceeded(f"global model budget of ${self.global_max_usd:.2f} reached")
 
+    def window_status(self, name: str, now: float | None = None) -> dict:
+        """Calls in the current rolling window, the cap, and any active pause."""
+        now = time.time() if now is None else now
+        spec = self.spec(name)
+        hours = float(spec.extra.get("window_hours", 5))
+        cap = spec.extra.get("max_calls_per_window")
+        calls = self.ledger.calls_since(name, now - hours * 3600) if self.ledger is not None else []
+        paused = self.ledger.active_limit(name, now) if self.ledger is not None else None
+        return {"window_hours": hours, "calls": len(calls), "cap": cap, "paused_until": paused,
+                "oldest_call": calls[0] if calls else None}
+
+    def _check_limits(self, name: str) -> None:
+        """Raise RateLimited if a recorded limit is active or the local window cap is full."""
+        if self.ledger is None:
+            return
+        now = time.time()
+        until = self.ledger.active_limit(name, now)
+        if until is not None:
+            raise RateLimited(name, until, "usage limit reported by the CLI")
+        st = self.window_status(name, now)
+        cap = st["cap"]
+        if cap and st["calls"] >= int(cap):
+            resume = st["oldest_call"] + st["window_hours"] * 3600 + 5
+            self.ledger.add_rate_limit_event(name, now, resume, "window", False,
+                                             f"{st['calls']} calls in {st['window_hours']}h (cap {cap})")
+            raise RateLimited(name, resume, f"local cap of {cap} calls per {st['window_hours']:g}h")
+
     def complete(self, name: str, messages: Sequence[dict], role: Role | str,
                  task_id: str | None = None, temperature: float = 0.7,
                  max_tokens: int = 2048) -> Completion:
@@ -118,6 +161,7 @@ class Router:
         if Role(role) not in entry.spec.roles:
             raise ValueError(f"model {name} is not configured for role {Role(role).value}")
         self._check_budget(name)
+        self._check_limits(name)
         last: AdapterError | None = None
         c: Completion | None = None
         for attempt in range(self.retries + 1):
@@ -126,6 +170,15 @@ class Router:
                 break
             except AdapterError as exc:
                 last = exc
+                if getattr(exc, "rate_limited", False):
+                    now = time.time()
+                    if self.ledger is not None:
+                        self.ledger.add_rate_limit_event(name, now, exc.resume_at, "reply",
+                                                         getattr(exc, "parsed", False), str(exc))
+                    raise RateLimited(name, exc.resume_at,
+                                      "usage limit reported by the CLI"
+                                      + ("" if getattr(exc, "parsed", False)
+                                         else " (no reset time given; cool-down)")) from None
                 if not exc.transient:
                     break  # e.g. 400/401/404: retrying cannot help
                 if attempt < self.retries:
@@ -139,5 +192,5 @@ class Router:
         return c
 
 
-__all__ = ["AdapterError", "BudgetExceeded", "Completion", "Router", "ScriptedAdapter",
-           "make_adapter"]
+__all__ = ["AdapterError", "BudgetExceeded", "Completion", "RateLimited", "Router",
+           "SUBSCRIPTION_PROVIDERS", "ScriptedAdapter", "make_adapter"]

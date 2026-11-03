@@ -102,6 +102,38 @@ lpswarm tiertest --models config\models.toml `
   `random_program:40` (non-overlapping CIs, or the same result over several seeds via
   `--seed`) and is reasonable per dollar compared with `baseline` and `random_program:2000`.
 
+## 4b. Claude Code and Codex on your subscription plans
+
+The `claude_code` and `codex` providers run the official CLIs signed in with your own account,
+so calls use your plan's included usage, not API billing:
+
+- Only the unmodified CLI is run; lpswarm never reads or stores its login.
+- Each call runs in a fresh empty temp folder. Claude Code runs with tools off, Codex in a
+  read-only sandbox, so they answer as chat models and cannot touch the repo, ledger or oracle.
+- `ANTHROPIC_API_KEY` / `OPENAI_API_KEY` / `CODEX_API_KEY` are removed from the CLI's
+  environment, so a key you have set for other tools never switches these calls to API billing.
+- Anthropic's docs say subscription limits assume "ordinary, individual usage"; keep runs small.
+  Codex: check OpenAI's current terms for automated `codex exec` use before enabling it.
+
+Usage limits (the 5-hour windows):
+- lpswarm counts its own calls per model in a rolling window (`window_hours`, default 5) and
+  pauses when `max_calls_per_window` is reached, until the oldest call ages out.
+- When the CLI replies that a usage limit was hit, lpswarm records the reset time (from the
+  message, or a 30-minute cool-down if none is given) and pauses that model until then.
+- While one model is paused, other generators keep working; if all are paused, the run waits
+  (create `STOP` to end it). `wait_on_rate_limit = false` in a `[swarm]` config section stops instead.
+- Both are stored in the ledger, so they carry over between runs. The real limit is shared with
+  your other use of the plan (chat, IDE), which lpswarm cannot see.
+- `lpswarm doctor` shows calls in the current window and any active pause per model.
+
+```powershell
+claude                 # sign in once (interactive), then exit
+.\.venv\Scripts\lpswarm.exe doctor --ping   # one tiny real call per model
+.\.venv\Scripts\lpswarm.exe tiertest --models config\models.toml --arms claude-code --cases 3 --out reports\tier-claude
+```
+
+With 5 rounds per case, 3 cases at 2 lengths is about 30 calls: inside one 40-call window.
+
 ## 5. Real sections (optional, after the tier test)
 
 ```powershell

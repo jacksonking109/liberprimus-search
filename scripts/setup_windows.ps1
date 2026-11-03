@@ -182,6 +182,19 @@ if ((Test-Path $ModelsToml) -and -not $Force) {
             "model = `"$rankerTag`"", 'roles = ["weighting", "triage"]', "json_mode = true", "timeout = 120",
             "options = { num_ctx = 8192 }", "")
     }
+    if (Get-Command claude -ErrorAction SilentlyContinue) {
+        $lines += @("# Claude Code on your plan (tools off, temp folder, API keys ignored). Sign in once: claude",
+            "[models.claude-code]", 'provider = "claude_code"', 'model = "sonnet"', 'roles = ["proposer"]',
+            "max_calls_per_window = 40", "window_hours = 5", "timeout = 600", "")
+        Write-Step "OK" "found Claude Code; added model claude-code (40 calls per 5h cap)"
+    } else {
+        $lines += @("# Claude Code not found when this file was generated. Install it, sign in, then uncomment:",
+            "# [models.claude-code]", '# provider = "claude_code"', '# model = "sonnet"', '# roles = ["proposer"]',
+            "# max_calls_per_window = 40", "# window_hours = 5", "")
+    }
+    $lines += @("# Codex on your ChatGPT plan: check OpenAI's terms for automated codex exec use, then uncomment.",
+        "# [models.codex]", '# provider = "codex"', '# model = "default"', '# roles = ["proposer"]',
+        "# max_calls_per_window = 30", "# window_hours = 5", "# timeout = 600", "")
     $lines += @("[models.dry]", 'provider = "scripted"', 'model = "dry"', 'roles = ["proposer", "weighting"]',
         "replies = ['{`"proposals`": [{`"spec`": {`"stream`": {`"kind`": `"sequence`", `"name`": `"primes`"}, `"combine`": `"sub`"}, `"why`": `"dry run`"}]}']",
         "")
@@ -210,6 +223,7 @@ Write-Host "`n== Next steps" -ForegroundColor Cyan
 $arms = @("baseline", "random_program:40", "random_program:2000")
 if ($proposerTag) { $arms += "qwen-local" }
 if ($extraTag) { $arms += "gemma-local" }
+$hasClaudeModel = (Test-Path $ModelsToml) -and (Select-String -Path $ModelsToml -Pattern '^\[models\.claude-code\]' -Quiet)
 $rankerFlag = ""
 if ($rankerTag) { $rankerFlag = " --ranker granite" }
 Write-Host @"
@@ -227,6 +241,14 @@ To add DeepSeek:
 
 More: docs\phase3_runbook.md
 "@
+
+if ($hasClaudeModel) {
+    Write-Host @"
+Claude Code on your plan (paces itself to the call cap; pauses at usage limits).
+Sign in once by running: claude    then:
+    .\.venv\Scripts\lpswarm.exe tiertest --models config\models.toml --arms claude-code --lengths 80,160 --cases 3 --out reports\tier-claude
+"@
+}
 
 if ($script:Problems.Count -gt 0) {
     Write-Host "`nFinished with $($script:Problems.Count) problem(s):" -ForegroundColor Yellow

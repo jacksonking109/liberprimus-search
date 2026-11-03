@@ -98,6 +98,18 @@ CREATE TABLE IF NOT EXISTS final_check (
     checked_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
+-- Usage limits hit by subscription CLIs; a model is paused until resume_at.
+CREATE TABLE IF NOT EXISTS rate_limit_event (
+    id INTEGER PRIMARY KEY,
+    model TEXT NOT NULL,
+    hit_at REAL NOT NULL,              -- epoch seconds
+    resume_at REAL NOT NULL,           -- epoch seconds
+    source TEXT NOT NULL,              -- 'reply' (CLI said so) or 'window' (local call cap)
+    parsed INTEGER NOT NULL DEFAULT 0, -- 1 if the reset time came from the CLI's message
+    message TEXT
+);
+CREATE INDEX IF NOT EXISTS rate_limit_model ON rate_limit_event(model, resume_at);
+
 CREATE TABLE IF NOT EXISTS budget_event (
     id INTEGER PRIMARY KEY,
     vendor TEXT NOT NULL,

@@ -19,6 +19,7 @@ from lpswarm.ledger import Ledger
 from lpswarm.oracle import FullOracle
 from lpswarm.programs import SpecError, compile_spec, describe, expand, spec_hash
 from lpswarm.router.adapters import AdapterError
+from lpswarm.router.limits import RateLimited
 from lpswarm.router.router import BudgetExceeded
 from lpswarm.swarm.generators import Feedback, GenContext, summarise_tried
 
@@ -31,6 +32,7 @@ class SwarmConfig:
     timeout_s: float | None = None
     stop_file: str | None = "STOP"
     stop_on_pass: bool = True
+    wait_on_rate_limit: bool = True       # pause until a usage limit resets (else stop)
 
     def __post_init__(self) -> None:
         if self.rounds < 1 or self.per_round < 1:
@@ -89,8 +91,12 @@ def run_swarm(target: Target, ledger: Ledger, oracle: FullOracle, generators: Se
     def time_left() -> float | None:
         return None if cfg.timeout_s is None else max(0.0, cfg.timeout_s - (time.monotonic() - t0))
 
-    for rnd in range(1, cfg.rounds + 1):
+    rnd = 0
+    while rnd < cfg.rounds:
+        rnd += 1
         rounds_run = rnd
+        limited: dict[str, float] = {}
+        proposed_this_round = 0
         for gen in generators:
             if stop_path is not None and stop_path.exists():
                 stopped = "stop_file"
@@ -108,6 +114,12 @@ def run_swarm(target: Target, ledger: Ledger, oracle: FullOracle, generators: Se
                              task_id=target.label)
             try:
                 raws = gen.propose(ctx)
+                proposed_this_round += 1
+            except RateLimited as exc:
+                limited[gen.model] = exc.resume_at
+                if progress:
+                    print(f"  [{gen.model}] {exc}", flush=True)
+                continue
             except BudgetExceeded as exc:
                 stopped = f"budget: {exc}"
                 break
@@ -199,5 +211,35 @@ def run_swarm(target: Target, ledger: Ledger, oracle: FullOracle, generators: Se
         if cfg.stop_on_pass and any(st.passes for st in stats.values()):
             stopped = "pass_found"
             break
+        if limited and proposed_this_round == 0:
+            # Every generator is paused by a usage limit: wait (no deadline) or stop.
+            resume = min(limited.values())
+            if not cfg.wait_on_rate_limit:
+                stopped = "rate_limited"
+                break
+            stopped = _wait_until(resume, stop_path, time_left, progress)
+            if stopped:
+                break
+            rnd -= 1   # the round produced nothing; do not count it
     final = final_check(ledger, oracle, tid)
     return SwarmResult(tid, rounds_run, stopped, stats, final, time.monotonic() - t0)
+
+
+def _wait_until(resume_at: float, stop_path, time_left, progress: bool) -> str | None:
+    """Sleep until resume_at, checking the STOP file and the run timeout every 30 s."""
+    from datetime import datetime
+    if progress:
+        print(f"all generators are paused by usage limits; waiting until "
+              f"{datetime.fromtimestamp(resume_at):%Y-%m-%d %H:%M} (create a STOP file to end)",
+              flush=True)
+    while True:
+        now = time.time()
+        if now >= resume_at:
+            return None
+        if stop_path is not None and stop_path.exists():
+            return "stop_file"
+        left = time_left()
+        if left is not None and left <= 0:
+            return "timeout"
+        step = min(30.0, resume_at - now) if left is None else min(30.0, resume_at - now, left)
+        time.sleep(max(0.5, step))

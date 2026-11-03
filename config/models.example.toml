@@ -68,11 +68,39 @@ model = "dry"
 roles = ["proposer", "weighting"]
 replies = ['{"proposals": [{"spec": {"stream": {"kind": "sequence", "name": "primes"}, "combine": "sub"}, "why": "dry run"}]}']
 
-# Any CLI that reads a prompt on stdin and prints the reply, e.g. a coding-assistant
-# CLI in non-interactive mode. Uses that tool's own login; no tokens or cost are tracked.
-# [models.cli-assistant]
-# provider = "command"
-# model = "cli-assistant"
-# command = ["claude", "-p"]
+# ---- Subscription CLIs (use your plan, not API billing) ---------------------------
+# Runs the official, unmodified CLI signed in with your own account, as a chat model:
+# fresh empty temp folder per call, tools off (Claude Code) / read-only sandbox (Codex),
+# API-key env vars removed so calls always use the plan. The harness never reads or
+# stores the CLI's login. Sign in once in a terminal first (`claude`, `codex login`).
+#
+# Usage limits: the harness counts its own calls per rolling window and pauses at
+# max_calls_per_window; when the CLI reports a usage limit it pauses until the reset
+# (or a 30 min cool-down if no time is given). Your other use of the plan (chat, IDE)
+# shares the same real limit, so keep the cap modest. Check status: lpswarm doctor
+#
+# [models.claude-code]
+# provider = "claude_code"
+# model = "sonnet"                 # alias or full model name; "default" = your CLI default
 # roles = ["proposer"]
+# max_calls_per_window = 40
+# window_hours = 5
 # timeout = 600
+#
+# Codex: check OpenAI's current terms for automated use of `codex exec` with a
+# ChatGPT plan before enabling.
+# [models.codex]
+# provider = "codex"
+# model = "default"                # or a model name accepted by `codex -m`
+# roles = ["proposer"]
+# max_calls_per_window = 30
+# window_hours = 5
+# timeout = 600
+
+# Any other CLI that reads a prompt on stdin and prints the reply (no isolation,
+# no usage tracking; prefer the providers above for Claude Code and Codex).
+# [models.other-cli]
+# provider = "command"
+# model = "other-cli"
+# command = ["some-cli", "--flag"]
+# roles = ["proposer"]

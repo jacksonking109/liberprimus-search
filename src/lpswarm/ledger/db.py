@@ -259,6 +259,27 @@ class Ledger:
             " VALUES (?,?,?,?,?,?)", (vendor, model, tokens_in, tokens_out, usd, task_id))
         return int(cur.lastrowid)
 
+    def add_rate_limit_event(self, model: str, hit_at: float, resume_at: float, source: str,
+                             parsed: bool = False, message: str | None = None) -> None:
+        self.conn.execute("INSERT INTO rate_limit_event (model, hit_at, resume_at, source, parsed,"
+                          " message) VALUES (?,?,?,?,?,?)",
+                          (model, hit_at, resume_at, source, int(parsed), (message or "")[:500]))
+        self.conn.commit()
+
+    def active_limit(self, model: str, now: float) -> float | None:
+        """Latest resume time for a model if it is still in the future."""
+        row = self.conn.execute("SELECT MAX(resume_at) FROM rate_limit_event WHERE model=?",
+                                (model,)).fetchone()
+        return float(row[0]) if row and row[0] is not None and row[0] > now else None
+
+    def calls_since(self, model: str, since_epoch: float) -> list[float]:
+        """Epoch times of this model's logged calls since `since_epoch`, oldest first."""
+        rows = self.conn.execute(
+            "SELECT CAST(strftime('%s', created_at) AS REAL) FROM budget_event"
+            " WHERE model=? AND CAST(strftime('%s', created_at) AS REAL) >= ? ORDER BY id",
+            (model, since_epoch)).fetchall()
+        return [float(r[0]) for r in rows]
+
     # ---------------------------------------------------------------- queries
     def counts(self) -> dict[str, int]:
         return {t: int(self.conn.execute(f"SELECT COUNT(*) FROM {t}").fetchone()[0])

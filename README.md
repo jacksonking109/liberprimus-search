@@ -217,7 +217,7 @@ thresholds or decrypted text.
 | Piece | Where |
 | --- | --- |
 | Cipher-program language, sequences, sampler | `src/lpswarm/programs/` |
-| Router + adapters (Ollama, OpenAI-compatible/DeepSeek, command, scripted), USD caps | `src/lpswarm/router/` |
+| Router + adapters (Ollama, OpenAI-compatible/DeepSeek, Claude Code and Codex on your plan, command, scripted), USD caps, usage-window pacing | `src/lpswarm/router/` |
 | Generators (LLM, random control, ranker) and the swarm loop | `src/lpswarm/swarm/` |
 | Tier test (baseline vs random vs models on held-out program ciphers) | `src/lpswarm/validation/tiertest.py` |
 

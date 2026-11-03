@@ -28,7 +28,7 @@ def _tag_present(tag: str, available: list[str]) -> bool:
 
 
 def run_checks(models_config: str | None = None, ping: bool = False,
-               data_root: str | Path = ".") -> list[Check]:
+               data_root: str | Path = ".", ledgers: list[str] | None = None) -> list[Check]:
     out: list[Check] = []
     v = sys.version_info
     out.append(Check(OK if v >= (3, 11) else FAIL, "python", f"{v.major}.{v.minor}.{v.micro}"))
@@ -93,6 +93,35 @@ def run_checks(models_config: str | None = None, ping: bool = False,
                 continue
             out.append(Check(OK, label, f"key in {s.api_key_env}, prices set, cap "
                                         f"{'$%.2f' % s.max_usd if s.max_usd is not None else 'none'}"))
+        elif s.provider in ("claude_code", "codex"):
+            from lpswarm.router.cli_adapters import ClaudeCodeAdapter, CodexAdapter, cli_version
+            exe = str(s.extra.get("exe", "claude" if s.provider == "claude_code" else "codex"))
+            ver = cli_version(exe)
+            if ver is None:
+                out.append(Check(FAIL, label, f"'{exe}' not found on PATH (install it and sign in)"))
+                continue
+            drop = ClaudeCodeAdapter.DROP_ENV if s.provider == "claude_code" else CodexAdapter.DROP_ENV
+            ignored = [k for k in drop if os.environ.get(k)]
+            note = (f"; {', '.join(ignored)} is set but is removed for this model, so calls use "
+                    "your plan" if ignored else "")
+            cap = s.extra.get("max_calls_per_window")
+            out.append(Check(OK, label, f"{exe} {ver}; plan sign-in (not checked without --ping); "
+                                        f"cap {cap or 'none'} calls per "
+                                        f"{s.extra.get('window_hours', 5)}h{note}"))
+            for lpath in ledgers or []:
+                if not Path(lpath).is_file():
+                    continue
+                from lpswarm.ledger import Ledger
+                from lpswarm.router import Router
+                with Ledger(lpath) as led:
+                    st = Router([s], ledger=led).window_status(s.name)
+                when = ""
+                if st["paused_until"]:
+                    from datetime import datetime
+                    when = f"; PAUSED until {datetime.fromtimestamp(st['paused_until']):%Y-%m-%d %H:%M}"
+                out.append(Check(WARN if st["paused_until"] else OK, f"usage {s.name}",
+                                 f"{st['calls']} call(s) in the last {st['window_hours']:g}h "
+                                 f"(cap {cap or 'none'}) in {lpath}{when}"))
         elif s.provider == "command":
             cmd = list(s.extra.get("command") or [])
             exe = shutil.which(cmd[0]) if cmd else None
