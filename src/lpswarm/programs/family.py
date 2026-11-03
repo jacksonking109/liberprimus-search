@@ -31,8 +31,21 @@ class ProgramFamily(CipherFamily):
     def encrypt(self, pt, key, n, **params):
         return S.encrypt(pt, self._resolve(key, params), n)
 
-    def decrypt(self, ct, key, n, **params):
-        return S.decrypt(ct, self._resolve(key, params), n)
+    def decrypt(self, ct, key, n, lm=None, **params):
+        spec = self._resolve(key, params)
+        if spec.get("skip_mode") == "resolve":
+            if lm is None:
+                raise ValueError('skip_mode "resolve" needs a language model (lm=bigram table)')
+            from lpswarm.programs.resolve import resolve_decrypt
+            return resolve_decrypt(ct, spec, n, lm)
+        return S.decrypt(ct, spec, n)
+
+    def null_variant(self, key) -> str | None:
+        """Attempts whose decryption is optimised for English (skip resolution) must be
+        judged against nulls produced by the same search."""
+        if isinstance(key, dict) and key.get("skip_mode") == "resolve":
+            return "skipdp:" + ",".join(str(int(x)) for x in key["skip"])
+        return None
 
     def param_grid(self, length, key=None, **limits):
         return [{}]

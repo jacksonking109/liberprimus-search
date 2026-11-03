@@ -67,6 +67,7 @@ class OracleConfig:
     dict_weight: float = 1.0
     word_weight: float = 1.0            # weight of the word-break signal (used only with breaks)
     word_min_words: int = 3             # fewer words than this: breaks are ignored
+    variant_null_samples: int = 1000    # per null type, for search-optimised decryptions
     dict_min_len: int = 3
     dict_max_len: int = 12
     dict_size: int = 5000
@@ -93,6 +94,8 @@ class OracleConfig:
             bad("order must be >= 1")
         if self.smoothing <= 0:
             bad("smoothing must be > 0")
+        if self.variant_null_samples < 100:
+            bad("variant_null_samples must be >= 100")
         if self.null_samples < 100:
             bad(f"null_samples must be >= 100, got {self.null_samples}")
         if not 1 <= self.dict_min_len <= self.dict_max_len:
@@ -139,6 +142,7 @@ class ScoreReport:
     alpha_eff: float = 0.0
     unreachable: bool = False         # threshold above the best score any text could get
     word_score: float | None = None   # share of symbols in dictionary words, given word breaks
+    null_variant: str | None = None   # which null calibration judged this (e.g. skip resolution)
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -323,12 +327,53 @@ class FullOracle:
         """Candidates longer than max_score_length are scored on a prefix of this length."""
         return min(int(length), self.cfg.max_score_length)
 
-    def calibrate(self, length: int, breaks=None) -> _NullSet:
+    def bigram_table(self) -> np.ndarray:
+        """(N, N) log P(next | previous) of the first configured language (used by
+        search-based decryptions such as skip resolution)."""
+        lang = self.cfg.languages[0]
+        screen = self._models[lang][0]
+        if screen.order != 2:
+            raise ValueError("bigram table needs an n-gram order of at least 2")
+        n = self.alphabet.size
+        return screen.logprob.reshape(n, n)
+
+    def _variant_transform(self, variant: str, length: int, rng: np.random.Generator):
+        """Null samples for search-optimised decryptions: each base null sample is used
+        as ciphertext and decrypted by the same search under a random (wrong) key."""
+        if not variant.startswith("skipdp:"):
+            raise ValueError(f"unknown null variant {variant!r}")
+        from lpswarm.programs.resolve import resolve_decrypt
+        from lpswarm.programs.sequences import SEQUENCES
+        skip = [int(x) for x in variant.split(":", 1)[1].split(",") if x != ""]
+        n = self.alphabet.size
+        bigram = self.bigram_table()
+        names = sorted(SEQUENCES)
+
+        def transform(x: np.ndarray) -> np.ndarray:
+            u = rng.random()
+            if u < 0.2:
+                stream = {"kind": "constant", "value": int(rng.integers(0, n))}
+            elif u < 0.6:
+                stream = {"kind": "repeat", "key": [int(v) for v in rng.integers(0, n, int(rng.integers(2, 14)))],
+                          "offset": 0}
+            else:
+                stream = {"kind": "sequence", "name": names[int(rng.integers(len(names)))],
+                          "offset": int(rng.integers(0, 50)), "scale": int(rng.integers(1, n)),
+                          "add": int(rng.integers(0, n))}
+            spec = {"v": 1, "combine": ("sub", "add", "beaufort")[int(rng.integers(3))],
+                    "map": "reverse" if rng.random() < 0.3 else "identity", "reverse_text": False,
+                    "skip": skip, "skip_mode": "resolve", "transpose": None, "stream": stream,
+                    "offset_range": None}
+            return resolve_decrypt(x, spec, n, bigram)
+        return transform
+
+    def calibrate(self, length: int, breaks=None, variant: str | None = None) -> _NullSet:
         """Null distributions for candidates of this length (and word-break pattern:
-        every null sample is scored with the same breaks as the target)."""
+        every null sample is scored with the same breaks as the target; and null
+        variant: search-optimised decryptions get nulls from the same search)."""
         length = self.scored_length(length)
         bk = self.normalise_breaks(length, breaks)
-        key = (length, bk)
+        key = (length, bk, variant)
         if key in self._cache:
             return self._cache[key]
         spans = word_spans(length, bk) if bk else None
@@ -343,9 +388,13 @@ class FullOracle:
         pooled: dict[str, list[float]] = {"screen": [], "ic": [], "ngram": [], "dict": [],
                                           "combined": []}
         n = self.alphabet.size
+        transform = self._variant_transform(variant, length, rng) if variant else None
+        count = self.cfg.variant_null_samples if variant else None
         for kind in self.cfg.null_types:
             sc, cb = [], []
-            for arr in self._null_samples(length, kind, rng):
+            for arr in self._null_samples(length, kind, rng, count=count):
+                if transform is not None:
+                    arr = transform(arr)
                 s = self._screen(arr)
                 c, _, ng, dc, _wd = self._full(arr, spans)
                 sc.append(s)
@@ -397,26 +446,28 @@ class FullOracle:
             return self.cfg.alpha / (i * (i + 1.0))
         return self.cfg.alpha / i
 
-    def final_threshold(self, length: int, total_attempts: int,
-                        breaks=None) -> tuple[float, float]:
+    def final_threshold(self, length: int, total_attempts: int, breaks=None,
+                        variant: str | None = None) -> tuple[float, float]:
         """(alpha_eff, threshold) for the end-of-search Bonferroni check over all attempts."""
         length = self.scored_length(length)
-        ns = self.calibrate(length, breaks)
+        ns = self.calibrate(length, breaks, variant)
         a = self.cfg.alpha if self.cfg.multiple_comparisons == "none" \
             else self.cfg.alpha / max(1, int(total_attempts))
         return a, max(self._upper_quantile(v, a) for v in ns.combined.values())
 
-    def threshold(self, length: int, attempt_count: int = 1, breaks=None) -> float:
-        ns = self.calibrate(self.scored_length(length), breaks)
+    def threshold(self, length: int, attempt_count: int = 1, breaks=None,
+                  variant: str | None = None) -> float:
+        ns = self.calibrate(self.scored_length(length), breaks, variant)
         a = self.alpha_eff(attempt_count)
         return max(self._upper_quantile(v, a) for v in ns.combined.values())
 
     # ------------------------------------------------------------------ score
-    def score(self, arr: np.ndarray, attempt_count: int = 1, breaks=None) -> ScoreReport:
+    def score(self, arr: np.ndarray, attempt_count: int = 1, breaks=None,
+              variant: str | None = None) -> ScoreReport:
         arr = np.asarray(arr, dtype=np.int16)[: self.cfg.max_score_length]
         L = len(arr)
         bk = self.normalise_breaks(L, breaks)
-        ns = self.calibrate(L, bk)
+        ns = self.calibrate(L, bk, variant)
         s = self._screen(arr)
         a_eff = self.alpha_eff(attempt_count)
         thr = max(self._upper_quantile(v, a_eff) for v in ns.combined.values())
@@ -424,7 +475,7 @@ class FullOracle:
         if s < ns.screen_threshold:
             return ScoreReport(L, "screen", FAIL, False, s, ns.screen_threshold,
                                threshold=thr, attempt_count=attempt_count, alpha_eff=a_eff,
-                               unreachable=unreachable)
+                               unreachable=unreachable, null_variant=variant)
         comb, lang, ng, dc, wd = self._full(arr, word_spans(L, bk) if bk else None)
         ic = index_of_coincidence(arr, self.alphabet.size)
         lm = None
@@ -446,7 +497,7 @@ class FullOracle:
             verdict = FAIL
         return ScoreReport(L, "full", verdict, verdict == PASS, s, ns.screen_threshold, ic, ng, dc,
                            lm, comb, lang, thr, thr0, null_pct, pct, attempt_count, a_eff,
-                           unreachable, wd)
+                           unreachable, wd, variant)
 
 
 class CoarseOracle:
@@ -466,7 +517,8 @@ def fpr_tolerance(alpha: float, n_test: int, n_calib: int, sigmas: float = 3.0) 
 
 
 def null_fpr_check(oracle: FullOracle, lengths: Sequence[int], samples: int = 2000,
-                   seed: int = 12345, breaks_by_length: dict | None = None) -> dict:
+                   seed: int = 12345, breaks_by_length: dict | None = None,
+                   variant: str | None = None) -> dict:
     """Measure false-positive rate on *fresh* nulls (different seed from calibration)
     at the unadjusted alpha (attempt_count=1).
 
@@ -480,15 +532,20 @@ def null_fpr_check(oracle: FullOracle, lengths: Sequence[int], samples: int = 20
     cfg = oracle.cfg
     for L in lengths:
         bk = (breaks_by_length or {}).get(L)
-        oracle.calibrate(L, bk)
+        oracle.calibrate(L, bk, variant)
         rng = np.random.default_rng([seed, L, 0xF00D])
-        tol = fpr_tolerance(cfg.alpha, samples, cfg.null_samples)
+        transform = oracle._variant_transform(variant, L, rng) if variant else None
+        tol = fpr_tolerance(cfg.alpha, samples,
+                            cfg.variant_null_samples if variant else cfg.null_samples)
         worst = 0.0
         ok_all = True
         for kind in cfg.null_types:
             arrs = oracle._null_samples(L, kind, rng, count=samples)
+            if transform is not None:
+                arrs = [transform(x) for x in arrs]
             hits = sum(1 for arr in arrs
-                       if _passes_unadjusted(oracle.score(arr, attempt_count=1, breaks=bk)))
+                       if _passes_unadjusted(oracle.score(arr, attempt_count=1, breaks=bk,
+                                                          variant=variant)))
             fpr = hits / len(arrs)
             lo, hi = wilson(hits, len(arrs))
             ok = fpr <= cfg.alpha + tol

@@ -85,6 +85,7 @@ CREATE TABLE IF NOT EXISTS result (
     alpha_eff REAL NOT NULL,
     unreachable INTEGER NOT NULL DEFAULT 0,  -- threshold above the best possible score
     word_score REAL,                   -- share of symbols in dictionary words (with breaks)
+    null_variant TEXT,                 -- null calibration used (e.g. skip resolution), NULL = standard
     plaintext_preview TEXT
 );
 CREATE INDEX IF NOT EXISTS result_verdict ON result(verdict);

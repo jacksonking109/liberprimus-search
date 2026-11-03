@@ -530,3 +530,52 @@ def test_structured_schema_reaches_ollama(stub):
     r2 = Router([spec_off], ledger=led)
     LLMGenerator(r2, "q2").propose(GenContext("t", A, case.ciphertext, 1, 3))
     assert _Stub.seen[-1][2]["format"] == "json"
+
+
+# ------------------------------------------------------ skip resolution (item 4)
+def test_skip_mode_validation_and_identity():
+    base = {"stream": {"kind": "sequence", "name": "primes"}, "skip": [5]}
+    assert "skip_mode" not in compile_spec(base, A)                      # old identity kept
+    assert compile_spec({**base, "skip_mode": "resolve"}, A)["skip_mode"] == "resolve"
+    for bad in ({**base, "skip_mode": "maybe"},
+                {"stream": {"kind": "constant", "value": 1}, "skip_mode": "resolve"},
+                {"stream": {"kind": "autokey", "primer": [1]}, "skip": [5], "skip_mode": "resolve"}):
+        with pytest.raises(SpecError):
+            compile_spec(bad, A)
+
+
+def test_resolve_recovers_ambiguous_skips(oracle):
+    from lpswarm.ciphers import get_family
+    from lpswarm.programs.resolve import resolve_decrypt
+    bigram = oracle.bigram_table()
+    fam = get_family("program")
+    better = 0
+    for seed in range(6):
+        case = heldout_cases(["caesar"], [200], 1, seed=seed)[0]
+        pt = case.plaintext
+        spec = compile_spec({"stream": {"kind": "sequence", "name": "primes", "offset": seed},
+                             "combine": "sub", "skip": [5]}, A)            # 5 = 'F'
+        ct = encrypt(pt, spec, 26)
+        naive = decrypt(ct, spec, 26)
+        resolved = resolve_decrypt(ct, {**spec, "skip_mode": "resolve"}, 26, bigram)
+        assert (resolved == pt).mean() >= (naive == pt).mean()
+        if (naive == pt).mean() < 0.9 and (resolved == pt).mean() >= 0.95:
+            better += 1
+    assert better >= 1   # at least one case where 'every F literal' desyncs and resolution fixes it
+    with pytest.raises(ValueError, match="language model"):
+        fam.decrypt(ct, compile_spec({"stream": {"kind": "constant", "value": 1}, "skip": [5],
+                                      "skip_mode": "resolve"}, A), 26)
+
+
+def test_executor_uses_variant_nulls_for_resolved_specs(oracle):
+    case = heldout_cases(["caesar"], [80], 1, seed=2)[0]
+    led = Ledger()
+    h = led.add_hypothesis("program", "x", "t", "proposer")
+    spec = compile_spec({"stream": {"kind": "constant", "value": int(case.key)}, "combine": "sub",
+                         "skip": [25], "skip_mode": "resolve"}, A)
+    Executor(led, oracle, stop_file=None).run(Target(A, case.ciphertext, "v", is_synthetic=True),
+                                              h, "program", ExplicitKeys([spec]))
+    assert led.conn.execute("SELECT null_variant FROM result").fetchone()[0] == "skipdp:25"
+    from lpswarm.executor import final_check
+    rows = final_check(led, oracle, led.targets()[0]["id"])
+    assert rows and rows[0]["null_variant"] == "skipdp:25"

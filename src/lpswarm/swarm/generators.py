@@ -86,6 +86,10 @@ Decryption of ciphertext symbols c (integers 0..N-1), in this order:
   2. "reverse_text": true                 read the text backwards (optional)
   3. "skip": [symbols]                    ciphertext symbols left as plaintext; the key
                                           stream does NOT advance there (optional)
+     "skip_mode": "all" | "resolve"       "all": every occurrence is a literal (default);
+                                          "resolve": each occurrence may be a literal or an
+                                          encrypted symbol; the program picks per occurrence
+                                          (not with autokey streams)
   4. "map": "identity" | "reverse"        reverse maps symbol i to N-1-i before combining
   5. "combine": "sub" | "add" | "beaufort"  p = c - k | c + k | k - c   (mod N)
   6. "stream": the key stream k_0, k_1, ... over non-skipped positions, one of
@@ -140,6 +144,7 @@ def proposal_schema(max_items: int = 16) -> dict:
         "map": {"enum": ["identity", "reverse"]},
         "skip": {"type": "array", "items": {"anyOf": [{"type": "integer"}, {"type": "string"}]},
                  "maxItems": 8},
+        "skip_mode": {"enum": ["all", "resolve"]},
         "reverse_text": {"type": "boolean"},
         "transpose": {"type": "object", "properties": {
             "columnar": {"type": "array", "items": {"type": "integer"}, "minItems": 2, "maxItems": 12}},

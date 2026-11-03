@@ -144,8 +144,13 @@ class Executor:
                                                            kc.corpus_item_id, kc.edition_id,
                                                            kj if len(kj) <= MAX_KEY_JSON else None)
                     ts = time.perf_counter()
-                    pt = fam.decrypt(ct, kc.key, n, **params)
-                    rep = self.oracle.score(pt, attempt_count=count + 1, breaks=breaks)
+                    variant = fam.null_variant(kc.key) if hasattr(fam, "null_variant") else None
+                    if variant:   # search-optimised decryption: needs the LM, own nulls
+                        pt = fam.decrypt(ct, kc.key, n, lm=self.oracle.bigram_table(), **params)
+                    else:
+                        pt = fam.decrypt(ct, kc.key, n, **params)
+                    rep = self.oracle.score(pt, attempt_count=count + 1, breaks=breaks,
+                                            variant=variant)
                     ms = (time.perf_counter() - ts) * 1000.0
                     aid = self.ledger.record_attempt(
                         hypothesis_id=hypothesis_id, key_candidate_id=kid, target_id=tid,
@@ -227,9 +232,13 @@ def final_check(ledger: Ledger, oracle: FullOracle, target_id: str) -> list[dict
         raise ValueError(f"unknown target {target_id}")
     total = ledger.attempt_count(target_id)
     breaks = json.loads(info["word_breaks"]) if info.get("word_breaks") else None
-    a, thr = oracle.final_threshold(int(info["length"]), total, breaks)
     rows = []
+    thresholds: dict = {}
     for c in ledger.candidates_for_final(target_id):
+        variant = c.get("null_variant")
+        if variant not in thresholds:   # each attempt is judged against its own nulls
+            thresholds[variant] = oracle.final_threshold(int(info["length"]), total, breaks, variant)
+        a, thr = thresholds[variant]
         ok = c["combined"] is not None and c["combined"] >= thr
         ledger.record_final_check(c["attempt_id"], total, a, thr, ok)
         rows.append({**c, "attempt_count_final": total, "alpha_eff_final": a,

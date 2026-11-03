@@ -44,8 +44,8 @@ MAX_WIDTH = 12
 COMBINES = ("sub", "add", "beaufort")
 MAPS = ("identity", "reverse")
 STREAM_KINDS = ("constant", "repeat", "autokey", "sequence")
-_TOP_KEYS = {"v", "stream", "combine", "map", "skip", "reverse_text", "transpose", "offset_range",
-             "note"}
+_TOP_KEYS = {"v", "stream", "combine", "map", "skip", "skip_mode", "reverse_text", "transpose",
+             "offset_range", "note"}
 
 
 class SpecError(ValueError):
@@ -149,6 +149,14 @@ def compile_spec(raw: Any, alphabet: Alphabet) -> dict:
         out["skip"] = sorted(set(_symbols(skip, alphabet, "skip", n, allow_word=False)))
         if len(out["skip"]) >= n:
             raise SpecError("skip cannot cover the whole alphabet")
+    mode = raw.get("skip_mode", "all")
+    if mode not in ("all", "resolve"):
+        raise SpecError('skip_mode must be "all" or "resolve"')
+    if mode == "resolve":
+        # Only stored when used, so existing specs keep their ledger identity.
+        if not out["skip"]:
+            raise SpecError('skip_mode "resolve" needs a skip list')
+        out["skip_mode"] = "resolve"
     tr = raw.get("transpose")
     if tr is None or tr is False:
         out["transpose"] = None
@@ -197,6 +205,8 @@ def compile_spec(raw: Any, alphabet: Alphabet) -> dict:
              "scale": _int(st.get("scale", 1), "scale", -10_000, 10_000) % n,
              "add": _int(st.get("add", 0), "add", -10_000, 10_000) % n}
     out["stream"] = s
+    if out.get("skip_mode") == "resolve" and kind == "autokey":
+        raise SpecError('skip_mode "resolve" does not support autokey streams')
 
     rng = raw.get("offset_range")
     if rng is not None:
@@ -274,7 +284,7 @@ def describe(spec: dict, alphabet: Alphabet | None = None) -> str:
         parts.append("map reverse")
     if spec["skip"]:
         sk = alphabet.decode(spec["skip"]) if alphabet else spec["skip"]
-        parts.append(f"skip {sk}")
+        parts.append(f"skip {sk}" + (" (resolve)" if spec.get("skip_mode") == "resolve" else ""))
     if spec["reverse_text"]:
         parts.append("reverse text")
     if spec["transpose"]:

@@ -72,3 +72,19 @@ def test_word_breaks_rescue_the_short_solved_section(lp):
     assert a.decode(pt).startswith("ANINSTRUCTION")
     with_breaks = oracle.score(pt, attempt_count=46_597, breaks=b)
     assert with_breaks.passed and with_breaks.word_score > 0.6
+
+
+def test_skip_resolution_decodes_the_skip_f_sections(lp):
+    """03-04 (DIVINITY) and 14-15 (FIRFUMFERENFE): keys as given by the source, every
+    plaintext F written in clear. Resolving which F runes are literal decodes both."""
+    from lpswarm.programs import compile_spec
+    from lpswarm.programs.resolve import resolve_decrypt
+    a, ct, oracle = lp
+    bigram = oracle.bigram_table()
+    for label, key, start in (("03.jpg-04.jpg", [6, 19, 28, 19, 20, 19, 13, 3], "WELCOMEWELCOMEPILGRIM"),
+                              ("14.jpg-15.jpg - 107.jpg-167.jpg",
+                               [29, 19, 25, 29, 28, 10, 29, 11, 25, 11, 20, 29, 11], "ACOANDURNGALESSON")):
+        spec = compile_spec({"stream": {"kind": "repeat", "key": key}, "combine": "add",
+                             "skip": ["F"], "skip_mode": "resolve"}, a)
+        pt = resolve_decrypt(ct(label), spec, a.size, bigram)
+        assert a.decode(pt).startswith(start)

@@ -81,7 +81,8 @@ class Ledger:
 
     _COLUMNS = {"target": {"word_breaks": "TEXT"},
                 "key_candidate": {"value_json": "TEXT"},
-                "result": {"unreachable": "INTEGER NOT NULL DEFAULT 0", "word_score": "REAL"}}
+                "result": {"unreachable": "INTEGER NOT NULL DEFAULT 0", "word_score": "REAL",
+                           "null_variant": "TEXT"}}
 
     def _migrate(self) -> None:
         """Add columns introduced after a ledger was created (tables are created by the
@@ -227,12 +228,12 @@ class Ledger:
         self.conn.execute(
             "INSERT OR IGNORE INTO result (attempt_id, stage, verdict, ic, ngram_score, dict_score,"
             " lm_loglik, combined, screen_score, threshold, null_percentile, passed,"
-            " attempt_count_at_scoring, alpha_eff, unreachable, word_score, plaintext_preview)"
-            " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            " attempt_count_at_scoring, alpha_eff, unreachable, word_score, null_variant,"
+            " plaintext_preview) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
             (attempt_id, r.stage, r.verdict, r.ic, r.ngram_score, r.dict_score, r.lm_loglik,
              r.combined, r.screen_score, r.threshold, r.null_percentile, int(r.passed),
              r.attempt_count, r.alpha_eff, int(bool(getattr(r, "unreachable", False))),
-             getattr(r, "word_score", None), plaintext_preview))
+             getattr(r, "word_score", None), getattr(r, "null_variant", None), plaintext_preview))
 
     def record_final_check(self, attempt_id: int, attempt_count: int, alpha_eff: float,
                            threshold: float, passed: bool) -> None:
@@ -244,7 +245,7 @@ class Ledger:
     def candidates_for_final(self, target_id: str) -> list[dict]:
         """In-run passes and near misses on a target, with their scores."""
         rows = self.conn.execute(
-            "SELECT a.id AS attempt_id, r.combined, r.verdict FROM attempt a"
+            "SELECT a.id AS attempt_id, r.combined, r.verdict, r.null_variant FROM attempt a"
             " JOIN result r ON r.attempt_id=a.id WHERE a.target_id=? AND r.stage='full'"
             " AND r.verdict IN ('pass','near_miss')", (target_id,)).fetchall()
         return [dict(r) for r in rows]

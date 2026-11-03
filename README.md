@@ -202,10 +202,11 @@ configured alpha sits between 0.4% and 1.5% across lengths, within the stated to
   running key 0.25 -> 0.75, substitution 0.75 -> 1.00, columnar 0.62 -> 0.88, null FPR unchanged.
   On the real solved sections every pass margin grows and the 38-rune section 09/2 now passes.
 - **The held-out guard prevents accidents; it is not a security boundary.**
-- **Skip-literal ambiguity.** A `skip` rule treats *every* occurrence of the symbol as a
-  literal. If encryption can also produce that symbol, the stream desynchronises. Resolving
-  this needs a search over the ambiguous positions, and the oracle's nulls would have to be
-  calibrated through the same search to stay honest. Not implemented.
+- **Skip-literal ambiguity is resolved by search, at a cost.** `skip_mode: "resolve"` lets a
+  Viterbi search decide, per occurrence, whether a skip symbol is a literal or an encrypted
+  symbol (bigram language model). Because that search optimises for English, those attempts are
+  judged against nulls decrypted by the same search (null variant `skipdp:<symbols>`, about 20 s
+  to calibrate per target and skip set). Not available with autokey streams.
 - **Tier-test budgets are per arm, not per dollar.** Compare recall with the attempts, calls
   and USD columns; `random_program:N` gives attempt-matched controls.
 - **Single process.** No multiprocessing, so a big brute force is bounded by one core
@@ -239,10 +240,11 @@ Model setup, dry runs and the full experiment: `docs/phase3_runbook.md`. Network
 only in `src/lpswarm/router/adapters.py` (enforced by a test); API keys come from environment
 variables named in the config and are never stored.
 
-The language can express the mechanisms of the three solved sections the Phase 1 baseline
-missed. Two of them still do not decode end to end: one because of transcription corruption,
-and both because "every ᚠ is a literal" is ambiguous when an encrypted symbol can also come out
-as ᚠ (see Known limitations).
+The language expresses the mechanisms of the three solved sections the Phase 1 baseline
+missed. With `skip_mode: "resolve"` and the source's keys, 03-04 ("WELCOME WELCOME PILGRIM TO
+THE GREAT JOURNEY...") and 14-15 ("A KOAN DURING A LESSON THE MASTER EXPLAINED...") decode end
+to end and pass the final check at a 50,000-attempt budget against nulls from the same search
+(null FPR 0.0-0.3% at alpha = 1%). 73 still fails, because of transcription corruption.
 
 ## Roadmap
 

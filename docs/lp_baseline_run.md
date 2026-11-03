@@ -47,3 +47,19 @@ this search space produces English.
   (ᛂ). These are dropped, which can misalign the text after them.
 - Decrypted previews print the alphabet's primary tokens, so ING shows as NG, K as C, V as U,
   Q as CW.
+
+## Update: Phase 3 cipher language (skip resolution)
+
+The two "skip F" sections are expressible in the cipher-program language with
+`skip_mode: "resolve"` (each ᚠ may be a literal or an encrypted rune; a Viterbi search picks):
+
+| Section | Spec | Result |
+| --- | --- | --- |
+| 03.jpg-04.jpg | repeat key [6,19,28,19,20,19,13,3], add, skip F (resolve) | "WELCOME WELCOME PILGRIM TO THE GREAT JOURNEY TOWARD THE END OF ALL THINGS..." passes the final check at 50k attempts |
+| 14.jpg-15.jpg | repeat key [29,19,25,29,28,10,29,11,25,11,20,29,11], add, skip F (resolve) | "A KOAN DURING A LESSON THE MASTER EXPLAINED THE I THE I IS THE VOICE OF THE CIRCUMFERENCE..." passes the final check at 50k attempts |
+| 56.jpg - 73.jpg | prime-totient stream, sub, skip F | decodes "...END WITHIN THE DEEP WEB THERE EXISTS A PA..." then loses sync at the corrupted characters |
+
+With "every ᚠ is a literal" (`skip_mode: "all"`) neither section passes. Resolved attempts are
+calibrated against nulls decrypted by the same search (measured null FPR 0.0-0.3% at alpha 1%).
+The keys come from the source's notes, so this validates the language and the scoring, not a
+model's ability to find them: a model may have memorised these published solutions.
