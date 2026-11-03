@@ -77,6 +77,7 @@ class OracleConfig:
     multiple_comparisons: str = "bonferroni"   # "bonferroni" | "spending" | "none" (see module doc)
     languages: tuple[str, ...] = ("english",)
     max_table_size: int = 20_000_000    # n-gram order is lowered until N**order fits
+    max_score_length: int = 500         # longer candidates are scored on their first N symbols
     seed: int = 0
 
     def __post_init__(self) -> None:
@@ -103,6 +104,8 @@ class OracleConfig:
             bad(f"null_types must be a non-empty subset of {NULL_TYPES}")
         if not self.languages:
             bad("at least one language is required")
+        if self.max_score_length < 8:
+            bad("max_score_length must be >= 8")
         self.null_types = tuple(self.null_types)
         self.wrong_key_families = tuple(self.wrong_key_families)
         self.languages = tuple(self.languages)
@@ -283,7 +286,12 @@ class FullOracle:
         start = int(rng.integers(0, len(good) - length + 1))
         return good[start:start + length]
 
+    def scored_length(self, length: int) -> int:
+        """Candidates longer than max_score_length are scored on a prefix of this length."""
+        return min(int(length), self.cfg.max_score_length)
+
     def calibrate(self, length: int) -> _NullSet:
+        length = self.scored_length(length)
         if length in self._cache:
             return self._cache[length]
         if length < self.min_length:
@@ -353,19 +361,20 @@ class FullOracle:
 
     def final_threshold(self, length: int, total_attempts: int) -> tuple[float, float]:
         """(alpha_eff, threshold) for the end-of-search Bonferroni check over all attempts."""
+        length = self.scored_length(length)
         ns = self.calibrate(length)
         a = self.cfg.alpha if self.cfg.multiple_comparisons == "none" \
             else self.cfg.alpha / max(1, int(total_attempts))
         return a, max(self._upper_quantile(v, a) for v in ns.combined.values())
 
     def threshold(self, length: int, attempt_count: int = 1) -> float:
-        ns = self.calibrate(length)
+        ns = self.calibrate(self.scored_length(length))
         a = self.alpha_eff(attempt_count)
         return max(self._upper_quantile(v, a) for v in ns.combined.values())
 
     # ------------------------------------------------------------------ score
     def score(self, arr: np.ndarray, attempt_count: int = 1) -> ScoreReport:
-        arr = np.asarray(arr, dtype=np.int16)
+        arr = np.asarray(arr, dtype=np.int16)[: self.cfg.max_score_length]
         L = len(arr)
         ns = self.calibrate(L)
         s = self._screen(arr)

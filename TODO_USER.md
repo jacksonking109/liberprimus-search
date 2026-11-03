@@ -4,20 +4,23 @@ Things only you can supply or decide. Each has a default so work can continue.
 
 ## Data you need to supply
 
-- [ ] **Liber Primus ciphertext.** Put page transcriptions in `data/` as UTF-8 text files, one
-      file per section/page range. Runes or a transliteration both work as long as the alphabet
-      file (next item) covers the characters. Check how a file is read with
-      `lpswarm encode data/<file>.txt --alphabet data/alphabet.json`.
-      Candidate sources you pointed to (not yet reviewed or imported; treat as third-party data,
-      check their licences and transcription conventions first):
-      `github.com/scream314/cicada3301`, `github.com/cijhho123/cicada3301`.
-      Preferred format: one plain UTF-8 file per page or section, runes as-is, keeping the
-      original word/line/page separators. Markdown is fine only if the rune text is raw (e.g. in
-      code blocks); headings and tables are dropped as unknown characters. Separators are
-      currently ignored by the scorer (see "Word breaks" below); keeping them costs nothing and
-      lets a later phase use them.
-- [ ] **Alphabet / rune table.** Nothing about the Gematria Primus is hard-coded. Write
-      `data/alphabet.json`:
+- [x] **Liber Primus ciphertext.** Imported from `github.com/scream314/cicada3301` into
+      `data/lp/` (see `data/lp/SOURCES.md`). Open points:
+  - [ ] That repo has **no licence file**. Fine for personal research; check before making this
+        repo public or redistributing `data/lp/`.
+  - [ ] The source groups text into **sections**, not pages; multi-page sections have no page
+        breaks. If you want strictly per-page targets, a source with page breaks is needed
+        (maybe `github.com/cijhho123/cicada3301`; not reviewed).
+  - [ ] Two sections are flagged: `56.jpg/2` and `56.jpg - 73.jpg` contain corrupted characters
+        (U+FFFD), and the latter has rune U+16C2 (ᛂ), which is not in the Gematria table. Both are
+        dropped, which can misalign everything after them. Correct them from the page images if
+        you can.
+- [x] **Alphabet / rune table.** `data/alphabet/gematria_primus.json`, from the table image in the
+      same repo; checked against the cleartext section 05. Open point:
+  - [ ] Q and V are not in the table, so English training text drops them. Solvers often map
+        V→U and Q→C(W); add `"V": "U"` etc. to `aliases` if you agree.
+- [ ] **Other alphabets (optional).** Nothing about the Gematria Primus is hard-coded in the
+      code. To try a different table or ordering, write another JSON like:
       ```json
       {"name": "my_runes",
        "tokens": ["F", "U", "TH", "..."],

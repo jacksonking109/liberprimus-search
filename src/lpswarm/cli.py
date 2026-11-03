@@ -106,22 +106,18 @@ def cmd_null_check(args) -> int:
     return 0 if ok else 2
 
 
-def cmd_baseline(args) -> int:
-    from lpswarm.baseline import BaselineConfig, load_key_texts, run_baseline
-    from lpswarm.executor import Target
-    from lpswarm.ledger import Ledger
-    from lpswarm.textgen import corpus
-    conf = _load_config(args.config)
-    alphabet = get_alphabet(args.alphabet or "latin26")
-    demo_key_text: list = []
-    if args.ciphertext and args.demo:
-        raise SystemExit("give either --ciphertext or --demo, not both")
+def _targets_from_args(args, alphabet) -> list[tuple]:
+    """(ciphertext ints, label, page_range, is_synthetic, demo key texts) per target."""
+    from lpswarm.textio import read_text
+    given = [bool(args.ciphertext), bool(args.demo), bool(args.manifest)]
+    if sum(given) != 1:
+        raise SystemExit("give exactly one of --ciphertext, --demo, --manifest")
+    out = []
     if args.ciphertext:
-        from lpswarm.textio import read_text
-        text = read_text(args.ciphertext)
-        ct = alphabet.encode(text)
-        label = args.label or Path(args.ciphertext).name
-        synthetic = False
+        for f in args.ciphertext:
+            ct = alphabet.encode(read_text(f), glyphs_only=args.glyphs_only)
+            label = args.label or Path(f).name
+            out.append((ct, label, args.page_range, False, []))
     elif args.demo:
         from lpswarm.ciphers import get_family
         from lpswarm.textgen.synth import generate_case
@@ -133,17 +129,35 @@ def cmd_baseline(args) -> int:
             raise SystemExit(f"--demo expects FAMILY:LENGTH, e.g. vigenere:120 (got {args.demo!r})")
         case = generate_case(fam, n_sym, args.difficulty or "medium",
                              alphabet=alphabet, seed=args.seed or 0)
-        ct = case.ciphertext
-        label = f"demo:{fam}:{len(ct)}:{case.case_id}"
-        synthetic = True
-        if fam == "running_key":
-            demo_key_text = [("demo-key-text", case.key)]
-        print(f"demo target: {fam} length {len(ct)}; true params {case.params}")
+        keys = [("demo-key-text", case.key)] if fam == "running_key" else []
+        print(f"demo target: {fam} length {len(case.ciphertext)}; true params {case.params}")
+        out.append((case.ciphertext, f"demo:{fam}:{len(case.ciphertext)}:{case.case_id}", None,
+                    True, keys))
     else:
-        raise SystemExit("give --ciphertext FILE or --demo FAMILY:LENGTH")
-    if len(ct) < 8:
-        raise SystemExit(f"ciphertext has only {len(ct)} symbols under alphabet {alphabet.name}; "
-                         "check --alphabet")
+        mpath = Path(args.manifest)
+        man = json.loads(read_text(mpath))
+        wanted = set(_csv_ints(args.sections) or ())
+        for sec in man["sections"]:
+            if wanted and sec["index"] not in wanted:
+                continue
+            raw = read_text(mpath.parent / sec["file"])
+            ct = alphabet.encode(raw, glyphs_only=True)
+            label = f"{sec.get('part', '')}:{sec['label']}"
+            if sec.get("replacement_chars") or sec.get("unknown_runes"):
+                print(f"warning: section {sec['index']} ({sec['label']}) has corrupted or unknown "
+                      "characters; they are dropped, so positions after them may be shifted")
+            out.append((ct, label, sec["label"], False, []))
+    return out
+
+
+def cmd_baseline(args) -> int:
+    from lpswarm.baseline import BaselineConfig, load_key_texts, run_baseline
+    from lpswarm.executor import Target
+    from lpswarm.ledger import Ledger
+    from lpswarm.textgen import corpus
+    conf = _load_config(args.config)
+    alphabet = get_alphabet(args.alphabet or "latin26")
+    targets = _targets_from_args(args, alphabet)
     if args.wordlist:
         words = corpus.load_wordlist_file(args.wordlist)
         wl_name = Path(args.wordlist).name
@@ -154,26 +168,36 @@ def cmd_baseline(args) -> int:
         "families": _csv_strs(args.families), "wordlist_name": wl_name,
         "max_attempts_per_family": args.max_attempts, "timeout_s": args.timeout,
         "columnar_max_width": args.columnar_max_width})
-    key_texts = load_key_texts(args.running_key_texts or [], alphabet) + demo_key_text
+    user_key_texts = load_key_texts(args.running_key_texts or [], alphabet)
     oracle = FullOracle(alphabet, _oracle_cfg(args, conf))
+    summary_rows = []
     with Ledger(args.ledger) as led:
-        tgt = Target(alphabet, ct, label, page_range=args.page_range, is_synthetic=synthetic)
-        res = run_baseline(tgt, led, oracle, words, bc, key_texts, progress=not args.quiet)
-        leads = led.leads(res.target_id, include_near_miss=True, limit=args.top)
-        print(f"\nledger: {args.ledger}  " + ", ".join(f"{k}={v}" for k, v in led.counts().items()))
-        n_final = sum(1 for r in res.final if r["passed_final"])
-        total = led.attempt_count(res.target_id)
-        print(f"final check: {n_final} attempt(s) pass at alpha/{total} over all attempts on this "
-              "target")
-        if leads:
-            print(f"\ntop {len(leads)} leads (in-run pass / near_miss; FINAL = survives final check):")
+        for ct, label, page_range, synthetic, demo_keys in targets:
+            if len(ct) < max(8, oracle.min_length):
+                print(f"skip {label}: only {len(ct)} symbols under alphabet {alphabet.name}")
+                continue
+            print(f"\n== {label}  ({len(ct)} symbols)")
+            tgt = Target(alphabet, ct, label, page_range=page_range, is_synthetic=synthetic)
+            res = run_baseline(tgt, led, oracle, words, bc, user_key_texts + demo_keys,
+                               progress=not args.quiet)
+            n_final = sum(1 for r in res.final if r["passed_final"])
+            total = led.attempt_count(res.target_id)
+            summary_rows.append((label, len(ct), total, n_final))
+            print(f"final check: {n_final} attempt(s) pass at alpha/{total} over all attempts on "
+                  "this target")
+            leads = led.leads(res.target_id, include_near_miss=True, limit=args.top)
             for r in leads:
                 tag = "FINAL" if r["passed_final"] else "     "
                 print(f"  {tag} {r['verdict']:<9} {r['cipher_family']:<12} "
                       f"key={r['key_preview']!s:<20} params={r['params_json']:<30} "
                       f"margin={r['combined'] - r['threshold']:+.3f}  {r['plaintext_preview']}")
-        else:
-            print("\nno passes or near misses: everything tried is recorded as ruled out")
+            if not leads:
+                print("  no passes or near misses: everything tried is recorded as ruled out")
+        print(f"\nledger: {args.ledger}  " + ", ".join(f"{k}={v}" for k, v in led.counts().items()))
+    if len(summary_rows) > 1:
+        print("\ntarget summary (symbols, attempts on target, final passes):")
+        for label, n, total, nf in summary_rows:
+            print(f"  {label[:50]:<50} {n:>6} {total:>9} {nf:>4}")
     return 0
 
 
@@ -218,7 +242,7 @@ def cmd_encode(args) -> int:
     from lpswarm.textio import read_text
     text = read_text(args.file)
     skipped: list[str] = []
-    arr = alphabet.encode(text, skipped=skipped)
+    arr = alphabet.encode(text, skipped=skipped, glyphs_only=args.glyphs_only)
     dropped = sorted({ch for ch in skipped if not ch.isspace()})
     print(f"alphabet {alphabet.name} (size {alphabet.size}); {len(arr)} symbols")
     print("tokens:", alphabet.decode(arr[:200]))
@@ -259,7 +283,12 @@ def build_parser() -> argparse.ArgumentParser:
 
     p = sub.add_parser("baseline", help="brute-force baseline into the ledger")
     _add_oracle_args(p)
-    p.add_argument("--ciphertext", help="text file holding the ciphertext")
+    p.add_argument("--ciphertext", nargs="+", help="text file(s); one target per file")
+    p.add_argument("--manifest", help="section manifest JSON (e.g. data/lp/manifest.json); "
+                   "one target per section")
+    p.add_argument("--sections", help="comma list of manifest indexes to run (default all)")
+    p.add_argument("--glyphs-only", action="store_true",
+                   help="read --ciphertext files by exact glyphs only (manifest always does)")
     p.add_argument("--demo", help="synthetic target FAMILY:LENGTH, e.g. vigenere:120")
     p.add_argument("--difficulty", choices=("easy", "medium", "hard"))
     p.add_argument("--seed", type=int)
@@ -290,6 +319,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     p = sub.add_parser("encode", help="show how a file is read under an alphabet")
     p.add_argument("file")
+    p.add_argument("--glyphs-only", action="store_true")
     p.add_argument("--alphabet")
     p.set_defaults(func=cmd_encode)
     return ap

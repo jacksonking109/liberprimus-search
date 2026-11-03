@@ -109,8 +109,12 @@ class Alphabet:
     def __len__(self) -> int:
         return self.size
 
-    def encode(self, text: str, skipped: list[str] | None = None) -> np.ndarray:
+    def encode(self, text: str, skipped: list[str] | None = None,
+               glyphs_only: bool = False) -> np.ndarray:
         """Greedy longest-match transliteration; unknown characters are dropped.
+
+        With glyphs_only=True only exact glyphs match: use it for ciphertext, so
+        Latin notes or hex inside a transcription are not read as symbols.
 
         At each position the longest match wins; at equal length an exact glyph
         match beats a case-folded token/alias match. Folding is per character and
@@ -118,7 +122,8 @@ class Alphabet:
         as they are), so positions never drift.
         """
         up = _fold(text)
-        exact, folded = self._exact, self._folded
+        exact = self._exact
+        folded = {} if glyphs_only else self._folded
         maxlen = self._maxlen
         out: list[int] = []
         i, n = 0, len(text)

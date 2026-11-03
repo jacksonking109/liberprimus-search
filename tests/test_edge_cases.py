@@ -121,11 +121,21 @@ def test_large_alphabet_lowers_order():
     assert o.order == 3 and any("lowered" in str(x.message) for x in w)
 
 
-def test_length_limits(oracle):
+def test_length_limits(oracle, latin):
     with pytest.raises(ValueError, match="too short"):
         oracle.calibrate(3)
+    assert oracle.scored_length(10_000_000) == oracle.cfg.max_score_length
+    from lpswarm.textgen.corpus import training_text
+    small = FullOracle(latin, OracleConfig(null_samples=100, max_score_length=5000),
+                       training_texts={"english": training_text()[:3000]})
     with pytest.raises(ValueError, match="too long"):
-        oracle.calibrate(10_000_000)
+        small.calibrate(2400)
+
+
+def test_long_candidates_scored_on_prefix(oracle):
+    c = heldout_cases(["caesar"], [1200], 1, seed=2)[0]
+    rep = oracle.score(c.plaintext, attempt_count=100)
+    assert rep.length == oracle.cfg.max_score_length and rep.passed
 
 
 def test_unreachable_flag(oracle):

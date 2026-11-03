@@ -67,6 +67,27 @@ Stop a long run by creating a file named `STOP` in the working directory
 (`New-Item STOP` in PowerShell); delete it to run again. `--max-attempts` and `--timeout` set
 per-family budgets.
 
+### Liber Primus data
+
+`data/lp/` holds the 28 sections of the scream314/cicada3301 transcription (one file per
+section as that source lists them; multi-page sections have no page breaks inside), with
+`manifest.json` (labels, the source's own cipher notes, quality flags) and `SOURCES.md`
+(provenance, licence caveat). `data/alphabet/gematria_primus.json` is the Gematria Primus table
+(order, letters, prime values), checked against the cleartext section. Re-import with
+`python scripts/import_lp_scream314.py <path to a clone of scream314/cicada3301>`.
+
+```powershell
+lpswarm baseline --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json `
+                 --ledger lp.sqlite                    # every section (~6 min)
+lpswarm baseline --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json `
+                 --ledger lp.sqlite --sections 10,22   # just some sections
+```
+
+Each section is its own target, so alpha is per section. Ciphertext is read by rune glyphs
+only; Latin notes, numbers and hex inside a section are ignored. Sections over 500 runes are
+scored on the first 500 decrypted runes (`max_score_length`). Results of the reference run:
+`docs/lp_baseline_run.md`.
+
 ### Options and config
 
 `--alphabet` takes `latin26` (default), `rune_likeNN` (a synthetic N-symbol rune-style alphabet,
