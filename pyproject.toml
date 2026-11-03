@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lpswarm"
+version = "0.1.0"
+description = "Research harness for cipher hypotheses: deterministic null-calibrated oracle + negative-results ledger (Phase 1, no LLMs)."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = ["numpy>=1.24"]
+
+[project.optional-dependencies]
+dev = ["pytest>=7"]
+
+[project.scripts]
+lpswarm = "lpswarm.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+lpswarm = ["fixtures/*.txt", "fixtures/*.md", "ledger/schema.sql"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
