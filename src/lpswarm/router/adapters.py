@@ -49,12 +49,8 @@ def _post_json(url: str, body: dict, headers: dict[str, str], timeout: float,
     data = json.dumps(body).encode("utf-8")
     req = urllib.request.Request(url, data=data, method="POST",
                                  headers={"Content-Type": "application/json", **headers})
-    host = (urllib.parse.urlsplit(url).hostname or "").lower()
-    # Never send local model traffic (Ollama) through a system HTTP proxy.
-    opener = (urllib.request.build_opener(urllib.request.ProxyHandler({}))
-              if host in ("localhost", "127.0.0.1", "::1") else urllib.request.build_opener())
     try:
-        with opener.open(req, timeout=timeout) as resp:
+        with _opener(url).open(req, timeout=timeout) as resp:
             return json.loads(resp.read().decode("utf-8"))
     except urllib.error.HTTPError as exc:
         detail = ""
@@ -70,6 +66,29 @@ def _post_json(url: str, body: dict, headers: dict[str, str], timeout: float,
         raise AdapterError(f"cannot reach {url}: {getattr(exc, 'reason', exc)}", True) from None
     except json.JSONDecodeError:
         raise AdapterError(f"non-JSON reply from {url}") from None
+
+
+def _opener(url: str):
+    host = (urllib.parse.urlsplit(url).hostname or "").lower()
+    # Never send local model traffic (Ollama) through a system HTTP proxy.
+    if host in ("localhost", "127.0.0.1", "::1"):
+        return urllib.request.build_opener(urllib.request.ProxyHandler({}))
+    return urllib.request.build_opener()
+
+
+def ollama_tags(endpoint: str, timeout: float = 5.0) -> list[str]:
+    """Names of the models an Ollama server has pulled (GET /api/tags)."""
+    url = endpoint.rstrip("/") + "/api/tags"
+    try:
+        with _opener(url).open(urllib.request.Request(url, method="GET"), timeout=timeout) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+    except urllib.error.HTTPError as exc:
+        raise AdapterError(f"HTTP {exc.code} from {url}") from None
+    except (urllib.error.URLError, TimeoutError, OSError) as exc:
+        raise AdapterError(f"cannot reach {url}: {getattr(exc, 'reason', exc)}", True) from None
+    except json.JSONDecodeError:
+        raise AdapterError(f"non-JSON reply from {url}") from None
+    return [m.get("name") or m.get("model") for m in data.get("models", []) if isinstance(m, dict)]
 
 
 class OllamaAdapter:

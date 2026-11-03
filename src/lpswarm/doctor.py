@@ -1,0 +1,132 @@
+"""`lpswarm doctor`: check that everything needed for a run is in place.
+
+Read-only. Never prints secrets: for API models it only says whether the
+environment variable is set. `--ping` (opt-in) sends one tiny prompt per model,
+which costs a fraction of a cent on paid APIs.
+"""
+from __future__ import annotations
+
+import os
+import shutil
+import sys
+from dataclasses import dataclass
+from pathlib import Path
+
+OK, WARN, FAIL = "OK", "WARN", "FAIL"
+
+
+@dataclass
+class Check:
+    status: str
+    name: str
+    detail: str = ""
+
+
+def _tag_present(tag: str, available: list[str]) -> bool:
+    want = tag if ":" in tag else tag + ":latest"
+    return tag in available or want in available
+
+
+def run_checks(models_config: str | None = None, ping: bool = False,
+               data_root: str | Path = ".") -> list[Check]:
+    out: list[Check] = []
+    v = sys.version_info
+    out.append(Check(OK if v >= (3, 11) else FAIL, "python", f"{v.major}.{v.minor}.{v.micro}"))
+    try:
+        import numpy  # noqa: F401
+
+        import lpswarm
+        out.append(Check(OK, "lpswarm package", lpswarm.__version__))
+    except Exception as exc:  # noqa: BLE001
+        out.append(Check(FAIL, "lpswarm package", str(exc)))
+        return out
+
+    root = Path(data_root)
+    for rel in ("data/alphabet/gematria_primus.json", "data/lp/manifest.json"):
+        p = root / rel
+        out.append(Check(OK if p.is_file() else WARN, rel,
+                         "" if p.is_file() else "missing (only needed for real Liber Primus runs)"))
+
+    if not models_config:
+        out.append(Check(WARN, "models config", "none given (--models); model checks skipped"))
+        return out
+    from lpswarm.router.adapters import AdapterError, ollama_tags
+    from lpswarm.router.base import Role, load_model_specs
+    try:
+        specs = load_model_specs(models_config)
+    except Exception as exc:  # noqa: BLE001
+        out.append(Check(FAIL, "models config", f"{models_config}: {exc}"))
+        return out
+    out.append(Check(OK, "models config", f"{models_config}: {len(specs)} model(s)"))
+    if not any(Role.WEIGHTING in s.roles for s in specs):
+        out.append(Check(WARN, "ranker", "no model has the 'weighting' role (--ranker unavailable)"))
+
+    tags_cache: dict[str, list[str] | AdapterError] = {}
+    for s in specs:
+        label = f"model {s.name}"
+        if s.provider == "ollama":
+            ep = s.endpoint or "http://localhost:11434"
+            if ep not in tags_cache:
+                try:
+                    tags_cache[ep] = ollama_tags(ep)
+                except AdapterError as exc:
+                    tags_cache[ep] = exc
+            got = tags_cache[ep]
+            if isinstance(got, AdapterError):
+                out.append(Check(FAIL, label, f"Ollama at {ep} not reachable (is it running? "
+                                              "scripts\\start_ollama.ps1)"))
+                continue
+            if not _tag_present(s.model, got):
+                out.append(Check(FAIL, label, f"'{s.model}' not pulled on {ep}; have: "
+                                              + (", ".join(sorted(got)) or "nothing")))
+                continue
+            out.append(Check(OK, label, f"{s.model} on {ep}"))
+        elif s.provider == "openai_compatible":
+            if not s.api_key_env or not os.environ.get(s.api_key_env):
+                out.append(Check(WARN, label, f"environment variable {s.api_key_env} is not set "
+                                              "(needed only when this model is used)"))
+                continue
+            prices = (s.extra.get("price_in_per_mtok") or 0, s.extra.get("price_out_per_mtok") or 0)
+            if not any(prices):
+                out.append(Check(WARN, label, "key is set, but prices are 0: spend is recorded as "
+                                              "$0 and max_usd cannot protect you"))
+                continue
+            out.append(Check(OK, label, f"key in {s.api_key_env}, prices set, cap "
+                                        f"{'$%.2f' % s.max_usd if s.max_usd is not None else 'none'}"))
+        elif s.provider == "command":
+            cmd = list(s.extra.get("command") or [])
+            exe = shutil.which(cmd[0]) if cmd else None
+            out.append(Check(OK if exe else FAIL, label,
+                             f"runs {exe}" if exe else f"command not found: {cmd[:1]}"))
+        elif s.provider == "scripted":
+            out.append(Check(OK, label, "scripted (offline dry run)"))
+        else:
+            out.append(Check(FAIL, label, f"unknown provider {s.provider!r}"))
+
+    if ping:
+        from lpswarm.ledger import Ledger
+        from lpswarm.router import Router
+        healthy = {c.name for c in out if c.status == OK}
+        router = Router(specs, ledger=Ledger())   # in-memory ledger: caps checked, nothing saved
+        for s in specs:
+            if f"model {s.name}" not in healthy:
+                continue
+            role = s.roles[0].value
+            try:
+                c = router.complete(s.name, [{"role": "user", "content":
+                                              'Reply with the JSON {"ok": true} and nothing else.'}],
+                                    role=role, max_tokens=20, temperature=0.0)
+                out.append(Check(OK, f"ping {s.name}", f"{c.latency_s:.1f}s, reply: {c.text[:40]!r}"))
+            except Exception as exc:  # noqa: BLE001
+                out.append(Check(FAIL, f"ping {s.name}", str(exc)[:200]))
+    return out
+
+
+def print_report(checks: list[Check]) -> int:
+    width = max(len(c.name) for c in checks)
+    for c in checks:
+        print(f"[{c.status:<4}] {c.name:<{width}}  {c.detail}")
+    fails = sum(c.status == FAIL for c in checks)
+    warns = sum(c.status == WARN for c in checks)
+    print(f"\n{fails} problem(s), {warns} warning(s)")
+    return 1 if fails else 0

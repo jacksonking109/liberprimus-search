@@ -14,3 +14,4 @@ reports/*
 !reports/.gitkeep
 STOP
 config/models.toml
+config/gpus.json

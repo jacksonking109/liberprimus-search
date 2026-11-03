@@ -24,7 +24,11 @@ optional dev script `scripts/fetch_corpus.py`, which refreshes the bundled corpu
 
 ## Install
 
-Python 3.11+. Windows (PowerShell):
+Windows, everything at once (venv, Ollama, GPU-pinned models, config, checks):
+`powershell -ExecutionPolicy Bypass -File scripts\setup_windows.ps1`. See the quick start in
+`docs/phase3_runbook.md`. `lpswarm doctor` checks an existing setup.
+
+Manual install. Python 3.11+. Windows (PowerShell):
 
 ```powershell
 cd liberprimus-search

@@ -4,6 +4,43 @@ The model tier test asks one question: do model-driven generators find ciphers b
 than (a) the Phase 1 brute force and (b) random programs from the same cipher language, at
 comparable cost? Everything below runs from the repo root in PowerShell, with the venv active.
 
+## Quick start (one command)
+
+In PowerShell (needs git and Python 3.11+; the script installs Ollama with winget if it is missing):
+
+```powershell
+git clone -b claude/eager-pasteur-l0dsma https://github.com/jacksonking109/liberprimus-search
+cd liberprimus-search
+powershell -ExecutionPolicy Bypass -File scripts\setup_windows.ps1
+```
+
+What it does, step by step (each line prints OK / WARN / FAIL; safe to re-run):
+1. Finds Python 3.11+, creates `.venv`, installs lpswarm.
+2. Installs Ollama if missing, finds your GPUs with `nvidia-smi`, and starts one Ollama server per
+   GPU: the biggest card (5060 Ti) on port 11434 for the proposer models, the smallest (2060) on
+   11435 for the ranker. Each server only sees its own GPU.
+3. Pulls models: the first of `qwen3:14b`, `qwen3:8b` that pulls, plus `gemma3:12b` for the big
+   card, and the first of `granite4:tiny-h`, `granite3.3:2b` for the small one. Override with
+   `-ProposerModels`, `-ExtraModels`, `-RankerModels`.
+4. Writes `config\models.toml` with whatever actually pulled (an existing file is kept; use
+   `-Force` to regenerate).
+5. Runs the tests, `lpswarm doctor`, and an offline dry run, then prints the next commands.
+
+After a reboot, only this is needed before a run:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\start_ollama.ps1
+.\.venv\Scripts\lpswarm.exe doctor
+```
+
+`-ExecutionPolicy Bypass` applies to that one PowerShell process only. Use
+`.\.venv\Scripts\lpswarm.exe` (no venv activation needed), or activate with
+`.\.venv\Scripts\Activate.ps1` if your execution policy allows scripts. Stop the servers with
+`scripts\start_ollama.ps1 -Stop`. The Ollama tray app is closed while the pinned servers run;
+starting it again takes over port 11434 with both GPUs.
+
+The steps below are the manual equivalent.
+
 ## 0. Update and check
 
 ```powershell

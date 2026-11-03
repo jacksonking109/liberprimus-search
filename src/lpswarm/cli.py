@@ -7,6 +7,9 @@ Commands:
   ruled-out   list hypotheses tried and failed, from a ledger
   leads       list passing (and optionally near-miss) attempts, from a ledger
   encode      show how a text file is read under an alphabet (sanity check)
+  swarm       Phase 3: generators propose cipher programs for targets
+  tiertest    Phase 3: compare generators against the baselines
+  doctor      check that everything needed for a run is in place
 """
 from __future__ import annotations
 
@@ -278,6 +281,14 @@ def cmd_tiertest(args) -> int:
     return 0
 
 
+def cmd_doctor(args) -> int:
+    from lpswarm.doctor import print_report, run_checks
+    models = args.models
+    if models is None and Path("config/models.toml").is_file():
+        models = "config/models.toml"
+    return print_report(run_checks(models, ping=args.ping))
+
+
 def cmd_ruled_out(args) -> int:
     from lpswarm.ledger import Ledger
     _require_ledger(args.ledger)
@@ -430,6 +441,12 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--quick", action="store_true")
     p.add_argument("--quiet", action="store_true")
     p.set_defaults(func=cmd_tiertest)
+
+    p = sub.add_parser("doctor", help="check Python, data, models config, Ollama and API keys")
+    p.add_argument("--models", help="models TOML (default config/models.toml if present)")
+    p.add_argument("--ping", action="store_true",
+                   help="send one tiny prompt to each healthy model (costs a little on paid APIs)")
+    p.set_defaults(func=cmd_doctor)
 
     for name, fn in (("ruled-out", cmd_ruled_out), ("leads", cmd_leads)):
         p = sub.add_parser(name)
