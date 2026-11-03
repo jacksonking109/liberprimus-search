@@ -25,7 +25,8 @@ from lpswarm.oracle import FullOracle, OracleConfig
 def _load_config(path: str | None) -> dict:
     if not path:
         return {}
-    return tomllib.loads(Path(path).read_text(encoding="utf-8"))
+    from lpswarm.textio import read_text
+    return tomllib.loads(read_text(path))
 
 
 def _apply(dc_cls, base: dict, overrides: dict) -> Any:
@@ -112,19 +113,31 @@ def cmd_baseline(args) -> int:
     from lpswarm.textgen import corpus
     conf = _load_config(args.config)
     alphabet = get_alphabet(args.alphabet or "latin26")
+    demo_key_text: list = []
+    if args.ciphertext and args.demo:
+        raise SystemExit("give either --ciphertext or --demo, not both")
     if args.ciphertext:
-        text = Path(args.ciphertext).read_text(encoding="utf-8")
+        from lpswarm.textio import read_text
+        text = read_text(args.ciphertext)
         ct = alphabet.encode(text)
         label = args.label or Path(args.ciphertext).name
         synthetic = False
     elif args.demo:
+        from lpswarm.ciphers import get_family
         from lpswarm.textgen.synth import generate_case
         fam, _, length = args.demo.partition(":")
-        case = generate_case(fam, int(length or 80), args.difficulty or "medium",
+        get_family(fam)
+        try:
+            n_sym = int(length) if length else 80
+        except ValueError:
+            raise SystemExit(f"--demo expects FAMILY:LENGTH, e.g. vigenere:120 (got {args.demo!r})")
+        case = generate_case(fam, n_sym, args.difficulty or "medium",
                              alphabet=alphabet, seed=args.seed or 0)
         ct = case.ciphertext
         label = f"demo:{fam}:{len(ct)}:{case.case_id}"
         synthetic = True
+        if fam == "running_key":
+            demo_key_text = [("demo-key-text", case.key)]
         print(f"demo target: {fam} length {len(ct)}; true params {case.params}")
     else:
         raise SystemExit("give --ciphertext FILE or --demo FAMILY:LENGTH")
@@ -141,19 +154,24 @@ def cmd_baseline(args) -> int:
         "families": _csv_strs(args.families), "wordlist_name": wl_name,
         "max_attempts_per_family": args.max_attempts, "timeout_s": args.timeout,
         "columnar_max_width": args.columnar_max_width})
-    key_texts = load_key_texts(args.running_key_texts or [], alphabet)
+    key_texts = load_key_texts(args.running_key_texts or [], alphabet) + demo_key_text
     oracle = FullOracle(alphabet, _oracle_cfg(args, conf))
     with Ledger(args.ledger) as led:
         tgt = Target(alphabet, ct, label, page_range=args.page_range, is_synthetic=synthetic)
         res = run_baseline(tgt, led, oracle, words, bc, key_texts, progress=not args.quiet)
         leads = led.leads(res.target_id, include_near_miss=True, limit=args.top)
         print(f"\nledger: {args.ledger}  " + ", ".join(f"{k}={v}" for k, v in led.counts().items()))
+        n_final = sum(1 for r in res.final if r["passed_final"])
+        total = led.attempt_count(res.target_id)
+        print(f"final check: {n_final} attempt(s) pass at alpha/{total} over all attempts on this "
+              "target")
         if leads:
-            print(f"\ntop {len(leads)} leads (pass / near_miss):")
+            print(f"\ntop {len(leads)} leads (in-run pass / near_miss; FINAL = survives final check):")
             for r in leads:
-                print(f"  {r['verdict']:<9} {r['cipher_family']:<12} key={r['key_preview']!s:<20} "
-                      f"params={r['params_json']:<30} margin={r['combined'] - r['threshold']:+.3f}  "
-                      f"{r['plaintext_preview']}")
+                tag = "FINAL" if r["passed_final"] else "     "
+                print(f"  {tag} {r['verdict']:<9} {r['cipher_family']:<12} "
+                      f"key={r['key_preview']!s:<20} params={r['params_json']:<30} "
+                      f"margin={r['combined'] - r['threshold']:+.3f}  {r['plaintext_preview']}")
         else:
             print("\nno passes or near misses: everything tried is recorded as ruled out")
     return 0
@@ -180,12 +198,14 @@ def cmd_leads(args) -> int:
     from lpswarm.ledger import Ledger
     _require_ledger(args.ledger)
     with Ledger(args.ledger) as led:
-        rows = led.leads(include_near_miss=args.near_miss, limit=args.top)
+        rows = led.leads(include_near_miss=args.near_miss, limit=args.top,
+                         final_only=args.final_only)
     if args.json:
         print(json.dumps(rows, indent=2))
         return 0
     for r in rows:
-        print(f"{r['verdict']:<9} {r['cipher_family']:<12} key={r['key_preview']!s:<20} "
+        tag = {1: "FINAL", 0: "     ", None: "  ?  "}[r["passed_final"]]
+        print(f"{tag} {r['verdict']:<9} {r['cipher_family']:<12} key={r['key_preview']!s:<20} "
               f"margin={r['combined'] - r['threshold']:+.3f} n={r['attempt_count_at_scoring']:<7} "
               f"{r['plaintext_preview']}")
     if not rows:
@@ -195,10 +215,16 @@ def cmd_leads(args) -> int:
 
 def cmd_encode(args) -> int:
     alphabet = get_alphabet(args.alphabet or "latin26")
-    arr = alphabet.encode(Path(args.file).read_text(encoding="utf-8"))
+    from lpswarm.textio import read_text
+    text = read_text(args.file)
+    skipped: list[str] = []
+    arr = alphabet.encode(text, skipped=skipped)
+    dropped = sorted({ch for ch in skipped if not ch.isspace()})
     print(f"alphabet {alphabet.name} (size {alphabet.size}); {len(arr)} symbols")
     print("tokens:", alphabet.decode(arr[:200]))
     print("ints:  ", " ".join(str(int(x)) for x in arr[:60]))
+    if dropped:
+        print("characters not in the alphabet (dropped):", " ".join(dropped[:80]))
     return 0
 
 
@@ -257,6 +283,8 @@ def build_parser() -> argparse.ArgumentParser:
         p.add_argument("--json", action="store_true")
         if name == "leads":
             p.add_argument("--near-miss", action="store_true")
+            p.add_argument("--final-only", action="store_true",
+                           help="only attempts that survived the final check")
             p.add_argument("--top", type=int, default=50)
         p.set_defaults(func=fn)
 
@@ -279,7 +307,15 @@ def _safe_console() -> None:
 def main(argv: Sequence[str] | None = None) -> int:
     _safe_console()
     args = build_parser().parse_args(argv)
-    return int(args.func(args) or 0)
+    try:
+        return int(args.func(args) or 0)
+    except (ValueError, FileNotFoundError, PermissionError, tomllib.TOMLDecodeError) as exc:
+        # Expected user errors: show the message, not a traceback.
+        print(f"lpswarm: error: {exc}", file=sys.stderr)
+        return 2
+    except KeyboardInterrupt:
+        print("lpswarm: interrupted (completed attempts are saved in the ledger)", file=sys.stderr)
+        return 130
 
 
 if __name__ == "__main__":

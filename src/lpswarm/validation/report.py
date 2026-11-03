@@ -55,17 +55,21 @@ def write_reports(result: dict, out_dir: Path) -> dict[str, Path]:
         "",
         "## Recall and false-positive rate by family and length",
         "",
-        "Recall = case recovered (a passing attempt with >=90% symbol agreement). "
-        "FPR = passing attempts with <50% agreement / all wrong attempts. "
-        "Partial = passing attempts with 50-90% agreement (near-solutions; not counted as FP).",
+        "Decisions use the **final check**: after the search, every in-run pass is re-scored at "
+        "alpha / N_total (N_total = all attempts on that target), which is independent of search "
+        "order. Recall = case recovered (a final pass with >= 90% similarity to the true "
+        "plaintext). In-run recall uses the running alpha / i triage verdict instead. "
+        "FPR = final passes with < 50% similarity / all wrong attempts. "
+        "Partial = final passes at 50-90% similarity (near-solutions; not counted as FP).",
         "",
-        "| family | length | cases | recall | recall 95% CI | attempts | false passes | FPR | partial |",
-        "| --- | ---: | ---: | ---: | --- | ---: | ---: | ---: | ---: |",
+        "| family | length | cases | recall | recall 95% CI | in-run recall | attempts | false passes | FPR | partial |",
+        "| --- | ---: | ---: | ---: | --- | ---: | ---: | ---: | ---: | ---: |",
     ]
     for r in result["table"]:
         lines.append(
             f"| {r['family']} | {r['length']} | {r['cases']} | {r['recall']:.2f} | "
-            f"[{r['recall_ci_lo']:.2f}, {r['recall_ci_hi']:.2f}] | {r['attempts']} | "
+            f"[{r['recall_ci_lo']:.2f}, {r['recall_ci_hi']:.2f}] | {r['recall_in_run']:.2f} | "
+            f"{r['attempts']} | "
             f"{r['false_passes']} | {r['fpr']:.2e} | {r['partial_passes']} |")
     ns = result["null_check"]
     lines += [

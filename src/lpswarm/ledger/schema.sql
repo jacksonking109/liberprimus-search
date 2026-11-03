@@ -43,9 +43,10 @@ CREATE TABLE IF NOT EXISTS key_candidate (
     id INTEGER PRIMARY KEY,
     corpus_item_id INTEGER REFERENCES corpus_item(id),
     derivation TEXT NOT NULL,          -- e.g. 'wordlist:<name>', 'enumerate', 'synthetic'
-    value_hash TEXT NOT NULL UNIQUE,
+    value_hash TEXT NOT NULL,          -- sha256(family, key); same key from two sources = two rows
     value_preview TEXT,
-    edition_id TEXT
+    edition_id TEXT,
+    UNIQUE (value_hash, derivation)
 );
 
 CREATE TABLE IF NOT EXISTS attempt (
@@ -80,9 +81,21 @@ CREATE TABLE IF NOT EXISTS result (
     passed INTEGER NOT NULL,
     attempt_count_at_scoring INTEGER NOT NULL,
     alpha_eff REAL NOT NULL,
+    unreachable INTEGER NOT NULL DEFAULT 0,  -- threshold above the best possible score
     plaintext_preview TEXT
 );
 CREATE INDEX IF NOT EXISTS result_verdict ON result(verdict);
+
+-- Order-independent final decision: every in-run pass re-scored against the
+-- total number of attempts on its target (Bonferroni over the whole search).
+CREATE TABLE IF NOT EXISTS final_check (
+    attempt_id INTEGER PRIMARY KEY REFERENCES attempt(id),
+    attempt_count_final INTEGER NOT NULL,
+    alpha_eff_final REAL NOT NULL,
+    threshold_final REAL NOT NULL,
+    passed_final INTEGER NOT NULL,
+    checked_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
 
 CREATE TABLE IF NOT EXISTS budget_event (
     id INTEGER PRIMARY KEY,

@@ -46,6 +46,7 @@ class Hit:
     threshold: float
     plaintext: str
     plaintext_arr: np.ndarray
+    attempt_id: int = 0
 
 
 @dataclass
@@ -58,6 +59,8 @@ class RunSummary:
     screened_out: int = 0
     passes: int = 0
     near_misses: int = 0
+    prior_passes: int = 0            # skipped attempts that had already passed
+    unreachable: int = 0             # attempts whose threshold exceeded the best possible score
     stopped: str | None = None       # reason if a budget or kill switch stopped the run
     hits: list[Hit] = field(default_factory=list)
     elapsed_s: float = 0.0
@@ -93,14 +96,22 @@ class Executor:
         fam = get_family(family_name)
         alpha = target.alphabet
         n = alpha.size
-        ct = np.asarray(target.ciphertext, dtype=np.int16)
+        ct = np.asarray(target.ciphertext, dtype=np.int16).reshape(-1)
         L = len(ct)
+        if L < self.oracle.min_length:
+            raise ValueError(f"ciphertext has {L} symbols; the oracle needs at least "
+                             f"{self.oracle.min_length}")
+        if ct.min() < 0 or ct.max() >= n:
+            raise ValueError(f"ciphertext values must be in 0..{n - 1} for alphabet {alpha.name}")
+        if alpha.size != self.oracle.alphabet.size or alpha.name != self.oracle.alphabet.name:
+            raise ValueError("target alphabet differs from the oracle's alphabet")
         lim = param_limits or {}
+        self.oracle.calibrate(L)  # fail early (e.g. length too long) before touching the ledger
         tid = self.ledger.add_target(alpha, ct, target.label, target.page_range, target.is_synthetic)
         self.ledger.set_hypothesis_status(hypothesis_id, "running")
+        self.ledger.commit()
         summary = RunSummary(tid, family_name, hypothesis_id)
         count = self.ledger.attempt_count(tid)
-        self.oracle.calibrate(L)
         t0 = time.monotonic()
         since_commit = 0
         exhausted = True
@@ -115,8 +126,11 @@ class Executor:
                         exhausted = False
                         raise _Stop
                     dh = dedupe_hash(tid, family_name, params, khash)
-                    if self.ledger.has_attempt(dh):
+                    prior = self.ledger.prior_verdict(dh)
+                    if prior is not None:
                         summary.skipped += 1
+                        if prior == "pass":
+                            summary.prior_passes += 1
                         continue
                     if kid is None:
                         preview = kc.label or fam.key_preview(kc.key)
@@ -131,35 +145,48 @@ class Executor:
                         cipher_family=family_name, params=params, dedupe=dh,
                         executor_version=EXECUTOR_VERSION, runtime_ms=ms,
                         page_range=target.page_range)
-                    if aid is None:  # raced with an identical attempt; treat as skipped
+                    if aid is None:  # recorded concurrently by someone else; treat as skipped
                         summary.skipped += 1
                         continue
                     count += 1
                     preview_pt = alpha.decode(pt[:PREVIEW_CHARS]) if rep.stage == "full" else None
                     self.ledger.record_result(aid, rep, preview_pt)
-                    self._tally(summary, rep, fam.name, params, khash, kc.label, alpha, pt)
+                    self._tally(summary, rep, fam.name, params, khash, kc.label, alpha, pt, aid)
                     since_commit += 1
                     if since_commit >= self.commit_every:
                         self.ledger.commit()
                         since_commit = 0
         except _Stop:
             pass
-        finally:
+        except BaseException:
+            # Roll back the uncommitted batch: an interrupt between the attempt and result
+            # inserts must not leave an attempt without a result (it would be skipped
+            # forever). At most commit_every attempts are lost and get redone next run.
+            # Do not leave the hypothesis looking 'running' forever.
+            self.ledger.rollback()
+            self.ledger.set_hypothesis_status(hypothesis_id, "open")
             self.ledger.commit()
-        if summary.passes or self.ledger.hypothesis_has_pass(hypothesis_id):
+            raise
+        self.ledger.commit()
+        tried = summary.new_attempts + summary.skipped
+        if summary.passes or summary.prior_passes or self.ledger.hypothesis_has_pass(hypothesis_id):
             status = "lead"
-        elif exhausted:
+        elif exhausted and tried > 0:
             status = "ruled_out"
         else:
-            status = "open"
+            status = "open"   # stopped early, or the key source produced nothing to try
+        if tried == 0 and exhausted:
+            summary.stopped = "empty_search_space"
         self.ledger.set_hypothesis_status(hypothesis_id, status)
         self.ledger.commit()
         summary.elapsed_s = time.monotonic() - t0
         return summary
 
     def _tally(self, s: RunSummary, rep: ScoreReport, family: str, params: dict, khash: str,
-               label: str, alpha: Alphabet, pt: np.ndarray) -> None:
+               label: str, alpha: Alphabet, pt: np.ndarray, attempt_id: int = 0) -> None:
         s.new_attempts += 1
+        if rep.unreachable:
+            s.unreachable += 1
         if rep.stage == "screen":
             s.screened_out += 1
             return
@@ -170,10 +197,34 @@ class Executor:
         else:
             return
         s.hits.append(Hit(family, dict(params), khash, label, rep.verdict, float(rep.combined),
-                          float(rep.threshold), alpha.decode(pt[:PREVIEW_CHARS]), pt.copy()))
+                          float(rep.threshold), alpha.decode(pt[:PREVIEW_CHARS]), pt.copy(),
+                          attempt_id))
         s.hits.sort(key=lambda h: h.combined - h.threshold, reverse=True)
         del s.hits[self.keep_hits:]
 
 
 class _Stop(Exception):
     pass
+
+
+def final_check(ledger: Ledger, oracle: FullOracle, target_id: str) -> list[dict]:
+    """Order-independent end-of-search decision for one target.
+
+    Re-scores every in-run pass / near miss against alpha / N_total, where N_total
+    is the number of attempts recorded on the target now (Bonferroni over the
+    whole search, whatever order it ran in). Thresholds only rise with N, so this
+    candidate set contains everything that can pass. Results go to final_check.
+    """
+    info = ledger.target_info(target_id)
+    if info is None:
+        raise ValueError(f"unknown target {target_id}")
+    total = ledger.attempt_count(target_id)
+    a, thr = oracle.final_threshold(int(info["length"]), total)
+    rows = []
+    for c in ledger.candidates_for_final(target_id):
+        ok = c["combined"] is not None and c["combined"] >= thr
+        ledger.record_final_check(c["attempt_id"], total, a, thr, ok)
+        rows.append({**c, "attempt_count_final": total, "alpha_eff_final": a,
+                     "threshold_final": thr, "passed_final": ok})
+    ledger.commit()
+    return rows

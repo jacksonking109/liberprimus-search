@@ -28,6 +28,7 @@ Two APIs:
 from __future__ import annotations
 
 import math
+import warnings
 from dataclasses import asdict, dataclass, field
 from typing import Sequence
 
@@ -39,6 +40,21 @@ from lpswarm.oracle.signals import Dictionary, LMScorer, NgramModel, index_of_co
 from lpswarm.textgen import corpus
 
 NULL_TYPES = ("shuffled", "random", "wrong_key")
+NEAR_SOLUTION = 0.5   # 4-gram overlap with the true plaintext above which a decryption is "near"
+
+
+def gram_overlap(cand: np.ndarray, truth: np.ndarray, k: int = 4) -> float:
+    """Fraction of distinct k-grams of `cand` that also occur in `truth`."""
+    if len(cand) < k or len(truth) < k:
+        return float(np.array_equal(cand, truth))
+    from numpy.lib.stride_tricks import sliding_window_view
+    wc = sliding_window_view(np.asarray(cand, dtype=np.int64), k)
+    wt = sliding_window_view(np.asarray(truth, dtype=np.int64), k)
+    base = 1 << 15
+    w = base ** np.arange(k - 1, -1, -1, dtype=np.int64)
+    gc = np.unique(wc @ w)
+    gt = wt @ w
+    return float(np.isin(gc, gt).mean())
 FAIL, NEAR_MISS, PASS = "fail", "near_miss", "pass"
 
 
@@ -58,9 +74,42 @@ class OracleConfig:
                                            "columnar")
     tail_fraction: float = 0.1          # top fraction used for exponential tail fit
     min_tail_exceedances: int = 10      # below alpha_eff * M < this, use the tail fit
-    multiple_comparisons: str = "bonferroni"   # or "none"
+    multiple_comparisons: str = "bonferroni"   # "bonferroni" | "spending" | "none" (see module doc)
     languages: tuple[str, ...] = ("english",)
+    max_table_size: int = 20_000_000    # n-gram order is lowered until N**order fits
     seed: int = 0
+
+    def __post_init__(self) -> None:
+        def bad(msg: str) -> None:
+            raise ValueError(f"OracleConfig: {msg}")
+        if not 0.0 < self.alpha < 1.0:
+            bad(f"alpha must be in (0, 1), got {self.alpha}")
+        if not 0.0 < self.screen_alpha <= 1.0:
+            bad(f"screen_alpha must be in (0, 1], got {self.screen_alpha}")
+        if self.order < 1:
+            bad("order must be >= 1")
+        if self.smoothing <= 0:
+            bad("smoothing must be > 0")
+        if self.null_samples < 100:
+            bad(f"null_samples must be >= 100, got {self.null_samples}")
+        if not 1 <= self.dict_min_len <= self.dict_max_len:
+            bad("need 1 <= dict_min_len <= dict_max_len")
+        if not 0.0 < self.tail_fraction < 1.0:
+            bad("tail_fraction must be in (0, 1)")
+        if self.multiple_comparisons not in ("bonferroni", "spending", "none"):
+            bad(f"unknown multiple_comparisons {self.multiple_comparisons!r}")
+        unknown = set(self.null_types) - set(NULL_TYPES)
+        if unknown or not self.null_types:
+            bad(f"null_types must be a non-empty subset of {NULL_TYPES}")
+        if not self.languages:
+            bad("at least one language is required")
+        self.null_types = tuple(self.null_types)
+        self.wrong_key_families = tuple(self.wrong_key_families)
+        self.languages = tuple(self.languages)
+        if "wrong_key" in self.null_types and not self.wrong_key_families:
+            bad("wrong_key nulls need at least one family")
+        for f in self.wrong_key_families:
+            get_family(f)  # raises on unknown names
 
 
 @dataclass
@@ -83,6 +132,7 @@ class ScoreReport:
     percentiles: dict = field(default_factory=dict)
     attempt_count: int = 1
     alpha_eff: float = 0.0
+    unreachable: bool = False         # threshold above the best score any text could get
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -104,24 +154,52 @@ class FullOracle:
         self.cfg = config or OracleConfig()
         self.lm_scorer = lm_scorer
         n = alphabet.size
+        if n < 2:
+            raise ValueError("the oracle needs an alphabet of at least 2 symbols")
+        # Lower the n-gram order for big alphabets so the table fits in memory.
+        order = self.cfg.order
+        while order > 1 and n ** order > self.cfg.max_table_size:
+            order -= 1
+        if order != self.cfg.order:
+            warnings.warn(f"alphabet size {n}: n-gram order lowered from {self.cfg.order} to "
+                          f"{order} to keep the table under {self.cfg.max_table_size} entries",
+                          stacklevel=2)
+        self.order = order
+        screen_order = min(2, order)
         self._good: dict[str, np.ndarray] = {}
         self._models: dict[str, tuple[NgramModel, NgramModel, Dictionary]] = {}
         self._words: list[np.ndarray] = []
+        self._max_combined = -math.inf
+        supplied = training_texts or {}
+        self.training_sources: dict[str, list[str]] = {}
         for lang in self.cfg.languages:
-            text = (training_texts or {}).get(lang) or corpus.training_text(lang)
+            if supplied.get(lang):
+                text = supplied[lang]
+                self.training_sources[lang] = ["<supplied text>"]
+                vocab = corpus.wordlist_from_text(text, min_len=self.cfg.dict_min_len,
+                                                  limit=self.cfg.dict_size)
+            else:
+                text = corpus.training_text(lang)
+                self.training_sources[lang] = corpus.training_sources(lang)
+                vocab = corpus.wordlist(lang, min_len=self.cfg.dict_min_len,
+                                        limit=self.cfg.dict_size)
             arr = alphabet.encode(text)
             if len(arr) < 1000:
-                raise ValueError(f"training text for {lang} too short after encoding")
+                raise ValueError(f"training text for {lang} has only {len(arr)} symbols under "
+                                 f"alphabet {alphabet.name}; need >= 1000 (check the alphabet "
+                                 "tokens cover the corpus letters)")
             self._good[lang] = arr
-            screen = NgramModel.train(arr, n, 2, self.cfg.smoothing, f"{lang}-2")
-            full = NgramModel.train(arr, n, self.cfg.order, self.cfg.smoothing,
-                                    f"{lang}-{self.cfg.order}")
-            words = [alphabet.encode(w) for w in
-                     corpus.wordlist(lang, min_len=self.cfg.dict_min_len, limit=self.cfg.dict_size)]
-            self._words.extend(w for w in words if len(w) >= self.cfg.dict_min_len)
+            screen = NgramModel.train(arr, n, screen_order, self.cfg.smoothing, f"{lang}-{screen_order}")
+            full = NgramModel.train(arr, n, order, self.cfg.smoothing, f"{lang}-{order}")
+            words = [w for w in (alphabet.encode(v) for v in vocab)
+                     if len(w) >= self.cfg.dict_min_len]
+            self._words.extend(words)
             self._models[lang] = (screen, full, Dictionary(words, self.cfg.dict_min_len,
                                                           self.cfg.dict_max_len))
+            self._max_combined = max(self._max_combined,
+                                     float(full.logprob.max()) + max(0.0, self.cfg.dict_weight))
         self._cache: dict[int, _NullSet] = {}
+        self.min_length = max(2, order)
 
     # ------------------------------------------------------------ raw signals
     def _screen(self, arr: np.ndarray) -> float:
@@ -138,9 +216,10 @@ class FullOracle:
         return best  # type: ignore[return-value]
 
     # ------------------------------------------------------------ null model
-    def _null_samples(self, length: int, kind: str, rng: np.random.Generator) -> list[np.ndarray]:
+    def _null_samples(self, length: int, kind: str, rng: np.random.Generator,
+                      count: int | None = None) -> list[np.ndarray]:
         n = self.alphabet.size
-        M = self.cfg.null_samples
+        M = self.cfg.null_samples if count is None else int(count)
         langs = list(self._good)
         out = []
         fams = [get_family(f) for f in self.cfg.wrong_key_families]
@@ -149,30 +228,69 @@ class FullOracle:
                 out.append(rng.integers(0, n, size=length).astype(np.int16))
                 continue
             good = self._good[langs[i % len(langs)]]
-            start = int(rng.integers(0, len(good) - length))
-            pt = good[start:start + length]
+            pt = self._window(rng, good, length)
             if kind == "shuffled":
                 out.append(rng.permutation(pt))
             elif kind == "wrong_key":
                 fam = fams[i % len(fams)]
-                k1 = fam.random_key(rng, n, "medium", words=self._words, length=length)
-                p1 = fam.random_params(rng, length, k1)
-                ct = fam.encrypt(pt, k1, n, **p1)
-                for _ in range(20):
-                    k2 = fam.random_key(rng, n, "medium", words=self._words, length=length)
-                    if fam.key_json(k2) != fam.key_json(k1):
-                        break
-                cand = fam.decrypt(ct, k2, n, **p1)
-                out.append(cand)
+                out.append(self._wrong_key_sample(fams[i % len(fams)], pt, good, rng))
             else:
                 raise ValueError(f"unknown null type {kind}")
         return out
 
+    def _wrong_key_sample(self, fam, pt: np.ndarray, good: np.ndarray,
+                          rng: np.random.Generator, tries: int = 20) -> np.ndarray:
+        """Decrypt pt's encryption under a *wrong* key.
+
+        A key can differ from the true one yet decrypt (almost) correctly:
+        equivalent keys (identity column orders of different widths, periodic
+        repeats like ABCABC vs ABC), keyword alphabets sharing their tail, a
+        Vigenere key off by one letter. Those are near-solutions, not noise, so
+        any candidate sharing >= NEAR_SOLUTION of its 4-grams with the true
+        plaintext is redrawn. This matches the validation harness, which counts
+        such decryptions as partial solutions rather than false positives.
+        """
+        n = self.alphabet.size
+        L = len(pt)
+        if fam.name == "running_key":
+            k1 = self._window(rng, good, L + 200)
+            p1 = fam.random_params(rng, L, k1)
+            ct = fam.encrypt(pt, k1, n, **p1)
+            for _ in range(tries):
+                k2 = self._window(rng, good, L + 200)
+                cand = fam.decrypt(ct, k2, n, **fam.random_params(rng, L, k2))
+                if gram_overlap(cand, pt) < NEAR_SOLUTION:
+                    return cand
+            return rng.permutation(pt)
+        k1 = fam.random_key(rng, n, "medium", words=self._words, length=L)
+        p1 = fam.random_params(rng, L, k1)
+        ct = fam.encrypt(pt, k1, n, **p1)
+        for _ in range(tries):
+            k2 = fam.random_key(rng, n, "medium", words=self._words, length=L)
+            if fam.key_json(k2) == fam.key_json(k1):
+                continue
+            cand = fam.decrypt(ct, k2, n, **p1)
+            if gram_overlap(cand, pt) < NEAR_SOLUTION:
+                return cand
+        # Tiny key spaces may offer no genuinely wrong key; never put the true
+        # plaintext (or a near copy) into the null.
+        return rng.permutation(pt)
+
+    @staticmethod
+    def _window(rng: np.random.Generator, good: np.ndarray, length: int) -> np.ndarray:
+        if length > len(good):
+            raise ValueError(f"length {length} exceeds the training text ({len(good)} symbols)")
+        start = int(rng.integers(0, len(good) - length + 1))
+        return good[start:start + length]
+
     def calibrate(self, length: int) -> _NullSet:
         if length in self._cache:
             return self._cache[length]
-        if length < max(2, self.cfg.order):
-            raise ValueError(f"length {length} too short to score (order {self.cfg.order})")
+        if length < self.min_length:
+            raise ValueError(f"length {length} too short to score (minimum {self.min_length} "
+                             f"for n-gram order {self.order})")
+        if any(length + 200 > len(g) for g in self._good.values()):
+            raise ValueError(f"length {length} too long for the training text; supply more corpus")
         rng = np.random.default_rng([self.cfg.seed, length, 0xCA11])
         screen: dict[str, np.ndarray] = {}
         combined: dict[str, np.ndarray] = {}
@@ -216,9 +334,29 @@ class FullOracle:
         return max(x, float(sorted_vals[-1]))
 
     def alpha_eff(self, attempt_count: int) -> float:
-        if self.cfg.multiple_comparisons == "none":
+        """Per-attempt level for the i-th attempt on a target (i = attempt_count).
+
+        bonferroni: alpha / i. Used in-run as a triage level; the binding,
+            order-independent decision is final_check() at alpha / N_total.
+        spending:   alpha / (i (i + 1)). Sums to < alpha over any number of
+            attempts, so in-run passes already control the family-wise error
+            rate, at the price of depending on search order.
+        none:       alpha.
+        """
+        i = max(1, int(attempt_count))
+        mode = self.cfg.multiple_comparisons
+        if mode == "none":
             return self.cfg.alpha
-        return self.cfg.alpha / max(1, int(attempt_count))
+        if mode == "spending":
+            return self.cfg.alpha / (i * (i + 1.0))
+        return self.cfg.alpha / i
+
+    def final_threshold(self, length: int, total_attempts: int) -> tuple[float, float]:
+        """(alpha_eff, threshold) for the end-of-search Bonferroni check over all attempts."""
+        ns = self.calibrate(length)
+        a = self.cfg.alpha if self.cfg.multiple_comparisons == "none" \
+            else self.cfg.alpha / max(1, int(total_attempts))
+        return a, max(self._upper_quantile(v, a) for v in ns.combined.values())
 
     def threshold(self, length: int, attempt_count: int = 1) -> float:
         ns = self.calibrate(length)
@@ -232,15 +370,17 @@ class FullOracle:
         ns = self.calibrate(L)
         s = self._screen(arr)
         a_eff = self.alpha_eff(attempt_count)
+        thr = max(self._upper_quantile(v, a_eff) for v in ns.combined.values())
+        unreachable = thr >= self._max_combined
         if s < ns.screen_threshold:
             return ScoreReport(L, "screen", FAIL, False, s, ns.screen_threshold,
-                               attempt_count=attempt_count, alpha_eff=a_eff)
+                               threshold=thr, attempt_count=attempt_count, alpha_eff=a_eff,
+                               unreachable=unreachable)
         comb, lang, ng, dc = self._full(arr)
         ic = index_of_coincidence(arr, self.alphabet.size)
         lm = None
         if self.lm_scorer is not None:
             lm = float(self.lm_scorer(self.alphabet.decode(arr)))
-        thr = max(self._upper_quantile(v, a_eff) for v in ns.combined.values())
         thr0 = max(self._upper_quantile(v, self.cfg.alpha) for v in ns.combined.values())
         pct = {k: float(np.searchsorted(v, x, side="right") / len(v))
                for k, v, x in (("ic", ns.pooled["ic"], ic), ("ngram", ns.pooled["ngram"], ng),
@@ -256,7 +396,8 @@ class FullOracle:
         else:
             verdict = FAIL
         return ScoreReport(L, "full", verdict, verdict == PASS, s, ns.screen_threshold, ic, ng, dc,
-                           lm, comb, lang, thr, thr0, null_pct, pct, attempt_count, a_eff)
+                           lm, comb, lang, thr, thr0, null_pct, pct, attempt_count, a_eff,
+                           unreachable)
 
 
 class CoarseOracle:
@@ -284,33 +425,36 @@ def null_fpr_check(oracle: FullOracle, lengths: Sequence[int], samples: int = 20
     <= alpha + tol, and the worst type's FPR should be within +/- tol of alpha.
     Returns {"rows": per (length, type), "summary": per length}.
     """
+    if samples < 1:
+        raise ValueError("samples must be >= 1")
     rows, summary = [], []
     cfg = oracle.cfg
     for L in lengths:
         oracle.calibrate(L)
         rng = np.random.default_rng([seed, L, 0xF00D])
-        saved = cfg.null_samples
-        cfg.null_samples = samples
-        tol = fpr_tolerance(cfg.alpha, samples, saved)
+        tol = fpr_tolerance(cfg.alpha, samples, cfg.null_samples)
         worst = 0.0
         ok_all = True
-        try:
-            for kind in cfg.null_types:
-                arrs = oracle._null_samples(L, kind, rng)
-                hits = sum(1 for arr in arrs if oracle.score(arr, attempt_count=1).passed)
-                fpr = hits / len(arrs)
-                lo, hi = wilson(hits, len(arrs))
-                ok = fpr <= cfg.alpha + tol
-                ok_all &= ok
-                worst = max(worst, fpr)
-                rows.append({"length": L, "null_type": kind, "n": len(arrs), "false_pos": hits,
-                             "fpr": fpr, "ci_lo": lo, "ci_hi": hi, "alpha": cfg.alpha,
-                             "tolerance": tol, "not_anticonservative": ok})
-        finally:
-            cfg.null_samples = saved
+        for kind in cfg.null_types:
+            arrs = oracle._null_samples(L, kind, rng, count=samples)
+            hits = sum(1 for arr in arrs if _passes_unadjusted(oracle.score(arr, attempt_count=1)))
+            fpr = hits / len(arrs)
+            lo, hi = wilson(hits, len(arrs))
+            ok = fpr <= cfg.alpha + tol
+            ok_all &= ok
+            worst = max(worst, fpr)
+            rows.append({"length": L, "null_type": kind, "n": len(arrs), "false_pos": hits,
+                         "fpr": fpr, "ci_lo": lo, "ci_hi": hi, "alpha": cfg.alpha,
+                         "tolerance": tol, "not_anticonservative": ok})
         summary.append({"length": L, "alpha": cfg.alpha, "worst_type_fpr": worst, "tolerance": tol,
                         "within_tolerance": ok_all and abs(worst - cfg.alpha) <= tol})
     return {"rows": rows, "summary": summary}
+
+
+def _passes_unadjusted(rep: ScoreReport) -> bool:
+    """Passed the screen and beat the threshold at the configured alpha, ignoring any
+    multiple-comparison adjustment (pass or near_miss)."""
+    return rep.stage == "full" and rep.verdict in (PASS, NEAR_MISS)
 
 
 def wilson(k: int, n: int, z: float = 1.96) -> tuple[float, float]:

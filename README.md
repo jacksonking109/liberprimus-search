@@ -73,6 +73,10 @@ per-family budgets.
 N ≥ 26, whose extra symbols are the commonest corpus digraphs), or a path to an alphabet JSON (see
 `TODO_USER.md`). `--alpha` sets the per-attempt false-positive rate.
 
+Extra training text goes in `data/corpora/english/*.txt` (or under `$LPSWARM_DATA` if set).
+Files that overlap the held-out validation book are refused with a warning. Text files may be
+UTF-8 with or without a BOM, or UTF-16; anything else gets a clear error.
+
 A TOML file passed with `--config` can set any field of `OracleConfig`
 (`src/lpswarm/oracle/oracle.py`), `ValidationConfig` (`src/lpswarm/validation/harness.py`) and
 `BaselineConfig` (`src/lpswarm/baseline/bruteforce.py`):
@@ -99,13 +103,27 @@ For a candidate of length L:
    do not affect the decision in Phase 1.
 3. **Threshold:** for each null type (shuffled good text, uniform random symbols, wrong-key
    decryptions of good text under each family), the upper `alpha_eff` quantile of `combined` at
-   exactly length L; the threshold is the max over types. `alpha_eff = alpha / n`, where n is the
-   number of attempts recorded against this target, counting this one (Bonferroni). When
-   `alpha_eff` is below what the null sample can resolve, the tail is extrapolated with an
-   exponential fit to the top 10% of samples.
-4. **Verdict:** `pass` if combined ≥ adjusted threshold, `near_miss` if it only beats the
-   unadjusted one, else `fail`. The ledger stores every signal, the null percentile, the threshold
-   and `attempt_count_at_scoring`.
+   exactly length L; the threshold is the max over types. When `alpha_eff` is below what the null
+   sample can resolve, the tail is extrapolated with an exponential fit to the top 10% of samples.
+   Wrong-key samples that are really near-solutions (equivalent keys such as identity column
+   orders of different widths, keyword alphabets sharing their tail; ≥ 50% 4-gram overlap with
+   the true plaintext) are redrawn: they are not noise.
+4. **In-run verdict (triage):** attempt *i* on a target is scored at `alpha_eff = alpha / i`.
+   `pass` if combined ≥ that threshold, `near_miss` if it only beats the unadjusted one, else
+   `fail`. The ledger stores every signal, the null percentile, the threshold and
+   `attempt_count_at_scoring`.
+5. **Final check (the binding decision):** after a search, every in-run pass / near miss is
+   re-scored at `alpha / N_total`, where N_total is every attempt recorded on that target
+   (Bonferroni over the whole search). This does not depend on the order attempts ran in, and it
+   keeps the chance of *any* false pass on a target at or below alpha. Thresholds only rise with N,
+   so nothing outside the re-scored set could pass. `lpswarm leads` marks survivors `FINAL`.
+
+   The running `alpha / i` level on its own would not control the error rate (expected false
+   passes grow like alpha · ln N). `multiple_comparisons = "spending"` switches the in-run level to
+   `alpha / (i(i+1))`, which sums to less than alpha and so is valid by itself, at the cost of
+   penalising whatever runs last. If a threshold exceeds the best score any text could reach, the
+   result is flagged `unreachable` and the baseline prints a warning: the ciphertext is too short
+   for that many attempts.
 
 Generators (Phase 3) only get `CoarseOracle.judge()`, which returns the verdict string and nothing
 else. Held-out synthetic data is only reachable from `lpswarm.validation` and the tests.
@@ -115,23 +133,36 @@ else. Held-out synthetic data is only reachable from `lpswarm.validation` and th
 `lpswarm validate` writes `reports/validation.md` (+ CSV/JSON). A copy of the reference run is in
 `docs/baseline_validation.md`. Each case hides the true key among decoys and counts:
 
-- **recall:** a passing attempt reproduces the true plaintext (≥ 90 % similarity);
-- **FPR:** passing attempts unrelated to the truth (< 50 % similarity) / all wrong attempts;
-- **partial:** passing attempts at 50–90 % similarity, i.e. near-solutions such as a columnar key
+- **recall:** an attempt that survives the final check reproduces the true plaintext
+  (≥ 90 % similarity); *in-run recall* uses the triage verdict instead;
+- **FPR:** final passes unrelated to the truth (< 50 % similarity) / all wrong attempts;
+- **partial:** final passes at 50–90 % similarity, i.e. near-solutions such as a columnar key
   with two columns swapped. Reported, not counted as false positives.
+
+Reference result (seed 0, 5 cases per cell, ~40 s): recall 1.0 for every family at lengths
+40–200; at length 20 recall falls to 0.6–1.0 (running key: 0.0 final, 0.6 in-run) because the
+threshold for ~10k attempts approaches the score of real English. One false pass in 160k
+attempts over 150 targets, consistent with the per-target alpha = 0.01. Null FPR at the
+configured alpha sits between 0.4% and 1.5% across lengths, within the stated tolerance.
 
 ## Known limitations
 
 - **Short texts are the hard case.** At length ~20 the n-gram statistics barely separate English
   from noise once the threshold is adjusted for thousands of attempts; recall drops there first.
 - **Bonferroni is conservative.** Over millions of attempts it raises the bar a lot. It controls
-  the chance of *any* false pass per target, not the false discovery rate.
+  the chance of *any* false pass per target, not the false discovery rate. Across many targets
+  (e.g. one per LP page) the per-target guarantee does not add up to a global one; set a smaller
+  alpha if you search many pages.
+- **The final check counts attempts, not distinct decryptions.** Equivalent keys (e.g. periodic
+  Vigenère repeats) are separate attempts, which makes it slightly more conservative.
 - **Tail extrapolation is a model.** Thresholds below 1/null_samples rely on the exponential tail
   fit; the null check only verifies the empirical part (attempt_count = 1).
 - **Calibration is per exact length and in memory.** First scoring at a new length costs about a
   second; nothing is cached on disk.
 - **Wrong-key nulls cover only the configured families**, using medium-difficulty keys. A cipher
   family not in that list may have an unrepresented null.
+- **Large alphabets lower the n-gram order** automatically (N^order ≤ 20M table entries), with a
+  warning; a 29-symbol alphabet keeps order 4.
 - **Substitution is only searched through keyword-mixed alphabets.** There is no hill-climbing
   solver for random substitution keys.
 - **Running key needs supplied texts**; there is no built-in key-text library yet (Phase 2).

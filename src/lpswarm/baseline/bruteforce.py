@@ -15,7 +15,7 @@ import numpy as np
 from lpswarm.alphabet import Alphabet
 from lpswarm.ciphers import VARIANTS
 from lpswarm.executor import (ChainKeys, EnumeratedKeys, Executor, KeySource, RunSummary, Target,
-                              TextKeys, WordlistKeys)
+                              TextKeys, WordlistKeys, final_check)
 from lpswarm.ledger import Ledger
 from lpswarm.oracle import FullOracle
 
@@ -31,14 +31,25 @@ class BaselineConfig:
     running_key_offset_step: int = 1
     running_key_max_offsets: int = 20000  # per key text
     max_attempts_per_family: int | None = None
-    timeout_s: float | None = None
+    timeout_s: float | None = None        # per family
     stop_file: str | None = "STOP"
+
+    def __post_init__(self) -> None:
+        from lpswarm.ciphers import get_family
+        self.families = tuple(self.families)
+        for f in self.families:
+            get_family(f)
+        if self.vigenere_enum_len < 0 or self.columnar_max_width < 2:
+            raise ValueError("BaselineConfig: vigenere_enum_len >= 0 and columnar_max_width >= 2")
+        if self.running_key_offset_step < 1 or self.running_key_max_offsets < 1:
+            raise ValueError("BaselineConfig: running-key step and max offsets must be >= 1")
 
 
 @dataclass
 class BaselineResult:
     target_id: str
     summaries: list[RunSummary] = field(default_factory=list)
+    final: list[dict] = field(default_factory=list)   # end-of-search Bonferroni check
 
 
 def _family_plan(family: str, words: WordlistKeys, cfg: BaselineConfig,
@@ -59,8 +70,10 @@ def _family_plan(family: str, words: WordlistKeys, cfg: BaselineConfig,
     if family == "running_key":
         if not key_texts:
             return None
-        hi = min(cfg.running_key_max_offsets * cfg.running_key_offset_step,
-                 max(len(t) for _, t in key_texts))
+        usable = [len(t) - length for _, t in key_texts if len(t) >= length]
+        if not usable:
+            return None
+        hi = min((cfg.running_key_max_offsets - 1) * cfg.running_key_offset_step, max(usable))
         return (TextKeys(list(key_texts), name="user-texts"),
                 {"offset_hi": hi, "offset_step": cfg.running_key_offset_step,
                  "variants": VARIANTS},
@@ -85,7 +98,7 @@ def run_baseline(target: Target, ledger: Ledger, oracle: FullOracle, words: Sequ
         plan = _family_plan(fam, wl, cfg, key_texts, L)
         if plan is None:
             if progress:
-                print(f"{fam:<13} skipped (no key texts supplied)")
+                print(f"{fam:<13} skipped (no key texts at least as long as the ciphertext)")
             continue
         src, limits, desc = plan
         hyp = ledger.find_or_add_hypothesis(fam, f"brute force: {desc}", "baseline", "baseline")
@@ -96,8 +109,13 @@ def run_baseline(target: Target, ledger: Ledger, oracle: FullOracle, words: Sequ
                   f"screened_out={s.screened_out:<8} pass={s.passes:<4} near={s.near_misses:<5} "
                   f"{s.elapsed_s:6.1f}s" + (f"  stopped: {s.stopped}" if s.stopped else ""),
                   flush=True)
-        if s.stopped in ("stop_file", "stop_event", "timeout"):
+            if s.unreachable:
+                print(f"{'':<13} warning: {s.unreachable} attempts had a threshold above the best "
+                      "possible score (ciphertext too short for this many attempts)")
+        # max_attempts and timeout are per family; only the kill switch stops the whole run.
+        if s.stopped in ("stop_file", "stop_event"):
             break
+    res.final = final_check(ledger, oracle, res.target_id)
     return res
 
 
@@ -106,8 +124,11 @@ def load_key_texts(paths: Sequence[str | Path], alphabet: Alphabet) -> list[tupl
     for p in paths:
         p = Path(p)
         files = sorted(p.glob("*.txt")) if p.is_dir() else [p]
+        if not files:
+            raise FileNotFoundError(f"no key texts found at {p}")
+        from lpswarm.textio import read_text
         for f in files:
-            arr = alphabet.encode(f.read_text(encoding="utf-8", errors="replace"))
+            arr = alphabet.encode(read_text(f, errors="replace"))
             if len(arr):
                 out.append((f.name, arr))
     return out

@@ -20,7 +20,25 @@ from lpswarm.alphabet import Alphabet
 
 
 def canonical_json(obj: Any) -> str:
-    return json.dumps(obj, sort_keys=True, separators=(",", ":"), default=_default)
+    return json.dumps(_canon(obj), sort_keys=True, separators=(",", ":"), default=_default)
+
+
+def _canon(obj: Any) -> Any:
+    """Normalise values so equal params hash equally (1 == 1.0 == np.int64(1))."""
+    if isinstance(obj, dict):
+        return {str(k): _canon(v) for k, v in obj.items()}
+    if isinstance(obj, (list, tuple)):
+        return [_canon(v) for v in obj]
+    if isinstance(obj, np.ndarray):
+        return [_canon(v) for v in obj.tolist()]
+    if isinstance(obj, (bool, np.bool_)):
+        return bool(obj)
+    if isinstance(obj, (int, np.integer)):
+        return int(obj)
+    if isinstance(obj, (float, np.floating)):
+        f = float(obj)
+        return int(f) if f.is_integer() else f
+    return obj
 
 
 def _default(o: Any) -> Any:
@@ -72,11 +90,15 @@ class Ledger:
             yield
             self.conn.commit()
         except BaseException:
-            self.conn.rollback()
+            self.rollback()
             raise
 
     def commit(self) -> None:
         self.conn.commit()
+
+    def rollback(self) -> None:
+        self.conn.rollback()
+        self._key_ids.clear()  # cached ids may refer to rolled-back rows
 
     # ---------------------------------------------------------------- records
     def add_corpus_item(self, work: str, author: str | None = None, edition: str | None = None,
@@ -130,16 +152,18 @@ class Ledger:
 
     def key_candidate_id(self, value_hash: str, derivation: str, preview: str | None = None,
                          corpus_item_id: int | None = None, edition_id: str | None = None) -> int:
-        kid = self._key_ids.get(value_hash)
+        ck = (value_hash, derivation)
+        kid = self._key_ids.get(ck)
         if kid is not None:
             return kid
         self.conn.execute(
             "INSERT OR IGNORE INTO key_candidate (corpus_item_id, derivation, value_hash,"
             " value_preview, edition_id) VALUES (?,?,?,?,?)",
             (corpus_item_id, derivation, value_hash, preview, edition_id))
-        kid = int(self.conn.execute("SELECT id FROM key_candidate WHERE value_hash=?",
-                                    (value_hash,)).fetchone()["id"])
-        self._key_ids[value_hash] = kid
+        kid = int(self.conn.execute(
+            "SELECT id FROM key_candidate WHERE value_hash=? AND derivation=?",
+            (value_hash, derivation)).fetchone()["id"])
+        self._key_ids[ck] = kid
         return kid
 
     def hypothesis_has_pass(self, hypothesis_id: int) -> bool:
@@ -150,6 +174,12 @@ class Ledger:
     def has_attempt(self, dhash: str) -> bool:
         return self.conn.execute("SELECT 1 FROM attempt WHERE dedupe_hash=?",
                                  (dhash,)).fetchone() is not None
+
+    def prior_verdict(self, dhash: str) -> str | None:
+        """Verdict of an already-recorded attempt (None if absent or unscored)."""
+        row = self.conn.execute("SELECT r.verdict FROM attempt a JOIN result r ON r.attempt_id=a.id"
+                                " WHERE a.dedupe_hash=?", (dhash,)).fetchone()
+        return row[0] if row else None
 
     def attempt_count(self, target_id: str) -> int:
         return int(self.conn.execute("SELECT COUNT(*) FROM attempt WHERE target_id=?",
@@ -173,11 +203,31 @@ class Ledger:
         self.conn.execute(
             "INSERT OR IGNORE INTO result (attempt_id, stage, verdict, ic, ngram_score, dict_score,"
             " lm_loglik, combined, screen_score, threshold, null_percentile, passed,"
-            " attempt_count_at_scoring, alpha_eff, plaintext_preview)"
-            " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            " attempt_count_at_scoring, alpha_eff, unreachable, plaintext_preview)"
+            " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
             (attempt_id, r.stage, r.verdict, r.ic, r.ngram_score, r.dict_score, r.lm_loglik,
              r.combined, r.screen_score, r.threshold, r.null_percentile, int(r.passed),
-             r.attempt_count, r.alpha_eff, plaintext_preview))
+             r.attempt_count, r.alpha_eff, int(bool(getattr(r, "unreachable", False))),
+             plaintext_preview))
+
+    def record_final_check(self, attempt_id: int, attempt_count: int, alpha_eff: float,
+                           threshold: float, passed: bool) -> None:
+        self.conn.execute(
+            "INSERT OR REPLACE INTO final_check (attempt_id, attempt_count_final, alpha_eff_final,"
+            " threshold_final, passed_final) VALUES (?,?,?,?,?)",
+            (attempt_id, attempt_count, alpha_eff, threshold, int(passed)))
+
+    def candidates_for_final(self, target_id: str) -> list[dict]:
+        """In-run passes and near misses on a target, with their scores."""
+        rows = self.conn.execute(
+            "SELECT a.id AS attempt_id, r.combined, r.verdict FROM attempt a"
+            " JOIN result r ON r.attempt_id=a.id WHERE a.target_id=? AND r.stage='full'"
+            " AND r.verdict IN ('pass','near_miss')", (target_id,)).fetchall()
+        return [dict(r) for r in rows]
+
+    def target_info(self, target_id: str) -> dict | None:
+        row = self.conn.execute("SELECT * FROM target WHERE id=?", (target_id,)).fetchone()
+        return dict(row) if row else None
 
     def add_budget_event(self, vendor: str, model: str, tokens_in: int = 0, tokens_out: int = 0,
                          usd: float = 0.0, task_id: str | None = None) -> int:
@@ -208,18 +258,34 @@ class Ledger:
         return [dict(r) for r in rows]
 
     def leads(self, target_id: str | None = None, include_near_miss: bool = False,
-              limit: int = 50) -> list[dict]:
-        """Human queue: passing (optionally near-miss) attempts, best first."""
+              limit: int = 50, final_only: bool = False) -> list[dict]:
+        """Human queue: passing (optionally near-miss) attempts, best margin first.
+
+        `passed_final` is NULL until final_check has run for the target; with
+        final_only=True only attempts that survived it are returned.
+        """
         verdicts = ("pass", "near_miss") if include_near_miss else ("pass",)
         q = ",".join("?" * len(verdicts))
+        where = [f"r.verdict IN ({q})"]
+        args: list = list(verdicts)
+        if target_id:
+            where.append("a.target_id=?")
+            args.append(target_id)
+        if final_only:
+            where.append("f.passed_final=1")
         sql = ("SELECT a.id AS attempt_id, a.target_id, a.cipher_family, a.params_json,"
                " k.value_preview AS key_preview, k.derivation, r.verdict, r.combined, r.threshold,"
                " r.null_percentile, r.attempt_count_at_scoring, r.plaintext_preview,"
+               " f.passed_final, f.threshold_final, f.attempt_count_final,"
                " h.proposer_model, h.proposer_role"
                " FROM attempt a JOIN result r ON r.attempt_id=a.id"
                " JOIN key_candidate k ON k.id=a.key_candidate_id"
                " JOIN hypothesis h ON h.id=a.hypothesis_id"
-               f" WHERE r.verdict IN ({q})" + (" AND a.target_id=?" if target_id else "") +
+               " LEFT JOIN final_check f ON f.attempt_id=a.id"
+               " WHERE " + " AND ".join(where) +
                " ORDER BY (r.combined - r.threshold) DESC LIMIT ?")
-        args: tuple = verdicts + ((target_id,) if target_id else ()) + (limit,)
+        args.append(int(limit))
         return [dict(r) for r in self.conn.execute(sql, args).fetchall()]
+
+    def targets(self) -> list[dict]:
+        return [dict(r) for r in self.conn.execute("SELECT * FROM target ORDER BY created_at")]

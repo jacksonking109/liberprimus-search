@@ -65,7 +65,9 @@ class CipherFamily(ABC):
         return int(key)
 
     def key_hash(self, key: Any) -> str:
-        return hashlib.sha256(json.dumps(self.key_json(key), separators=(",", ":")).encode()).hexdigest()
+        """Family-scoped: the same integers mean different keys in different families."""
+        payload = json.dumps([self.name, self.key_json(key)], separators=(",", ":"))
+        return hashlib.sha256(payload.encode()).hexdigest()
 
     def key_preview(self, key: Any, max_len: int = 64) -> str:
         s = json.dumps(self.key_json(key), separators=(",", ":"))

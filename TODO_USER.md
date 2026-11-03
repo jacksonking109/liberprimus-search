@@ -8,6 +8,14 @@ Things only you can supply or decide. Each has a default so work can continue.
       file per section/page range. Runes or a transliteration both work as long as the alphabet
       file (next item) covers the characters. Check how a file is read with
       `lpswarm encode data/<file>.txt --alphabet data/alphabet.json`.
+      Candidate sources you pointed to (not yet reviewed or imported; treat as third-party data,
+      check their licences and transcription conventions first):
+      `github.com/scream314/cicada3301`, `github.com/cijhho123/cicada3301`.
+      Preferred format: one plain UTF-8 file per page or section, runes as-is, keeping the
+      original word/line/page separators. Markdown is fine only if the rune text is raw (e.g. in
+      code blocks); headings and tables are dropped as unknown characters. Separators are
+      currently ignored by the scorer (see "Word breaks" below); keeping them costs nothing and
+      lets a later phase use them.
 - [ ] **Alphabet / rune table.** Nothing about the Gematria Primus is hard-coded. Write
       `data/alphabet.json`:
       ```json
@@ -36,9 +44,10 @@ Things only you can supply or decide. Each has a default so work can continue.
       DeepSeek goes through its API and everything else is local (Qwen or Gemma as proposers,
       Granite tiny for weighting/triage). Recorded in `config/models.example.toml`; key read from
       `DEEPSEEK_API_KEY` at call time only. Confirm exact model tags and a USD cap.
-- [ ] **False-positive rate.** [alpha = 0.01 per attempt, Bonferroni over attempts per target.]
-      For a real search over millions of keys you may prefer controlling the false discovery
-      rate instead; that would be a new `multiple_comparisons` mode.
+- [ ] **False-positive rate.** [alpha = 0.01 per target: the final check is Bonferroni over
+      every attempt on the target.] If you search many pages, the chance of a false pass
+      *somewhere* grows with the number of pages; lower alpha (e.g. 0.01 / number of pages) or
+      add a false-discovery-rate mode.
 - [ ] **Calibration tolerance.** [3 binomial standard errors over test + calibration samples.]
 - [ ] **Word breaks.** [Ignored: ciphertexts are scored as unbroken symbol streams and dictionary
       coverage uses segmentation.] If you want word-separator positions from the real pages used

@@ -4,8 +4,10 @@ For each cipher family and ciphertext length, held-out synthetic cases are
 generated (answers hidden from the executor), the executor searches a key space
 that contains the true key among decoys, and we measure:
 
-  recall  = fraction of cases where some passing attempt reproduces the
-            true plaintext (>= 90% symbol agreement);
+  recall  = fraction of cases where some attempt that passes the *final*
+            check (Bonferroni over every attempt on the case's target, so
+            independent of search order) reproduces the true plaintext
+            (>= 90% similarity); recall_in_run uses the in-run triage verdict;
   FPR     = passing attempts whose plaintext is wrong (< 50% agreement),
             divided by all wrong attempts;
   partial = passing attempts with 50-90% agreement (near-solutions, reported
@@ -23,7 +25,8 @@ import numpy as np
 
 from lpswarm.alphabet import Alphabet, get_alphabet
 from lpswarm.ciphers import VARIANTS, get_family
-from lpswarm.executor import (EnumeratedKeys, Executor, ExplicitKeys, Target, TextKeys)
+from lpswarm.executor import (EnumeratedKeys, Executor, ExplicitKeys, Target, TextKeys,
+                              final_check)
 from lpswarm.ledger import Ledger
 from lpswarm.oracle import FullOracle, OracleConfig, null_fpr_check, wilson
 from lpswarm.textgen.synth import SynthCase, encoded_words, heldout_cases
@@ -47,6 +50,22 @@ class ValidationConfig:
     null_check_samples: int = 2000
     out_dir: str = "reports"
     ledger_path: str | None = None   # default: <out_dir>/validation.sqlite (recreated)
+
+    def __post_init__(self) -> None:
+        self.families = tuple(self.families)
+        self.lengths = tuple(int(x) for x in self.lengths)
+        for f in self.families:
+            get_family(f)
+        if not self.families or not self.lengths:
+            raise ValueError("ValidationConfig: need at least one family and one length")
+        if min(self.lengths) < 1 or self.cases_per_cell < 1 or self.decoys < 0:
+            raise ValueError("ValidationConfig: lengths and cases_per_cell must be >= 1, decoys >= 0")
+        if self.difficulty not in ("easy", "medium", "hard"):
+            raise ValueError(f"ValidationConfig: unknown difficulty {self.difficulty!r}")
+        if self.columnar_max_width < 2 or self.running_key_offsets < 1:
+            raise ValueError("ValidationConfig: columnar_max_width >= 2, running_key_offsets >= 1")
+        if self.null_check_samples < 1:
+            raise ValueError("ValidationConfig: null_check_samples >= 1")
 
 
 def _agreement(cand: np.ndarray, truth: np.ndarray) -> float:
@@ -108,7 +127,11 @@ def run_validation(vc: ValidationConfig | None = None, oc: OracleConfig | None =
     for suffix in ("", "-wal", "-shm", "-journal"):
         p = Path(str(ledger_path) + suffix)
         if p.exists():
-            p.unlink()
+            try:
+                p.unlink()
+            except PermissionError:
+                raise PermissionError(f"cannot replace {p}: is it open in another program "
+                                      "(e.g. a DB browser)? Close it and retry.") from None
     alphabet = get_alphabet(vc.alphabet)
     t0 = time.monotonic()
     oracle = FullOracle(alphabet, oc)
@@ -125,11 +148,20 @@ def run_validation(vc: ValidationConfig | None = None, oc: OracleConfig | None =
         tgt = Target(alphabet, case.ciphertext, f"val:{case.family}:{case.length}:{case.case_id}",
                      is_synthetic=True)
         s = ex.run(tgt, hyp, case.family, keys, limits)
+        final_ok = {r["attempt_id"] for r in final_check(ledger, oracle, s.target_id)
+                    if r["passed_final"]}
+        if s.passes and len(s.hits) >= ex.keep_hits:
+            raise RuntimeError("hit list truncated; raise keep_hits")
         correct = partial = wrong = 0
+        inrun_correct = 0
         for h in s.hits:
             if h.verdict != "pass":
                 continue
             ag = _agreement(h.plaintext_arr, case.plaintext)
+            if ag >= 0.9:
+                inrun_correct += 1
+            if h.attempt_id not in final_ok:
+                continue
             if ag >= 0.9:
                 correct += 1
             elif ag >= 0.5:
@@ -141,8 +173,10 @@ def run_validation(vc: ValidationConfig | None = None, oc: OracleConfig | None =
             "case_id": case.case_id, "family": case.family, "length": case.length,
             "attempts": s.new_attempts, "screened_out": s.screened_out,
             "passes": s.passes, "near_misses": s.near_misses,
+            "final_passes": len(final_ok),
             "correct_passes": correct, "partial_passes": partial, "false_passes": wrong,
             "wrong_attempts": wrong_attempts, "recovered": int(correct > 0),
+            "recovered_in_run": int(inrun_correct > 0), "unreachable": s.unreachable,
             "elapsed_s": round(s.elapsed_s, 3),
         })
         if progress:
@@ -159,12 +193,14 @@ def run_validation(vc: ValidationConfig | None = None, oc: OracleConfig | None =
             if not rows:
                 continue
             nrec = sum(r["recovered"] for r in rows)
+            nrec_run = sum(r["recovered_in_run"] for r in rows)
             fp = sum(r["false_passes"] for r in rows)
             wa = sum(r["wrong_attempts"] for r in rows)
             rlo, rhi = wilson(nrec, len(rows))
             table.append({
                 "family": fam, "length": L, "cases": len(rows), "recovered": nrec,
                 "recall": nrec / len(rows), "recall_ci_lo": rlo, "recall_ci_hi": rhi,
+                "recall_in_run": nrec_run / len(rows),
                 "attempts": sum(r["attempts"] for r in rows),
                 "false_passes": fp, "wrong_attempts": wa, "fpr": fp / wa,
                 "cases_with_false_pass": sum(1 for r in rows if r["false_passes"]),

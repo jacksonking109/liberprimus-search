@@ -43,6 +43,13 @@ def _dec(c: np.ndarray, k: np.ndarray, n: int, variant: str) -> np.ndarray:
     return np.mod(p, n).astype(DTYPE)
 
 
+def _key_vector(key) -> np.ndarray:
+    k = as_arr(key).reshape(-1)
+    if k.size == 0:
+        raise ValueError("key must contain at least one symbol")
+    return k
+
+
 # ----------------------------------------------------------------- Caesar
 class Caesar(CipherFamily):
     name = "caesar"
@@ -56,7 +63,7 @@ class Caesar(CipherFamily):
         return np.mod(ct.astype(np.int32) - int(key), n).astype(DTYPE)
 
     def random_key(self, rng, n, difficulty="medium", words=None, length=None):
-        return int(rng.integers(1, n))
+        return int(rng.integers(1, n)) if n > 1 else 0
 
     def enumerate_keys(self, n, length, **limits):
         return iter(range(n))
@@ -75,7 +82,7 @@ class Vigenere(CipherFamily):
     enumerable = True
 
     def _stream(self, key, length):
-        k = as_arr(key)
+        k = _key_vector(key)
         return np.resize(k, length)
 
     def encrypt(self, pt, key, n, variant="vigenere", **params):
@@ -113,12 +120,12 @@ class Autokey(Vigenere):
     name = "autokey"
 
     def encrypt(self, pt, key, n, variant="vigenere", **params):
-        primer = as_arr(key)
+        primer = _key_vector(key)
         stream = np.concatenate([primer, pt])[: len(pt)]
         return _enc(pt, stream, n, variant)
 
     def decrypt(self, ct, key, n, variant="vigenere", **params):
-        primer = as_arr(key)
+        primer = _key_vector(key)
         m = len(primer)
         out = np.empty(len(ct), dtype=DTYPE)
         prev = primer
@@ -142,9 +149,11 @@ class RunningKey(CipherFamily):
     word_keys = False
 
     def _stream(self, key, length, offset):
-        k = as_arr(key)
-        if offset + length > len(k):
-            raise ValueError("running key text too short for offset+length")
+        k = as_arr(key).reshape(-1)
+        offset = int(offset)
+        if offset < 0 or offset + length > len(k):
+            raise ValueError(f"running key offset {offset} out of range for key length {len(k)} "
+                             f"and text length {length}")
         return k[offset:offset + length]
 
     def encrypt(self, pt, key, n, variant="vigenere", offset=0, **params):
@@ -158,9 +167,11 @@ class RunningKey(CipherFamily):
         if key is None:
             return [{"variant": v, "offset": 0} for v in variants]
         max_off = len(key) - length
-        lo = int(limits.get("offset_lo", 0))
+        if max_off < 0:
+            return []  # key text shorter than the ciphertext: nothing to try
+        lo = max(0, int(limits.get("offset_lo", 0)))
         hi = min(max_off, int(limits.get("offset_hi", max_off)))
-        step = int(limits.get("offset_step", 1))
+        step = max(1, int(limits.get("offset_step", 1)))
         return [{"variant": v, "offset": o} for v in variants for o in range(lo, hi + 1, step)]
 
     def random_key(self, rng, n, difficulty="medium", words=None, length=None):
@@ -168,6 +179,8 @@ class RunningKey(CipherFamily):
 
     def random_params(self, rng, length, key=None):
         max_off = len(key) - length
+        if max_off < 0:
+            raise ValueError("running key text shorter than the plaintext")
         return {"variant": "vigenere", "offset": int(rng.integers(0, max_off + 1))}
 
 
@@ -181,12 +194,18 @@ class Substitution(CipherFamily):
     """
     name = "substitution"
 
+    @staticmethod
+    def _perm(key, n):
+        perm = as_arr(key).reshape(-1)
+        if len(perm) != n or not np.array_equal(np.sort(perm), np.arange(n)):
+            raise ValueError(f"substitution key must be a permutation of 0..{n - 1}")
+        return perm
+
     def encrypt(self, pt, key, n, **params):
-        perm = as_arr(key)
-        return perm[pt]
+        return self._perm(key, n)[pt]
 
     def decrypt(self, ct, key, n, **params):
-        perm = as_arr(key)
+        perm = self._perm(key, n)
         inv = np.empty(n, dtype=DTYPE)
         inv[perm] = np.arange(n, dtype=DTYPE)
         return inv[ct]
@@ -227,8 +246,10 @@ class Columnar(CipherFamily):
 
     @staticmethod
     def _perm(key, length):
-        order = np.asarray(key)
+        order = np.asarray(key).reshape(-1)
         w = len(order)
+        if w == 0 or not np.array_equal(np.sort(order), np.arange(w)):
+            raise ValueError("columnar key must be a permutation of 0..width-1")
         read_cols = np.argsort(order, kind="stable")
         idx = [np.arange(c, length, w) for c in read_cols]
         return np.concatenate(idx) if idx else np.arange(0)
