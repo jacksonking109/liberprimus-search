@@ -75,7 +75,7 @@ def cmd_validate(args) -> int:
     over: dict = {"families": _csv_strs(args.families), "lengths": _csv_ints(args.lengths),
                   "cases_per_cell": args.cases, "seed": args.seed, "out_dir": args.out,
                   "alphabet": args.alphabet, "decoys": args.decoys,
-                  "difficulty": args.difficulty}
+                  "difficulty": args.difficulty, "word_breaks": args.word_breaks or None}
     if args.quick:
         over.update(cases_per_cell=args.cases or 2, decoys=args.decoys or 100,
                     null_check_samples=500, lengths=over["lengths"] or (30, 80))
@@ -116,11 +116,13 @@ def _targets_from_args(args, alphabet) -> list[tuple]:
     if sum(given) != 1:
         raise SystemExit("give exactly one of --ciphertext, --demo, --manifest")
     out = []
+    use_breaks = not getattr(args, "no_word_breaks", False)
     if args.ciphertext:
         for f in args.ciphertext:
-            ct = alphabet.encode(read_text(f), glyphs_only=args.glyphs_only)
+            b: list[int] = []
+            ct = alphabet.encode(read_text(f), glyphs_only=args.glyphs_only, boundaries=b)
             label = args.label or Path(f).name
-            out.append((ct, label, args.page_range, False, []))
+            out.append((ct, label, args.page_range, False, [], tuple(b) if use_breaks else None))
     elif args.demo:
         from lpswarm.ciphers import get_family
         from lpswarm.textgen.synth import generate_case
@@ -134,8 +136,9 @@ def _targets_from_args(args, alphabet) -> list[tuple]:
                              alphabet=alphabet, seed=args.seed or 0)
         keys = [("demo-key-text", case.key)] if fam == "running_key" else []
         print(f"demo target: {fam} length {len(case.ciphertext)}; true params {case.params}")
+        from lpswarm.textgen.synth import case_breaks
         out.append((case.ciphertext, f"demo:{fam}:{len(case.ciphertext)}:{case.case_id}", None,
-                    True, keys))
+                    True, keys, case_breaks(case, alphabet) if use_breaks else None))
     else:
         mpath = Path(args.manifest)
         man = json.loads(read_text(mpath))
@@ -144,12 +147,13 @@ def _targets_from_args(args, alphabet) -> list[tuple]:
             if wanted and sec["index"] not in wanted:
                 continue
             raw = read_text(mpath.parent / sec["file"])
-            ct = alphabet.encode(raw, glyphs_only=True)
+            b = []
+            ct = alphabet.encode(raw, glyphs_only=True, boundaries=b)
             label = f"{sec.get('part', '')}:{sec['label']}"
             if sec.get("replacement_chars") or sec.get("unknown_runes"):
                 print(f"warning: section {sec['index']} ({sec['label']}) has corrupted or unknown "
                       "characters; they are dropped, so positions after them may be shifted")
-            out.append((ct, label, sec["label"], False, []))
+            out.append((ct, label, sec["label"], False, [], tuple(b) if use_breaks else None))
     return out
 
 
@@ -175,12 +179,13 @@ def cmd_baseline(args) -> int:
     oracle = FullOracle(alphabet, _oracle_cfg(args, conf))
     summary_rows = []
     with Ledger(args.ledger) as led:
-        for ct, label, page_range, synthetic, demo_keys in targets:
+        for ct, label, page_range, synthetic, demo_keys, breaks in targets:
             if len(ct) < max(8, oracle.min_length):
                 print(f"skip {label}: only {len(ct)} symbols under alphabet {alphabet.name}")
                 continue
             print(f"\n== {label}  ({len(ct)} symbols)")
-            tgt = Target(alphabet, ct, label, page_range=page_range, is_synthetic=synthetic)
+            tgt = Target(alphabet, ct, label, page_range=page_range, is_synthetic=synthetic,
+                         breaks=breaks)
             res = run_baseline(tgt, led, oracle, words, bc, user_key_texts + demo_keys,
                                progress=not args.quiet)
             n_final = sum(1 for r in res.final if r["passed_final"])
@@ -235,12 +240,13 @@ def cmd_swarm(args) -> int:
                 router.spec(g)
                 gens.append(LLMGenerator(router, g))
         ranker = ModelRanker(router, args.ranker) if args.ranker else None
-        for ct, label, page_range, synthetic, _ in targets:
+        for ct, label, page_range, synthetic, _, breaks in targets:
             if len(ct) < max(8, oracle.min_length):
                 print(f"skip {label}: only {len(ct)} symbols")
                 continue
             print(f"\n== {label}  ({len(ct)} symbols)")
-            res = run_swarm(Target(alphabet, ct, label, page_range=page_range, is_synthetic=synthetic),
+            res = run_swarm(Target(alphabet, ct, label, page_range=page_range, is_synthetic=synthetic,
+                                   breaks=breaks),
                             led, oracle, gens, sc, ranker=ranker, alphabet_values=values,
                             progress=not args.quiet)
             n_final = sum(1 for r in res.final if r["passed_final"])
@@ -263,7 +269,7 @@ def cmd_tiertest(args) -> int:
             "max_attempts": args.max_attempts, "ranker": args.ranker, "models_config": args.models,
             "max_usd": args.max_usd, "seed": args.seed, "out_dir": args.out,
             "difficulty": args.difficulty, "alphabet": args.alphabet,
-            "spend_ledger": args.spend_ledger,
+            "spend_ledger": args.spend_ledger, "word_breaks": args.word_breaks or None,
             "case_families": _csv_strs(args.case_families)}
     if args.quick:
         over.update(lengths=over["lengths"] or (100,), cases_per_length=args.cases or 2,
@@ -364,6 +370,8 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--seed", type=int)
     p.add_argument("--out", help="report directory (default reports)")
     p.add_argument("--quick", action="store_true", help="small fast run")
+    p.add_argument("--word-breaks", action="store_true",
+                   help="give the oracle the plaintext's word breaks (as Liber Primus pages show)")
     p.add_argument("--quiet", action="store_true")
     p.set_defaults(func=cmd_validate)
 
@@ -381,6 +389,8 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--sections", help="comma list of manifest indexes to run (default all)")
     p.add_argument("--glyphs-only", action="store_true",
                    help="read --ciphertext files by exact glyphs only (manifest always does)")
+    p.add_argument("--no-word-breaks", action="store_true",
+                   help="ignore word separators in the ciphertext")
     p.add_argument("--demo", help="synthetic target FAMILY:LENGTH, e.g. vigenere:120")
     p.add_argument("--difficulty", choices=("easy", "medium", "hard"))
     p.add_argument("--seed", type=int)
@@ -408,6 +418,8 @@ def build_parser() -> argparse.ArgumentParser:
         p.add_argument("--seed", type=int)
         p.add_argument("--label")
         p.add_argument("--page-range")
+        p.add_argument("--no-word-breaks", action="store_true",
+                       help="ignore word separators in the ciphertext")
 
     p = sub.add_parser("swarm", help="Phase 3: model/random generators propose cipher programs")
     _add_oracle_args(p)
@@ -438,6 +450,8 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--per-round", type=int)
     p.add_argument("--max-attempts", type=int)
     p.add_argument("--max-usd", type=float)
+    p.add_argument("--word-breaks", action="store_true",
+                   help="give the oracle the plaintext's word breaks")
     p.add_argument("--spend-ledger", help="where model calls are logged (default "
                    "reports/model_spend.sqlite; never deleted, so caps are cumulative)")
     p.add_argument("--seed", type=int)

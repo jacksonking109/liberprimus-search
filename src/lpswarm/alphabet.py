@@ -31,6 +31,17 @@ DTYPE = np.int16
 MAX_SYMBOLS = 30000  # int16 headroom for modular arithmetic done in int32
 
 
+# Word separators in transcriptions: whitespace (line ends are word ends in the
+# Liber Primus transcription; checked on the solved sections) and the word dot.
+WORD_SEPARATORS = frozenset(" \t\r\n\u2022\u00b7\u205a")
+
+
+def word_spans(length: int, boundaries) -> list[tuple[int, int]]:
+    """(start, end) spans of words for a text of `length` symbols and boundary indices."""
+    cuts = [0] + sorted({int(b) for b in boundaries if 0 < int(b) < length}) + [length]
+    return [(a, b) for a, b in zip(cuts, cuts[1:]) if b > a]
+
+
 def _fold(text: str) -> str:
     """Per-character, length-preserving upper case."""
     out = []
@@ -110,11 +121,16 @@ class Alphabet:
         return self.size
 
     def encode(self, text: str, skipped: list[str] | None = None,
-               glyphs_only: bool = False) -> np.ndarray:
+               glyphs_only: bool = False, boundaries: list[int] | None = None) -> np.ndarray:
         """Greedy longest-match transliteration; unknown characters are dropped.
 
         With glyphs_only=True only exact glyphs match: use it for ciphertext, so
         Latin notes or hex inside a transcription are not read as symbols.
+
+        If `boundaries` is a list, word boundaries are appended to it: the symbol
+        index where a new word starts after a word separator (WORD_SEPARATORS:
+        whitespace including line ends, and the rune text's word dot). Use
+        `word_spans` to turn them into (start, end) spans.
 
         At each position the longest match wins; at equal length an exact glyph
         match beats a case-folded token/alias match. Folding is per character and
@@ -139,7 +155,12 @@ class Alphabet:
             else:
                 if skipped is not None:
                     skipped.append(text[i])
+                if boundaries is not None and text[i] in WORD_SEPARATORS and out \
+                        and (not boundaries or boundaries[-1] != len(out)):
+                    boundaries.append(len(out))
                 i += 1
+        if boundaries is not None and boundaries and boundaries[-1] >= len(out):
+            boundaries.pop()
         return np.asarray(out, dtype=DTYPE)
 
     def encode_words(self, text: str) -> list[np.ndarray]:

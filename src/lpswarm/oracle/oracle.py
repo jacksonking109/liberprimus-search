@@ -34,7 +34,7 @@ from typing import Sequence
 
 import numpy as np
 
-from lpswarm.alphabet import Alphabet
+from lpswarm.alphabet import Alphabet, word_spans
 from lpswarm.ciphers import get_family
 from lpswarm.oracle.signals import Dictionary, LMScorer, NgramModel, index_of_coincidence
 from lpswarm.textgen import corpus
@@ -65,6 +65,8 @@ class OracleConfig:
     order: int = 4                      # n-gram order for the full scorer
     smoothing: float = 0.5              # add-k
     dict_weight: float = 1.0
+    word_weight: float = 1.0            # weight of the word-break signal (used only with breaks)
+    word_min_words: int = 3             # fewer words than this: breaks are ignored
     dict_min_len: int = 3
     dict_max_len: int = 12
     dict_size: int = 5000
@@ -136,6 +138,7 @@ class ScoreReport:
     attempt_count: int = 1
     alpha_eff: float = 0.0
     unreachable: bool = False         # threshold above the best score any text could get
+    word_score: float | None = None   # share of symbols in dictionary words, given word breaks
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -172,6 +175,7 @@ class FullOracle:
         self._good: dict[str, np.ndarray] = {}
         self._models: dict[str, tuple[NgramModel, NgramModel, Dictionary]] = {}
         self._words: list[np.ndarray] = []
+        self._lexicons: dict[str, set[str]] = {}
         self._max_combined = -math.inf
         supplied = training_texts or {}
         self.training_sources: dict[str, list[str]] = {}
@@ -199,24 +203,53 @@ class FullOracle:
             self._words.extend(words)
             self._models[lang] = (screen, full, Dictionary(words, self.cfg.dict_min_len,
                                                           self.cfg.dict_max_len))
+            # Word lexicon for the word-break signal, in the alphabet's canonical spelling
+            # (encode then decode), so digraph choices and aliases compare equal.
+            lex_src = (corpus.wordlist_from_text(text, min_len=1, min_count=2)
+                       if supplied.get(lang) else corpus.wordlist(lang, min_len=1, min_count=2))
+            self._lexicons[lang] = {alphabet.decode(e) for e in (alphabet.encode(w) for w in lex_src)
+                                    if len(e)}
             self._max_combined = max(self._max_combined,
                                      float(full.logprob.max()) + max(0.0, self.cfg.dict_weight))
-        self._cache: dict[int, _NullSet] = {}
+        self._cache: dict[tuple, _NullSet] = {}
         self.min_length = max(2, order)
+        self._max_word_bonus = max(0.0, self.cfg.word_weight)
 
     # ------------------------------------------------------------ raw signals
     def _screen(self, arr: np.ndarray) -> float:
         return max(m[0].score(arr) for m in self._models.values())
 
-    def _full(self, arr: np.ndarray) -> tuple[float, str, float, float]:
+    def _word_score(self, arr: np.ndarray, spans, lang: str) -> float:
+        lex = self._lexicons[lang]
+        tok = self.alphabet.tokens
+        hit = 0
+        for a, b in spans:
+            if "".join(tok[int(x)] for x in arr[a:b]) in lex:
+                hit += b - a
+        return hit / max(1, len(arr))
+
+    def _full(self, arr: np.ndarray, spans=None) -> tuple[float, str, float, float, float | None]:
         best = None
         for lang, (_, full, dic) in self._models.items():
             ng = full.score(arr)
             dc = dic.coverage(arr)
             comb = ng + self.cfg.dict_weight * dc
+            wd = None
+            if spans:
+                wd = self._word_score(arr, spans, lang)
+                comb += self.cfg.word_weight * wd
             if best is None or comb > best[0]:
-                best = (comb, lang, ng, dc)
+                best = (comb, lang, ng, dc, wd)
         return best  # type: ignore[return-value]
+
+    def normalise_breaks(self, length: int, breaks) -> tuple[int, ...] | None:
+        """Word boundaries usable for a candidate of `length` (after prefix scoring), or
+        None when there are too few words for the signal to mean anything."""
+        if not breaks or self.cfg.word_weight == 0:
+            return None
+        L = self.scored_length(length)
+        b = tuple(sorted({int(x) for x in breaks if 0 < int(x) < L}))
+        return b if len(b) + 1 >= self.cfg.word_min_words else None
 
     # ------------------------------------------------------------ null model
     def _null_samples(self, length: int, kind: str, rng: np.random.Generator,
@@ -290,10 +323,15 @@ class FullOracle:
         """Candidates longer than max_score_length are scored on a prefix of this length."""
         return min(int(length), self.cfg.max_score_length)
 
-    def calibrate(self, length: int) -> _NullSet:
+    def calibrate(self, length: int, breaks=None) -> _NullSet:
+        """Null distributions for candidates of this length (and word-break pattern:
+        every null sample is scored with the same breaks as the target)."""
         length = self.scored_length(length)
-        if length in self._cache:
-            return self._cache[length]
+        bk = self.normalise_breaks(length, breaks)
+        key = (length, bk)
+        if key in self._cache:
+            return self._cache[key]
+        spans = word_spans(length, bk) if bk else None
         if length < self.min_length:
             raise ValueError(f"length {length} too short to score (minimum {self.min_length} "
                              f"for n-gram order {self.order})")
@@ -309,7 +347,7 @@ class FullOracle:
             sc, cb = [], []
             for arr in self._null_samples(length, kind, rng):
                 s = self._screen(arr)
-                c, _, ng, dc = self._full(arr)
+                c, _, ng, dc, _wd = self._full(arr, spans)
                 sc.append(s)
                 cb.append(c)
                 pooled["screen"].append(s)
@@ -323,7 +361,7 @@ class FullOracle:
         screen_thr = max(float(np.quantile(v, q)) for v in screen.values())
         ns = _NullSet(screen, combined, {k: np.sort(np.asarray(v)) for k, v in pooled.items()},
                       screen_thr)
-        self._cache[length] = ns
+        self._cache[key] = ns
         return ns
 
     # ------------------------------------------------------------- thresholds
@@ -359,33 +397,35 @@ class FullOracle:
             return self.cfg.alpha / (i * (i + 1.0))
         return self.cfg.alpha / i
 
-    def final_threshold(self, length: int, total_attempts: int) -> tuple[float, float]:
+    def final_threshold(self, length: int, total_attempts: int,
+                        breaks=None) -> tuple[float, float]:
         """(alpha_eff, threshold) for the end-of-search Bonferroni check over all attempts."""
         length = self.scored_length(length)
-        ns = self.calibrate(length)
+        ns = self.calibrate(length, breaks)
         a = self.cfg.alpha if self.cfg.multiple_comparisons == "none" \
             else self.cfg.alpha / max(1, int(total_attempts))
         return a, max(self._upper_quantile(v, a) for v in ns.combined.values())
 
-    def threshold(self, length: int, attempt_count: int = 1) -> float:
-        ns = self.calibrate(self.scored_length(length))
+    def threshold(self, length: int, attempt_count: int = 1, breaks=None) -> float:
+        ns = self.calibrate(self.scored_length(length), breaks)
         a = self.alpha_eff(attempt_count)
         return max(self._upper_quantile(v, a) for v in ns.combined.values())
 
     # ------------------------------------------------------------------ score
-    def score(self, arr: np.ndarray, attempt_count: int = 1) -> ScoreReport:
+    def score(self, arr: np.ndarray, attempt_count: int = 1, breaks=None) -> ScoreReport:
         arr = np.asarray(arr, dtype=np.int16)[: self.cfg.max_score_length]
         L = len(arr)
-        ns = self.calibrate(L)
+        bk = self.normalise_breaks(L, breaks)
+        ns = self.calibrate(L, bk)
         s = self._screen(arr)
         a_eff = self.alpha_eff(attempt_count)
         thr = max(self._upper_quantile(v, a_eff) for v in ns.combined.values())
-        unreachable = thr >= self._max_combined
+        unreachable = thr >= self._max_combined + (self._max_word_bonus if bk else 0.0)
         if s < ns.screen_threshold:
             return ScoreReport(L, "screen", FAIL, False, s, ns.screen_threshold,
                                threshold=thr, attempt_count=attempt_count, alpha_eff=a_eff,
                                unreachable=unreachable)
-        comb, lang, ng, dc = self._full(arr)
+        comb, lang, ng, dc, wd = self._full(arr, word_spans(L, bk) if bk else None)
         ic = index_of_coincidence(arr, self.alphabet.size)
         lm = None
         if self.lm_scorer is not None:
@@ -406,7 +446,7 @@ class FullOracle:
             verdict = FAIL
         return ScoreReport(L, "full", verdict, verdict == PASS, s, ns.screen_threshold, ic, ng, dc,
                            lm, comb, lang, thr, thr0, null_pct, pct, attempt_count, a_eff,
-                           unreachable)
+                           unreachable, wd)
 
 
 class CoarseOracle:
@@ -426,7 +466,7 @@ def fpr_tolerance(alpha: float, n_test: int, n_calib: int, sigmas: float = 3.0) 
 
 
 def null_fpr_check(oracle: FullOracle, lengths: Sequence[int], samples: int = 2000,
-                   seed: int = 12345) -> dict:
+                   seed: int = 12345, breaks_by_length: dict | None = None) -> dict:
     """Measure false-positive rate on *fresh* nulls (different seed from calibration)
     at the unadjusted alpha (attempt_count=1).
 
@@ -439,14 +479,16 @@ def null_fpr_check(oracle: FullOracle, lengths: Sequence[int], samples: int = 20
     rows, summary = [], []
     cfg = oracle.cfg
     for L in lengths:
-        oracle.calibrate(L)
+        bk = (breaks_by_length or {}).get(L)
+        oracle.calibrate(L, bk)
         rng = np.random.default_rng([seed, L, 0xF00D])
         tol = fpr_tolerance(cfg.alpha, samples, cfg.null_samples)
         worst = 0.0
         ok_all = True
         for kind in cfg.null_types:
             arrs = oracle._null_samples(L, kind, rng, count=samples)
-            hits = sum(1 for arr in arrs if _passes_unadjusted(oracle.score(arr, attempt_count=1)))
+            hits = sum(1 for arr in arrs
+                       if _passes_unadjusted(oracle.score(arr, attempt_count=1, breaks=bk)))
             fpr = hits / len(arrs)
             lo, hi = wilson(hits, len(arrs))
             ok = fpr <= cfg.alpha + tol

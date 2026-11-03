@@ -86,3 +86,24 @@ def test_heldout_guard():
     g = {"__name__": "lpswarm.swarm.generator", "synth": synth}
     with pytest.raises(PermissionError):
         exec("def f():\n    return synth.heldout_cases(['caesar'], [30], 1)\nf()", g)
+
+
+def test_word_boundaries_from_text():
+    from lpswarm.alphabet import Alphabet, word_spans
+    a = Alphabet.latin26()
+    b = []
+    arr = a.encode("the cat\nsat • on  mat", boundaries=b)
+    assert b == [3, 6, 9, 11] and word_spans(len(arr), b)[-1] == (11, 14)
+
+
+def test_word_breaks_change_target_identity_and_null_fpr(oracle):
+    from lpswarm.ledger import target_id_for
+    from lpswarm.oracle import null_fpr_check
+    c = heldout_cases(["caesar"], [40], 1, seed=8)[0]
+    from lpswarm.textgen.synth import case_breaks
+    b = case_breaks(c, oracle.alphabet)
+    assert target_id_for(oracle.alphabet, c.ciphertext) != target_id_for(oracle.alphabet, c.ciphertext, b)
+    rep = oracle.score(c.plaintext, attempt_count=1000, breaks=b)
+    assert rep.passed and rep.word_score is not None
+    res = null_fpr_check(oracle, [40], samples=600, seed=5, breaks_by_length={40: b})
+    assert all(r["not_anticonservative"] for r in res["rows"])

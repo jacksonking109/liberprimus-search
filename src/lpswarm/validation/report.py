@@ -42,7 +42,8 @@ def write_reports(result: dict, out_dir: Path) -> dict[str, Path]:
         "",
         f"Alphabet `{result['alphabet']}` (size {result['alphabet_size']}), language "
         f"`{vc['language']}`, held-out synthetic cases, difficulty `{vc['difficulty']}`, "
-        f"seed {vc['seed']}. Runtime {result['elapsed_s']:.1f}s.",
+        f"seed {vc['seed']}. Word breaks given to the oracle: "
+        f"{'yes' if vc.get('word_breaks') else 'no'}. Runtime {result['elapsed_s']:.1f}s.",
         "",
         f"Oracle: alpha={oc['alpha']} per attempt, multiple-comparison adjustment "
         f"`{oc['multiple_comparisons']}` (alpha_eff = alpha / attempts so far on the target), "

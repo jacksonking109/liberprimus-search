@@ -29,7 +29,7 @@ from lpswarm.executor import (EnumeratedKeys, Executor, ExplicitKeys, Target, Te
                               final_check)
 from lpswarm.ledger import Ledger
 from lpswarm.oracle import FullOracle, OracleConfig, null_fpr_check, wilson
-from lpswarm.textgen.synth import SynthCase, encoded_words, heldout_cases
+from lpswarm.textgen.synth import SynthCase, case_breaks, encoded_words, heldout_cases
 
 DEFAULT_FAMILIES = ("caesar", "vigenere", "autokey", "running_key", "substitution", "columnar")
 DEFAULT_LENGTHS = (20, 40, 60, 100, 200)
@@ -48,6 +48,7 @@ class ValidationConfig:
     language: str = "english"
     seed: int = 0
     null_check_samples: int = 2000
+    word_breaks: bool = False        # give targets the plaintext's word breaks (as LP pages show)
     out_dir: str = "reports"
     ledger_path: str | None = None   # default: <out_dir>/validation.sqlite (recreated)
 
@@ -146,7 +147,8 @@ def run_validation(vc: ValidationConfig | None = None, oc: OracleConfig | None =
         hyp = ledger.add_hypothesis(case.family, f"validation case {case.case_id}", "baseline",
                                     "validation")
         tgt = Target(alphabet, case.ciphertext, f"val:{case.family}:{case.length}:{case.case_id}",
-                     is_synthetic=True)
+                     is_synthetic=True,
+                     breaks=case_breaks(case, alphabet) if vc.word_breaks else None)
         s = ex.run(tgt, hyp, case.family, keys, limits)
         final_ok = {r["attempt_id"] for r in final_check(ledger, oracle, s.target_id)
                     if r["passed_final"]}
@@ -209,7 +211,13 @@ def run_validation(vc: ValidationConfig | None = None, oc: OracleConfig | None =
 
     if progress:
         print("null false-positive check ...", flush=True)
-    nulls = null_fpr_check(oracle, vc.lengths, samples=vc.null_check_samples, seed=vc.seed + 777)
+    bmap = None
+    if vc.word_breaks:   # null check with a real break pattern of each length
+        bmap = {}
+        for case in cases:
+            bmap.setdefault(case.length, case_breaks(case, alphabet))
+    nulls = null_fpr_check(oracle, vc.lengths, samples=vc.null_check_samples, seed=vc.seed + 777,
+                           breaks_by_length=bmap)
     elapsed = time.monotonic() - t0
     result = {"validation_config": asdict(vc), "oracle_config": asdict(oc), "table": table,
               "cases": per_case, "null_check": nulls, "elapsed_s": elapsed,

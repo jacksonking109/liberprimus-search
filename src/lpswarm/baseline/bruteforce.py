@@ -92,7 +92,8 @@ def run_baseline(target: Target, ledger: Ledger, oracle: FullOracle, words: Sequ
     ex = Executor(ledger, oracle, max_attempts=cfg.max_attempts_per_family,
                   timeout_s=cfg.timeout_s, stop_file=cfg.stop_file)
     res = BaselineResult(ledger.add_target(alpha, target.ciphertext, target.label,
-                                           target.page_range, target.is_synthetic))
+                                           target.page_range, target.is_synthetic,
+                                           breaks=target.breaks))
     L = len(target.ciphertext)
     for fam in cfg.families:
         plan = _family_plan(fam, wl, cfg, key_texts, L)

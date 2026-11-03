@@ -35,6 +35,7 @@ class Target:
     label: str
     page_range: str | None = None
     is_synthetic: bool = False
+    breaks: tuple[int, ...] | None = None   # word-start indices (plaintext positions), optional
 
 
 @dataclass
@@ -108,8 +109,10 @@ class Executor:
         if alpha.size != self.oracle.alphabet.size or alpha.name != self.oracle.alphabet.name:
             raise ValueError("target alphabet differs from the oracle's alphabet")
         lim = param_limits or {}
-        self.oracle.calibrate(L)  # fail early (e.g. length too long) before touching the ledger
-        tid = self.ledger.add_target(alpha, ct, target.label, target.page_range, target.is_synthetic)
+        breaks = self.oracle.normalise_breaks(L, target.breaks)
+        self.oracle.calibrate(L, breaks)  # fail early (e.g. length too long) before touching the ledger
+        tid = self.ledger.add_target(alpha, ct, target.label, target.page_range, target.is_synthetic,
+                                     breaks=target.breaks)
         self.ledger.set_hypothesis_status(hypothesis_id, "running")
         self.ledger.commit()
         summary = RunSummary(tid, family_name, hypothesis_id)
@@ -142,7 +145,7 @@ class Executor:
                                                            kj if len(kj) <= MAX_KEY_JSON else None)
                     ts = time.perf_counter()
                     pt = fam.decrypt(ct, kc.key, n, **params)
-                    rep = self.oracle.score(pt, attempt_count=count + 1)
+                    rep = self.oracle.score(pt, attempt_count=count + 1, breaks=breaks)
                     ms = (time.perf_counter() - ts) * 1000.0
                     aid = self.ledger.record_attempt(
                         hypothesis_id=hypothesis_id, key_candidate_id=kid, target_id=tid,
@@ -223,7 +226,8 @@ def final_check(ledger: Ledger, oracle: FullOracle, target_id: str) -> list[dict
     if info is None:
         raise ValueError(f"unknown target {target_id}")
     total = ledger.attempt_count(target_id)
-    a, thr = oracle.final_threshold(int(info["length"]), total)
+    breaks = json.loads(info["word_breaks"]) if info.get("word_breaks") else None
+    a, thr = oracle.final_threshold(int(info["length"]), total, breaks)
     rows = []
     for c in ledger.candidates_for_final(target_id):
         ok = c["combined"] is not None and c["combined"] >= thr

@@ -51,6 +51,28 @@ def encoded_text(alphabet: Alphabet, language: str, split: str) -> np.ndarray:
     return alphabet.encode(text)
 
 
+@lru_cache(maxsize=8)
+def encoded_breaks(alphabet: Alphabet, language: str, split: str) -> np.ndarray:
+    """Word-start indices of encoded_text (same text, same encoding)."""
+    if split == "train":
+        text = corpus.training_text(language)
+    elif split == "heldout":
+        text = corpus._heldout_text(language)
+    else:
+        raise ValueError(split)
+    b: list[int] = []
+    alphabet.encode(text, boundaries=b)
+    return np.asarray(b, dtype=np.int64)
+
+
+def window_breaks(alphabet: Alphabet, language: str, split: str, start: int,
+                  length: int) -> tuple[int, ...]:
+    """Word starts inside text[start:start+length], relative to the window."""
+    b = encoded_breaks(alphabet, language, split)
+    lo, hi = np.searchsorted(b, start, side="right"), np.searchsorted(b, start + length, side="left")
+    return tuple(int(x) - start for x in b[lo:hi])
+
+
 @lru_cache(maxsize=32)
 def encoded_words(alphabet: Alphabet, language: str, min_len: int = 3,
                   limit: int = 5000) -> tuple[np.ndarray, ...]:
@@ -80,7 +102,10 @@ def _make(family: str, length: int, difficulty: str, language: str, alphabet: Al
     rng = np.random.default_rng([seed, salt, index, length, zlib.crc32(family.encode()),
                                  ("easy", "medium", "hard").index(difficulty)])
     text = encoded_text(alphabet, language, split)
-    pt = _window(rng, text, length)
+    if len(text) < length:
+        raise ValueError("corpus too short for requested length")
+    start = int(rng.integers(0, len(text) - length + 1))   # same draw as _window
+    pt = text[start:start + length].copy()
     words = encoded_words(alphabet, language)
     extra: dict = {}
     if family == "running_key":
@@ -104,7 +129,14 @@ def _make(family: str, length: int, difficulty: str, language: str, alphabet: Al
     ct = fam.encrypt(pt, key, alphabet.size, **params)
     cid = _case_id(family=family, length=length, difficulty=difficulty, language=language,
                    alphabet=alphabet.name, seed=seed, split=split, index=index)
+    extra["start"] = start
     return SynthCase(cid, family, language, length, difficulty, split, pt, ct, key, params, extra)
+
+
+def case_breaks(case: SynthCase, alphabet: Alphabet) -> tuple[int, ...]:
+    """The plaintext's real word starts for a synthetic case (as a transcription with
+    word separators would show them)."""
+    return window_breaks(alphabet, case.language, case.split, case.extra["start"], case.length)
 
 
 def generate_case(family: str, length: int, difficulty: str = "medium", language: str = "english",

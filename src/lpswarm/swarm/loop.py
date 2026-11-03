@@ -68,7 +68,7 @@ def run_swarm(target: Target, ledger: Ledger, oracle: FullOracle, generators: Se
     cfg = cfg or SwarmConfig()
     alpha = target.alphabet
     tid = ledger.add_target(alpha, target.ciphertext, target.label, target.page_range,
-                            target.is_synthetic)
+                            target.is_synthetic, breaks=target.breaks)
     ledger.commit()
     names = [g.model for g in generators]
     if len(set(names)) != len(names):

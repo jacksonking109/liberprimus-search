@@ -55,10 +55,14 @@ def dedupe_hash(target_id: str, family: str, params: dict, key_hash: str) -> str
     return hashlib.sha256(canonical_json([target_id, family, params, key_hash]).encode()).hexdigest()
 
 
-def target_id_for(alphabet: Alphabet, ciphertext: np.ndarray) -> str:
+def target_id_for(alphabet: Alphabet, ciphertext: np.ndarray, breaks=None) -> str:
+    """Scores with and without word breaks are different experiments, so breaks are
+    part of the target's identity (and of every attempt's dedupe hash)."""
     h = hashlib.sha256()
     h.update(canonical_json(alphabet.to_json()).encode())
     h.update(np.asarray(ciphertext, dtype=np.int16).tobytes())
+    if breaks:
+        h.update(b"breaks:" + canonical_json(sorted(int(b) for b in breaks)).encode())
     return h.hexdigest()
 
 
@@ -75,8 +79,9 @@ class Ledger:
         self.conn.execute("PRAGMA journal_mode = WAL" if self.path != ":memory:" else "PRAGMA journal_mode = MEMORY")
         self._key_ids: dict[str, int] = {}
 
-    _COLUMNS = {"key_candidate": {"value_json": "TEXT"},
-                "result": {"unreachable": "INTEGER NOT NULL DEFAULT 0"}}
+    _COLUMNS = {"target": {"word_breaks": "TEXT"},
+                "key_candidate": {"value_json": "TEXT"},
+                "result": {"unreachable": "INTEGER NOT NULL DEFAULT 0", "word_score": "REAL"}}
 
     def _migrate(self) -> None:
         """Add columns introduced after a ledger was created (tables are created by the
@@ -134,12 +139,14 @@ class Ledger:
         return int(cur.lastrowid)
 
     def add_target(self, alphabet: Alphabet, ciphertext: np.ndarray, label: str,
-                   page_range: str | None = None, is_synthetic: bool = False) -> str:
-        tid = target_id_for(alphabet, ciphertext)
+                   page_range: str | None = None, is_synthetic: bool = False,
+                   breaks=None) -> str:
+        tid = target_id_for(alphabet, ciphertext, breaks)
+        wb = canonical_json(sorted(int(b) for b in breaks)) if breaks else None
         self.conn.execute(
-            "INSERT OR IGNORE INTO target (id, label, alphabet, length, page_range, is_synthetic)"
-            " VALUES (?,?,?,?,?,?)",
-            (tid, label, alphabet.name, int(len(ciphertext)), page_range, int(is_synthetic)))
+            "INSERT OR IGNORE INTO target (id, label, alphabet, length, page_range, is_synthetic,"
+            " word_breaks) VALUES (?,?,?,?,?,?,?)",
+            (tid, label, alphabet.name, int(len(ciphertext)), page_range, int(is_synthetic), wb))
         return tid
 
     def add_hypothesis(self, cipher_family: str, description: str, proposer_model: str,
@@ -220,12 +227,12 @@ class Ledger:
         self.conn.execute(
             "INSERT OR IGNORE INTO result (attempt_id, stage, verdict, ic, ngram_score, dict_score,"
             " lm_loglik, combined, screen_score, threshold, null_percentile, passed,"
-            " attempt_count_at_scoring, alpha_eff, unreachable, plaintext_preview)"
-            " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            " attempt_count_at_scoring, alpha_eff, unreachable, word_score, plaintext_preview)"
+            " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
             (attempt_id, r.stage, r.verdict, r.ic, r.ngram_score, r.dict_score, r.lm_loglik,
              r.combined, r.screen_score, r.threshold, r.null_percentile, int(r.passed),
              r.attempt_count, r.alpha_eff, int(bool(getattr(r, "unreachable", False))),
-             plaintext_preview))
+             getattr(r, "word_score", None), plaintext_preview))
 
     def record_final_check(self, attempt_id: int, attempt_count: int, alpha_eff: float,
                            threshold: float, passed: bool) -> None:

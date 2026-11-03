@@ -194,7 +194,13 @@ configured alpha sits between 0.4% and 1.5% across lengths, within the stated to
   solver for random substitution keys.
 - **Running key needs supplied texts**; there is no built-in key-text library yet (Phase 2).
 - **English only by default**; other languages need corpora (see `TODO_USER.md`).
-- **Word breaks are ignored.** Dictionary coverage segments unspaced text.
+- **Word breaks are optional.** With breaks (default for transcription targets; `--word-breaks`
+  for validation/tier tests) the oracle adds a calibrated word score: the share of symbols in
+  dictionary words under the given segmentation. It assumes separators sit at plaintext word
+  boundaries (true for every solved section); for transposition hypotheses that assumption may
+  not hold. Short-text recall with breaks (8 cases per cell, length 20): Vigenere 0.50 -> 0.88,
+  running key 0.25 -> 0.75, substitution 0.75 -> 1.00, columnar 0.62 -> 0.88, null FPR unchanged.
+  On the real solved sections every pass margin grows and the 38-rune section 09/2 now passes.
 - **The held-out guard prevents accidents; it is not a security boundary.**
 - **Skip-literal ambiguity.** A `skip` rule treats *every* occurrence of the symbol as a
   literal. If encryption can also produce that symbol, the stream desynchronises. Resolving

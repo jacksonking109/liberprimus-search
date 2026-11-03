@@ -59,3 +59,16 @@ def test_unsolved_sections_do_not_pass_unshifted(lp):
     a, ct, oracle = lp
     for label in ("17.jpg, 18.jpg, 19.jpg - 0.jpg-2.jpg", "57.jpg-66.jpg/1"):
         assert not oracle.score(ct(label), attempt_count=1).passed
+
+
+def test_word_breaks_rescue_the_short_solved_section(lp):
+    """09.jpg/2 (38 runes) fails without word breaks and passes with them, at the
+    attempt count of a full brute-force run."""
+    a, ct, oracle = lp
+    raw = (MANIFEST.parent / json.loads(MANIFEST.read_text(encoding="utf-8"))["sections"][6]["file"])
+    b = []
+    c = a.encode(raw.read_text(encoding="utf-8"), glyphs_only=True, boundaries=b)
+    pt = get_family("vigenere").decrypt(c, (2,), a.size, variant="beaufort")
+    assert a.decode(pt).startswith("ANINSTRUCTION")
+    with_breaks = oracle.score(pt, attempt_count=46_597, breaks=b)
+    assert with_breaks.passed and with_breaks.word_score > 0.6

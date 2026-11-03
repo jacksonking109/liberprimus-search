@@ -18,12 +18,13 @@ CREATE TABLE IF NOT EXISTS corpus_item (
 
 -- A ciphertext under attack (real page range or a synthetic case).
 CREATE TABLE IF NOT EXISTS target (
-    id TEXT PRIMARY KEY,               -- sha256 of alphabet name + ciphertext
+    id TEXT PRIMARY KEY,               -- sha256 of alphabet + ciphertext (+ word breaks if used)
     label TEXT NOT NULL,
     alphabet TEXT NOT NULL,
     length INTEGER NOT NULL,
     page_range TEXT,
     is_synthetic INTEGER NOT NULL DEFAULT 0,
+    word_breaks TEXT,                  -- JSON list of word-start indices, NULL if not used
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
@@ -83,6 +84,7 @@ CREATE TABLE IF NOT EXISTS result (
     attempt_count_at_scoring INTEGER NOT NULL,
     alpha_eff REAL NOT NULL,
     unreachable INTEGER NOT NULL DEFAULT 0,  -- threshold above the best possible score
+    word_score REAL,                   -- share of symbols in dictionary words (with breaks)
     plaintext_preview TEXT
 );
 CREATE INDEX IF NOT EXISTS result_verdict ON result(verdict);

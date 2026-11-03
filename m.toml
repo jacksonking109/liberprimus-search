@@ -1,0 +1,34 @@
+[models.deepseek]
+provider = "openai_compatible"
+endpoint = "https://api.deepseek.com"
+model = "deepseek-chat"            # confirm against DeepSeek's docs
+api_key_env = "DEEPSEEK_API_KEY"
+roles = ["proposer"]
+max_usd = 10.0
+price_in_per_mtok = 0.0            # FILL IN
+price_out_per_mtok = 0.0
+json_mode = true
+timeout = 180
+
+[models.qwen-local]
+provider = "ollama"
+endpoint = "http://127.0.0.1:11434"
+model = "qwen3:14b"
+roles = ["proposer"]
+json_mode = true
+timeout = 600
+options = { num_ctx = 16384 }
+
+[models.claude-code]
+provider = "claude_code"
+model = "sonnet"
+roles = ["proposer"]
+max_calls_per_window = 40
+window_hours = 5
+timeout = 600
+
+[models.dry]
+provider = "scripted"
+model = "dry"
+roles = ["proposer", "weighting"]
+replies = ['{"proposals": [{"spec": {"stream": {"kind": "sequence", "name": "primes"}, "combine": "sub"}, "why": "dry run"}]}']

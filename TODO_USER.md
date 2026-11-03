@@ -52,9 +52,9 @@ Things only you can supply or decide. Each has a default so work can continue.
       *somewhere* grows with the number of pages; lower alpha (e.g. 0.01 / number of pages) or
       add a false-discovery-rate mode.
 - [ ] **Calibration tolerance.** [3 binomial standard errors over test + calibration samples.]
-- [ ] **Word breaks.** [Ignored: ciphertexts are scored as unbroken symbol streams and dictionary
-      coverage uses segmentation.] If you want word-separator positions from the real pages used
-      as a signal, that is a Phase 2 feature.
+- [x] **Word breaks.** Used by default for transcription targets (`--no-word-breaks` turns them
+      off). Separators: the rune word dot and whitespace, including line ends (checked on the
+      solved sections: joining across a line end never forms a dictionary word).
 - [ ] **Validation key spaces.** [True key hidden among 500 word-derived decoys; columnar widths
       2-6; 2000 running-key offsets.] Bigger spaces lower recall at short lengths because the
       Bonferroni threshold rises; that trade-off is the point of the baseline.

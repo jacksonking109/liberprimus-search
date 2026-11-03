@@ -32,7 +32,7 @@ from lpswarm.ciphers import get_family
 from lpswarm.executor import Target
 from lpswarm.ledger import Ledger
 from lpswarm.oracle import FullOracle, OracleConfig, wilson
-from lpswarm.textgen.synth import heldout_cases
+from lpswarm.textgen.synth import case_breaks, heldout_cases
 from lpswarm.validation.harness import _agreement
 
 BUILTIN_ARMS = ("baseline", "random_program")
@@ -61,6 +61,7 @@ class TierConfig:
     language: str = "english"
     seed: int = 0
     out_dir: str = "reports/tiertest"
+    word_breaks: bool = False             # give targets the plaintext's word breaks
     # Model calls are logged here, never deleted, so max_usd caps hold across tier-test runs.
     spend_ledger: str = "reports/model_spend.sqlite"
 
@@ -138,7 +139,8 @@ def run_tiertest(tc: TierConfig, oc: OracleConfig | None = None, progress: bool 
         ranker = ModelRanker(router, tc.ranker) if tc.ranker and router else None
         for ci, case in enumerate(cases):
             label = f"tier:{run_id}:{arm}:{case.family}:{case.length}:{case.case_id}"
-            tgt = Target(alphabet, case.ciphertext, label, is_synthetic=True)
+            tgt = Target(alphabet, case.ciphertext, label, is_synthetic=True,
+                         breaks=case_breaks(case, alphabet) if tc.word_breaks else None)
             ts = time.monotonic()
             stopped = None
             if arm == "baseline":
