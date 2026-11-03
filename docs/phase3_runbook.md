@@ -54,6 +54,10 @@ lpswarm tiertest --models config\models.toml `
   --lengths 80,160 --cases 10 --rounds 5 --per-round 8 --max-usd 5 --out reports\tier1
 ```
 
+- Reference numbers for the non-model arms: `docs/tiertest_reference.md` (baseline 30%,
+  random_program:40 5%, random_program:2000 20% on 20 cases).
+- Model calls are logged in `reports\model_spend.sqlite`, which is never deleted, so each
+  model's `max_usd` is a cumulative cap across tier-test runs. Delete that file to reset it.
 - `random_program:40` gets the same number of proposals as a model arm (5 rounds × 8) and is
   the fair control per proposal. `random_program:2000` is the control per unit of compute.
 - Add `--ranker granite-tiny` to have Granite order each round's proposals.

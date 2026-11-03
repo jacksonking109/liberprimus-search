@@ -26,7 +26,11 @@ Message = dict  # {"role": "system"|"user"|"assistant", "content": str}
 
 
 class AdapterError(RuntimeError):
-    pass
+    """`transient` errors (timeouts, connection problems, 408/429/5xx) may be retried."""
+
+    def __init__(self, msg: str, transient: bool = False):
+        super().__init__(msg)
+        self.transient = transient
 
 
 @dataclass
@@ -40,7 +44,8 @@ class Completion:
     raw: dict = field(default_factory=dict, repr=False)
 
 
-def _post_json(url: str, body: dict, headers: dict[str, str], timeout: float) -> dict:
+def _post_json(url: str, body: dict, headers: dict[str, str], timeout: float,
+               secret: str | None = None) -> dict:
     data = json.dumps(body).encode("utf-8")
     req = urllib.request.Request(url, data=data, method="POST",
                                  headers={"Content-Type": "application/json", **headers})
@@ -57,9 +62,12 @@ def _post_json(url: str, body: dict, headers: dict[str, str], timeout: float) ->
             detail = exc.read().decode("utf-8", errors="replace")[:300]
         except Exception:  # noqa: BLE001
             pass
-        raise AdapterError(f"HTTP {exc.code} from {url}: {detail}") from None
+        if secret:
+            detail = detail.replace(secret, "[redacted]")
+        transient = exc.code in (408, 429) or exc.code >= 500
+        raise AdapterError(f"HTTP {exc.code} from {url}: {detail}", transient) from None
     except (urllib.error.URLError, TimeoutError, OSError) as exc:
-        raise AdapterError(f"cannot reach {url}: {getattr(exc, 'reason', exc)}") from None
+        raise AdapterError(f"cannot reach {url}: {getattr(exc, 'reason', exc)}", True) from None
     except json.JSONDecodeError:
         raise AdapterError(f"non-JSON reply from {url}") from None
 
@@ -68,7 +76,9 @@ class OllamaAdapter:
     def __init__(self, model: str, endpoint: str = "http://localhost:11434", timeout: float = 300,
                  json_mode: bool = False, options: dict | None = None):
         self.model, self.endpoint, self.timeout = model, endpoint.rstrip("/"), timeout
-        self.json_mode, self.options = json_mode, options or {}
+        # Ollama's default context window can silently cut long prompts (long sections
+        # plus history); ask for a larger one unless the config sets num_ctx.
+        self.json_mode, self.options = json_mode, {"num_ctx": 16384, **(options or {})}
 
     def complete(self, messages: Sequence[Message], temperature: float = 0.7,
                  max_tokens: int = 2048) -> Completion:
@@ -109,7 +119,8 @@ class OpenAICompatibleAdapter:
         url = self.endpoint + ("/chat/completions" if not self.endpoint.endswith("/chat/completions")
                                else "")
         t0 = time.monotonic()
-        r = _post_json(url, body, {"Authorization": f"Bearer {self._key()}"}, self.timeout)
+        key = self._key()
+        r = _post_json(url, body, {"Authorization": f"Bearer {key}"}, self.timeout, secret=key)
         try:
             text = r["choices"][0]["message"]["content"] or ""
         except (KeyError, IndexError, TypeError):

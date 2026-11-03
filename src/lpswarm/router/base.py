@@ -74,11 +74,24 @@ def load_model_specs(path: str | Path) -> list[ModelSpec]:
         for req in ("provider", "model"):
             if req not in d:
                 raise ValueError(f"model {name}: missing {req!r}")
+        max_usd = d.get("max_usd")
+        if max_usd is not None:
+            try:
+                max_usd = float(max_usd)
+            except (TypeError, ValueError):
+                raise ValueError(f"model {name}: max_usd must be a number") from None
+        for k in ("price_in_per_mtok", "price_out_per_mtok", "timeout"):
+            if k in d and not isinstance(d[k], (int, float)):
+                raise ValueError(f"model {name}: {k} must be a number")
+        try:
+            roles = tuple(Role(r) for r in d.get("roles", ["proposer"]))
+        except ValueError:
+            raise ValueError(f"model {name}: roles must be from {[r.value for r in Role]}") from None
         specs.append(ModelSpec(
             name=name, provider=d["provider"], model=d["model"],
-            roles=tuple(Role(r) for r in d.get("roles", ["proposer"])),
+            roles=roles,
             endpoint=d.get("endpoint"), api_key_env=d.get("api_key_env"),
-            max_usd=d.get("max_usd"),
+            max_usd=max_usd,
             extra={k: v for k, v in d.items() if k not in
                    {"provider", "model", "roles", "endpoint", "api_key_env", "max_usd"}}))
     return specs

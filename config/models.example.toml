@@ -13,7 +13,10 @@
 #   provider    ollama | openai_compatible | command | scripted
 #   roles       any of "proposer" (proposes cipher programs), "weighting" (ranks
 #               proposals), "triage" (reserved)
-#   max_usd     hard cap per model, checked against the ledger before every call
+#   max_usd     spend cap per model, checked against logged spend before every call.
+#               It counts spend in one ledger: the --ledger of `lpswarm swarm`, or
+#               reports/model_spend.sqlite for `lpswarm tiertest`. A single call can
+#               overshoot by its own cost.
 #   price_in_per_mtok / price_out_per_mtok   USD per million tokens, used for cost
 #               tracking and max_usd. Leave 0 for local models. If you leave them 0
 #               for a paid API, max_usd cannot protect you.
@@ -40,6 +43,7 @@ model = "qwen3:8b"                 # placeholder; confirm with `ollama list`
 roles = ["proposer"]
 json_mode = true
 timeout = 600
+options = { num_ctx = 16384 }      # context window; default 16384 if omitted
 
 [models.gemma-local]
 provider = "ollama"

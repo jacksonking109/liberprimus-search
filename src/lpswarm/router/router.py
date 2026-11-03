@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import time
+import warnings
 from dataclasses import dataclass
 from typing import Sequence
 
@@ -63,7 +64,14 @@ class Router:
         self.global_max_usd = global_max_usd
         self.retries = retries
         self._models: dict[str, _Entry] = {}
+        if ledger is None and (global_max_usd is not None or any(s.max_usd is not None for s in specs)):
+            raise ValueError("USD caps need a ledger to count spending; pass ledger=...")
         for s in specs:
+            if (s.provider == "openai_compatible" and s.max_usd is not None
+                    and not s.extra.get("price_in_per_mtok") and not s.extra.get("price_out_per_mtok")):
+                warnings.warn(f"model {s.name}: max_usd is set but prices are 0, so spend is "
+                              "recorded as $0 and the cap can never trigger; fill in "
+                              "price_in_per_mtok / price_out_per_mtok", stacklevel=2)
             ad = (adapters or {}).get(s.name) or make_adapter(s)
             self._models[s.name] = _Entry(s, ad)
 
@@ -110,17 +118,20 @@ class Router:
         if Role(role) not in entry.spec.roles:
             raise ValueError(f"model {name} is not configured for role {Role(role).value}")
         self._check_budget(name)
-        last: Exception | None = None
+        last: AdapterError | None = None
+        c: Completion | None = None
         for attempt in range(self.retries + 1):
             try:
                 c = entry.adapter.complete(messages, temperature=temperature, max_tokens=max_tokens)
                 break
             except AdapterError as exc:
                 last = exc
+                if not exc.transient:
+                    break  # e.g. 400/401/404: retrying cannot help
                 if attempt < self.retries:
                     time.sleep(1.5 * (attempt + 1))
-        else:
-            raise AdapterError(f"{name}: {last}")
+        if c is None:
+            raise AdapterError(f"{name}: {last}", getattr(last, "transient", False))
         if self.ledger is not None:
             self.ledger.add_budget_event(entry.spec.provider, name, c.tokens_in, c.tokens_out,
                                          c.usd, task_id)

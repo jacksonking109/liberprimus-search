@@ -280,6 +280,14 @@ class Ledger:
         rows = self.conn.execute(sql, (target_id,) if target_id else ()).fetchall()
         return [dict(r) for r in rows]
 
+    def tried(self, target_id: str) -> list[dict]:
+        """Every hypothesis tried on a target with its attempt count (no verdicts)."""
+        rows = self.conn.execute(
+            "SELECT a.cipher_family, h.description, h.proposer_model, COUNT(*) AS attempts"
+            " FROM attempt a JOIN hypothesis h ON h.id=a.hypothesis_id WHERE a.target_id=?"
+            " GROUP BY a.cipher_family, h.id ORDER BY h.id", (target_id,)).fetchall()
+        return [dict(r) for r in rows]
+
     def leads(self, target_id: str | None = None, include_near_miss: bool = False,
               limit: int = 50, final_only: bool = False) -> list[dict]:
         """Human queue: passing (optionally near-miss) attempts, best margin first.

@@ -61,6 +61,8 @@ class TierConfig:
     language: str = "english"
     seed: int = 0
     out_dir: str = "reports/tiertest"
+    # Model calls are logged here, never deleted, so max_usd caps hold across tier-test runs.
+    spend_ledger: str = "reports/model_spend.sqlite"
 
     def __post_init__(self) -> None:
         self.arms = tuple(self.arms)
@@ -88,10 +90,13 @@ def _decrypt_attempt(led: Ledger, attempt_id: int, ct: np.ndarray, n: int) -> np
     return fam.decrypt(ct, key, n, **json.loads(d["params_json"]))
 
 
-def _cost(led: Ledger, label: str) -> dict:
+def _cost(led: Ledger | None, label: str) -> dict:
+    if led is None:
+        return {"model_calls": 0, "tokens_in": 0, "tokens_out": 0, "usd": 0.0}
+    prefix = label + "#"  # exact prefix match (LIKE would treat '_' and '%' as wildcards)
     row = led.conn.execute("SELECT COUNT(*), COALESCE(SUM(tokens_in),0), COALESCE(SUM(tokens_out),0),"
-                           " COALESCE(SUM(usd),0) FROM budget_event WHERE task_id LIKE ?",
-                           (label + "#%",)).fetchone()
+                           " COALESCE(SUM(usd),0) FROM budget_event WHERE substr(task_id, 1, ?) = ?",
+                           (len(prefix), prefix)).fetchone()
     return {"model_calls": int(row[0]), "tokens_in": int(row[1]), "tokens_out": int(row[2]),
             "usd": float(row[3])}
 
@@ -119,17 +124,20 @@ def run_tiertest(tc: TierConfig, oc: OracleConfig | None = None, progress: bool 
                           tc.language, alphabet, tc.seed)
     words = corpus.wordlist(tc.language, min_len=1, limit=tc.baseline_words)
     t0 = time.monotonic()
+    run_id = time.strftime("%Y%m%dT%H%M%S")
     rows = []
+    needs_models = any(not _builtin(a) for a in tc.arms) or tc.ranker
+    spend = Ledger(tc.spend_ledger) if needs_models else None
     for arm in tc.arms:
         led = _fresh_ledger(out / f"{arm.replace(':', '_')}.sqlite")
         router = None
-        if not _builtin(arm) or tc.ranker:
-            router = Router.from_toml(tc.models_config, ledger=led, global_max_usd=tc.max_usd)
+        if not _builtin(arm):
+            router = Router.from_toml(tc.models_config, ledger=spend, global_max_usd=tc.max_usd)
             if not _builtin(arm):
                 router.spec(arm)  # raises on unknown model names
         ranker = ModelRanker(router, tc.ranker) if tc.ranker and router else None
         for ci, case in enumerate(cases):
-            label = f"tier:{arm}:{case.family}:{case.length}:{case.case_id}"
+            label = f"tier:{run_id}:{arm}:{case.family}:{case.length}:{case.case_id}"
             tgt = Target(alphabet, case.ciphertext, label, is_synthetic=True)
             ts = time.monotonic()
             stopped = None
@@ -176,13 +184,16 @@ def run_tiertest(tc: TierConfig, oc: OracleConfig | None = None, progress: bool 
                    "recovered": int(bool(correct)), "attempts": led.attempt_count(tid),
                    "attempts_to_solve": first, "false_passes": wrong, "partial_passes": partial,
                    "unverified_passes": unverified, "stopped": stopped,
-                   "elapsed_s": round(time.monotonic() - ts, 2), **_cost(led, label)}
+                   "elapsed_s": round(time.monotonic() - ts, 2),
+                   **_cost(spend, label)}
             rows.append(row)
             if progress:
                 print(f"[{arm}] {ci + 1}/{len(cases)} L={case.length} recovered={row['recovered']} "
                       f"attempts={row['attempts']} calls={row['model_calls']} usd={row['usd']:.4f}"
                       + (f" stopped={stopped}" if stopped else ""), flush=True)
         led.close()
+    if spend is not None:
+        spend.close()
 
     summary = []
     for arm in tc.arms:
@@ -229,6 +240,9 @@ def _write(result: dict, out: Path) -> None:
         "",
         "Recovered = an attempt surviving the final check (Bonferroni over all of the arm's "
         "attempts on that case) decrypts to >= 90% of the plaintext. Each arm has its own ledger.",
+        "",
+        f"Model spend is logged in `{tc['spend_ledger']}` (kept across runs, so per-model "
+        "`max_usd` caps are cumulative).",
         "",
         "| arm | length | cases | recall | 95% CI | median attempts to solve | attempts | false passes | model calls | tokens in/out | USD |",
         "| --- | --- | ---: | ---: | --- | ---: | ---: | ---: | ---: | --- | ---: |",

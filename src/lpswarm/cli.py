@@ -260,6 +260,7 @@ def cmd_tiertest(args) -> int:
             "max_attempts": args.max_attempts, "ranker": args.ranker, "models_config": args.models,
             "max_usd": args.max_usd, "seed": args.seed, "out_dir": args.out,
             "difficulty": args.difficulty, "alphabet": args.alphabet,
+            "spend_ledger": args.spend_ledger,
             "case_families": _csv_strs(args.case_families)}
     if args.quick:
         over.update(lengths=over["lengths"] or (100,), cases_per_length=args.cases or 2,
@@ -422,6 +423,8 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--per-round", type=int)
     p.add_argument("--max-attempts", type=int)
     p.add_argument("--max-usd", type=float)
+    p.add_argument("--spend-ledger", help="where model calls are logged (default "
+                   "reports/model_spend.sqlite; never deleted, so caps are cumulative)")
     p.add_argument("--seed", type=int)
     p.add_argument("--out")
     p.add_argument("--quick", action="store_true")

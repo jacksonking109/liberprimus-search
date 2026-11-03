@@ -41,6 +41,7 @@ class GenContext:
     errors: list[str] = field(default_factory=list)
     already_ruled_out: list[str] = field(default_factory=list)   # e.g. Phase 1 families tried
     alphabet_values: list[int] | None = None
+    task_id: str = ""      # internal (cost attribution); never shown to the model
 
     def stats(self) -> dict:
         c = self.ciphertext
@@ -139,34 +140,58 @@ def build_prompt(ctx: GenContext, max_symbols: int = 300) -> list[dict]:
 _FENCE = re.compile(r"```(?:json)?\s*(.*?)```", re.S)
 
 
-def parse_proposals(text: str) -> tuple[list[RawProposal], list[str]]:
-    """Extract proposals from a model reply. Tolerates code fences and chatter."""
-    errors: list[str] = []
-    candidates = [m.group(1) for m in _FENCE.finditer(text)] + [text]
+MAX_REPLY_CHARS = 200_000
+
+
+def _iter_json_values(text: str):
     dec = json.JSONDecoder()
-    data = None
-    for chunk in candidates:
-        for i, ch in enumerate(chunk):
-            if ch in "{[":
-                try:
-                    data, _ = dec.raw_decode(chunk[i:])
-                    break
-                except json.JSONDecodeError:
-                    continue
-        if data is not None:
+    i = 0
+    while i < len(text):
+        ch = text[i]
+        if ch in "{[":
+            try:
+                val, end = dec.raw_decode(text, i)
+            except (json.JSONDecodeError, RecursionError, ValueError):
+                i += 1
+                continue
+            yield val
+            i = end
+        else:
+            i += 1
+
+
+def _proposal_items(val: Any):
+    if isinstance(val, dict) and isinstance(val.get("proposals"), list):
+        return val["proposals"]
+    if isinstance(val, dict) and "stream" in val:
+        return [val]
+    if isinstance(val, list) and val and all(isinstance(x, dict) and ("spec" in x or "stream" in x)
+                                             for x in val):
+        return val
+    return None
+
+
+def parse_proposals(text: str) -> tuple[list[RawProposal], list[str]]:
+    """Extract proposals from a model reply. Tolerates code fences, chatter and
+    stray JSON (e.g. a list of numbers in the prose): the first JSON value that
+    looks like proposals wins."""
+    errors: list[str] = []
+    if len(text) > MAX_REPLY_CHARS:
+        text = text[:MAX_REPLY_CHARS]
+        errors.append("reply was truncated (too long)")
+    chunks = [m.group(1) for m in _FENCE.finditer(text)] + [text]
+    items = None
+    for chunk in chunks:
+        for val in _iter_json_values(chunk):
+            items = _proposal_items(val)
+            if items is not None:
+                break
+        if items is not None:
             break
-    if data is None:
-        return [], ["reply contained no JSON"]
-    if isinstance(data, dict) and "proposals" in data:
-        items = data["proposals"]
-    elif isinstance(data, dict) and "stream" in data:
-        items = [data]
-    elif isinstance(data, list):
-        items = data
-    else:
-        return [], ['expected {"proposals": [...]}']
+    if items is None:
+        return [], errors + ['no proposals found; reply with {"proposals": [{"spec": {...}}]}']
     out = []
-    for it in items if isinstance(items, list) else []:
+    for it in items:
         if isinstance(it, dict) and "spec" in it:
             out.append(RawProposal(it["spec"], str(it.get("why", ""))[:200]))
         elif isinstance(it, dict) and "stream" in it:
@@ -187,7 +212,7 @@ class LLMGenerator:
     def propose(self, ctx: GenContext) -> list[RawProposal]:
         msgs = build_prompt(ctx)
         c = self.router.complete(self.model, msgs, role="proposer",
-                                 task_id=f"{ctx.label}#r{ctx.round}",
+                                 task_id=f"{ctx.task_id or ctx.label}#r{ctx.round}",
                                  temperature=self.temperature, max_tokens=self.max_tokens)
         props, errs = parse_proposals(c.text)
         self.last_errors = errs
@@ -211,7 +236,8 @@ class ModelRanker:
                   + "\n".join(f"{i}. {d}" for i, d in enumerate(descriptions)))
         try:
             c = self.router.complete(self.model, [{"role": "user", "content": prompt}],
-                                     role="weighting", task_id=f"{ctx.label}#rank{ctx.round}",
+                                     role="weighting",
+                                     task_id=f"{ctx.task_id or ctx.label}#rank{ctx.round}",
                                      temperature=0.0, max_tokens=400)
             m = re.search(r"\{.*\}", c.text, re.S)
             scores = json.loads(m.group(0))["scores"] if m else None
@@ -223,9 +249,16 @@ class ModelRanker:
         return sorted(range(len(descriptions)), key=lambda i: -scores[i])
 
 
-def summarise_ruled_out(rows: Sequence[dict]) -> list[str]:
-    """Compact 'already tried' lines from Ledger.ruled_out rows for one target."""
+def summarise_tried(rows: Sequence[dict]) -> list[str]:
+    """Compact 'already tried' lines for a target, from Ledger.tried rows.
+
+    Lists every hypothesis tried on the target regardless of outcome (so the list
+    reveals no verdicts), using only the deterministic description: the free-text
+    `why` a model attached is stripped, so one model cannot inject text into
+    another model's prompt.
+    """
     c: Counter = Counter()
     for r in rows:
-        c[(r["cipher_family"], r["description"])] += int(r["attempts"])
+        desc = str(r["description"]).split(" | why:", 1)[0]
+        c[(r["cipher_family"], desc)] += int(r["attempts"])
     return [f"{fam}: {desc} ({n} attempts)" for (fam, desc), n in c.most_common(30)]

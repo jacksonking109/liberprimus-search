@@ -14,8 +14,9 @@ from lpswarm.programs import spec as S
 class ProgramFamily(CipherFamily):
     """Key = compiled spec (dict with integers only, see programs.spec).
 
-    Params: {"offset": o} when the spec has an offset_range, else {}. Specs must be
-    compiled with `compile_spec` (validated, words resolved) before use.
+    Params are always {}. Specs must be compiled with `compile_spec` and, if they
+    carry an offset_range, expanded with `programs.expand` into one spec per
+    offset, so every concrete cipher has exactly one ledger identity.
     """
     name = "program"
     word_keys = False
@@ -23,8 +24,8 @@ class ProgramFamily(CipherFamily):
     def _resolve(self, key: dict, params: dict) -> dict:
         if not isinstance(key, dict) or key.get("v") != S.SPEC_VERSION:
             raise ValueError("program key must be a compiled spec (use programs.compile_spec)")
-        if "offset" in params:
-            return S.with_offset(key, params["offset"])
+        if key.get("offset_range"):
+            raise ValueError("program key has an offset_range; run programs.expand() first")
         return key
 
     def encrypt(self, pt, key, n, **params):
@@ -34,9 +35,6 @@ class ProgramFamily(CipherFamily):
         return S.decrypt(ct, self._resolve(key, params), n)
 
     def param_grid(self, length, key=None, **limits):
-        if isinstance(key, dict) and key.get("offset_range"):
-            lo, hi = key["offset_range"]
-            return [{"offset": o} for o in range(lo, hi + 1)]
         return [{}]
 
     def random_key(self, rng, n, difficulty="medium", words=None, length=None):
@@ -71,3 +69,11 @@ class _IntAlphabet:
 
     def decode(self, arr) -> str:
         return " ".join(str(int(x)) for x in arr)
+
+
+def _self_register() -> None:
+    from lpswarm.ciphers import REGISTRY
+    REGISTRY.setdefault(ProgramFamily.name, ProgramFamily())
+
+
+_self_register()

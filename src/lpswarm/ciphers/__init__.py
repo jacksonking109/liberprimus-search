@@ -11,8 +11,12 @@ REGISTRY: dict[str, CipherFamily] = {
 
 
 def _register_programs() -> None:
-    # Imported lazily: programs depends on ciphers.base.
-    from lpswarm.programs.family import ProgramFamily
+    # programs.family imports ciphers.base; if it is mid-import (someone imported
+    # lpswarm.programs.family first), it registers itself when it finishes.
+    try:
+        from lpswarm.programs.family import ProgramFamily
+    except ImportError:
+        return
     REGISTRY.setdefault(ProgramFamily.name, ProgramFamily())
 
 
