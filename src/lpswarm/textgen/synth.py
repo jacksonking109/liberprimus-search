@@ -115,11 +115,15 @@ _ALLOWED_HELDOUT_CALLERS = ("lpswarm.validation", "test_", "tests.", "conftest")
 
 
 def _require_validation_caller() -> None:
-    for frame_info in inspect.stack()[2:]:
-        mod = frame_info.frame.f_globals.get("__name__", "")
-        if mod.startswith(_ALLOWED_HELDOUT_CALLERS):
-            return
-    raise PermissionError("held-out synthetic data is reserved for lpswarm.validation")
+    """Only the direct caller of heldout_cases is checked. This is a guard
+    against accidental use (e.g. a generator tuning itself on held-out data),
+    not a security boundary."""
+    frame = inspect.currentframe()
+    caller = frame.f_back.f_back if frame and frame.f_back else None
+    mod = caller.f_globals.get("__name__", "") if caller else ""
+    if not mod.startswith(_ALLOWED_HELDOUT_CALLERS):
+        raise PermissionError(f"held-out synthetic data is reserved for lpswarm.validation "
+                              f"(called from {mod!r})")
 
 
 def heldout_cases(families: Sequence[str], lengths: Sequence[int], n_per: int,
