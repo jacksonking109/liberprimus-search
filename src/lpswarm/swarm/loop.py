@@ -92,6 +92,7 @@ def run_swarm(target: Target, ledger: Ledger, oracle: FullOracle, generators: Se
         return None if cfg.timeout_s is None else max(0.0, cfg.timeout_s - (time.monotonic() - t0))
 
     rnd = 0
+    idle_rounds = 0          # consecutive rounds where every generator was paused
     while rnd < cfg.rounds:
         rnd += 1
         rounds_run = rnd
@@ -213,14 +214,22 @@ def run_swarm(target: Target, ledger: Ledger, oracle: FullOracle, generators: Se
             break
         if limited and proposed_this_round == 0:
             # Every generator is paused by a usage limit: wait (no deadline) or stop.
-            resume = min(limited.values())
+            # At least a minute per pause, and a cap on idle rounds, so a limit that keeps
+            # reporting a past reset time can never turn into a tight call loop.
+            resume = max(min(limited.values()), time.time() + 60)
+            idle_rounds += 1
             if not cfg.wait_on_rate_limit:
                 stopped = "rate_limited"
+                break
+            if idle_rounds > 500:
+                stopped = "rate_limited: too many paused rounds in a row"
                 break
             stopped = _wait_until(resume, stop_path, time_left, progress)
             if stopped:
                 break
             rnd -= 1   # the round produced nothing; do not count it
+        else:
+            idle_rounds = 0
     final = final_check(ledger, oracle, tid)
     return SwarmResult(tid, rounds_run, stopped, stats, final, time.monotonic() - t0)
 

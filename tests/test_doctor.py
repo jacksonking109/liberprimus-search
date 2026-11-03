@@ -98,5 +98,8 @@ def test_doctor_ping_scripted(tmp_path):
     p = tmp_path / "dry.toml"
     p.write_text('[models.dry]\nprovider = "scripted"\nmodel = "dry"\nroles = ["proposer"]\n'
                  'replies = ["{\\"ok\\": true}"]\n', encoding="utf-8")
-    checks = _by_name(run_checks(str(p), ping=True))
+    spend = tmp_path / "spend.sqlite"
+    checks = _by_name(run_checks(str(p), ping=True, ledgers=[str(spend)]))
     assert checks["ping dry"].status == OK
+    import sqlite3
+    assert sqlite3.connect(spend).execute("SELECT COUNT(*) FROM budget_event").fetchone()[0] == 1

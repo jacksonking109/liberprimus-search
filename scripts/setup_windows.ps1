@@ -11,9 +11,9 @@
       powershell -ExecutionPolicy Bypass -File scripts\setup_windows.ps1
 
   Options:
-      -ProposerModels qwen3:14b,qwen3:8b   first tag that pulls is used (big GPU)
-      -ExtraModels gemma3:12b              also pulled for the big GPU ('' to skip)
-      -RankerModels granite4:tiny-h,granite3.3:2b   first that pulls (small GPU)
+      -ProposerModels "qwen3:14b,qwen3:8b"  first tag that pulls is used (big GPU)
+      -ExtraModels gemma3:12b               also pulled for the big GPU (none to skip)
+      -RankerModels "granite4:tiny-h,granite3.3:2b"  first that pulls (small GPU; none to skip)
       -Force        rewrite config\models.toml even if it exists
       -SkipTests    skip pytest
       -SkipModels   skip Ollama install, servers and model pulls
@@ -29,6 +29,16 @@ param(
 )
 
 $ErrorActionPreference = "Continue"
+# With `powershell -File`, a list like qwen3:14b,qwen3:8b arrives as ONE string, and empty
+# strings are dropped; so split on commas here and use "none" to mean "skip".
+function Split-List([string[]]$Items) {
+    $out = @()
+    foreach ($i in $Items) { foreach ($t in ($i -split ',')) { $t = $t.Trim(); if ($t -and $t -ne 'none') { $out += $t } } }
+    return ,$out
+}
+$ProposerModels = Split-List $ProposerModels
+$ExtraModels = Split-List $ExtraModels
+$RankerModels = Split-List $RankerModels
 $Root = Split-Path -Parent $PSScriptRoot
 Set-Location $Root
 $VenvPy = Join-Path $Root ".venv\Scripts\python.exe"

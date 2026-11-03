@@ -6,8 +6,13 @@ Design rules, so plan usage stays within what the providers document:
   - Each call runs in a fresh empty temporary folder with tools off (Claude Code)
     or a read-only sandbox (Codex), so the CLI answers as a chat model and cannot
     touch the repo, the ledger or the oracle.
-  - API-key variables (ANTHROPIC_API_KEY, OPENAI_API_KEY, ...) are removed from
-    the CLI's environment, so calls always use the plan, never API billing.
+  - API-key and backend variables (ANTHROPIC_API_KEY, ANTHROPIC_BASE_URL,
+    CLAUDE_CODE_USE_BEDROCK/VERTEX, OPENAI_API_KEY, ...) are removed from the CLI's
+    environment. This covers the common ways a call gets billed to an API instead of
+    the plan, but not settings inside the CLIs' own config files (for example an
+    apiKeyHelper or env block in ~/.claude/settings.json): keep those plan-based.
+  - Codex's read-only sandbox stops writes, not reads; on Windows its sandbox is
+    weaker than on macOS/Linux. Treat it as a chat model you trust not to go looking.
   - Prompts go over stdin; the system prompt goes in a file (no command-line
     quoting problems with Windows .cmd launchers).
 Usage limits are detected from the CLI's reply and raised as AdapterError with
@@ -17,7 +22,9 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import shutil
+import signal
 import subprocess
 import tempfile
 import time
@@ -56,20 +63,87 @@ def _resolve(exe: str) -> str:
     return found
 
 
-def _run(cmd: list[str], stdin: str, cwd: str, env: dict, timeout: float) -> subprocess.CompletedProcess:
+def _kill_tree(proc: subprocess.Popen) -> None:
+    """Kill the CLI and everything it started. npm launchers (.cmd -> node -> CLI) would
+    otherwise leave the real CLI running and holding our pipes after a timeout."""
     try:
-        return subprocess.run(cmd, input=stdin, capture_output=True, text=True, encoding="utf-8",
-                              errors="replace", cwd=cwd, env=env, timeout=timeout)
+        if os.name == "nt":
+            subprocess.run(["taskkill", "/F", "/T", "/PID", str(proc.pid)],
+                           capture_output=True, timeout=30)
+        else:
+            os.killpg(proc.pid, signal.SIGKILL)
+    except (OSError, subprocess.SubprocessError):
+        pass
+    try:
+        proc.kill()
+    except OSError:
+        pass
+
+
+def _run(cmd: list[str], stdin: str, cwd: str, env: dict, timeout: float) -> subprocess.CompletedProcess:
+    kw: dict = {}
+    if os.name == "nt":
+        kw["creationflags"] = subprocess.CREATE_NEW_PROCESS_GROUP
+    else:
+        kw["start_new_session"] = True
+    try:
+        proc = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                                stderr=subprocess.PIPE, cwd=cwd, env=env, **kw)
     except FileNotFoundError:
         raise AdapterError(f"command not found: {cmd[0]}") from None
+    try:
+        out, err = proc.communicate(stdin.encode("utf-8"), timeout=timeout)
     except subprocess.TimeoutExpired:
+        _kill_tree(proc)
+        try:
+            proc.communicate(timeout=10)
+        except (subprocess.TimeoutExpired, OSError, ValueError):
+            pass
         raise AdapterError(f"{Path(cmd[0]).name} timed out after {timeout:.0f}s", transient=True) from None
+    return subprocess.CompletedProcess(cmd, proc.returncode, out.decode("utf-8", "replace"),
+                                       err.decode("utf-8", "replace"))
+
+
+# Short, anchored forms of the CLIs' usage-limit replies; used to catch a limit message
+# returned as a normal (non-error) result. Long replies are never treated as limits.
+_LIMIT_REPLY = re.compile(r"^\s*(claude ai usage limit reached|you'?ve (hit|reached) your "
+                          r"(usage )?limit|usage limit reached|.{0,40}limit reached\b)", re.I)
+
+
+def _is_limit_reply(text: str) -> bool:
+    return bool(text) and len(text) < 300 and bool(_LIMIT_REPLY.search(text))
+
+
+def _last_result_json(out: str):
+    """The CLI's final result object. Scans from the end, so update notices or other
+    lines printed around the JSON don't break parsing; accepts the --verbose array form."""
+    for line in reversed([x for x in out.splitlines() if x.strip()]):
+        try:
+            val = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if isinstance(val, list):
+            for item in reversed(val):
+                if isinstance(item, dict) and item.get("type") == "result":
+                    return item
+            continue
+        if isinstance(val, dict) and ("result" in val or val.get("type") == "result"):
+            return val
+    try:
+        val = json.loads(out)
+        if isinstance(val, list):
+            val = next((i for i in reversed(val) if isinstance(i, dict) and i.get("type") == "result"), None)
+        return val if isinstance(val, dict) else None
+    except json.JSONDecodeError:
+        return None
 
 
 class ClaudeCodeAdapter:
     """`claude -p` with tools off, JSON output, no session saved."""
 
-    DROP_ENV = ("ANTHROPIC_API_KEY", "ANTHROPIC_AUTH_TOKEN")
+    # Variables that would send calls to API billing or another backend instead of the plan.
+    DROP_ENV = ("ANTHROPIC_API_KEY", "ANTHROPIC_AUTH_TOKEN", "ANTHROPIC_BASE_URL",
+                "CLAUDE_CODE_USE_BEDROCK", "CLAUDE_CODE_USE_VERTEX", "CLAUDE_CODE_USE_FOUNDRY")
 
     def __init__(self, model: str = "", exe: str = "claude", timeout: float = 600,
                  extra_args: Sequence[str] = ()):
@@ -90,26 +164,26 @@ class ClaudeCodeAdapter:
                  max_tokens: int = 2048) -> Completion:
         system, user = _split(messages)
         t0 = time.monotonic()
-        with tempfile.TemporaryDirectory(prefix="lpswarm-claude-") as tmp:
+        with tempfile.TemporaryDirectory(prefix="lpswarm-claude-", ignore_cleanup_errors=True) as tmp:
             sys_file = None
             if system:
                 sys_file = str(Path(tmp) / "system.txt")
                 Path(sys_file).write_text(system, encoding="utf-8")
             r = _run(self.command(sys_file), user, tmp, _clean_env(self.DROP_ENV), self.timeout)
         out = (r.stdout or "").strip()
-        data = None
-        try:
-            data = json.loads(out.splitlines()[-1]) if out else None
-        except (json.JSONDecodeError, IndexError):
-            data = None
-        text = (data or {}).get("result") if isinstance(data, dict) else None
-        is_error = bool((data or {}).get("is_error")) if isinstance(data, dict) else r.returncode != 0
-        blob = " ".join(filter(None, [text, out if data is None else "", r.stderr]))
-        if (is_error or r.returncode != 0) and looks_like_limit(blob):
+        data = _last_result_json(out) if out else None
+        text = data.get("result") if data else None
+        is_error = bool(data.get("is_error")) if data else r.returncode != 0
+        # With a parsed result, judge limits on its text only (a stderr warning that
+        # mentions 429 must not pause the model); without one, use whatever was printed.
+        blob = (text or "") if data else " ".join(filter(None, [out, r.stderr]))
+        if ((is_error or r.returncode != 0) and looks_like_limit(blob)) or \
+                (isinstance(text, str) and _is_limit_reply(text)):
             at, parsed = parse_resume_at(blob)
             raise CLILimitError(f"Claude Code usage limit: {blob[:200]}", at, parsed)
-        if r.returncode != 0 or is_error or text is None:
-            raise AdapterError(f"claude exited {r.returncode}: {blob[:300]}")
+        if r.returncode != 0 or is_error or not isinstance(text, str):
+            detail = blob or (r.stderr or "")
+            raise AdapterError(f"claude exited {r.returncode}: {detail[:300]}")
         u = (data or {}).get("usage") or {}
         tin = int(u.get("input_tokens") or 0) + int(u.get("cache_read_input_tokens") or 0) \
             + int(u.get("cache_creation_input_tokens") or 0)
@@ -122,7 +196,7 @@ class ClaudeCodeAdapter:
 class CodexAdapter:
     """`codex exec -` in a read-only sandbox, ephemeral, last message written to a file."""
 
-    DROP_ENV = ("OPENAI_API_KEY", "CODEX_API_KEY")
+    DROP_ENV = ("OPENAI_API_KEY", "CODEX_API_KEY", "OPENAI_BASE_URL")
 
     def __init__(self, model: str = "", exe: str = "codex", timeout: float = 600,
                  extra_args: Sequence[str] = ()):
@@ -141,7 +215,7 @@ class CodexAdapter:
         system, user = _split(messages)
         prompt = (system + "\n\n" + user) if system else user
         t0 = time.monotonic()
-        with tempfile.TemporaryDirectory(prefix="lpswarm-codex-") as tmp:
+        with tempfile.TemporaryDirectory(prefix="lpswarm-codex-", ignore_cleanup_errors=True) as tmp:
             out_file = str(Path(tmp) / "last_message.txt")
             r = _run(self.command(out_file), prompt, tmp, _clean_env(self.DROP_ENV), self.timeout)
             text = Path(out_file).read_text(encoding="utf-8", errors="replace") \
@@ -162,7 +236,9 @@ class CodexAdapter:
             if "error" in str(ev.get("type", "")) or "failed" in str(ev.get("type", "")):
                 errors.append(json.dumps(ev)[:300])
         blob = " ".join(errors + [r.stderr or ""])
-        if (r.returncode != 0 or not text.strip()) and looks_like_limit(blob):
+        if ((r.returncode != 0 or not text.strip()) and looks_like_limit(blob)) or \
+                _is_limit_reply(text.strip()):
+            blob = blob if blob.strip() else text
             at, parsed = parse_resume_at(blob)
             raise CLILimitError(f"Codex usage limit: {blob[:200]}", at, parsed)
         if r.returncode != 0 or not text.strip():

@@ -64,7 +64,8 @@ Useful options:
 
 - Regenerate the config: add `-Force`
 - Skip the tests (faster re-run): add `-SkipTests`
-- Pick models yourself: `-ProposerModels qwen3:8b -ExtraModels gemma3:12b -RankerModels granite3.3:2b`
+- Pick models yourself: `-ProposerModels "qwen3:8b" -ExtraModels "gemma3:12b" -RankerModels "granite3.3:2b"`
+  (comma-separate several to try in order; `none` skips one, e.g. `-ExtraModels none`)
 
 Notes:
 

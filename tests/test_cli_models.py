@@ -17,7 +17,7 @@ import json, os, sys, time
 log = os.environ["FAKE_LOG"]
 mode = os.environ.get("FAKE_MODE", "ok")
 argv = sys.argv[1:]
-stdin = sys.stdin.read()
+stdin = sys.stdin.buffer.read().decode("utf-8")
 rec = {"argv": argv, "cwd": os.getcwd(), "stdin": stdin,
        "has_anthropic_key": "ANTHROPIC_API_KEY" in os.environ,
        "has_openai_key": "OPENAI_API_KEY" in os.environ}
@@ -39,6 +39,20 @@ if kind == "claude":
     elif mode == "limit_text":
         print(json.dumps({"type": "result", "is_error": True,
                           "result": "You've hit your limit - resets 3pm"})); sys.exit(1)
+    elif mode == "trailing":
+        print(json.dumps({"type": "result", "is_error": False, "result": "OK-REPLY", "usage": {}}))
+        print("Update available: run claude update")
+    elif mode == "limit_not_error":
+        print(json.dumps({"type": "result", "is_error": False,
+                          "result": "Claude AI usage limit reached|" + os.environ["FAKE_TS"]}))
+    elif mode == "other_error_429_stderr":
+        sys.stderr.write("warning: upstream returned 429 once, retried\n")
+        print(json.dumps({"type": "result", "is_error": True, "result": "Invalid model name"})); sys.exit(1)
+    elif mode == "sleep":
+        import subprocess
+        child = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(60)"])
+        open(os.environ["FAKE_CHILD"], "w").write(str(child.pid))
+        time.sleep(60)
     else:
         sys.stderr.write("boom"); sys.exit(2)
 else:
@@ -241,3 +255,83 @@ def test_doctor_reports_cli_models_and_window(fake, tmp_path, monkeypatch):
     assert "removed for this model" in checks["model cc"].detail   # ANTHROPIC_API_KEY is set
     assert checks["usage cc"].detail.startswith("1 call(s) in the last 5h (cap 40)")
     assert len(fake["calls"]()) == 2                                 # only --version, no model calls
+
+
+def test_review_regressions_claude_parsing(fake, monkeypatch):
+    from lpswarm.router import AdapterError
+    monkeypatch.setenv("FAKE_KIND", "claude")
+    ad = ClaudeCodeAdapter("", exe=fake["claude"])
+    monkeypatch.setenv("FAKE_MODE", "trailing")
+    assert ad.complete(MSGS).text == "OK-REPLY"             # notice after the JSON is ignored
+    monkeypatch.setenv("FAKE_MODE", "limit_not_error")
+    monkeypatch.setenv("FAKE_TS", str(int(time.time()) + 600))
+    with pytest.raises(CLILimitError):                       # limit text in a non-error result
+        ad.complete(MSGS)
+    monkeypatch.setenv("FAKE_MODE", "other_error_429_stderr")
+    with pytest.raises(AdapterError) as ei:                  # 429 on stderr is not a limit
+        ad.complete(MSGS)
+    assert not isinstance(ei.value, CLILimitError)
+
+
+def test_non_ascii_prompt_round_trips(fake, monkeypatch):
+    monkeypatch.setenv("FAKE_KIND", "claude")
+    runes = "\u16a0\u16a2\u16a6 \u2022 \u16a9"
+    ClaudeCodeAdapter("", exe=fake["claude"]).complete([{"role": "user", "content": runes}])
+    assert fake["calls"]()[-1]["stdin"] == runes
+
+
+def test_stale_reset_time_falls_back_to_cooldown():
+    now = time.time()
+    at, parsed = parse_resume_at(f"usage limit reached|{int(now) - 100}", now)
+    assert not parsed and at >= now + 60
+    at, parsed = parse_resume_at("Try again in 1 hour 30 minutes", now)
+    assert parsed and abs(at - now - 5400) < 1
+    assert parse_resume_at("retry in 500ms", now)[0] - now < 1
+    assert not parse_resume_at("presets 10 things", now)[1]
+
+
+@pytest.mark.skipif(os.name == "nt", reason="process-group check uses POSIX signals")
+def test_timeout_kills_the_whole_process_tree(fake, monkeypatch, tmp_path):
+    from lpswarm.router import AdapterError
+    monkeypatch.setenv("FAKE_KIND", "claude")
+    monkeypatch.setenv("FAKE_MODE", "sleep")
+    child_file = tmp_path / "child.pid"
+    monkeypatch.setenv("FAKE_CHILD", str(child_file))
+    t0 = time.monotonic()
+    with pytest.raises(AdapterError, match="timed out"):
+        ClaudeCodeAdapter("", exe=fake["claude"], timeout=2).complete(MSGS)
+    assert time.monotonic() - t0 < 20
+    pid = int(child_file.read_text())
+    time.sleep(0.5)
+    try:
+        os.kill(pid, 0)
+        alive = Path(f"/proc/{pid}/status").exists() and "zombie" not in Path(f"/proc/{pid}/status").read_text()
+    except ProcessLookupError:
+        alive = False
+    assert not alive
+
+
+def test_loop_never_spins_on_a_past_reset(oracle):
+    """A limit that keeps reporting an already-past reset must not make the loop call
+    the CLI in a tight loop: each pause is at least a minute, so we stop via timeout."""
+    from lpswarm.alphabet import Alphabet
+    from lpswarm.executor import Target
+    from lpswarm.swarm import LLMGenerator, SwarmConfig, run_swarm
+    from lpswarm.textgen.synth import generate_case
+
+    class AlwaysLimited:
+        calls = 0
+
+        def complete(self, messages, temperature=0.7, max_tokens=2048):
+            AlwaysLimited.calls += 1
+            raise CLILimitError("usage limit", time.time() - 10, True)
+
+    a = Alphabet.latin26()
+    case = generate_case("caesar", 60, seed=4)
+    led = Ledger()
+    r = Router([ModelSpec("m", "scripted", "m", (Role.PROPOSER,))], ledger=led,
+               adapters={"m": AlwaysLimited()})
+    res = run_swarm(Target(a, case.ciphertext, "s", is_synthetic=True), led, oracle,
+                    [LLMGenerator(r, "m")], SwarmConfig(rounds=2, stop_file=None, timeout_s=3),
+                    progress=False)
+    assert res.stopped == "timeout" and AlwaysLimited.calls <= 2

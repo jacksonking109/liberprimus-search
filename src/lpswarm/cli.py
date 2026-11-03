@@ -230,7 +230,10 @@ def cmd_swarm(args) -> int:
         "rounds": args.rounds, "per_round": args.per_round, "max_attempts": args.max_attempts,
         "timeout_s": args.timeout})
     with Ledger(args.ledger) as led:
-        router = Router.from_toml(args.models, ledger=led, global_max_usd=args.max_usd) \
+        # Model calls are counted in one shared spend ledger (also used by tiertest and
+        # doctor), so per-model USD caps and call-per-window caps hold across all runs.
+        spend = Ledger(args.spend_ledger) if args.models else None
+        router = Router.from_toml(args.models, ledger=spend, global_max_usd=args.max_usd) \
             if args.models else None
         gens = []
         for g in names:
@@ -256,8 +259,9 @@ def cmd_swarm(args) -> int:
                 print(f"  {tag} {r['verdict']:<9} by {r['proposer_model']:<16} {r['key_preview']}\n"
                       f"        {r['plaintext_preview']}")
         if router:
-            print("\nmodel spend (this ledger): " + ", ".join(
+            print(f"\nmodel spend ({args.spend_ledger}): " + ", ".join(
                 f"{n}=${router.spent(n):.4f}" for n in router.names()))
+            spend.close()
     return 0
 
 
@@ -294,8 +298,7 @@ def cmd_doctor(args) -> int:
         models = "config/models.toml"
     ledgers = list(args.ledger or [])
     if not ledgers:
-        ledgers = [p for p in ("reports/model_spend.sqlite", "ledger.sqlite", "lp.sqlite")
-                   if Path(p).is_file()]
+        ledgers = [p for p in ("reports/model_spend.sqlite",) if Path(p).is_file()]
     return print_report(run_checks(models, ping=args.ping, ledgers=ledgers))
 
 
@@ -431,7 +434,10 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--rounds", type=int)
     p.add_argument("--per-round", type=int)
     p.add_argument("--max-attempts", type=int, help="new attempts per target")
-    p.add_argument("--max-usd", type=float, help="global model spend cap for this ledger")
+    p.add_argument("--max-usd", type=float, help="global model spend cap (spend ledger)")
+    p.add_argument("--spend-ledger", default="reports/model_spend.sqlite",
+                   help="where model calls, spend and usage-limit pauses are logged (shared by "
+                        "swarm, tiertest and doctor)")
     p.add_argument("--timeout", type=float, help="seconds per target")
     p.add_argument("--top", type=int, default=5)
     p.add_argument("--quiet", action="store_true")
@@ -464,8 +470,8 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--models", help="models TOML (default config/models.toml if present)")
     p.add_argument("--ping", action="store_true",
                    help="send one tiny prompt to each healthy model (costs a little on paid APIs)")
-    p.add_argument("--ledger", nargs="*", help="ledgers to read call counts and pauses from "
-                   "(default: reports/model_spend.sqlite, ledger.sqlite, lp.sqlite if present)")
+    p.add_argument("--ledger", nargs="*", help="spend ledger(s) to read call counts and pauses "
+                   "from (default: reports/model_spend.sqlite)")
     p.set_defaults(func=cmd_doctor)
 
     for name, fn in (("ruled-out", cmd_ruled_out), ("leads", cmd_leads)):

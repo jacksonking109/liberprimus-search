@@ -22,12 +22,25 @@ _LIMIT_RE = re.compile(
     r"(usage|rate)[ _-]?limit|limit (reached|exceeded|hit)|hit your (usage )?limit|"
     r"too many requests|\b429\b|quota (exceeded|reached)|out of (credits|usage)", re.I)
 _UNIX_RE = re.compile(r"\|\s*(\d{10})\b")
-_IN_RE = re.compile(r"(?:try again|retry|resets?|available again)\s+in\s+(?:about\s+)?"
-                    r"(\d+(?:\.\d+)?)\s*(s|sec|second|m|min|minute|h|hr|hour|d|day)s?\b", re.I)
-_AT_RE = re.compile(r"resets?\s+(?:at\s+)?(\d{1,2})(?::(\d{2}))?\s*(am|pm)?", re.I)
+_IN_RE = re.compile(r"\b(?:try again|retry|resets?|available again)\s+in\s+(?:about\s+)?"
+                    r"((?:\d+(?:\.\d+)?\s*[a-z]+\b[\s,]*(?:and\s+)?)+)", re.I)
+_PAIR_RE = re.compile(r"(\d+(?:\.\d+)?)\s*(ms|milliseconds?|s|secs?|seconds?|m|mins?|minutes?|"
+                      r"h|hrs?|hours?|d|days?)\b", re.I)
+_ISO_RE = re.compile(r"\b(\d{4})-(\d{2})-(\d{2})[ T](\d{1,2}):(\d{2})")
+_AT_RE = re.compile(r"\b(?:resets?(?:\s+at)?|(?:try|available)\s+again\s+at)\s+"
+                    r"(?!\d{4}-)(\d{1,2})(?::(\d{2}))?\s*(am|pm)?\b", re.I)
 
-_UNIT_S = {"s": 1, "sec": 1, "second": 1, "m": 60, "min": 60, "minute": 60, "h": 3600, "hr": 3600,
-           "hour": 3600, "d": 86400, "day": 86400}
+_UNIT_S = {"ms": 0.001, "millisecond": 0.001, "s": 1, "sec": 1, "second": 1, "m": 60, "min": 60,
+           "minute": 60, "h": 3600, "hr": 3600, "hour": 3600, "d": 86400, "day": 86400}
+
+
+def _unit_seconds(unit: str) -> float:
+    u = unit.lower()
+    if u in _UNIT_S:
+        return _UNIT_S[u]
+    if u.endswith("s") and u[:-1] in _UNIT_S:
+        return _UNIT_S[u[:-1]]
+    return 60.0
 
 
 class RateLimited(RuntimeError):
@@ -45,19 +58,29 @@ def looks_like_limit(text: str) -> bool:
 
 def parse_resume_at(text: str, now: float | None = None,
                     default_cooldown_s: float = DEFAULT_COOLDOWN_S) -> tuple[float, bool]:
-    """(resume time, parsed?) from a limit message. Falls back to now + cool-down."""
+    """(resume time, parsed?) from a limit message. Falls back to now + cool-down,
+    including when the message names a time that is already past."""
     now = time.time() if now is None else now
-    m = _UNIX_RE.search(text or "")
+    text = text or ""
+    fallback = (now + default_cooldown_s, False)
+    m = _UNIX_RE.search(text)
     if m:
         ts = float(m.group(1))
-        if now - 3600 < ts < now + 8 * 86400:
-            return max(ts, now), True
-    m = _IN_RE.search(text or "")
+        return (ts, True) if now < ts < now + 8 * 86400 else fallback
+    m = _IN_RE.search(text)
     if m:
-        unit = m.group(2).lower().rstrip("s") or "s"
-        secs = float(m.group(1)) * _UNIT_S.get(unit, _UNIT_S.get(m.group(2).lower(), 60))
-        return now + secs, True
-    m = _AT_RE.search(text or "")
+        secs = sum(float(v) * _unit_seconds(u) for v, u in _PAIR_RE.findall(m.group(1)))
+        if 0 < secs <= 8 * 86400:
+            return now + secs, True
+    m = _ISO_RE.search(text)
+    if m:
+        try:
+            y, mo, d, hh, mm = (int(g) for g in m.groups())
+            ts = datetime(y, mo, d, hh, mm).timestamp()
+            return (ts, True) if now < ts < now + 8 * 86400 else fallback
+        except ValueError:
+            pass
+    m = _AT_RE.search(text)
     if m:
         hour, minute, ampm = int(m.group(1)), int(m.group(2) or 0), (m.group(3) or "").lower()
         if ampm == "pm" and hour < 12:
@@ -70,4 +93,4 @@ def parse_resume_at(text: str, now: float | None = None,
             if target <= local_now:
                 target += timedelta(days=1)
             return target.timestamp(), True
-    return now + default_cooldown_s, False
+    return fallback

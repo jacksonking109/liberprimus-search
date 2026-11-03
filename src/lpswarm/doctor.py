@@ -109,7 +109,7 @@ def run_checks(models_config: str | None = None, ping: bool = False,
                                         f"cap {cap or 'none'} calls per "
                                         f"{s.extra.get('window_hours', 5)}h{note}"))
             for lpath in ledgers or []:
-                if not Path(lpath).is_file():
+                if not _is_ledger(lpath):
                     continue
                 from lpswarm.ledger import Ledger
                 from lpswarm.router import Router
@@ -136,7 +136,13 @@ def run_checks(models_config: str | None = None, ping: bool = False,
         from lpswarm.ledger import Ledger
         from lpswarm.router import Router
         healthy = {c.name for c in out if c.status == OK}
-        router = Router(specs, ledger=Ledger())   # in-memory ledger: caps checked, nothing saved
+        # Pings go through the shared spend ledger, so they respect active pauses and
+        # call caps and are counted like any other call.
+        spend_path = next((p for p in (ledgers or []) if _is_ledger(p) or not Path(p).exists()), None)
+        if spend_path is None:
+            Path("reports").mkdir(exist_ok=True)
+            spend_path = "reports/model_spend.sqlite"
+        router = Router(specs, ledger=Ledger(spend_path))
         for s in specs:
             if f"model {s.name}" not in healthy:
                 continue
@@ -149,6 +155,24 @@ def run_checks(models_config: str | None = None, ping: bool = False,
             except Exception as exc:  # noqa: BLE001
                 out.append(Check(FAIL, f"ping {s.name}", str(exc)[:200]))
     return out
+
+
+def _is_ledger(path: str) -> bool:
+    """True only for an existing SQLite file that already has lpswarm's tables (doctor
+    must not add tables to, or crash on, some other file the user names)."""
+    import sqlite3
+    p = Path(path)
+    if not p.is_file():
+        return False
+    try:
+        con = sqlite3.connect(f"file:{p.as_posix()}?mode=ro", uri=True)
+        try:
+            names = {r[0] for r in con.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+        finally:
+            con.close()
+    except sqlite3.Error:
+        return False
+    return {"budget_event", "attempt"} <= names
 
 
 def print_report(checks: list[Check]) -> int:

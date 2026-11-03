@@ -50,9 +50,16 @@ function Test-Ollama([int]$Port) {
 }
 
 function Stop-OurServers {
+    # The PID file can be stale after a reboot (PIDs reused by other programs), so only
+    # stop a recorded PID if it is still an ollama process.
     if (Test-Path $PidFile) {
         foreach ($id in Get-Content $PidFile) {
-            if ($id -match '^\d+$') { Stop-Process -Id ([int]$id) -Force -ErrorAction SilentlyContinue }
+            if ($id -match '^\d+$') {
+                $proc = Get-Process -Id ([int]$id) -ErrorAction SilentlyContinue
+                if ($proc -and $proc.ProcessName -like "ollama*") {
+                    Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue
+                }
+            }
         }
         Remove-Item $PidFile -Force -ErrorAction SilentlyContinue
     }
@@ -107,6 +114,10 @@ function Start-OneServer([int]$Port, [string]$Uuid) {
         if ($Uuid) { $env:CUDA_VISIBLE_DEVICES = $Uuid }
         else { Remove-Item Env:CUDA_VISIBLE_DEVICES -ErrorAction SilentlyContinue }
         $log = Join-Path $Reports "ollama-$Port.log"
+        if (Test-Ollama $Port) {
+            Write-Step "FAIL" "port $Port is already answering (another Ollama server or service?); stop it and re-run"
+            return $false
+        }
         $p = Start-Process -FilePath $ollama.Source -ArgumentList "serve" -WindowStyle Hidden `
             -RedirectStandardError $log -RedirectStandardOutput "$log.out" -PassThru
         Add-Content -Path $PidFile -Value $p.Id
@@ -117,6 +128,7 @@ function Start-OneServer([int]$Port, [string]$Uuid) {
         else { $env:CUDA_VISIBLE_DEVICES = $oldCuda }
     }
     for ($i = 0; $i -lt 60; $i++) {
+        if ($p.HasExited) { return $false }   # e.g. failed to bind the port
         if (Test-Ollama $Port) { return $true }
         Start-Sleep -Seconds 1
     }
