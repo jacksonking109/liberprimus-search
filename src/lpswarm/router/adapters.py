@@ -17,6 +17,7 @@ import shutil
 import subprocess
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 from dataclasses import dataclass, field
 from typing import Callable, Sequence
@@ -43,8 +44,12 @@ def _post_json(url: str, body: dict, headers: dict[str, str], timeout: float) ->
     data = json.dumps(body).encode("utf-8")
     req = urllib.request.Request(url, data=data, method="POST",
                                  headers={"Content-Type": "application/json", **headers})
+    host = (urllib.parse.urlsplit(url).hostname or "").lower()
+    # Never send local model traffic (Ollama) through a system HTTP proxy.
+    opener = (urllib.request.build_opener(urllib.request.ProxyHandler({}))
+              if host in ("localhost", "127.0.0.1", "::1") else urllib.request.build_opener())
     try:
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
+        with opener.open(req, timeout=timeout) as resp:
             return json.loads(resp.read().decode("utf-8"))
     except urllib.error.HTTPError as exc:
         detail = ""

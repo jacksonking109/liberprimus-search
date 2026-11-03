@@ -7,6 +7,7 @@ budget holds across runs that share a ledger.
 """
 from __future__ import annotations
 
+import json
 import time
 from dataclasses import dataclass
 from typing import Sequence
@@ -34,6 +35,15 @@ def make_adapter(spec: ModelSpec):
                                        price_in_per_mtok=float(x.get("price_in_per_mtok", 0.0)),
                                        price_out_per_mtok=float(x.get("price_out_per_mtok", 0.0)),
                                        json_mode=bool(x.get("json_mode")))
+    if spec.provider == "scripted":
+        # Offline dry runs: replies from the config (cycled) or from a JSON file of strings.
+        replies = x.get("replies")
+        if x.get("replies_file"):
+            from lpswarm.textio import read_text
+            replies = json.loads(read_text(x["replies_file"]))
+        if not replies:
+            raise ValueError(f"model {spec.name}: scripted provider needs replies or replies_file")
+        return ScriptedAdapter(spec.name, list(replies))
     if spec.provider == "command":
         return CommandAdapter(spec.model, list(x.get("command") or []),
                               timeout=float(x.get("timeout", 600)))

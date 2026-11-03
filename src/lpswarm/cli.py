@@ -201,6 +201,82 @@ def cmd_baseline(args) -> int:
     return 0
 
 
+def cmd_swarm(args) -> int:
+    from lpswarm.executor import Target
+    from lpswarm.ledger import Ledger
+    from lpswarm.router import Router
+    from lpswarm.swarm import LLMGenerator, ModelRanker, RandomProgramGenerator, SwarmConfig, run_swarm
+    conf = _load_config(args.config)
+    alphabet = get_alphabet(args.alphabet or "latin26")
+    targets = _targets_from_args(args, alphabet)
+    names = _csv_strs(args.generators) or ("random_program",)
+    model_names = [g for g in names if g != "random_program"]
+    if (model_names or args.ranker) and not args.models:
+        raise SystemExit("model generators/ranker need --models config/models.toml")
+    values = None
+    if args.alphabet and Path(args.alphabet).is_file():
+        from lpswarm.textio import read_text
+        values = json.loads(read_text(args.alphabet)).get("values")
+    oracle = FullOracle(alphabet, _oracle_cfg(args, conf))
+    sc = _apply(SwarmConfig, conf.get("swarm", {}), {
+        "rounds": args.rounds, "per_round": args.per_round, "max_attempts": args.max_attempts,
+        "timeout_s": args.timeout})
+    with Ledger(args.ledger) as led:
+        router = Router.from_toml(args.models, ledger=led, global_max_usd=args.max_usd) \
+            if args.models else None
+        gens = []
+        for g in names:
+            if g == "random_program":
+                gens.append(RandomProgramGenerator(seed=args.seed or 0))
+            else:
+                router.spec(g)
+                gens.append(LLMGenerator(router, g))
+        ranker = ModelRanker(router, args.ranker) if args.ranker else None
+        for ct, label, page_range, synthetic, _ in targets:
+            if len(ct) < max(8, oracle.min_length):
+                print(f"skip {label}: only {len(ct)} symbols")
+                continue
+            print(f"\n== {label}  ({len(ct)} symbols)")
+            res = run_swarm(Target(alphabet, ct, label, page_range=page_range, is_synthetic=synthetic),
+                            led, oracle, gens, sc, ranker=ranker, alphabet_values=values,
+                            progress=not args.quiet)
+            n_final = sum(1 for r in res.final if r["passed_final"])
+            print(f"stopped: {res.stopped or 'rounds done'}; final passes: {n_final}")
+            for r in led.leads(res.target_id, include_near_miss=True, limit=args.top):
+                tag = "FINAL" if r["passed_final"] else "     "
+                print(f"  {tag} {r['verdict']:<9} by {r['proposer_model']:<16} {r['key_preview']}\n"
+                      f"        {r['plaintext_preview']}")
+        if router:
+            print("\nmodel spend (this ledger): " + ", ".join(
+                f"{n}=${router.spent(n):.4f}" for n in router.names()))
+    return 0
+
+
+def cmd_tiertest(args) -> int:
+    from lpswarm.validation.tiertest import TierConfig, run_tiertest
+    conf = _load_config(args.config)
+    over = {"arms": _csv_strs(args.arms), "lengths": _csv_ints(args.lengths),
+            "cases_per_length": args.cases, "rounds": args.rounds, "per_round": args.per_round,
+            "max_attempts": args.max_attempts, "ranker": args.ranker, "models_config": args.models,
+            "max_usd": args.max_usd, "seed": args.seed, "out_dir": args.out,
+            "difficulty": args.difficulty, "alphabet": args.alphabet,
+            "case_families": _csv_strs(args.case_families)}
+    if args.quick:
+        over.update(lengths=over["lengths"] or (100,), cases_per_length=args.cases or 2,
+                    rounds=args.rounds or 2, per_round=args.per_round or 4)
+    tc = _apply(TierConfig, conf.get("tiertest", {}), over)
+    oc = _oracle_cfg(args, conf)
+    if args.quick and args.null_samples is None:
+        oc = dataclasses.replace(oc, null_samples=500)
+    res = run_tiertest(tc, oc, progress=not args.quiet)
+    print(f"\nwrote {Path(tc.out_dir) / 'tiertest.md'}")
+    for s in res["summary"]:
+        if s["length"] == "all":
+            print(f"  {s['arm']:<20} recall {s['recall']:.2f} ({s['recovered']}/{s['cases']})  "
+                  f"attempts {s['attempts']:<8} calls {s['model_calls']:<5} ${s['usd']:.4f}")
+    return 0
+
+
 def cmd_ruled_out(args) -> int:
     from lpswarm.ledger import Ledger
     _require_ledger(args.ledger)
@@ -305,6 +381,52 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--top", type=int, default=10)
     p.add_argument("--quiet", action="store_true")
     p.set_defaults(func=cmd_baseline)
+
+    def add_targets(p):
+        p.add_argument("--ciphertext", nargs="+", help="text file(s); one target per file")
+        p.add_argument("--manifest", help="section manifest JSON; one target per section")
+        p.add_argument("--sections", help="comma list of manifest indexes")
+        p.add_argument("--demo", help="synthetic target FAMILY:LENGTH (e.g. program:120)")
+        p.add_argument("--glyphs-only", action="store_true")
+        p.add_argument("--difficulty", choices=("easy", "medium", "hard"))
+        p.add_argument("--seed", type=int)
+        p.add_argument("--label")
+        p.add_argument("--page-range")
+
+    p = sub.add_parser("swarm", help="Phase 3: model/random generators propose cipher programs")
+    _add_oracle_args(p)
+    add_targets(p)
+    p.add_argument("--ledger", default="ledger.sqlite")
+    p.add_argument("--models", help="models TOML (see config/models.example.toml)")
+    p.add_argument("--generators", help="comma list: random_program and/or model names")
+    p.add_argument("--ranker", help="model name with the weighting role")
+    p.add_argument("--rounds", type=int)
+    p.add_argument("--per-round", type=int)
+    p.add_argument("--max-attempts", type=int, help="new attempts per target")
+    p.add_argument("--max-usd", type=float, help="global model spend cap for this ledger")
+    p.add_argument("--timeout", type=float, help="seconds per target")
+    p.add_argument("--top", type=int, default=5)
+    p.add_argument("--quiet", action="store_true")
+    p.set_defaults(func=cmd_swarm)
+
+    p = sub.add_parser("tiertest", help="Phase 3: compare generators against the baselines")
+    _add_oracle_args(p)
+    p.add_argument("--arms", help="comma list: baseline, random_program[:N], model names")
+    p.add_argument("--models")
+    p.add_argument("--ranker")
+    p.add_argument("--case-families", help="cipher families of the test cases (default program)")
+    p.add_argument("--lengths")
+    p.add_argument("--cases", type=int, help="cases per length")
+    p.add_argument("--difficulty", choices=("easy", "medium", "hard"))
+    p.add_argument("--rounds", type=int)
+    p.add_argument("--per-round", type=int)
+    p.add_argument("--max-attempts", type=int)
+    p.add_argument("--max-usd", type=float)
+    p.add_argument("--seed", type=int)
+    p.add_argument("--out")
+    p.add_argument("--quick", action="store_true")
+    p.add_argument("--quiet", action="store_true")
+    p.set_defaults(func=cmd_tiertest)
 
     for name, fn in (("ruled-out", cmd_ruled_out), ("leads", cmd_leads)):
         p = sub.add_parser(name)
