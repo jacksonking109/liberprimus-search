@@ -100,10 +100,12 @@ class OllamaAdapter:
         self.json_mode, self.options = json_mode, {"num_ctx": 16384, **(options or {})}
 
     def complete(self, messages: Sequence[Message], temperature: float = 0.7,
-                 max_tokens: int = 2048) -> Completion:
+                 max_tokens: int = 2048, schema: dict | None = None) -> Completion:
         body = {"model": self.model, "messages": list(messages), "stream": False,
                 "options": {"temperature": temperature, "num_predict": max_tokens, **self.options}}
-        if self.json_mode:
+        if schema is not None:
+            body["format"] = schema       # structured output: reply must match the JSON schema
+        elif self.json_mode:
             body["format"] = "json"
         t0 = time.monotonic()
         r = _post_json(f"{self.endpoint}/api/chat", body, {}, self.timeout)
@@ -130,10 +132,10 @@ class OpenAICompatibleAdapter:
         return key
 
     def complete(self, messages: Sequence[Message], temperature: float = 0.7,
-                 max_tokens: int = 2048) -> Completion:
+                 max_tokens: int = 2048, schema: dict | None = None) -> Completion:
         body = {"model": self.model, "messages": list(messages), "temperature": temperature,
                 "max_tokens": max_tokens, "stream": False}
-        if self.json_mode:
+        if self.json_mode or schema is not None:
             body["response_format"] = {"type": "json_object"}
         url = self.endpoint + ("/chat/completions" if not self.endpoint.endswith("/chat/completions")
                                else "")

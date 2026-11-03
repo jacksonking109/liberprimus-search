@@ -99,6 +99,60 @@ Decryption of ciphertext symbols c (integers 0..N-1), in this order:
 Symbols may be given as integers or as alphabet tokens (strings); words are spelled with tokens.
 """
 
+EXAMPLES = """Examples of valid proposals (generic illustrations, not hints about this target):
+  {"spec": {"stream": {"kind": "repeat", "word": "KEY"}, "combine": "sub"}, "why": "periodic key"}
+  {"spec": {"stream": {"kind": "constant", "value": 3}, "combine": "add", "map": "reverse"},
+   "why": "shift on a reversed alphabet"}
+  {"spec": {"stream": {"kind": "sequence", "name": "primes", "offset": 0, "scale": 1, "add": 0},
+            "combine": "sub", "skip": [0]}, "why": "prime-number key, symbol 0 left in clear"}
+  {"spec": {"stream": {"kind": "sequence", "name": "fibonacci"}, "combine": "beaufort",
+            "offset_range": [0, 50]}, "why": "Fibonacci key, unknown start"}
+  {"spec": {"stream": {"kind": "autokey", "word": "SEED", "source": "plaintext"}, "combine": "sub"},
+   "why": "autokey with a short primer"}
+"""
+
+
+def _stream_schema() -> dict:
+    ints = {"type": "array", "items": {"type": "integer"}, "minItems": 1, "maxItems": 64}
+    return {"anyOf": [
+        {"type": "object", "properties": {"kind": {"enum": ["constant"]}, "value": {"type": "integer"}},
+         "required": ["kind", "value"], "additionalProperties": False},
+        {"type": "object", "properties": {"kind": {"enum": ["repeat"]}, "key": ints,
+                                          "word": {"type": "string"}, "offset": {"type": "integer"}},
+         "required": ["kind"], "additionalProperties": False},
+        {"type": "object", "properties": {"kind": {"enum": ["autokey"]}, "primer": ints,
+                                          "word": {"type": "string"},
+                                          "source": {"enum": ["plaintext", "ciphertext"]}},
+         "required": ["kind"], "additionalProperties": False},
+        {"type": "object", "properties": {"kind": {"enum": ["sequence"]},
+                                          "name": {"enum": sorted(SEQUENCES)},
+                                          "offset": {"type": "integer"}, "scale": {"type": "integer"},
+                                          "add": {"type": "integer"}},
+         "required": ["kind", "name"], "additionalProperties": False},
+    ]}
+
+
+def proposal_schema(max_items: int = 16) -> dict:
+    """JSON schema for a proposals reply; models with structured output are held to it."""
+    spec = {"type": "object", "properties": {
+        "stream": _stream_schema(),
+        "combine": {"enum": ["sub", "add", "beaufort"]},
+        "map": {"enum": ["identity", "reverse"]},
+        "skip": {"type": "array", "items": {"anyOf": [{"type": "integer"}, {"type": "string"}]},
+                 "maxItems": 8},
+        "reverse_text": {"type": "boolean"},
+        "transpose": {"type": "object", "properties": {
+            "columnar": {"type": "array", "items": {"type": "integer"}, "minItems": 2, "maxItems": 12}},
+            "required": ["columnar"], "additionalProperties": False},
+        "offset_range": {"type": "array", "items": {"type": "integer"}, "minItems": 2, "maxItems": 2},
+    }, "required": ["stream"], "additionalProperties": False}
+    return {"type": "object", "properties": {"proposals": {
+        "type": "array", "maxItems": max_items, "items": {
+            "type": "object", "properties": {"spec": spec, "why": {"type": "string"}},
+            "required": ["spec", "why"], "additionalProperties": False}}},
+        "required": ["proposals"], "additionalProperties": False}
+
+
 SYSTEM_PROMPT = ("You are a cryptanalysis assistant proposing hypotheses for an unsolved "
                  "historical-style cipher. Be concrete and diverse; do not repeat proposals that "
                  "already failed. Reply with JSON only.")
@@ -114,6 +168,7 @@ def build_prompt(ctx: GenContext, max_symbols: int = 300) -> list[dict]:
     st = ctx.stats()
     lines = [
         LANGUAGE_DOC % {"sequences": ", ".join(sorted(SEQUENCES))},
+        EXAMPLES,
         f"Alphabet (N={a.size}, index=token" + ("(value)" if vals else "") + f"): {table}",
         f"Target: {ctx.label}. Length {st['length']} symbols"
         + (f" (first {len(shown)} shown)" if len(shown) < st["length"] else "") + ".",
@@ -163,8 +218,8 @@ def _iter_json_values(text: str):
 def _proposal_items(val: Any):
     if isinstance(val, dict) and isinstance(val.get("proposals"), list):
         return val["proposals"]
-    if isinstance(val, dict) and "stream" in val:
-        return [val]
+    if isinstance(val, dict) and ("stream" in val or isinstance(val.get("spec"), dict)):
+        return [val]   # a single bare spec, or a single {"spec": ..., "why": ...}
     if isinstance(val, list) and val and all(isinstance(x, dict) and ("spec" in x or "stream" in x)
                                              for x in val):
         return val
@@ -204,14 +259,17 @@ def parse_proposals(text: str) -> tuple[list[RawProposal], list[str]]:
 class LLMGenerator:
     role = "proposer"
 
-    def __init__(self, router, model: str, temperature: float = 0.8, max_tokens: int = 3000):
+    def __init__(self, router, model: str, temperature: float = 0.8, max_tokens: int = 3000,
+                 structured: bool = True):
         self.router, self.model = router, model
+        self.structured = structured
         self.temperature, self.max_tokens = temperature, max_tokens
         self.last_errors: list[str] = []
 
     def propose(self, ctx: GenContext) -> list[RawProposal]:
         msgs = build_prompt(ctx)
         c = self.router.complete(self.model, msgs, role="proposer",
+                                 schema=proposal_schema(2 * max(ctx.k, 1)) if self.structured else None,
                                  task_id=f"{ctx.task_id or ctx.label}#r{ctx.round}",
                                  temperature=self.temperature, max_tokens=self.max_tokens)
         props, errs = parse_proposals(c.text)

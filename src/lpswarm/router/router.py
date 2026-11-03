@@ -26,6 +26,14 @@ class BudgetExceeded(RuntimeError):
 SUBSCRIPTION_PROVIDERS = ("claude_code", "codex")
 
 
+def _accepts(fn, name: str) -> bool:
+    import inspect
+    try:
+        return name in inspect.signature(fn).parameters
+    except (TypeError, ValueError):
+        return False
+
+
 def make_adapter(spec: ModelSpec):
     x = spec.extra
     if spec.provider == "ollama":
@@ -154,7 +162,9 @@ class Router:
 
     def complete(self, name: str, messages: Sequence[dict], role: Role | str,
                  task_id: str | None = None, temperature: float = 0.7,
-                 max_tokens: int = 2048) -> Completion:
+                 max_tokens: int = 2048, schema: dict | None = None) -> Completion:
+        """`schema` (JSON schema for the reply) is used by adapters that support
+        structured output (Ollama) and ignored by the others."""
         entry = self._models.get(name)
         if entry is None:
             raise ValueError(f"unknown model {name!r}")
@@ -166,7 +176,11 @@ class Router:
         c: Completion | None = None
         for attempt in range(self.retries + 1):
             try:
-                c = entry.adapter.complete(messages, temperature=temperature, max_tokens=max_tokens)
+                kw = {"temperature": temperature, "max_tokens": max_tokens}
+                if schema is not None and _accepts(entry.adapter.complete, "schema") \
+                        and entry.spec.extra.get("structured_output", True):
+                    kw["schema"] = schema
+                c = entry.adapter.complete(messages, **kw)
                 break
             except AdapterError as exc:
                 last = exc

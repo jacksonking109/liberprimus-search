@@ -490,3 +490,43 @@ def test_program_family_import_order():
     import subprocess
     code = "import lpswarm.programs.family; from lpswarm.ciphers import get_family; get_family('program')"
     assert subprocess.run([sys.executable, "-c", code], capture_output=True).returncode == 0
+
+
+# ------------------------------------------------- prompt examples and schema
+def test_prompt_examples_are_valid_proposals():
+    import re
+    from lpswarm.swarm.generators import EXAMPLES
+    blocks = re.findall(r"\{\"spec\".*?\"why\": \"[^\"]*\"\}", EXAMPLES, re.S)
+    assert len(blocks) == 5
+    for b in blocks:
+        props, errs = parse_proposals(b)
+        assert len(props) == 1 and not errs
+        compile_spec(props[0].spec, A)
+
+
+def test_schema_covers_examples_shape():
+    from lpswarm.swarm.generators import proposal_schema
+    sch = proposal_schema(4)
+    assert sch["properties"]["proposals"]["maxItems"] == 4
+    item = sch["properties"]["proposals"]["items"]
+    kinds = [s["properties"]["kind"]["enum"][0]
+             for s in item["properties"]["spec"]["properties"]["stream"]["anyOf"]]
+    assert kinds == ["constant", "repeat", "autokey", "sequence"]
+    json.dumps(sch)  # serialisable for Ollama's `format`
+
+
+def test_structured_schema_reaches_ollama(stub):
+    led = Ledger()
+    spec = ModelSpec("q", "ollama", "qwen", (Role.PROPOSER,), endpoint=stub)
+    r = Router([spec], ledger=led)
+    gen = LLMGenerator(r, "q")
+    from lpswarm.swarm.generators import GenContext
+    case = generate_case("caesar", 40, seed=1)
+    gen.propose(GenContext("t", A, case.ciphertext, 1, 3))
+    fmt = _Stub.seen[-1][2]["format"]
+    assert isinstance(fmt, dict) and "proposals" in fmt["properties"]
+    spec_off = ModelSpec("q2", "ollama", "qwen", (Role.PROPOSER,), endpoint=stub,
+                         extra={"structured_output": False, "json_mode": True})
+    r2 = Router([spec_off], ledger=led)
+    LLMGenerator(r2, "q2").propose(GenContext("t", A, case.ciphertext, 1, 3))
+    assert _Stub.seen[-1][2]["format"] == "json"
