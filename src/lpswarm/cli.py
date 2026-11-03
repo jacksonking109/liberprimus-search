@@ -267,7 +267,17 @@ def build_parser() -> argparse.ArgumentParser:
     return ap
 
 
+def _safe_console() -> None:
+    """Windows consoles often use cp1252; replace unencodable glyphs instead of crashing."""
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(errors="replace")  # type: ignore[attr-defined]
+        except (AttributeError, ValueError):
+            pass
+
+
 def main(argv: Sequence[str] | None = None) -> int:
+    _safe_console()
     args = build_parser().parse_args(argv)
     return int(args.func(args) or 0)
 

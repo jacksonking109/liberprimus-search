@@ -52,7 +52,7 @@ class OracleConfig:
     dict_min_len: int = 3
     dict_max_len: int = 12
     dict_size: int = 5000
-    null_samples: int = 1000            # per null type per length
+    null_samples: int = 3000            # per null type per length (>= ~30 exceedances at alpha=0.01)
     null_types: tuple[str, ...] = NULL_TYPES
     wrong_key_families: tuple[str, ...] = ("caesar", "vigenere", "autokey", "substitution",
                                            "columnar")
