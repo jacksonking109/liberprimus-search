@@ -129,10 +129,16 @@ Usage limits (the 5-hour windows):
 ```powershell
 claude                 # sign in once (interactive), then exit
 .\.venv\Scripts\lpswarm.exe doctor --ping   # one tiny real call per model
-.\.venv\Scripts\lpswarm.exe tiertest --models config\models.toml --arms claude-code --cases 3 --out reports\tier-claude
+.\.venv\Scripts\lpswarm.exe tiertest --models config\models.toml --arms claude-opus,claude-sonnet --cases 3 --out reports\tier-claude
 ```
 
 With 5 rounds per case, 3 cases at 2 lengths is about 30 calls: inside one 40-call window.
+
+## 4c. Unattended runs
+
+`scripts\overnight.ps1` runs the queue in `config\overnight.toml` with `lpswarm overnight`:
+resumable, per-job logs and reports, `SUMMARY.md`, optional Claude Code supervisor (menu actions
+only), results pushed to the `results` branch. See START_HERE.md section 7.
 
 ## 5. Real sections (optional, after the tier test)
 

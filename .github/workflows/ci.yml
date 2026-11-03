@@ -67,6 +67,31 @@ jobs:
           Get-Content config\models.toml
           .\.venv\Scripts\lpswarm.exe doctor --models config\models.toml
           if (-not (Test-Path reports\dry\tiertest.md)) { Write-Host "dry run report missing"; exit 1 }
+      - name: Overnight queue with a scripted supervisor (no publish)
+        shell: powershell
+        run: |
+          @'
+          [models.sup]
+          provider = "scripted"
+          model = "sup"
+          roles = ["supervisor"]
+          replies = ['{"actions": [{"type": "note", "text": "ci tick"}]}']
+          '@ | Set-Content -Encoding ascii config\ci_models.toml
+          @'
+          [overnight]
+          models = "config/ci_models.toml"
+          supervisor = "sup"
+          publish = false
+          [[job]]
+          id = "sw"
+          kind = "swarm"
+          args = ["--manifest", "data/lp/manifest.json", "--alphabet", "data/alphabet/gematria_primus.json", "--sections", "9", "--generators", "random_program", "--rounds", "1", "--null-samples", "200"]
+          '@ | Set-Content -Encoding ascii config\ci_overnight.toml
+          .\.venv\Scripts\lpswarm.exe overnight --config config\ci_overnight.toml --no-publish
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $sum = Get-ChildItem reports\overnight -Recurse -Filter SUMMARY.md | Select-Object -First 1
+          Get-Content $sum.FullName
+          if (-not (Select-String -Path $sum.FullName -Pattern "ci tick" -Quiet)) { Write-Host "supervisor note missing"; exit 1 }
       - name: start_ollama.ps1 -Stop runs cleanly without Ollama
         shell: powershell
         run: |

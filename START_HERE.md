@@ -123,7 +123,7 @@ If a model name is missing from your config (for example gemma didn't download),
 **B. Claude Code on your plan (small first run, about 30 calls):**
 
 ```powershell
-.\.venv\Scripts\lpswarm.exe tiertest --models config\models.toml --arms claude-code --lengths 80,160 --cases 3 --out reports\tier-claude
+.\.venv\Scripts\lpswarm.exe tiertest --models config\models.toml --arms claude-opus,claude-sonnet --lengths 80,160 --cases 3 --out reports\tier-claude
 ```
 
 It counts its own calls (40 per 5 hours by default) and pauses at that cap or when Claude
@@ -164,7 +164,49 @@ $env:DEEPSEEK_API_KEY = "paste-your-key-here"
 
 ---
 
-## 7. Everyday controls
+## 7. Leaving it running (overnight / workday)
+
+One command runs a queue of jobs unattended and writes `SUMMARY.md` as it goes:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\overnight.ps1
+```
+
+- The queue is `config\overnight.toml` (created by setup). Default: (1) tier test with Claude Code
+  Opus + Sonnet, (2) every unsolved section with Codex (explorer) + DeepSeek (brute force), one
+  sub-job per section. Edit the file to change jobs.
+- **Results:** `reports\overnight\<run>\SUMMARY.md` on the desktop, and on GitHub: branch
+  **`results`** of this repo (open it in the GitHub app; only report `.md`/`.csv` files are
+  pushed, never ledgers, logs or config). Uses your normal git login on the PC.
+- **Supervisor:** `claude-supervisor` (Claude Code Opus, tools off) checks in every 60 min and after
+  each job. It can only pick from a menu: write you a note, add a swarm job on chosen sections
+  (max 5 per run, max 8 rounds), skip or retry a job, restart Ollama, or stop the run. Its notes
+  appear in SUMMARY.md.
+- **Usage limits:** Opus, Sonnet and the supervisor share one Claude quota (40 calls / 5 h by
+  default); Codex has its own (30 / 5 h). At a cap or a usage-limit message the affected models
+  pause until the reset and the run keeps going with whatever else it can do.
+- **Money:** DeepSeek jobs are refused unless its prices are filled in (so `max_usd` can protect
+  you) and `DEEPSEEK_API_KEY` is set. Set the key in the same PowerShell window first, or as a
+  user environment variable:
+
+```powershell
+[Environment]::SetEnvironmentVariable("DEEPSEEK_API_KEY", "paste-your-key-here", "User")
+```
+
+  (Open a new PowerShell window afterwards so it is picked up.)
+- **Crashes and reboots:** a failing job doesn't stop the queue. If the PC restarts, run the same
+  command again: it resumes the unfinished run (finished jobs and sections are skipped).
+- **Stop:** create a file named `STOP` in the repo folder (`New-Item STOP`); or pass
+  `-Until 08:30` to stop at a time. Delete `STOP` before the next run.
+
+Before leaving it:
+
+1. Settings > System > Power: set "When plugged in, put my device to sleep after" to Never (the
+   runner also asks Windows to stay awake, but this is the safe setting).
+2. Settings > Windows Update: "Pause updates" for a week, so it doesn't reboot overnight.
+3. Run `doctor --ping` once (section 5) and check Claude Code / Codex are signed in.
+
+## 8. Everyday controls
 
 After every reboot, start the GPU-pinned Ollama servers before any run:
 
@@ -198,7 +240,7 @@ See usage windows and pauses for Claude Code / Codex:
 
 ---
 
-## 8. If something goes wrong
+## 9. If something goes wrong
 
 | Symptom | Fix |
 | --- | --- |

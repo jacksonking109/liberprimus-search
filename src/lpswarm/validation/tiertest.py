@@ -64,6 +64,7 @@ class TierConfig:
     word_breaks: bool = False             # give targets the plaintext's word breaks
     # Model calls are logged here, never deleted, so max_usd caps hold across tier-test runs.
     spend_ledger: str = "reports/model_spend.sqlite"
+    resume: bool = False                  # keep ledgers and finished cases from an earlier run
 
     def __post_init__(self) -> None:
         self.arms = tuple(self.arms)
@@ -125,12 +126,27 @@ def run_tiertest(tc: TierConfig, oc: OracleConfig | None = None, progress: bool 
                           tc.language, alphabet, tc.seed)
     words = corpus.wordlist(tc.language, min_len=1, limit=tc.baseline_words)
     t0 = time.monotonic()
-    run_id = time.strftime("%Y%m%dT%H%M%S")
-    rows = []
+    state_file, rows_file = out / "run.json", out / "tiertest_cases.jsonl"
+    rows: list[dict] = []
+    if tc.resume and state_file.is_file():
+        run_id = json.loads(state_file.read_text(encoding="utf-8"))["run_id"]
+        if rows_file.is_file():
+            rows = [json.loads(x) for x in rows_file.read_text(encoding="utf-8").splitlines() if x.strip()]
+            rows = [r for r in rows if r["arm"] in tc.arms]
+        if progress:
+            print(f"resuming run {run_id}: {len(rows)} case(s) already done", flush=True)
+    else:
+        run_id = time.strftime("%Y%m%dT%H%M%S")
+        state_file.write_text(json.dumps({"run_id": run_id, "config": asdict(tc)}, default=str),
+                              encoding="utf-8")
+        if rows_file.exists():
+            rows_file.unlink()
+    done = {(r["arm"], r["case_id"]) for r in rows}
     needs_models = any(not _builtin(a) for a in tc.arms) or tc.ranker
     spend = Ledger(tc.spend_ledger) if needs_models else None
     for arm in tc.arms:
-        led = _fresh_ledger(out / f"{arm.replace(':', '_')}.sqlite")
+        lpath = out / f"{arm.replace(':', '_')}.sqlite"
+        led = Ledger(lpath) if tc.resume else _fresh_ledger(lpath)
         router = None
         if not _builtin(arm):
             router = Router.from_toml(tc.models_config, ledger=spend, global_max_usd=tc.max_usd)
@@ -138,6 +154,8 @@ def run_tiertest(tc: TierConfig, oc: OracleConfig | None = None, progress: bool 
                 router.spec(arm)  # raises on unknown model names
         ranker = ModelRanker(router, tc.ranker) if tc.ranker and router else None
         for ci, case in enumerate(cases):
+            if (arm, case.case_id) in done:
+                continue
             label = f"tier:{run_id}:{arm}:{case.family}:{case.length}:{case.case_id}"
             tgt = Target(alphabet, case.ciphertext, label, is_synthetic=True,
                          breaks=case_breaks(case, alphabet) if tc.word_breaks else None)
@@ -189,6 +207,9 @@ def run_tiertest(tc: TierConfig, oc: OracleConfig | None = None, progress: bool 
                    "elapsed_s": round(time.monotonic() - ts, 2),
                    **_cost(spend, label)}
             rows.append(row)
+            with rows_file.open("a", encoding="utf-8") as f:
+                f.write(json.dumps(row, default=str) + "\n")
+            _write(_result(tc, oracle, rows, time.monotonic() - t0), out)   # partial report
             if progress:
                 print(f"[{arm}] {ci + 1}/{len(cases)} L={case.length} recovered={row['recovered']} "
                       f"attempts={row['attempts']} calls={row['model_calls']} usd={row['usd']:.4f}"
@@ -197,6 +218,12 @@ def run_tiertest(tc: TierConfig, oc: OracleConfig | None = None, progress: bool 
     if spend is not None:
         spend.close()
 
+    result = _result(tc, oracle, rows, time.monotonic() - t0)
+    _write(result, out)
+    return result
+
+
+def _result(tc: TierConfig, oracle, rows: list[dict], elapsed: float) -> dict:
     summary = []
     for arm in tc.arms:
         for L in (*tc.lengths, None):
@@ -217,10 +244,8 @@ def run_tiertest(tc: TierConfig, oc: OracleConfig | None = None, progress: bool 
                 "tokens_out": sum(r["tokens_out"] for r in rs),
                 "usd": round(sum(r["usd"] for r in rs), 4),
             })
-    result = {"config": asdict(tc), "oracle_config": asdict(oracle.cfg), "rows": rows,
-              "summary": summary, "elapsed_s": time.monotonic() - t0}
-    _write(result, out)
-    return result
+    return {"config": asdict(tc), "oracle_config": asdict(oracle.cfg), "rows": rows,
+            "summary": summary, "elapsed_s": elapsed}
 
 
 def _write(result: dict, out: Path) -> None:

@@ -109,7 +109,8 @@ def run_swarm(target: Target, ledger: Ledger, oracle: FullOracle, generators: Se
                 stopped = "max_attempts"
                 break
             gs = stats[gen.model]
-            ctx = GenContext(shown_label, alpha, target.ciphertext, rnd, cfg.per_round,
+            k = min(int(getattr(gen, "per_round", None) or cfg.per_round), 32)
+            ctx = GenContext(shown_label, alpha, target.ciphertext, rnd, k,
                              history[gen.model], errors[gen.model],
                              summarise_tried(ledger.tried(tid)), alphabet_values,
                              task_id=target.label)
@@ -158,10 +159,10 @@ def run_swarm(target: Target, ledger: Ledger, oracle: FullOracle, generators: Se
                     continue
                 seen.add(h)
                 compiled.append((spec, rp.why))
-            if len(compiled) > cfg.per_round:
-                errors[gen.model].append(f"{len(compiled) - cfg.per_round} proposal(s) beyond the "
-                                         f"limit of {cfg.per_round} per round were not run")
-                compiled = compiled[: cfg.per_round]
+            if len(compiled) > k:
+                errors[gen.model].append(f"{len(compiled) - k} proposal(s) beyond the "
+                                         f"limit of {k} per round were not run")
+                compiled = compiled[:k]
             if ranker is not None and len(compiled) > 1:
                 order = ranker.rank(ctx, [describe(sp, alpha) for sp, _ in compiled])
                 compiled = [compiled[i] for i in order]

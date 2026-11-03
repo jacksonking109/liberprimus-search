@@ -42,6 +42,7 @@ class GenContext:
     already_ruled_out: list[str] = field(default_factory=list)   # e.g. Phase 1 families tried
     alphabet_values: list[int] | None = None
     task_id: str = ""      # internal (cost attribution); never shown to the model
+    style: str = ""        # per-model role hint: "exploratory" | "volume" | ""
 
     def stats(self) -> dict:
         c = self.ciphertext
@@ -158,6 +159,16 @@ def proposal_schema(max_items: int = 16) -> dict:
         "required": ["proposals"], "additionalProperties": False}
 
 
+STYLE_HINTS = {
+    "exploratory": ("Your role: explorer. Favour structurally different ideas (different stream "
+                    "kinds, maps, skip rules, transpositions) over small variations, and say in "
+                    "'why' what each one tests."),
+    "volume": ("Your role: brute force. Favour wide searches: sequence and repeat streams with "
+               "an offset_range of up to 2000 values, and systematic variations of the most "
+               "promising families tried so far."),
+}
+
+
 SYSTEM_PROMPT = ("You are a cryptanalysis assistant proposing hypotheses for an unsolved "
                  "historical-style cipher. Be concrete and diverse; do not repeat proposals that "
                  "already failed. Reply with JSON only.")
@@ -190,6 +201,8 @@ def build_prompt(ctx: GenContext, max_symbols: int = 300) -> list[dict]:
     if ctx.errors:
         lines.append("These earlier proposals were invalid and were not run:")
         lines += [f"  - {e}" for e in ctx.errors[-10:]]
+    if ctx.style in STYLE_HINTS:
+        lines.append(STYLE_HINTS[ctx.style])
     lines.append(
         f'Round {ctx.round}. Propose {ctx.k} NEW, diverse hypotheses as JSON: '
         '{"proposals": [{"spec": {...}, "why": "one short sentence"}, ...]}')
@@ -265,13 +278,26 @@ class LLMGenerator:
     role = "proposer"
 
     def __init__(self, router, model: str, temperature: float = 0.8, max_tokens: int = 3000,
-                 structured: bool = True):
+                 structured: bool = True, style: str | None = None):
         self.router, self.model = router, model
         self.structured = structured
+        if style is None:
+            try:
+                style = str(router.spec(model).extra.get("style", ""))
+            except Exception:  # noqa: BLE001
+                style = ""
+        self.style = style
+        try:
+            pr = router.spec(model).extra.get("per_round")
+            self.per_round = int(pr) if pr else None   # per-model proposals per round
+        except Exception:  # noqa: BLE001
+            self.per_round = None
         self.temperature, self.max_tokens = temperature, max_tokens
         self.last_errors: list[str] = []
 
     def propose(self, ctx: GenContext) -> list[RawProposal]:
+        if self.style and not ctx.style:
+            ctx.style = self.style
         msgs = build_prompt(ctx)
         c = self.router.complete(self.model, msgs, role="proposer",
                                  schema=proposal_schema(2 * max(ctx.k, 1)) if self.structured else None,

@@ -133,25 +133,34 @@ class Router:
         if self.global_max_usd is not None and self.spent() >= self.global_max_usd:
             raise BudgetExceeded(f"global model budget of ${self.global_max_usd:.2f} reached")
 
+    def quota_members(self, name: str) -> list[str]:
+        """Models sharing `name`'s plan quota (same `quota_group`), including itself."""
+        group = self.spec(name).extra.get("quota_group")
+        if not group:
+            return [name]
+        return [n for n, e in self._models.items() if e.spec.extra.get("quota_group") == group]
+
     def window_status(self, name: str, now: float | None = None) -> dict:
-        """Calls in the current rolling window, the cap, and any active pause."""
+        """Calls in the current rolling window (summed over the quota group), the cap,
+        and any active pause (a limit hit by any group member pauses them all)."""
         now = time.time() if now is None else now
         spec = self.spec(name)
         hours = float(spec.extra.get("window_hours", 5))
         cap = spec.extra.get("max_calls_per_window")
-        calls = self.ledger.calls_since(name, now - hours * 3600) if self.ledger is not None else []
-        paused = self.ledger.active_limit(name, now) if self.ledger is not None else None
+        members = self.quota_members(name)
+        calls = self.ledger.calls_since(members, now - hours * 3600) if self.ledger is not None else []
+        paused = self.ledger.active_limit(members, now) if self.ledger is not None else None
         return {"window_hours": hours, "calls": len(calls), "cap": cap, "paused_until": paused,
-                "oldest_call": calls[0] if calls else None}
+                "oldest_call": calls[0] if calls else None, "group": members}
 
     def _check_limits(self, name: str) -> None:
         """Raise RateLimited if a recorded limit is active or the local window cap is full."""
         if self.ledger is None:
             return
         now = time.time()
-        until = self.ledger.active_limit(name, now)
+        until = self.ledger.active_limit(self.quota_members(name), now)
         if until is not None:
-            raise RateLimited(name, until, "usage limit reported by the CLI")
+            raise RateLimited(name, until, "usage limit active for this plan")
         st = self.window_status(name, now)
         cap = st["cap"]
         if cap and st["calls"] >= int(cap):

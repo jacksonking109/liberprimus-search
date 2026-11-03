@@ -274,18 +274,24 @@ class Ledger:
                           (model, hit_at, resume_at, source, int(parsed), (message or "")[:500]))
         self.conn.commit()
 
-    def active_limit(self, model: str, now: float) -> float | None:
-        """Latest resume time for a model if it is still in the future."""
-        row = self.conn.execute("SELECT MAX(resume_at) FROM rate_limit_event WHERE model=?",
-                                (model,)).fetchone()
+    def active_limit(self, model, now: float) -> float | None:
+        """Latest resume time for a model (or any of a list of models sharing a quota)
+        if it is still in the future."""
+        models = [model] if isinstance(model, str) else list(model)
+        q = ",".join("?" * len(models))
+        row = self.conn.execute(f"SELECT MAX(resume_at) FROM rate_limit_event WHERE model IN ({q})",
+                                models).fetchone()
         return float(row[0]) if row and row[0] is not None and row[0] > now else None
 
-    def calls_since(self, model: str, since_epoch: float) -> list[float]:
-        """Epoch times of this model's logged calls since `since_epoch`, oldest first."""
+    def calls_since(self, model, since_epoch: float) -> list[float]:
+        """Epoch times of logged calls since `since_epoch` for a model or a list of models
+        (a shared plan quota), oldest first."""
+        models = [model] if isinstance(model, str) else list(model)
+        q = ",".join("?" * len(models))
         rows = self.conn.execute(
             "SELECT CAST(strftime('%s', created_at) AS REAL) FROM budget_event"
-            " WHERE model=? AND CAST(strftime('%s', created_at) AS REAL) >= ? ORDER BY id",
-            (model, since_epoch)).fetchall()
+            f" WHERE model IN ({q}) AND CAST(strftime('%s', created_at) AS REAL) >= ?"
+            " ORDER BY created_at, id", (*models, since_epoch)).fetchall()
         return [float(r[0]) for r in rows]
 
     # ---------------------------------------------------------------- queries

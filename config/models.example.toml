@@ -31,10 +31,12 @@ model = "deepseek-chat"            # placeholder; confirm
 api_key_env = "DEEPSEEK_API_KEY"
 roles = ["proposer"]
 max_usd = 10.0
-price_in_per_mtok = 0.0            # FILL IN from DeepSeek's pricing page
+price_in_per_mtok = 0.0            # FILL IN from DeepSeek's pricing page (unattended runs refuse 0)
 price_out_per_mtok = 0.0           # FILL IN
 json_mode = true
 timeout = 180
+style = "volume"                   # brute-force style prompts (wide offset ranges)
+per_round = 16                     # proposals per round for this model
 
 [models.qwen-local]
 provider = "ollama"
@@ -79,22 +81,43 @@ replies = ['{"proposals": [{"spec": {"stream": {"kind": "sequence", "name": "pri
 # (or a 30 min cool-down if no time is given). Your other use of the plan (chat, IDE)
 # shares the same real limit, so keep the cap modest. Check status: lpswarm doctor
 #
-# [models.claude-code]
+# All Claude models share ONE plan quota: quota_group makes their calls count together
+# and a usage limit hit by any of them pauses all.
+# [models.claude-opus]
 # provider = "claude_code"
-# model = "sonnet"                 # alias or full model name; "default" = your CLI default
+# model = "opus"
 # roles = ["proposer"]
+# quota_group = "claude-plan"
 # max_calls_per_window = 40
 # window_hours = 5
-# timeout = 600
 #
-# Codex: check OpenAI's current terms for automated use of `codex exec` with a
-# ChatGPT plan before enabling.
+# [models.claude-sonnet]
+# provider = "claude_code"
+# model = "sonnet"
+# roles = ["proposer"]
+# quota_group = "claude-plan"
+# max_calls_per_window = 40
+# window_hours = 5
+#
+# Supervisor for `lpswarm overnight` (answers with menu actions only; tools stay off).
+# [models.claude-supervisor]
+# provider = "claude_code"
+# model = "opus"
+# roles = ["supervisor"]
+# quota_group = "claude-plan"
+# max_calls_per_window = 40
+# window_hours = 5
+#
+# Codex on your ChatGPT plan: the explorer.
 # [models.codex]
 # provider = "codex"
 # model = "default"                # or a model name accepted by `codex -m`
 # roles = ["proposer"]
+# quota_group = "codex-plan"
 # max_calls_per_window = 30
 # window_hours = 5
+# style = "exploratory"
+# per_round = 8
 # timeout = 600
 
 # Any other CLI that reads a prompt on stdin and prints the reply (no isolation,

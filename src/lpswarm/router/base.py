@@ -27,6 +27,7 @@ class Role(str, Enum):
     PROPOSER = "proposer"
     TRIAGE = "triage"
     WEIGHTING = "weighting"
+    SUPERVISOR = "supervisor"
 
 
 @dataclass

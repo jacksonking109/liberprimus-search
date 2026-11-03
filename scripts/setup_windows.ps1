@@ -171,10 +171,12 @@ if ((Test-Path $ModelsToml) -and -not $Force) {
         'api_key_env = "DEEPSEEK_API_KEY"',
         'roles = ["proposer"]',
         "max_usd = 10.0",
-        "price_in_per_mtok = 0.0            # FILL IN from DeepSeek's pricing page",
+        "price_in_per_mtok = 0.0            # FILL IN from DeepSeek's pricing page (unattended runs refuse 0)",
         "price_out_per_mtok = 0.0           # FILL IN",
         "json_mode = true",
         "timeout = 180",
+        'style = "volume"',
+        "per_round = 16",
         ""
     )
     if ($proposerTag) {
@@ -192,25 +194,43 @@ if ((Test-Path $ModelsToml) -and -not $Force) {
             "model = `"$rankerTag`"", 'roles = ["weighting", "triage"]', "json_mode = true", "timeout = 120",
             "options = { num_ctx = 8192 }", "")
     }
+    $claudeBlock = @(
+        "[models.claude-opus]", 'provider = "claude_code"', 'model = "opus"', 'roles = ["proposer"]',
+        'quota_group = "claude-plan"', "max_calls_per_window = 40", "window_hours = 5", "timeout = 600", "",
+        "[models.claude-sonnet]", 'provider = "claude_code"', 'model = "sonnet"', 'roles = ["proposer"]',
+        'quota_group = "claude-plan"', "max_calls_per_window = 40", "window_hours = 5", "timeout = 600", "",
+        "[models.claude-supervisor]", 'provider = "claude_code"', 'model = "opus"', 'roles = ["supervisor"]',
+        'quota_group = "claude-plan"', "max_calls_per_window = 40", "window_hours = 5", "timeout = 600", "")
     if (Get-Command claude -ErrorAction SilentlyContinue) {
-        $lines += @("# Claude Code on your plan (tools off, temp folder, API keys ignored). Sign in once: claude",
-            "[models.claude-code]", 'provider = "claude_code"', 'model = "sonnet"', 'roles = ["proposer"]',
-            "max_calls_per_window = 40", "window_hours = 5", "timeout = 600", "")
-        Write-Step "OK" "found Claude Code; added model claude-code (40 calls per 5h cap)"
+        $lines += @("# Claude Code on your plan (tools off, temp folder, API keys ignored). One shared quota.")
+        $lines += $claudeBlock
+        Write-Step "OK" "found Claude Code; added claude-opus, claude-sonnet, claude-supervisor (shared 40 calls / 5h)"
     } else {
-        $lines += @("# Claude Code not found when this file was generated. Install it, sign in, then uncomment:",
-            "# [models.claude-code]", '# provider = "claude_code"', '# model = "sonnet"', '# roles = ["proposer"]',
-            "# max_calls_per_window = 40", "# window_hours = 5", "")
+        $lines += @("# Claude Code not found when this file was generated. Install it, sign in, then uncomment:")
+        $lines += ($claudeBlock | ForEach-Object { if ($_) { "# $_" } else { "" } })
     }
-    $lines += @("# Codex on your ChatGPT plan: check OpenAI's terms for automated codex exec use, then uncomment.",
-        "# [models.codex]", '# provider = "codex"', '# model = "default"', '# roles = ["proposer"]',
-        "# max_calls_per_window = 30", "# window_hours = 5", "# timeout = 600", "")
+    $codexBlock = @("[models.codex]", 'provider = "codex"', 'model = "default"', 'roles = ["proposer"]',
+        'quota_group = "codex-plan"', "max_calls_per_window = 30", "window_hours = 5",
+        'style = "exploratory"', "per_round = 8", "timeout = 600", "")
+    if (Get-Command codex -ErrorAction SilentlyContinue) {
+        $lines += @("# Codex on your ChatGPT plan: the explorer.") + $codexBlock
+        Write-Step "OK" "found Codex; added model codex (30 calls / 5h)"
+    } else {
+        $lines += @("# Codex not found when this file was generated. Install it, run: codex login, then uncomment:")
+        $lines += ($codexBlock | ForEach-Object { if ($_) { "# $_" } else { "" } })
+    }
     $lines += @("[models.dry]", 'provider = "scripted"', 'model = "dry"', 'roles = ["proposer", "weighting"]',
         "replies = ['{`"proposals`": [{`"spec`": {`"stream`": {`"kind`": `"sequence`", `"name`": `"primes`"}, `"combine`": `"sub`"}, `"why`": `"dry run`"}]}']",
         "")
     New-Item -ItemType Directory -Force -Path (Split-Path $ModelsToml) | Out-Null
     [IO.File]::WriteAllText($ModelsToml, ($lines -join "`r`n"), (New-Object System.Text.UTF8Encoding $false))
     Write-Step "OK" "wrote config\models.toml"
+}
+
+$OvernightToml = Join-Path $Root "config\overnight.toml"
+if (-not (Test-Path $OvernightToml)) {
+    Copy-Item (Join-Path $Root "config\overnight.example.toml") $OvernightToml
+    Write-Step "OK" "wrote config\overnight.toml (the unattended job queue; edit freely)"
 }
 
 # ------------------------------------------------------- 8. tests, doctor, dry run
@@ -233,7 +253,7 @@ Write-Host "`n== Next steps" -ForegroundColor Cyan
 $arms = @("baseline", "random_program:40", "random_program:2000")
 if ($proposerTag) { $arms += "qwen-local" }
 if ($extraTag) { $arms += "gemma-local" }
-$hasClaudeModel = (Test-Path $ModelsToml) -and (Select-String -Path $ModelsToml -Pattern '^\[models\.claude-code\]' -Quiet)
+$hasClaudeModel = (Test-Path $ModelsToml) -and (Select-String -Path $ModelsToml -Pattern '^\[models\.claude-opus\]' -Quiet)
 $rankerFlag = ""
 if ($rankerTag) { $rankerFlag = " --ranker granite" }
 Write-Host @"
@@ -256,7 +276,7 @@ if ($hasClaudeModel) {
     Write-Host @"
 Claude Code on your plan (paces itself to the call cap; pauses at usage limits).
 Sign in once by running: claude    then:
-    .\.venv\Scripts\lpswarm.exe tiertest --models config\models.toml --arms claude-code --lengths 80,160 --cases 3 --out reports\tier-claude
+    .\.venv\Scripts\lpswarm.exe tiertest --models config\models.toml --arms claude-opus,claude-sonnet --lengths 80,160 --cases 3 --out reports\tier-claude
 "@
 }
 

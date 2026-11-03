@@ -10,6 +10,7 @@ Commands:
   swarm       Phase 3: generators propose cipher programs for targets
   tiertest    Phase 3: compare generators against the baselines
   doctor      check that everything needed for a run is in place
+  overnight   run a queue of jobs unattended (resumable; SUMMARY.md; optional supervisor)
 """
 from __future__ import annotations
 
@@ -17,6 +18,7 @@ import argparse
 import dataclasses
 import json
 import sys
+import time
 import tomllib
 from pathlib import Path
 from typing import Any, Sequence
@@ -142,7 +144,11 @@ def _targets_from_args(args, alphabet) -> list[tuple]:
     else:
         mpath = Path(args.manifest)
         man = json.loads(read_text(mpath))
-        wanted = set(_csv_ints(args.sections) or ())
+        if args.sections in ("unsolved", "solved", "all"):
+            from lpswarm.overnight import manifest_sections
+            wanted = set(manifest_sections(mpath, args.sections))
+        else:
+            wanted = set(_csv_ints(args.sections) or ())
         for sec in man["sections"]:
             if wanted and sec["index"] not in wanted:
                 continue
@@ -178,6 +184,10 @@ def cmd_baseline(args) -> int:
     user_key_texts = load_key_texts(args.running_key_texts or [], alphabet)
     oracle = FullOracle(alphabet, _oracle_cfg(args, conf))
     summary_rows = []
+    from lpswarm.reports import default_report_dir, target_entry, write_run_report
+    report_dir = Path(args.report_dir) if args.report_dir else default_report_dir("baseline")
+    entries: list[dict] = []
+    cmdline = "lpswarm " + " ".join(sys.argv[1:])
     with Ledger(args.ledger) as led:
         for ct, label, page_range, synthetic, demo_keys, breaks in targets:
             if len(ct) < max(8, oracle.min_length):
@@ -186,8 +196,12 @@ def cmd_baseline(args) -> int:
             print(f"\n== {label}  ({len(ct)} symbols)")
             tgt = Target(alphabet, ct, label, page_range=page_range, is_synthetic=synthetic,
                          breaks=breaks)
+            t_start = time.monotonic()
             res = run_baseline(tgt, led, oracle, words, bc, user_key_texts + demo_keys,
                                progress=not args.quiet)
+            entries.append(target_entry(led, res.target_id, label, len(ct),
+                                        elapsed_s=time.monotonic() - t_start))
+            write_run_report(report_dir, "Brute-force baseline", cmdline, entries)
             n_final = sum(1 for r in res.final if r["passed_final"])
             total = led.attempt_count(res.target_id)
             summary_rows.append((label, len(ct), total, n_final))
@@ -202,6 +216,7 @@ def cmd_baseline(args) -> int:
             if not leads:
                 print("  no passes or near misses: everything tried is recorded as ruled out")
         print(f"\nledger: {args.ledger}  " + ", ".join(f"{k}={v}" for k, v in led.counts().items()))
+        print(f"report: {report_dir / 'report.md'}")
     if len(summary_rows) > 1:
         print("\ntarget summary (symbols, attempts on target, final passes):")
         for label, n, total, nf in summary_rows:
@@ -243,6 +258,25 @@ def cmd_swarm(args) -> int:
                 router.spec(g)
                 gens.append(LLMGenerator(router, g))
         ranker = ModelRanker(router, args.ranker) if args.ranker else None
+        from dataclasses import asdict as _asdict
+        from lpswarm.reports import default_report_dir, target_entry, write_run_report
+        report_dir = Path(args.report_dir) if args.report_dir else default_report_dir("swarm")
+        entries: list[dict] = []
+        cmdline = "lpswarm " + " ".join(sys.argv[1:])
+
+        def usage_lines() -> list[str]:
+            if not router:
+                return []
+            out = ["Model usage (spend ledger): " + ", ".join(
+                f"{n} ${router.spent(n):.4f}" for n in router.names()), ""]
+            for n in router.names():
+                st = router.window_status(n)
+                if st["cap"] or st["paused_until"]:
+                    out.append(f"- {n}: {st['calls']} call(s) in the last {st['window_hours']:g}h "
+                               f"(cap {st['cap'] or 'none'})"
+                               + (f", paused until {time.strftime('%Y-%m-%d %H:%M', time.localtime(st['paused_until']))}"
+                                  if st["paused_until"] else ""))
+            return out + [""]
         for ct, label, page_range, synthetic, _, breaks in targets:
             if len(ct) < max(8, oracle.min_length):
                 print(f"skip {label}: only {len(ct)} symbols")
@@ -254,12 +288,18 @@ def cmd_swarm(args) -> int:
                             progress=not args.quiet)
             n_final = sum(1 for r in res.final if r["passed_final"])
             print(f"stopped: {res.stopped or 'rounds done'}; final passes: {n_final}")
+            entries.append(target_entry(led, res.target_id, label, len(ct), stopped=res.stopped,
+                                        stats={k: _asdict(v) for k, v in res.stats.items()},
+                                        elapsed_s=res.elapsed_s))
+            write_run_report(report_dir, "Swarm run", cmdline, entries, usage_lines())
             for r in led.leads(res.target_id, include_near_miss=True, limit=args.top):
                 tag = "FINAL" if r["passed_final"] else "     "
                 print(f"  {tag} {r['verdict']:<9} by {r['proposer_model']:<16} {r['key_preview']}\n"
                       f"        {r['plaintext_preview']}")
+        if entries:
+            print(f"\nreport: {report_dir / 'report.md'}")
         if router:
-            print(f"\nmodel spend ({args.spend_ledger}): " + ", ".join(
+            print(f"model spend ({args.spend_ledger}): " + ", ".join(
                 f"{n}=${router.spent(n):.4f}" for n in router.names()))
             spend.close()
     return 0
@@ -274,6 +314,7 @@ def cmd_tiertest(args) -> int:
             "max_usd": args.max_usd, "seed": args.seed, "out_dir": args.out,
             "difficulty": args.difficulty, "alphabet": args.alphabet,
             "spend_ledger": args.spend_ledger, "word_breaks": args.word_breaks or None,
+            "resume": args.resume or None,
             "case_families": _csv_strs(args.case_families)}
     if args.quick:
         over.update(lengths=over["lengths"] or (100,), cases_per_length=args.cases or 2,
@@ -300,6 +341,41 @@ def cmd_doctor(args) -> int:
     if not ledgers:
         ledgers = [p for p in ("reports/model_spend.sqlite",) if Path(p).is_file()]
     return print_report(run_checks(models, ping=args.ping, ledgers=ledgers))
+
+
+def cmd_overnight(args) -> int:
+    from lpswarm.ledger import Ledger
+    from lpswarm.overnight import Overnight, latest_unfinished, load_config
+    from lpswarm.router import Role, Router
+    cfg = load_config(args.config)
+    if args.until:
+        cfg.until = args.until
+    base = Path("reports") / "overnight"
+    run_dir = Path(args.run_dir) if args.run_dir else None
+    if run_dir is None and not args.new:
+        run_dir = latest_unfinished(base)
+        if run_dir is not None:
+            print(f"resuming {run_dir} (use --new to start a fresh run)")
+    if run_dir is None:
+        run_dir = base / time.strftime("%Y%m%d-%H%M")
+    router = None
+    spend = None
+    if Path(cfg.models).is_file():
+        spend = Ledger(cfg.spend_ledger)
+        router = Router.from_toml(cfg.models, ledger=spend)
+        if cfg.supervisor:
+            if Role.SUPERVISOR not in router.spec(cfg.supervisor).roles:
+                raise SystemExit(f"model {cfg.supervisor} needs roles = [\"supervisor\"] in {cfg.models}")
+    elif cfg.supervisor:
+        raise SystemExit(f"supervisor {cfg.supervisor} configured but {cfg.models} not found")
+    run = Overnight(cfg, run_dir, publish=False if args.no_publish else None, router=router)
+    try:
+        st = run.run()
+    finally:
+        if spend is not None:
+            spend.close()
+    print(f"\nsummary: {run_dir / 'SUMMARY.md'}  (status: {st['status']})")
+    return 0
 
 
 def cmd_ruled_out(args) -> int:
@@ -389,7 +465,8 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--ciphertext", nargs="+", help="text file(s); one target per file")
     p.add_argument("--manifest", help="section manifest JSON (e.g. data/lp/manifest.json); "
                    "one target per section")
-    p.add_argument("--sections", help="comma list of manifest indexes to run (default all)")
+    p.add_argument("--sections", help="comma list of manifest indexes, or unsolved / solved / all "
+                   "(default all)")
     p.add_argument("--glyphs-only", action="store_true",
                    help="read --ciphertext files by exact glyphs only (manifest always does)")
     p.add_argument("--no-word-breaks", action="store_true",
@@ -400,6 +477,8 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--label")
     p.add_argument("--page-range")
     p.add_argument("--ledger", default="ledger.sqlite")
+    p.add_argument("--report-dir", help="where report.md/report.json go (default "
+                   "reports/baseline-<timestamp>)")
     p.add_argument("--wordlist", help="word list file (one word per line); default corpus words")
     p.add_argument("--words", type=int, default=5000, help="corpus words to use if no --wordlist")
     p.add_argument("--families")
@@ -414,7 +493,7 @@ def build_parser() -> argparse.ArgumentParser:
     def add_targets(p):
         p.add_argument("--ciphertext", nargs="+", help="text file(s); one target per file")
         p.add_argument("--manifest", help="section manifest JSON; one target per section")
-        p.add_argument("--sections", help="comma list of manifest indexes")
+        p.add_argument("--sections", help="comma list of manifest indexes, or unsolved / solved / all")
         p.add_argument("--demo", help="synthetic target FAMILY:LENGTH (e.g. program:120)")
         p.add_argument("--glyphs-only", action="store_true")
         p.add_argument("--difficulty", choices=("easy", "medium", "hard"))
@@ -428,6 +507,8 @@ def build_parser() -> argparse.ArgumentParser:
     _add_oracle_args(p)
     add_targets(p)
     p.add_argument("--ledger", default="ledger.sqlite")
+    p.add_argument("--report-dir", help="where report.md/report.json go (default "
+                   "reports/swarm-<timestamp>)")
     p.add_argument("--models", help="models TOML (see config/models.example.toml)")
     p.add_argument("--generators", help="comma list: random_program and/or model names")
     p.add_argument("--ranker", help="model name with the weighting role")
@@ -458,6 +539,8 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--max-usd", type=float)
     p.add_argument("--word-breaks", action="store_true",
                    help="give the oracle the plaintext's word breaks")
+    p.add_argument("--resume", action="store_true",
+                   help="continue an interrupted run in the same --out folder (keeps finished cases)")
     p.add_argument("--spend-ledger", help="where model calls are logged (default "
                    "reports/model_spend.sqlite; never deleted, so caps are cumulative)")
     p.add_argument("--seed", type=int)
@@ -473,6 +556,16 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--ledger", nargs="*", help="spend ledger(s) to read call counts and pauses "
                    "from (default: reports/model_spend.sqlite)")
     p.set_defaults(func=cmd_doctor)
+
+    p = sub.add_parser("overnight", help="run a queue of jobs unattended, with SUMMARY.md, "
+                       "resume, optional supervisor and publishing")
+    p.add_argument("--config", default="config/overnight.toml")
+    p.add_argument("--run-dir", help="run folder (default: resume the latest unfinished run in "
+                   "reports/overnight, else start a new one)")
+    p.add_argument("--new", action="store_true", help="start a new run even if one is unfinished")
+    p.add_argument("--until", help="stop at this local time, HH:MM (resumable later)")
+    p.add_argument("--no-publish", action="store_true", help="do not push results to GitHub")
+    p.set_defaults(func=cmd_overnight)
 
     for name, fn in (("ruled-out", cmd_ruled_out), ("leads", cmd_leads)):
         p = sub.add_parser(name)

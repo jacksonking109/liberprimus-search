@@ -1,0 +1,39 @@
+# Unattended queue for `lpswarm overnight` (copy to config/overnight.toml and edit).
+# Re-running the same command resumes an unfinished run. Create a file named STOP in the
+# repo folder to stop cleanly. Results: reports/overnight/<run>/SUMMARY.md (and, with
+# publish = true, the `results` branch on GitHub).
+
+[overnight]
+models = "config/models.toml"
+spend_ledger = "reports/model_spend.sqlite"   # shared call/spend counts and usage pauses
+supervisor = "claude-supervisor"              # a model with roles = ["supervisor"]; "" to disable
+tick_minutes = 60                             # supervisor check-ins (also after every job)
+publish = true                                # push report files to the `results` branch
+results_branch = "results"
+max_added_jobs = 5                            # cap on jobs the supervisor may add per run
+# until = "08:30"                             # optional stop time (HH:MM, local)
+
+# 1. Tier test with Claude Code on your plan (paced by the claude-plan quota; pauses at limits).
+[[job]]
+id = "tier-claude"
+kind = "tiertest"
+args = ["--arms", "random_program:40,claude-opus,claude-sonnet", "--lengths", "80,160",
+        "--cases", "3", "--word-breaks"]
+note = "Claude Code proposers vs the random control"
+
+# 2. Unsolved sections: Codex explores, DeepSeek brute-forces (one sub-job per section).
+[[job]]
+id = "unsolved"
+kind = "swarm"
+args = ["--manifest", "data/lp/manifest.json", "--alphabet", "data/alphabet/gematria_primus.json",
+        "--sections", "unsolved", "--generators", "codex,deepseek", "--rounds", "6",
+        "--per-round", "8", "--max-attempts", "60000"]
+note = "Codex (exploratory) + DeepSeek (volume)"
+
+# Example: add local models when the GPUs are free.
+# [[job]]
+# id = "unsolved-local"
+# kind = "swarm"
+# args = ["--manifest", "data/lp/manifest.json", "--alphabet", "data/alphabet/gematria_primus.json",
+#         "--sections", "unsolved", "--generators", "qwen-local,gemma-local", "--rounds", "5",
+#         "--ranker", "granite"]
