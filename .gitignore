@@ -13,3 +13,4 @@ venv/
 reports/*
 !reports/.gitkeep
 STOP
+config/models.toml

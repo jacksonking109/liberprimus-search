@@ -1,13 +1,25 @@
-# Phase 3 model config (EXAMPLE, nothing reads this in Phase 1).
-# Copy to config/models.toml and edit. No secrets ever go in this file.
+# Phase 3 models config. Copy to config/models.toml and edit. No secrets ever go in this file.
 #
-# Model tags below are placeholders. Confirm local tags with `ollama list`
-# and the DeepSeek model id against DeepSeek's API docs before use.
+# Model tags below are placeholders: confirm local tags with `ollama list`, and the
+# DeepSeek model id and prices against DeepSeek's own docs before use.
 #
-# API keys: put the NAME of an environment variable in api_key_env. The harness
-# reads it at call time and never stores or logs the value.
+# API keys: put the NAME of an environment variable in api_key_env. The harness reads
+# it at call time and never stores or logs the value. A config containing `api_key`
+# is rejected.
 #   PowerShell (current session):  $env:DEEPSEEK_API_KEY = "..."
 #   PowerShell (persist for user): [Environment]::SetEnvironmentVariable("DEEPSEEK_API_KEY", "...", "User")
+#
+# Fields:
+#   provider    ollama | openai_compatible | command | scripted
+#   roles       any of "proposer" (proposes cipher programs), "weighting" (ranks
+#               proposals), "triage" (reserved)
+#   max_usd     hard cap per model, checked against the ledger before every call
+#   price_in_per_mtok / price_out_per_mtok   USD per million tokens, used for cost
+#               tracking and max_usd. Leave 0 for local models. If you leave them 0
+#               for a paid API, max_usd cannot protect you.
+#   json_mode   ask the server for JSON output (Ollama `format: json`, OpenAI
+#               `response_format: json_object`)
+#   timeout     seconds per call
 
 [models.deepseek]
 provider = "openai_compatible"
@@ -15,22 +27,48 @@ endpoint = "https://api.deepseek.com"
 model = "deepseek-chat"            # placeholder; confirm
 api_key_env = "DEEPSEEK_API_KEY"
 roles = ["proposer"]
-max_usd = 10.0                     # hard budget, enforced via ledger budget_event
+max_usd = 10.0
+price_in_per_mtok = 0.0            # FILL IN from DeepSeek's pricing page
+price_out_per_mtok = 0.0           # FILL IN
+json_mode = true
+timeout = 180
 
 [models.qwen-local]
 provider = "ollama"
 endpoint = "http://localhost:11434"
 model = "qwen3:8b"                 # placeholder; confirm with `ollama list`
 roles = ["proposer"]
+json_mode = true
+timeout = 600
 
 [models.gemma-local]
 provider = "ollama"
 endpoint = "http://localhost:11434"
 model = "gemma3:12b"               # placeholder; confirm with `ollama list`
 roles = ["proposer"]
+json_mode = true
+timeout = 600
 
 [models.granite-tiny]
 provider = "ollama"
 endpoint = "http://localhost:11434"
 model = "granite-tiny"             # placeholder; confirm exact tag
 roles = ["weighting", "triage"]
+json_mode = true
+timeout = 120
+
+# Offline dry run: no network, canned reply. Lets you check a whole run end to end.
+[models.dry]
+provider = "scripted"
+model = "dry"
+roles = ["proposer", "weighting"]
+replies = ['{"proposals": [{"spec": {"stream": {"kind": "sequence", "name": "primes"}, "combine": "sub"}, "why": "dry run"}]}']
+
+# Any CLI that reads a prompt on stdin and prints the reply, e.g. a coding-assistant
+# CLI in non-interactive mode. Uses that tool's own login; no tokens or cost are tracked.
+# [models.cli-assistant]
+# provider = "command"
+# model = "cli-assistant"
+# command = ["claude", "-p"]
+# roles = ["proposer"]
+# timeout = 600

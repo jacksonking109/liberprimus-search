@@ -17,7 +17,7 @@ later model-driven search is measured against:
 | Executor | Enumerates params × keys, skips anything already in the ledger, scores, records; budgets + kill switch | `src/lpswarm/executor/` |
 | Validation | Recall and false-positive rate per family and length, plus a null-calibration check | `src/lpswarm/validation/` |
 | Baseline | Non-LLM brute force over every family with word-list keys | `src/lpswarm/baseline/` |
-| Router | Interface stub only (Phase 3) | `src/lpswarm/router/`, `config/models.example.toml` |
+| Router | Model adapters and budgets (Phase 3, see below) | `src/lpswarm/router/`, `config/models.example.toml` |
 
 Nothing in `src/` touches the network or reads credentials. The only networked file is the
 optional dev script `scripts/fetch_corpus.py`, which refreshes the bundled corpus.
@@ -190,13 +190,51 @@ configured alpha sits between 0.4% and 1.5% across lengths, within the stated to
 - **English only by default**; other languages need corpora (see `TODO_USER.md`).
 - **Word breaks are ignored.** Dictionary coverage segments unspaced text.
 - **The held-out guard prevents accidents; it is not a security boundary.**
+- **Skip-literal ambiguity.** A `skip` rule treats *every* occurrence of the symbol as a
+  literal. If encryption can also produce that symbol, the stream desynchronises. Resolving
+  this needs a search over the ambiguous positions, and the oracle's nulls would have to be
+  calibrated through the same search to stay honest. Not implemented.
+- **Tier-test budgets are per arm, not per dollar.** Compare recall with the attempts, calls
+  and USD columns; `random_program:N` gives attempt-matched controls.
 - **Single process.** No multiprocessing, so a big brute force is bounded by one core
   (roughly 10–25k attempts/s on a desktop).
+
+## Phase 3: model tier test
+
+Models propose; code disposes. Generators (LLMs or a random control) propose ciphers in a small
+JSON **cipher-program language** (`src/lpswarm/programs/`): key streams (constant, repeating key,
+autokey, number sequences such as primes, prime totients, Fibonacci, digits of pi/e),
+`sub`/`add`/`beaufort` combination, reversed alphabet map, skip-literal symbols that do not
+advance the stream, reversed text and columnar transposition. Code validates and interprets the
+programs; the Phase 1 oracle and ledger judge and record them. Models never write code, and they
+only see coarse verdicts (`fail`/`near_miss`/`pass`) for their own proposals: no scores,
+thresholds or decrypted text.
+
+| Piece | Where |
+| --- | --- |
+| Cipher-program language, sequences, sampler | `src/lpswarm/programs/` |
+| Router + adapters (Ollama, OpenAI-compatible/DeepSeek, command, scripted), USD caps | `src/lpswarm/router/` |
+| Generators (LLM, random control, ranker) and the swarm loop | `src/lpswarm/swarm/` |
+| Tier test (baseline vs random vs models on held-out program ciphers) | `src/lpswarm/validation/tiertest.py` |
+
+```powershell
+lpswarm swarm --demo program:120 --generators random_program --rounds 3      # no models needed
+lpswarm tiertest --arms baseline,random_program:40,random_program:2000 --quick
+lpswarm tiertest --models config\models.toml --arms baseline,random_program:40,qwen-local,deepseek
+```
+
+Model setup, dry runs and the full experiment: `docs/phase3_runbook.md`. Network access exists
+only in `src/lpswarm/router/adapters.py` (enforced by a test); API keys come from environment
+variables named in the config and are never stored.
+
+The language can express the mechanisms of the three solved sections the Phase 1 baseline
+missed. Two of them still do not decode end to end: one because of transcription corruption,
+and both because "every ᚠ is a literal" is ambiguous when an encrypted symbol can also come out
+as ᚠ (see Known limitations).
 
 ## Roadmap
 
 2. Corpus census: sourced list of everything Cicada 3301 referenced, with confidence tags,
    editions and expansion rings, and rule-based key-candidate generation.
-3. Model tier test: model-driven hypothesis generators behind the router (DeepSeek via API; local
-   Qwen/Gemma; Granite tiny for weighting), measured against this Phase 1 baseline.
+3. Model tier test (built; run it with your models, see `docs/phase3_runbook.md`).
 4. Scale up only if Phase 3 wins.
