@@ -39,6 +39,7 @@ STATUSES = ("pending", "running", "done", "failed", "skipped", "interrupted", "b
 KINDS = ("tiertest", "swarm", "baseline", "validate")
 MAX_ROUNDS_ADDED = 8
 MAX_PER_ROUND_ADDED = 8
+MIN_FORCED_TICK_S = 600   # after-job supervisor check-ins at least 10 minutes apart
 
 
 # --------------------------------------------------------------------- config
@@ -182,7 +183,7 @@ class KeepAwake:
 class Overnight:
     def __init__(self, cfg: OvernightConfig, run_dir: str | Path, *, publish: bool | None = None,
                  router=None, stop_file: str | Path = "STOP", poll_s: float = 5.0,
-                 python: str | None = None, progress: bool = True):
+                 python: str | None = None, progress: bool = True, retry_failed: bool = False):
         self.cfg = cfg
         self.dir = Path(run_dir)
         self.dir.mkdir(parents=True, exist_ok=True)
@@ -196,6 +197,11 @@ class Overnight:
         self.until = _until_epoch(cfg.until)
         self.state = self._load_state()
         self.last_tick = 0.0
+        if retry_failed:
+            for j in self.state["jobs"]:
+                if j["status"] in ("failed", "blocked"):
+                    j.update(status="pending", reason="retry requested")
+            self.log("failed and blocked jobs reset to pending (--retry-failed)")
 
     # ----------------------------------------------------------------- state
     def _load_state(self) -> dict:
@@ -319,7 +325,8 @@ class Overnight:
                     self.log("queue empty")
                     break
                 self.run_job(job)
-                self.after_job(job)
+                if job["status"] != "blocked":   # refused jobs did nothing; no report or check-in
+                    self.after_job(job)
             self.state["status"] = "finished" if not any(
                 j["status"] in ("pending", "interrupted") for j in self.state["jobs"]) else "stopped"
             self.save()
@@ -453,8 +460,11 @@ class Overnight:
     def maybe_tick(self, force: bool = False) -> None:
         if not self.cfg.supervisor or self.router is None:
             return
-        if not force and time.time() - self.last_tick < self.cfg.tick_minutes * 60:
+        gap = time.time() - self.last_tick
+        if not force and gap < self.cfg.tick_minutes * 60:
             return
+        if force and gap < MIN_FORCED_TICK_S:
+            return   # after-job check-ins at most every few minutes (saves plan quota)
         self.last_tick = time.time()
         self.state["ticks"] += 1
         try:

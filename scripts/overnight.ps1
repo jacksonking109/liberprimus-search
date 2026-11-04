@@ -12,13 +12,15 @@
       powershell -ExecutionPolicy Bypass -File scripts\overnight.ps1
       powershell -ExecutionPolicy Bypass -File scripts\overnight.ps1 -Until 08:30
       powershell -ExecutionPolicy Bypass -File scripts\overnight.ps1 -New -NoPublish
+      powershell -ExecutionPolicy Bypass -File scripts\overnight.ps1 -RetryFailed
 #>
 [CmdletBinding()]
 param(
     [string]$Until = "",
     [switch]$New,
     [switch]$NoPublish,
-    [switch]$NoOllama
+    [switch]$NoOllama,
+    [switch]$RetryFailed
 )
 
 $ErrorActionPreference = "Continue"
@@ -46,5 +48,6 @@ $argsList = @("overnight", "--config", "config\overnight.toml")
 if ($Until) { $argsList += @("--until", $Until) }
 if ($New) { $argsList += "--new" }
 if ($NoPublish) { $argsList += "--no-publish" }
+if ($RetryFailed) { $argsList += "--retry-failed" }
 & $Lpswarm @argsList
 exit $LASTEXITCODE

@@ -368,7 +368,8 @@ def cmd_overnight(args) -> int:
                 raise SystemExit(f"model {cfg.supervisor} needs roles = [\"supervisor\"] in {cfg.models}")
     elif cfg.supervisor:
         raise SystemExit(f"supervisor {cfg.supervisor} configured but {cfg.models} not found")
-    run = Overnight(cfg, run_dir, publish=False if args.no_publish else None, router=router)
+    run = Overnight(cfg, run_dir, publish=False if args.no_publish else None, router=router,
+                    retry_failed=args.retry_failed)
     try:
         st = run.run()
     finally:
@@ -565,6 +566,8 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--new", action="store_true", help="start a new run even if one is unfinished")
     p.add_argument("--until", help="stop at this local time, HH:MM (resumable later)")
     p.add_argument("--no-publish", action="store_true", help="do not push results to GitHub")
+    p.add_argument("--retry-failed", action="store_true",
+                   help="when resuming, run failed and blocked jobs again")
     p.set_defaults(func=cmd_overnight)
 
     for name, fn in (("ruled-out", cmd_ruled_out), ("leads", cmd_leads)):

@@ -81,15 +81,27 @@ class TierConfig:
             raise ValueError(f"arms {model_arms or [self.ranker]} need --models (a models TOML)")
 
 
-def _decrypt_attempt(led: Ledger, attempt_id: int, ct: np.ndarray, n: int) -> np.ndarray | None:
+def _decrypt_attempt(led: Ledger, attempt_id: int, ct: np.ndarray, n: int,
+                     oracle: FullOracle | None = None) -> np.ndarray | None:
+    """Re-decrypt a recorded attempt to compare it with the true plaintext. Returns None
+    (counted as 'unverified') if it cannot be reproduced, instead of failing the run."""
     d = led.attempt_detail(attempt_id)
     if not d or d["value_json"] is None:
         return None
-    fam = get_family(d["cipher_family"])
-    key = json.loads(d["value_json"])
-    if isinstance(key, list):
-        key = tuple(key)
-    return fam.decrypt(ct, key, n, **json.loads(d["params_json"]))
+    try:
+        fam = get_family(d["cipher_family"])
+        key = json.loads(d["value_json"])
+        if isinstance(key, list):
+            key = tuple(key)
+        params = json.loads(d["params_json"])
+        if hasattr(fam, "null_variant") and fam.null_variant(key):
+            # search-based decryption (e.g. skip resolution) needs the language model
+            if oracle is None:
+                return None
+            return fam.decrypt(ct, key, n, lm=oracle.bigram_table(), **params)
+        return fam.decrypt(ct, key, n, **params)
+    except Exception:  # noqa: BLE001 - verification is best-effort
+        return None
 
 
 def _cost(led: Ledger | None, label: str) -> dict:
@@ -185,7 +197,7 @@ def run_tiertest(tc: TierConfig, oc: OracleConfig | None = None, progress: bool 
             for f in final:
                 if not f["passed_final"]:
                     continue
-                pt = _decrypt_attempt(led, f["attempt_id"], case.ciphertext, n)
+                pt = _decrypt_attempt(led, f["attempt_id"], case.ciphertext, n, oracle)
                 if pt is None:
                     unverified += 1
                     continue

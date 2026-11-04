@@ -139,6 +139,9 @@ def test_supervisor_tick_uses_router_and_survives_failure(tmp_path):
             import time
             raise CLILimitError("usage limit", time.time() + 600, True)
     run.router._models["sup"].adapter = Down()
+    run.maybe_tick(force=True)          # within 10 minutes of the last check-in: throttled
+    assert not any("supervisor unavailable" in e for e in run.state["events"])
+    run.last_tick = 0.0
     run.maybe_tick(force=True)          # paused supervisor: logged, run continues
     assert any("supervisor unavailable" in e for e in run.state["events"])
 
@@ -186,3 +189,53 @@ def test_quota_group_shared_between_models():
         r.complete("sonnet", [], role="proposer")
     r.complete("other", [], role="proposer")  # other models are unaffected
     assert r.window_status("sonnet")["calls"] == 2
+
+
+def test_blocked_jobs_do_not_trigger_publish_or_supervisor(tmp_path, monkeypatch):
+    monkeypatch.chdir(ROOT)
+    models = tmp_path / "m.toml"
+    models.write_text('[models.ds]\nprovider = "openai_compatible"\nendpoint = "https://x.invalid"\n'
+                      'model = "m"\napi_key_env = "K"\nroles = ["proposer"]\nmax_usd = 1.0\n',
+                      encoding="utf-8")
+    jobs = [{"id": f"j{i}", "kind": "swarm", "args": ["--generators", "ds"]} for i in range(5)]
+    run = _sup_run(tmp_path, [json.dumps({"actions": []})])
+    run.cfg.models = str(models)
+    run.state["jobs"] = [__import__("lpswarm.overnight", fromlist=["_job"])._job(j["id"], "swarm", j["args"], "config")
+                         for j in jobs]
+    calls = {"publish": 0}
+    monkeypatch.setattr(run, "publish", lambda: calls.__setitem__("publish", calls["publish"] + 1))
+    st = run.run()
+    assert all(j["status"] == "blocked" for j in st["jobs"])
+    assert calls["publish"] == 1                         # only the final publish
+    assert run.state["ticks"] == 0                       # no supervisor calls for refused jobs
+
+
+def test_retry_failed_resets_failed_and_blocked(tmp_path, monkeypatch):
+    monkeypatch.chdir(ROOT)
+    run = Overnight(_cfg(tmp_path, [TIER]), tmp_path / "run", stop_file=tmp_path / "STOP", progress=False)
+    run.state["jobs"][0]["status"] = "failed"
+    run.save()
+    again = Overnight(_cfg(tmp_path, [TIER]), tmp_path / "run", stop_file=tmp_path / "STOP",
+                      progress=False, retry_failed=True)
+    assert again.state["jobs"][0]["status"] == "pending"
+
+
+def test_tiertest_recheck_handles_resolved_specs(tmp_path):
+    from lpswarm.alphabet import Alphabet
+    from lpswarm.executor import Executor, ExplicitKeys, Target
+    from lpswarm.oracle import FullOracle, OracleConfig
+    from lpswarm.programs import compile_spec
+    from lpswarm.textgen.synth import generate_case
+    from lpswarm.validation.tiertest import _decrypt_attempt
+    a = Alphabet.latin26()
+    o = FullOracle(a, OracleConfig(null_samples=100, variant_null_samples=100))
+    case = generate_case("caesar", 60, seed=3)
+    led = Ledger()
+    h = led.add_hypothesis("program", "x", "t", "proposer")
+    spec = compile_spec({"stream": {"kind": "constant", "value": int(case.key)}, "skip": [25],
+                         "skip_mode": "resolve"}, a)
+    Executor(led, o, stop_file=None).run(Target(a, case.ciphertext, "r", is_synthetic=True), h,
+                                         "program", ExplicitKeys([spec]))
+    aid = led.conn.execute("SELECT id FROM attempt").fetchone()[0]
+    assert _decrypt_attempt(led, aid, case.ciphertext, 26, o) is not None
+    assert _decrypt_attempt(led, aid, case.ciphertext, 26, None) is None   # no crash without LM
