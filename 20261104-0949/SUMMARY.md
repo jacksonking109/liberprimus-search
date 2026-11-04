@@ -1,6 +1,6 @@
 # Overnight run 20261104-0949
 
-Started 2026-11-04 09:49:00, updated 2026-11-04 13:40:11, status **running**. Jobs: done 61, blocked 15
+Started 2026-11-04 09:49:00, updated 2026-11-04 13:40:27, status **finished**. Jobs: done 61, blocked 15
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -249,8 +249,6 @@ Prefer the longer sections (1000+ runes). On short ones (91 and 121 runes) noise
 
 ## Events
 
-- 2026-11-04 13:04:05 sup1/20: start (uses claude-plan)
-- 2026-11-04 13:04:05 sup1/21 waiting: claude-plan in use by sup1/20
 - 2026-11-04 13:09:05 sup1/20: running 5 min | 13:04:14 [model] claude-opus (proposer) ok 7.4s, tokens in/out 3718/694, reply 1459 chars
 - 2026-11-04 13:14:05 sup1/20: running 10 min | 13:12:55 [model] claude-opus (proposer) ok 16.1s, tokens in/out 4722/749, reply 1610 chars
 - 2026-11-04 13:16:20 sup1/20: done (exit 0, 12 min)
@@ -274,3 +272,5 @@ Prefer the longer sections (1000+ runes). On short ones (91 and 121 runes) noise
 - 2026-11-04 13:36:36 published: 60 file(s) to branch results
 - 2026-11-04 13:36:36 sup1/25: start (uses claude-plan)
 - 2026-11-04 13:40:11 sup1/25: done (exit 0, 4 min)
+- 2026-11-04 13:40:27 published: 61 file(s) to branch results
+- 2026-11-04 13:40:27 queue empty
