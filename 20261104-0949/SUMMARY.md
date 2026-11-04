@@ -1,6 +1,6 @@
 # Overnight run 20261104-0949
 
-Started 2026-11-04 09:49:00, updated 2026-11-04 11:38:07, status **running**. Jobs: pending 6, running 1, done 39, blocked 15
+Started 2026-11-04 09:49:00, updated 2026-11-04 11:40:34, status **running**. Jobs: pending 20, running 1, done 40, blocked 15
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -16,7 +16,7 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 11:38:07, status **running**. Jo
 | sonnet/18 | done | 2026-11-04 11:13:42 | 2026-11-04 11:26:43 | Sonnet, briefed by Opus |
 | sonnet/19 | done | 2026-11-04 11:27:10 | 2026-11-04 11:29:30 | Sonnet, briefed by Opus |
 | sonnet/20 | done | 2026-11-04 11:29:45 | 2026-11-04 11:38:07 | Sonnet, briefed by Opus |
-| sonnet/21 | pending |  |  | Sonnet, briefed by Opus |
+| sonnet/21 | running | 2026-11-04 11:38:39 |  | Sonnet, briefed by Opus |
 | sonnet/22 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/24 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/25 | pending |  |  | Sonnet, briefed by Opus |
@@ -32,7 +32,7 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 11:38:07, status **running**. Jo
 | codex/15 | done | 2026-11-04 11:21:08 | 2026-11-04 11:21:13 | Codex (exploratory) |
 | codex/14 | done | 2026-11-04 11:21:28 | 2026-11-04 11:30:45 | Codex (exploratory) |
 | codex/13 | done | 2026-11-04 11:31:01 | 2026-11-04 11:36:01 | Codex (exploratory) |
-| codex/12 | running | 2026-11-04 11:36:17 |  | Codex (exploratory) |
+| codex/12 | done | 2026-11-04 11:36:17 | 2026-11-04 11:40:34 | Codex (exploratory) |
 | codex/11 | pending |  |  | Codex (exploratory) |
 | codex/10 | pending |  |  | Codex (exploratory) |
 | local/17 | done | 2026-11-04 09:49:00 | 2026-11-04 09:55:18 | local models |
@@ -65,15 +65,36 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 11:38:07, status **running**. Jo
 | deepseek/22 | blocked |  | 2026-11-04 11:13:42 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
 | deepseek/24 | blocked |  | 2026-11-04 11:13:42 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
 | deepseek/25 | blocked |  | 2026-11-04 11:13:42 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
+| sup1/10 | pending |  |  | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
+| sup1/11 | pending |  |  | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
+| sup1/12 | pending |  |  | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
+| sup1/13 | pending |  |  | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
+| sup1/14 | pending |  |  | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
+| sup1/15 | pending |  |  | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
+| sup1/16 | pending |  |  | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
+| sup1/17 | pending |  |  | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
+| sup1/18 | pending |  |  | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
+| sup1/19 | pending |  |  | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
+| sup1/20 | pending |  |  | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
+| sup1/21 | pending |  |  | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
+| sup1/22 | pending |  |  | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
+| sup1/24 | pending |  |  | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
+| sup1/25 | pending |  |  | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
 
 ## Now running
 
-**codex/12** (since 2026-11-04 11:36:17), latest log lines:
+**sonnet/21** (since 2026-11-04 11:38:39), latest log lines:
 ```
-===== 2026-11-04 11:36:17 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 12 --gen
-== LP2:20.jpg/2-23.jpg/1 - 3.jpg/2-6.jpg/1  (693 symbols)
-11:36:18 [model] codex (proposer) calling...
-11:36:35 [model] codex (proposer) ok 17.2s, tokens in/out 17627/412, reply 1638 chars
+        near_miss by claude-sonnet    sub; sequence prime_totients*1+0 @403; skip [0] (resolve)  [chance 46: noise level (pure noise does this well that often)]
+        GUNUWYOECPTYOEREONGXSSMSNGYTJSIYWHSLRAELTHRSWIOSIOLAPALLJROCHAEEOEOPALESTJYJJOEDTHNGGRYEEYBYDNG
+        near_miss by claude-sonnet    sub; sequence prime_totients*1+0 @353; skip [0] (resolve)  [chance 53: noise level (pure noise does this well that often)]
+        DAUOELGEOAOGEOGSHEAPIHTTOTBGXATHININCYNGDFDCUHFGJIYFGTHEMIICEATHFOFDTNHOLLENGEACEACUJSJFAAEWO
+        near_miss by claude-sonnet    sub; sequence prime_totients*1+0 @862; skip [0] (resolve)  [chance 50: noise level (pure noise does this well that often)]
+        WREORRJMNGTHAJOTOFEARGIFEOAEBGFEFGTFEAAXPSFSOEXNGWSTCDOEEXXPGISEMOIOCEANGEMIDGHSIOAEBTHIOEOERYCICC
+        near_miss by claude-sonnet    beaufort; sequence prime_totients*1+0 @564; map reverse; skip [0] (resolve)  [chance 34: noise level (pure noise does this well that often)]
+        HIOAANWRCMBUPCRTHWAOAEHEAEAAGOEIOXWLTRHXGLUNGNAEPSGNGJGFOECRJLAECPEABULCLGSLENNGJCDHWRUSNGCICOEU
+report: reports\overnight\20261104-0949\sonnet_21\report.md
+model spend (reports/model_spend.sqlite): deepseek=$0.0000, qwen-local=$0.0000, gemma-local=$0.0000, granite=$0.0000, claude-opus=$0.0000, claude-sonnet=$0.0000, claude-supervisor=$0.0000, codex=$0.00
 ```
 
 ## Results so far
@@ -104,6 +125,8 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 11:38:07, status **running**. Jo
   - LP2:33.jpg - 50.jpg/1: 8899 attempts, 22 hypotheses, **0 final pass(es)** (caution: short section (91 runes): many keys give plausible-looking text this short; treat any lead with extra caution)
 - **sonnet/20** (done)
   - LP2:50.jpg/2-56.jpg/1: 12757 attempts, 39 hypotheses, **0 final pass(es)**
+- **sonnet/21** (running)
+  - LP2:56.jpg/2: 6575 attempts, 16 hypotheses, **0 final pass(es)**, stopped: stop_file
 - **codex/25** (done)
   - LP2:54.jpg-55.jpg - 71.jpg-72.jpg: 30269 attempts, 47 hypotheses, **0 final pass(es)**
 - **codex/24** (done)
@@ -128,6 +151,8 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 11:38:07, status **running**. Jo
   - LP2:8.jpg-14.jpg - 25.jpg-31.jpg: 22286 attempts, 40 hypotheses, **0 final pass(es)**
 - **codex/13** (done)
   - LP2:6.jpg/2-7.jpg - 23.jpg/2-24.jpg: 22330 attempts, 46 hypotheses, **0 final pass(es)**
+- **codex/12** (done)
+  - LP2:20.jpg/2-23.jpg/1 - 3.jpg/2-6.jpg/1: 11780 attempts, 20 hypotheses, **0 final pass(es)**, stopped: stop_file
 - **local/17** (done)
   - LP2:- - 40.jpg-43.jpg: 298 attempts, 82 hypotheses, **0 final pass(es)**
 - **local/18** (done)
@@ -163,10 +188,10 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 11:38:07, status **running**. Jo
 
 - qwen-local: 84 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 84 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 123 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-sonnet: 123 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-supervisor: 123 call(s) in the last 5h (cap 550), spent $0.0000
-- codex: 67 call(s) in the last 5h (cap 750), spent $0.0000
+- claude-opus: 128 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-sonnet: 128 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-supervisor: 128 call(s) in the last 5h (cap 550), spent $0.0000
+- codex: 69 call(s) in the last 5h (cap 750), spent $0.0000
 
 ## Supervisor notes
 
@@ -178,16 +203,20 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 11:38:07, status **running**. Jo
 - 2026-11-04 10:58:43: 10:58 check: the run is healthy. codex/18, local/12, local/24 and sonnet/15 (skipped as too short) have finished. codex/17 and sonnet/16 are running, and sonnet/17 is waiting on claude-plan. There are still 0 final passes across about 26 finished jobs. No new near misses beyond the noise-level patterns noted earlier (primes/prime_totients/e_digits sub, skip [0] resolve). Pending jobs still cover the remaining sections, so I added no jobs.
 - 2026-11-04 11:13:26: 11:13 check: the run is healthy. sonnet/16, sonnet/17, codex/17 and local/25 have finished. codex/16 and local/10 are running, and sonnet/18 is next. There are still 0 final passes across about 30 finished jobs. sonnet/17 and codex/17 together made about 48k attempts on the 40-43 section, and neither found any near miss. The near misses seen earlier (primes/prime_totients/e_digits sub, skip [0] resolve) are still at noise level and don't settle on any one key. The queue still covers the remaining sections, so I added no jobs.
 - 2026-11-04 11:27:09: 11:27 check: the run is healthy. sonnet/18 and codex/16 have finished, codex/15 was skipped (section too short), and codex/14 is running, with sonnet/19 next. All 15 deepseek jobs (deepseek/10 to deepseek/25) are blocked: price_in_per_mtok and price_out_per_mtok are 0 in config/models.toml, so the USD cap can't work. The owner needs to fill in those prices. The sections are still covered by sonnet, codex and local, so I added no replacement jobs. There are still 0 final passes across about 33 finished jobs. The new near misses from codex/16 (beaufort with pi_digits @1055-1056) are at noise level, like the earlier ones.
+- 2026-11-04 11:38:39: 11:38 check: the run is healthy. sonnet/19, sonnet/20, codex/14 and codex/13 have finished, and codex/12 is running. There are still 0 final passes across about 37 finished jobs. The near misses are all at noise level. On section 13, codex hit e_digits sub @1553-1554 with skip [27], and section 19 shows the same patterns as before. The deepseek jobs are still blocked until the price fields in config/models.toml are filled in. The run has spent most of its effort on primes/prime_totients/e_digits sub/add/beaufort with skip [0] resolve, so I queued one claude-opus job on unsolved sections to try other cipher families.
+- 2026-11-04 11:38:39: brief for sup1 (claude-opus): Most of the swarm's attempts on every section so far have been sub/add/beaufort with primes, prime_totients, e_digits or pi_digits sequences, *1+0, skip [0] resolve, at offsets across about 0-2000. None gave a final pass, and every near miss is at noise level. Do NOT repeat that family with only a different offset.
+
+Try these instead:
+(1) Sequences with non-trivial mult/add: primes*k+c and prime_totients*k+c with k in 2-5 and c != 0, plus squares, fibonacci and triangular numbers.
+(2) Skip rules other than [0]: try other single interrupter runes and pairs, and the skip [27] and [0,7] variants that came up on sections 13 and 19, but on other sections.
+(3) map reverse combined with beaufort, and the reverse-text variants.
+(4) Any transposition or reversal steps the language supports, applied before the stream: column/row reversal, reading in reverse, every-n-th rune.
+(5) Simple shift/atbash-style mappings with no sequence. These are a cheap baseline that some sections may never have had.
+
+Prefer the longer sections (1000+ runes). On short ones (91 and 121 runes) noise looks convincing, so don't chase near misses there. Keep each proposal distinct from the others and well-formed, because invalid proposals waste rounds.
 
 ## Events
 
-- 2026-11-04 11:21:28 codex/14: start (uses codex-plan)
-- 2026-11-04 11:21:28 2 running: sonnet/18, codex/14
-- 2026-11-04 11:23:43 sonnet/18: running 10 min | 11:21:25 [model] claude-sonnet (proposer) ok 15.1s, tokens in/out 6456/1007, reply 2224 chars
-- 2026-11-04 11:26:28 codex/14: running 5 min | 11:25:18 [model] codex (proposer) ok 15.7s, tokens in/out 18075/457, reply 1614 chars
-- 2026-11-04 11:26:43 sonnet/18: done (exit 0, 13 min)
-- 2026-11-04 11:26:59 published: 36 file(s) to branch results
-- 2026-11-04 11:27:09 supervisor: note: 11:27 check: the run is healthy. sonnet/18 and codex/16 have finished, codex/15 was skipped (section too short), and codex/14 is running, with sonnet/19 next. All 15 deepseek jobs (deepseek/10 to deepseek/25) are blocked: price_in_per_mtok and price_out_per_mtok are 0 in config/models.toml, so th...
 - 2026-11-04 11:27:10 sonnet/19: start (uses claude-plan)
 - 2026-11-04 11:27:10 2 running: codex/14, sonnet/19
 - 2026-11-04 11:27:10 sonnet/20 waiting: claude-plan in use by sonnet/19
@@ -206,3 +235,10 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 11:38:07, status **running**. Jo
 - 2026-11-04 11:36:17 codex/12: start (uses codex-plan)
 - 2026-11-04 11:36:17 2 running: sonnet/20, codex/12
 - 2026-11-04 11:38:07 sonnet/20: done (exit 0, 8 min)
+- 2026-11-04 11:38:22 published: 40 file(s) to branch results
+- 2026-11-04 11:38:39 supervisor: note: 11:38 check: the run is healthy. sonnet/19, sonnet/20, codex/14 and codex/13 have finished, and codex/12 is running. There are still 0 final passes across about 37 finished jobs. The near misses are all at noise level. On section 13, codex hit e_digits sub @1553-1554 with skip [27], and section 1...
+- 2026-11-04 11:38:39 supervisor: added sup1: swarm on 15 section(s) with claude-opus; brief: Most of the swarm's attempts on every section so far have been sub/add/beaufort with primes, prime_totients, e_digits or pi_digits sequences, *1+0, skip [0] resolve, at offsets across about 0-2000. No...
+- 2026-11-04 11:38:39 sonnet/21: start (uses claude-plan)
+- 2026-11-04 11:38:39 2 running: codex/12, sonnet/21
+- 2026-11-04 11:38:39 sonnet/22 waiting: claude-plan in use by sonnet/21
+- 2026-11-04 11:40:34 codex/12: done (exit 0, 4 min)
