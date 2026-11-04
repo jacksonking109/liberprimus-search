@@ -1,6 +1,6 @@
 # Overnight run 20261104-0949
 
-Started 2026-11-04 09:49:00, updated 2026-11-04 11:40:49, status **running**. Jobs: pending 20, done 41, blocked 15
+Started 2026-11-04 09:49:00, updated 2026-11-04 11:40:53, status **stopped**. Jobs: pending 20, done 41, blocked 15
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -201,8 +201,6 @@ Prefer the longer sections (1000+ runes). On short ones (91 and 121 runes) noise
 
 ## Events
 
-- 2026-11-04 11:27:10 sonnet/20 waiting: claude-plan in use by sonnet/19
-- 2026-11-04 11:29:30 sonnet/19: done (exit 0, 2 min)
 - 2026-11-04 11:29:45 published: 37 file(s) to branch results
 - 2026-11-04 11:29:45 sonnet/20: start (uses claude-plan)
 - 2026-11-04 11:29:45 2 running: codex/14, sonnet/20
@@ -226,3 +224,5 @@ Prefer the longer sections (1000+ runes). On short ones (91 and 121 runes) noise
 - 2026-11-04 11:40:34 codex/12: done (exit 0, 4 min)
 - 2026-11-04 11:40:49 published: 42 file(s) to branch results
 - 2026-11-04 11:40:49 sonnet/21: done (exit 0, 2 min)
+- 2026-11-04 11:40:53 published: 42 file(s) to branch results
+- 2026-11-04 11:40:53 stopping: STOP file
