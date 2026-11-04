@@ -53,15 +53,15 @@ args = ["--manifest", "data/lp/manifest.json", "--alphabet", "data/alphabet/gema
         "--per-round", "8", "--max-attempts", "60000"]
 note = "Codex (exploratory)"
 
-# Local lane (5060 Ti; qwen and gemma take turns on the one GPU). Add "--ranker", "granite"
-# once the 2060 is in.
+# Local lane (5060 Ti; qwen and gemma take turns on the one GPU). Granite orders each
+# round's proposals from port 11435 (the second GPU, or the CPU until there is one).
 [[job]]
 id = "local"
 kind = "swarm"
 order = "middle"
 args = ["--manifest", "data/lp/manifest.json", "--alphabet", "data/alphabet/gematria_primus.json",
-        "--sections", "unsolved", "--generators", "qwen-local,gemma-local", "--rounds", "6",
-        "--per-round", "8", "--max-attempts", "60000"]
+        "--sections", "unsolved", "--generators", "qwen-local,gemma-local", "--ranker", "granite",
+        "--rounds", "6", "--per-round", "8", "--max-attempts", "60000"]
 note = "local models"
 
 # 5. DeepSeek brute force: refused until its prices and DEEPSEEK_API_KEY are set.

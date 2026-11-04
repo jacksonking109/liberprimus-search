@@ -58,13 +58,15 @@ roles = ["proposer"]
 json_mode = true
 timeout = 600
 
-[models.granite-tiny]
+# The ranker: always port 11435, which start_ollama.ps1 puts on the second GPU, or on the
+# CPU when there is only one GPU (slower, but it leaves the big GPU to the proposers).
+[models.granite]
 provider = "ollama"
-endpoint = "http://localhost:11434"
-model = "granite-tiny"             # placeholder; confirm exact tag
+endpoint = "http://127.0.0.1:11435"
+model = "granite4:tiny-h"          # or granite3.3:2b
 roles = ["weighting", "triage"]
 json_mode = true
-timeout = 120
+timeout = 300
 
 # Offline dry run: no network, canned reply. Lets you check a whole run end to end.
 [models.dry]

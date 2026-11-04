@@ -86,6 +86,6 @@ def test_model_config_parses_without_env():
     p = pathlib.Path(__file__).resolve().parent.parent / "config" / "models.example.toml"
     specs = {s.name: s for s in load_model_specs(p)}
     assert specs["deepseek"].api_key_env == "DEEPSEEK_API_KEY"
-    assert Role.WEIGHTING in specs["granite-tiny"].roles
+    assert Role.WEIGHTING in specs["granite"].roles
     with pytest.raises(NotImplementedError):
         NullRouter().propose(Role.PROPOSER, {})

@@ -124,10 +124,8 @@ if (-not $SkipModels) {
     Write-Host "`n== GPUs and servers" -ForegroundColor Cyan
     & (Join-Path $PSScriptRoot "start_ollama.ps1")
     if ($LASTEXITCODE -ne 0) { Stop-Setup "could not start the Ollama servers (see reports\ollama-*.log)" }
-    $plan = $null
-    if (Test-Path $GpuFile) { $plan = Get-Content $GpuFile -Raw | ConvertFrom-Json }
-    $twoGpus = ($plan -and $plan.proposer -and $plan.ranker)
-    if (-not $twoGpus) { $rankerPort = 11434 }
+    # The ranker always uses port 11435: the second GPU if there is one, else the CPU
+    # (start_ollama.ps1 decides), so this config stays valid when a GPU is added.
 
     function Get-FirstModel([string[]]$Tags, [int]$Port, [string]$What) {
         $old = $env:OLLAMA_HOST
@@ -202,7 +200,7 @@ if ((Test-Path $ModelsToml) -and -not $Force) {
     }
     if ($rankerTag) {
         $lines += @("[models.granite]", 'provider = "ollama"', "endpoint = `"http://127.0.0.1:$rankerPort`"",
-            "model = `"$rankerTag`"", 'roles = ["weighting", "triage"]', "json_mode = true", "timeout = 120",
+            "model = `"$rankerTag`"", 'roles = ["weighting", "triage"]', "json_mode = true", "timeout = 300",
             "options = { num_ctx = 8192 }", "")
     }
     $claudeBlock = @(

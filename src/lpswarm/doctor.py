@@ -73,8 +73,10 @@ def run_checks(models_config: str | None = None, ping: bool = False,
                     tags_cache[ep] = exc
             got = tags_cache[ep]
             if isinstance(got, AdapterError):
+                hint = (" It starts the ranker server too, on the CPU if there is no "
+                        "second GPU." if ep.rstrip("/").endswith(":11435") else "")
                 out.append(Check(FAIL, label, f"Ollama at {ep} not reachable (is it running? "
-                                              "scripts\\start_ollama.ps1)"))
+                                              "scripts\\start_ollama.ps1)" + hint))
                 continue
             if not _tag_present(s.model, got):
                 out.append(Check(FAIL, label, f"'{s.model}' not pulled on {ep}; have: "

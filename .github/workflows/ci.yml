@@ -99,3 +99,41 @@ jobs:
         run: |
           powershell -NoProfile -ExecutionPolicy Bypass -File scripts\start_ollama.ps1 -Stop
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: start_ollama.ps1 with fake GPUs (ranker on CPU, then re-detect a second GPU)
+        shell: powershell
+        run: |
+          $fake = Join-Path $env:RUNNER_TEMP "fakebin"
+          New-Item -ItemType Directory -Force $fake | Out-Null
+          Set-Content "$fake\nvidia-smi.cmd" "@echo off`r`ntype `"%FAKE_GPUS%`"" -Encoding ascii
+          Set-Content "$fake\fake_ollama.py" -Encoding ascii -Value @'
+          import os, http.server, socketserver
+          host, port = os.environ["OLLAMA_HOST"].split(":")
+          with open(os.path.join(os.environ["FAKE_OUT"], "cuda-%s.txt" % port), "w") as f:
+              f.write(os.environ.get("CUDA_VISIBLE_DEVICES", "<unset>"))
+          class H(http.server.BaseHTTPRequestHandler):
+              def do_GET(self):
+                  self.send_response(200); self.end_headers(); self.wfile.write(b'{"models": []}')
+              def log_message(self, *a):
+                  pass
+          socketserver.TCPServer((host, int(port)), H).serve_forever()
+          '@
+          Set-Content "$fake\ollama.cmd" "@echo off`r`npython `"$fake\fake_ollama.py`"" -Encoding ascii
+          $env:PATH = "$fake;$env:PATH"
+          $env:FAKE_OUT = $fake
+          Remove-Item config\gpus.json -ErrorAction SilentlyContinue
+          # 1) one GPU: proposer pinned to it, ranker on the CPU
+          Set-Content "$fake\gpus.txt" "0, GPU-AAA, NVIDIA GeForce RTX 5060 Ti, 16311" -Encoding ascii
+          $env:FAKE_GPUS = "$fake\gpus.txt"
+          powershell -NoProfile -ExecutionPolicy Bypass -File scripts\start_ollama.ps1
+          if ($LASTEXITCODE -ne 0) { Write-Host "start failed (one GPU)"; exit 1 }
+          if ((Get-Content "$fake\cuda-11434.txt") -ne "GPU-AAA") { Write-Host "11434 not pinned to the GPU"; exit 1 }
+          if ((Get-Content "$fake\cuda-11435.txt") -ne "-1") { Write-Host "11435 not CPU-only"; exit 1 }
+          Get-Process python -ErrorAction SilentlyContinue | Stop-Process -Force
+          Start-Sleep -Seconds 2
+          # 2) a second GPU appears: re-detected without deleting gpus.json; ranker moves to it
+          Set-Content "$fake\gpus.txt" "0, GPU-AAA, NVIDIA GeForce RTX 5060 Ti, 16311`r`n1, GPU-BBB, NVIDIA GeForce RTX 2060, 6144" -Encoding ascii
+          powershell -NoProfile -ExecutionPolicy Bypass -File scripts\start_ollama.ps1
+          if ($LASTEXITCODE -ne 0) { Write-Host "start failed (two GPUs)"; exit 1 }
+          if ((Get-Content "$fake\cuda-11435.txt") -ne "GPU-BBB") { Write-Host "11435 not moved to the second GPU"; exit 1 }
+          if ((Get-Content config\gpus.json -Raw | ConvertFrom-Json).ranker.uuid -ne "GPU-BBB") { Write-Host "gpus.json not re-detected"; exit 1 }
+          Get-Process python -ErrorAction SilentlyContinue | Stop-Process -Force

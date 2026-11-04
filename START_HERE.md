@@ -234,7 +234,10 @@ Before leaving it:
 
 ## 8. Everyday controls
 
-After every reboot, start the GPU-pinned Ollama servers before any run:
+After every reboot, start the GPU-pinned Ollama servers before any run. Port 11434 is the
+5060 Ti (qwen, gemma). Port 11435 is Granite, the ranker: on the 2060 when it's installed,
+otherwise on the CPU. The script notices when a GPU is added or removed and re-assigns by
+itself, so `config\models.toml` never needs changing for it:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File scripts\start_ollama.ps1

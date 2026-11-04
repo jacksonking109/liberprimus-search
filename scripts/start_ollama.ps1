@@ -10,8 +10,10 @@
   because it would otherwise hold port 11434 and use every GPU.
 
   GPU choice is saved in config\gpus.json (biggest VRAM = proposer GPU, smallest =
-  ranker GPU). Delete that file to re-detect. With one GPU (or none) a single
-  server runs on 11434.
+  ranker GPU). It is re-detected automatically when the number of GPUs changes
+  (e.g. a second card is installed); delete the file to force it. With one GPU (or
+  none) the proposer server runs on 11434 and the ranker server on 11435 runs on the
+  CPU, so the models config never changes when a second card goes in.
 
   Run after every reboot, before lpswarm runs:
       powershell -ExecutionPolicy Bypass -File scripts\start_ollama.ps1
@@ -91,10 +93,16 @@ function Get-Gpus {
 }
 
 function Get-GpuPlan {
-    if (Test-Path $GpuFile) {
-        return (Get-Content $GpuFile -Raw | ConvertFrom-Json)
-    }
     $gpus = @(Get-Gpus | Sort-Object memory_mb -Descending)
+    if (Test-Path $GpuFile) {
+        $saved = Get-Content $GpuFile -Raw | ConvertFrom-Json
+        $savedCount = [int][bool]$saved.proposer + [int][bool]$saved.ranker
+        $nowCount = [Math]::Min($gpus.Count, 2)
+        # Keep the saved choice unless the GPU count changed (nvidia-smi failing counts as
+        # "unknown", not as zero GPUs).
+        if ($gpus.Count -eq 0 -or $savedCount -eq $nowCount) { return $saved }
+        Write-Step "...." "number of GPUs changed ($savedCount -> $nowCount); choosing GPUs again"
+    }
     $plan = [pscustomobject]@{ proposer = $null; ranker = $null }
     if ($gpus.Count -ge 1) { $plan.proposer = $gpus[0] }
     if ($gpus.Count -ge 2) { $plan.ranker = $gpus[$gpus.Count - 1] }
@@ -104,14 +112,15 @@ function Get-GpuPlan {
     return $plan
 }
 
-function Start-OneServer([int]$Port, [string]$Uuid) {
+function Start-OneServer([int]$Port, [string]$Uuid, [switch]$Cpu) {
     $ollama = Get-Command ollama -ErrorAction SilentlyContinue
     if (-not $ollama) { throw "ollama is not on PATH (run scripts\setup_windows.ps1 first)" }
     $oldHost = $env:OLLAMA_HOST
     $oldCuda = $env:CUDA_VISIBLE_DEVICES
     try {
         $env:OLLAMA_HOST = "127.0.0.1:$Port"
-        if ($Uuid) { $env:CUDA_VISIBLE_DEVICES = $Uuid }
+        if ($Cpu) { $env:CUDA_VISIBLE_DEVICES = "-1" }      # hide every GPU: CPU only
+        elseif ($Uuid) { $env:CUDA_VISIBLE_DEVICES = $Uuid }
         else { Remove-Item Env:CUDA_VISIBLE_DEVICES -ErrorAction SilentlyContinue }
         $log = Join-Path $Reports "ollama-$Port.log"
         if (Test-Ollama $Port) {
@@ -158,7 +167,14 @@ if ($plan.proposer -and $plan.ranker) {
     $uuid = $null
     if ($plan.proposer) { $uuid = $plan.proposer.uuid; Write-Step "...." ("single GPU: {0}" -f $plan.proposer.name) }
     else { Write-Step "WARN" "no NVIDIA GPU found (nvidia-smi); Ollama will choose its own device" }
-    if (Start-OneServer $ProposerPort $uuid) { Write-Step "OK" "server on 127.0.0.1:$ProposerPort" }
+    if (Start-OneServer $ProposerPort $uuid) { Write-Step "OK" "proposer server on 127.0.0.1:$ProposerPort" }
     else { Write-Step "FAIL" "server did not start; see reports\ollama-$ProposerPort.log"; exit 1 }
+    # The ranker (a small model) runs on the CPU until a second GPU is installed; then the
+    # next run of this script puts port $RankerPort on that GPU instead.
+    if (Start-OneServer $RankerPort $null -Cpu) {
+        Write-Step "OK" "ranker server on 127.0.0.1:$RankerPort (CPU; moves to a second GPU when one is installed)"
+    } else {
+        Write-Step "WARN" "ranker server did not start (see reports\ollama-$RankerPort.log); runs still work without --ranker"
+    }
 }
 exit 0

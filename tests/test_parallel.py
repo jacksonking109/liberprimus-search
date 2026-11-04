@@ -463,3 +463,17 @@ def test_chance_level_is_monotone_and_sane():
     assert 0 < at_final <= 0.0101
     assert o.chance_level(thr0, L, N) > 50            # the near-miss floor is noise level
     assert o.chance_level(thr_final + 1, L, N) < at_final < o.chance_level(thr_final - 0.2, L, N)
+
+
+def test_ranker_backend_is_its_own_resource(tmp_path):
+    models = tmp_path / "m.toml"
+    models.write_text(
+        '[models.qwen-local]\nprovider = "ollama"\nendpoint = "http://127.0.0.1:11434"\nmodel = "q"\n'
+        'roles = ["proposer"]\n\n[models.granite]\nprovider = "ollama"\n'
+        'endpoint = "http://127.0.0.1:11435"\nmodel = "g"\nroles = ["weighting"]\n', encoding="utf-8")
+    cfg = OvernightConfig(models=str(models), spend_ledger=str(tmp_path / "s.sqlite"), publish=False,
+                          jobs=[{"id": "local", "kind": "swarm",
+                                 "args": ["--generators", "qwen-local", "--ranker", "granite"]}])
+    run = Overnight(cfg, tmp_path / "run", stop_file=tmp_path / "STOP", progress=False)
+    assert run.job_resources(run.state["jobs"][0]) == {"ollama:http://127.0.0.1:11434",
+                                                       "ollama:http://127.0.0.1:11435"}

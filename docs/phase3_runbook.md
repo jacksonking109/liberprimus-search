@@ -97,7 +97,7 @@ lpswarm tiertest --models config\models.toml `
   model's `max_usd` is a cumulative cap across tier-test runs. Delete that file to reset it.
 - `random_program:40` gets the same number of proposals as a model arm (5 rounds × 8) and is
   the fair control per proposal. `random_program:2000` is the control per unit of compute.
-- Add `--ranker granite-tiny` to have Granite order each round's proposals.
+- Add `--ranker granite` to have Granite order each round's proposals.
 - Read `reports\tier1\tiertest.md`. A model arm "wins" only if its recall clearly beats
   `random_program:40` (non-overlapping CIs, or the same result over several seeds via
   `--seed`) and is reasonable per dollar compared with `baseline` and `random_program:2000`.
