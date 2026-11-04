@@ -1,6 +1,6 @@
 # Overnight run 20261104-0949
 
-Started 2026-11-04 09:49:00, updated 2026-11-04 13:18:12, status **running**. Jobs: pending 3, done 58, blocked 15
+Started 2026-11-04 09:49:00, updated 2026-11-04 13:33:58, status **running**. Jobs: pending 2, done 59, blocked 15
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -77,7 +77,7 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 13:18:12, status **running**. Jo
 | sup1/19 | done | 2026-11-04 13:02:19 | 2026-11-04 13:03:50 | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
 | sup1/20 | done | 2026-11-04 13:04:05 | 2026-11-04 13:16:20 | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
 | sup1/21 | done | 2026-11-04 13:16:42 | 2026-11-04 13:18:12 | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
-| sup1/22 | pending |  |  | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
+| sup1/22 | done | 2026-11-04 13:18:28 | 2026-11-04 13:33:58 | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
 | sup1/24 | pending |  |  | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
 | sup1/25 | pending |  |  | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
 
@@ -201,14 +201,16 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 13:18:12, status **running**. Jo
   - LP2:50.jpg/2-56.jpg/1: 7654 attempts, 16 hypotheses, **0 final pass(es)**
 - **sup1/21** (done)
   - LP2:56.jpg/2: 2652 attempts, 24 hypotheses, **0 final pass(es)**
+- **sup1/22** (done)
+  - LP2:57.jpg-66.jpg/1: 11228 attempts, 23 hypotheses, **0 final pass(es)**
 
 ## Model usage
 
 - qwen-local: 84 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 84 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 202 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-sonnet: 202 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-supervisor: 202 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-opus: 206 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-sonnet: 206 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-supervisor: 206 call(s) in the last 5h (cap 550), spent $0.0000
 - codex: 81 call(s) in the last 5h (cap 750), spent $0.0000
 
 ## Supervisor notes
@@ -242,13 +244,6 @@ Prefer the longer sections (1000+ runes). On short ones (91 and 121 runes) noise
 
 ## Events
 
-- 2026-11-04 12:45:49 sup1/18 waiting: claude-plan in use by sup1/17
-- 2026-11-04 12:50:49 sup1/17: running 5 min | 12:49:40 [model] claude-opus (proposer) ok 7.9s, tokens in/out 4240/734, reply 1569 chars
-- 2026-11-04 12:55:49 sup1/17: running 10 min | 12:53:24 [model] claude-opus (proposer) ok 11.6s, tokens in/out 4827/739, reply 1534 chars
-- 2026-11-04 12:55:54 sup1/17: done (exit 0, 10 min)
-- 2026-11-04 12:56:09 published: 54 file(s) to branch results
-- 2026-11-04 12:56:19 supervisor: note: 12:56 check: the run is healthy. sup1/17 finished: 9.2k attempts on the 1021-rune section and 0 final passes, with no near misses. sup1/18 is next on claude-plan. There are still 0 final passes across about 53 finished jobs. The new cipher families tried by sup1 (sequences with non-trivial mult/a...
-- 2026-11-04 12:56:19 sup1/18: start (uses claude-plan)
 - 2026-11-04 12:56:19 sup1/19 waiting: claude-plan in use by sup1/18
 - 2026-11-04 13:01:19 sup1/18: running 5 min | 13:00:19 [model] claude-opus (proposer) ok 8.3s, tokens in/out 5073/703, reply 1481 chars
 - 2026-11-04 13:02:04 sup1/18: done (exit 0, 6 min)
@@ -267,3 +262,10 @@ Prefer the longer sections (1000+ runes). On short ones (91 and 121 runes) noise
 - 2026-11-04 13:16:42 sup1/21: start (uses claude-plan)
 - 2026-11-04 13:16:42 sup1/22 waiting: claude-plan in use by sup1/21
 - 2026-11-04 13:18:12 sup1/21: done (exit 0, 2 min)
+- 2026-11-04 13:18:28 published: 58 file(s) to branch results
+- 2026-11-04 13:18:28 sup1/22: start (uses claude-plan)
+- 2026-11-04 13:18:28 sup1/24 waiting: claude-plan in use by sup1/22
+- 2026-11-04 13:23:28 sup1/22: running 5 min | 13:22:06 [model] claude-opus (proposer) ok 8.6s, tokens in/out 4207/682, reply 1465 chars
+- 2026-11-04 13:28:28 sup1/22: running 10 min | 13:28:23 [model] claude-opus (proposer) ok 15.6s, tokens in/out 5218/755, reply 1617 chars
+- 2026-11-04 13:33:28 sup1/22: running 15 min | 13:28:23 [model] claude-opus (proposer) ok 15.6s, tokens in/out 5218/755, reply 1617 chars
+- 2026-11-04 13:33:58 sup1/22: done (exit 0, 16 min)
