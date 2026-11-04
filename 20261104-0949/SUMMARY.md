@@ -1,6 +1,6 @@
 # Overnight run 20261104-0949
 
-Started 2026-11-04 09:49:00, updated 2026-11-04 11:04:59, status **running**. Jobs: pending 31, running 2, done 28
+Started 2026-11-04 09:49:00, updated 2026-11-04 11:05:15, status **running**. Jobs: pending 31, running 1, done 29
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -27,7 +27,7 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 11:04:59, status **running**. Jo
 | codex/20 | done | 2026-11-04 10:25:24 | 2026-11-04 10:39:11 | Codex (exploratory) |
 | codex/19 | done | 2026-11-04 10:39:26 | 2026-11-04 10:43:17 | Codex (exploratory) |
 | codex/18 | done | 2026-11-04 10:43:33 | 2026-11-04 10:54:10 | Codex (exploratory) |
-| codex/17 | running | 2026-11-04 10:54:26 |  | Codex (exploratory) |
+| codex/17 | done | 2026-11-04 10:54:26 | 2026-11-04 11:05:15 | Codex (exploratory) |
 | codex/16 | pending |  |  | Codex (exploratory) |
 | codex/15 | pending |  |  | Codex (exploratory) |
 | codex/14 | pending |  |  | Codex (exploratory) |
@@ -68,23 +68,8 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 11:04:59, status **running**. Jo
 
 ## Now running
 
-**codex/17** (since 2026-11-04 10:54:26), latest log lines:
-```
-10:57:54 [model] codex (proposer) calling...
-10:58:18 [model] codex (proposer) ok 24.0s, tokens in/out 17865/739, reply 2152 chars
-round 3 [codex] proposals=8 valid=8 attempts=14193 passes=0 near=0 invalid=0
-10:59:29 [model] codex (proposer) calling...
-10:59:42 [model] codex (proposer) ok 12.6s, tokens in/out 18801/439, reply 1625 chars
-round 4 [codex] proposals=8 valid=8 attempts=18273 passes=0 near=0 invalid=0
-11:01:01 [model] codex (proposer) calling...
-11:01:23 [model] codex (proposer) ok 22.4s, tokens in/out 19173/541, reply 1679 chars
-round 5 [codex] proposals=8 valid=8 attempts=24315 passes=0 near=0 invalid=0
-11:04:36 [model] codex (proposer) calling...
-```
 **local/25** (since 2026-11-04 11:02:59), latest log lines:
 ```
-11:04:16 [model] gemma-local (proposer) ok 15.8s, tokens in/out 2833/480, reply 1510 chars
-round 2 [qwen-local] proposals=8 valid=8 attempts=14 passes=0 near=0 invalid=0
 round 2 [gemma-local] proposals=8 valid=8 attempts=54 passes=0 near=0 invalid=1
 11:04:16 [model] qwen-local (proposer) calling...
 11:04:34 [model] qwen-local (proposer) ok 18.0s, tokens in/out 3067/527, reply 1796 chars
@@ -93,6 +78,8 @@ round 2 [gemma-local] proposals=8 valid=8 attempts=54 passes=0 near=0 invalid=1
 round 3 [qwen-local] proposals=8 valid=8 attempts=18 passes=0 near=0 invalid=0
 round 3 [gemma-local] proposals=8 valid=8 attempts=65 passes=0 near=0 invalid=1
 11:04:50 [model] qwen-local (proposer) calling...
+11:05:10 [model] qwen-local (proposer) ok 20.4s, tokens in/out 3235/617, reply 1991 chars
+11:05:10 [model] gemma-local (proposer) calling...
 ```
 
 ## Results so far
@@ -129,6 +116,8 @@ round 3 [gemma-local] proposals=8 valid=8 attempts=65 passes=0 near=0 invalid=1
   - LP2:33.jpg - 50.jpg/1: 30254 attempts, 47 hypotheses, **0 final pass(es)** (caution: short section (91 runes): many keys give plausible-looking text this short; treat any lead with extra caution)
 - **codex/18** (done)
   - LP2:- - 44.jpg-49.jpg: 28364 attempts, 48 hypotheses, **0 final pass(es)**
+- **codex/17** (done)
+  - LP2:- - 40.jpg-43.jpg: 30353 attempts, 48 hypotheses, **0 final pass(es)**
 - **local/17** (done)
   - LP2:- - 40.jpg-43.jpg: 298 attempts, 82 hypotheses, **0 final pass(es)**
 - **local/18** (done)
@@ -158,12 +147,12 @@ round 3 [gemma-local] proposals=8 valid=8 attempts=65 passes=0 near=0 invalid=1
 
 ## Model usage
 
-- qwen-local: 75 call(s) in the last 5h (cap none), spent $0.0000
+- qwen-local: 76 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 75 call(s) in the last 5h (cap none), spent $0.0000
 - claude-opus: 93 call(s) in the last 5h (cap 550), spent $0.0000
 - claude-sonnet: 93 call(s) in the last 5h (cap 550), spent $0.0000
 - claude-supervisor: 93 call(s) in the last 5h (cap 550), spent $0.0000
-- codex: 47 call(s) in the last 5h (cap 750), spent $0.0000
+- codex: 48 call(s) in the last 5h (cap 750), spent $0.0000
 
 ## Supervisor notes
 
@@ -176,8 +165,6 @@ round 3 [gemma-local] proposals=8 valid=8 attempts=65 passes=0 near=0 invalid=1
 
 ## Events
 
-- 2026-11-04 10:51:00 sonnet/17 waiting: claude-plan in use by sonnet/16
-- 2026-11-04 10:53:10 sonnet/16: running 5 min | 10:52:29 [model] claude-sonnet (proposer) ok 7.9s, tokens in/out 5481/841, reply 1796 chars
 - 2026-11-04 10:53:35 codex/18: running 10 min | 10:52:20 [model] codex (proposer) ok 19.2s, tokens in/out 19375/500, reply 1578 chars
 - 2026-11-04 10:54:10 codex/18: done (exit 0, 11 min)
 - 2026-11-04 10:54:26 published: 27 file(s) to branch results
@@ -201,3 +188,5 @@ round 3 [gemma-local] proposals=8 valid=8 attempts=65 passes=0 near=0 invalid=1
 - 2026-11-04 11:03:14 sonnet/16: running 15 min | 11:02:31 [model] claude-sonnet (proposer) ok 10.6s, tokens in/out 7183/878, reply 1960 chars
 - 2026-11-04 11:04:29 codex/17: running 10 min | 11:01:23 [model] codex (proposer) ok 22.4s, tokens in/out 19173/541, reply 1679 chars
 - 2026-11-04 11:04:59 sonnet/16: done (exit 0, 17 min)
+- 2026-11-04 11:05:15 published: 30 file(s) to branch results
+- 2026-11-04 11:05:15 codex/17: done (exit 0, 11 min)
