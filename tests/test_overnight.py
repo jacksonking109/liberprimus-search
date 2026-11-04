@@ -258,7 +258,8 @@ def test_log_tail_skips_warning_noise(tmp_path):
     from lpswarm.overnight import _log_tail
     p = tmp_path / "job.log"
     p.write_text("round 1 [codex] proposals=8\nC:\\x\\router.py:106: UserWarning: prices are 0\n"
-                 "  return cls(load_model_specs(path), ledger=ledger, **kw)\n\n", encoding="utf-8")
+                 "  return cls(load_model_specs(path), ledger=ledger, **kw)\n"
+                 "  r = cls(load_model_specs(path), ledger=ledger, **kw)\n\n", encoding="utf-8")
     assert _log_tail(p, 3) == ["round 1 [codex] proposals=8"]
 
 

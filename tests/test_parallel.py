@@ -262,3 +262,28 @@ def test_blocked_jobs_are_reported_once(tmp_path, capsys):
     out = capsys.readouterr().out
     assert out.count("prices are 0") == 1 and "blocked 3 jobs (u/0 ... u/2)" in out
     assert all(j["status"] == "blocked" and "prices are 0" in j["reason"] for j in st["jobs"])
+
+
+def test_job_env_mutes_the_prices_warning(tmp_path):
+    import subprocess as sp
+    from lpswarm.router.router import PRICES_ZERO_WARNING
+    run = _night(tmp_path, ["a"], sleep_s=0, progress=False)
+    seen = {}
+    real = sp.Popen
+
+    def spy(cmd, **kw):
+        seen["env"] = kw["env"]
+        return real(cmd, **kw)
+    import lpswarm.overnight as ov
+    ov.subprocess.Popen = spy
+    try:
+        run.run()
+    finally:
+        ov.subprocess.Popen = real
+    assert f"ignore:{PRICES_ZERO_WARNING}" in seen["env"]["PYTHONWARNINGS"]
+    # and the filter really matches the warning text
+    code = ("import warnings; from lpswarm.router import Router, ModelSpec, Role;"
+            "Router([ModelSpec('ds','openai_compatible','m',(Role.PROPOSER,),endpoint='https://x.invalid',"
+            "max_usd=1.0)], ledger=__import__('lpswarm.ledger',fromlist=['Ledger']).Ledger())")
+    out = sp.run([sys.executable, "-c", code], env=seen["env"], capture_output=True, text=True)
+    assert out.returncode == 0 and "prices are 0" not in out.stderr

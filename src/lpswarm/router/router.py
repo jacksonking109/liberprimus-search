@@ -26,6 +26,7 @@ class BudgetExceeded(RuntimeError):
 
 
 SUBSCRIPTION_PROVIDERS = ("claude_code", "codex")
+PRICES_ZERO_WARNING = "max_usd is set but prices are 0"
 
 
 def backend_key(spec: ModelSpec) -> str:
@@ -118,9 +119,10 @@ class Router:
         for s in specs:
             if (s.provider == "openai_compatible" and s.max_usd is not None
                     and not s.extra.get("price_in_per_mtok") and not s.extra.get("price_out_per_mtok")):
-                warnings.warn(f"model {s.name}: max_usd is set but prices are 0, so spend is "
-                              "recorded as $0 and the cap can never trigger; fill in "
-                              "price_in_per_mtok / price_out_per_mtok", stacklevel=2)
+                # The text starts with PRICES_ZERO_WARNING so `-W ignore:<prefix>` can mute it.
+                warnings.warn(f"{PRICES_ZERO_WARNING} (model {s.name}), so spend is recorded as "
+                              "$0 and the cap can never trigger; fill in price_in_per_mtok / "
+                              "price_out_per_mtok", stacklevel=2)
             ad = (adapters or {}).get(s.name) or make_adapter(s)
             self._models[s.name] = _Entry(s, ad)
 

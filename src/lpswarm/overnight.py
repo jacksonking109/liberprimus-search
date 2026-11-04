@@ -465,8 +465,12 @@ class Overnight:
         cmd = self.job_command(job)
         kw: dict = {"creationflags": subprocess.CREATE_NEW_PROCESS_GROUP} if os.name == "nt" \
             else {"start_new_session": True}
+        from lpswarm.router.router import PRICES_ZERO_WARNING
+        # The prices-are-0 warning is shown once in the main window; not again per job.
+        warn = ",".join(x for x in (os.environ.get("PYTHONWARNINGS", ""),
+                                    f"ignore:{PRICES_ZERO_WARNING}") if x)
         env = dict(os.environ, LPSWARM_LOG_CALLS="1", PYTHONUNBUFFERED="1", PYTHONIOENCODING="utf-8",
-                   LPSWARM_TRANSCRIPT=str(d / "transcript.jsonl"))
+                   PYTHONWARNINGS=warn, LPSWARM_TRANSCRIPT=str(d / "transcript.jsonl"))
         log_path = d / "job.log"
         logf = log_path.open("a", encoding="utf-8")
         logf.write(f"\n===== {_now()} {' '.join(cmd)}\n")
@@ -536,8 +540,7 @@ class Overnight:
         text = r.partial + data.decode("utf-8", errors="replace")
         lines = text.split("\n")
         r.partial = lines.pop()          # an unfinished last line waits for the next poll
-        lines = [x.rstrip() for x in lines if x.strip() and "UserWarning" not in x
-                 and not x.lstrip().startswith("return cls(")]
+        lines = [x.rstrip() for x in lines if x.strip() and not _noise(x)]
         extra = len(lines) - self.echo_max_lines
         if extra > 0:
             lines = lines[:self.echo_max_lines // 2] + [f"... (+{extra} more lines in job.log)"] \
@@ -859,6 +862,11 @@ def publish_results(run_dir: Path, branch: str = "results", repo: str | Path = "
     return f"{copied} file(s) to branch {branch}"
 
 
+def _noise(line: str) -> bool:
+    """Python warning output in a job log: the warning line and the source line after it."""
+    return "UserWarning" in line or "load_model_specs(" in line
+
+
 def _echo(line: str) -> None:
     try:
         print(line, flush=True)
@@ -878,7 +886,7 @@ def _log_tail(path: Path, n: int) -> list[str]:
     except OSError:
         return []
     lines = [x.rstrip() for x in text.splitlines() if x.strip()]
-    lines = [x for x in lines if "UserWarning" not in x and not x.lstrip().startswith("return cls(")]
+    lines = [x for x in lines if not _noise(x)]
     return [x[:200] for x in lines[-n:]]
 
 
