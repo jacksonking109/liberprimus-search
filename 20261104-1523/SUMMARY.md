@@ -1,6 +1,6 @@
 # Overnight run 20261104-1523
 
-Started 2026-11-04 15:23:11, updated 2026-11-04 17:40:26, status **running**. Jobs: pending 13, running 1, done 48
+Started 2026-11-04 15:23:11, updated 2026-11-04 17:40:47, status **running**. Jobs: pending 12, running 1, done 49
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -55,7 +55,7 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 17:40:26, status **running**. Jo
 | deepseek/12 | done | 2026-11-04 17:35:59 | 2026-11-04 17:37:05 | DeepSeek (volume) |
 | deepseek/13 | done | 2026-11-04 17:37:21 | 2026-11-04 17:39:01 | DeepSeek (volume) |
 | deepseek/14 | done | 2026-11-04 17:39:16 | 2026-11-04 17:40:26 | DeepSeek (volume) |
-| deepseek/15 | pending |  | 2026-11-04 16:54:25 | retry requested |
+| deepseek/15 | done | 2026-11-04 17:40:42 | 2026-11-04 17:40:47 | DeepSeek (volume) |
 | deepseek/16 | pending |  | 2026-11-04 16:54:25 | retry requested |
 | deepseek/17 | pending |  | 2026-11-04 16:54:25 | retry requested |
 | deepseek/18 | pending |  | 2026-11-04 16:54:25 | retry requested |
@@ -183,6 +183,8 @@ round 2 [claude-sonnet] proposals=12 valid=9 attempts=1986 passes=0 near=0 inval
   - LP2:6.jpg/2-7.jpg - 23.jpg/2-24.jpg: 24432 attempts, 53 hypotheses, **0 final pass(es)**
 - **deepseek/14** (done)
   - LP2:8.jpg-14.jpg - 25.jpg-31.jpg: 22725 attempts, 44 hypotheses, **0 final pass(es)**
+- **deepseek/15** (done)
+  - skip LP2:15.jpg/1 - 32.jpg/1: only 9 symbols (minimum 20, --min-length); too short to judge
 
 ## Model usage
 
@@ -206,10 +208,6 @@ round 2 [claude-sonnet] proposals=12 valid=9 attempts=1986 passes=0 near=0 inval
 
 ## Events
 
-- 2026-11-04 17:32:18 2 running: sonnet/21, deepseek/10
-- 2026-11-04 17:32:18 sonnet/22 waiting: claude-plan in use by sonnet/21
-- 2026-11-04 17:32:33 supervisor: note: 17:32 check: the run resumed after the STOP file at 17:16, and there are still no final passes in any section. --retry-failed put the 15 blocked deepseek jobs back to pending, and deepseek/10 has started. If the models config still has the literal key (sk-150a...) where the environment variable n...
-- 2026-11-04 17:34:33 deepseek/10: done (exit 0, 2 min)
 - 2026-11-04 17:34:49 published: 44 file(s) to branch results
 - 2026-11-04 17:34:49 deepseek/11: start (uses api:https://api.deepseek.com)
 - 2026-11-04 17:34:49 2 running: sonnet/21, deepseek/11
@@ -231,3 +229,7 @@ round 2 [claude-sonnet] proposals=12 valid=9 attempts=1986 passes=0 near=0 inval
 - 2026-11-04 17:39:16 deepseek/14: start (uses api:https://api.deepseek.com)
 - 2026-11-04 17:39:16 2 running: sonnet/22, deepseek/14
 - 2026-11-04 17:40:26 deepseek/14: done (exit 0, 1 min)
+- 2026-11-04 17:40:42 published: 49 file(s) to branch results
+- 2026-11-04 17:40:42 deepseek/15: start (uses api:https://api.deepseek.com)
+- 2026-11-04 17:40:42 2 running: sonnet/22, deepseek/15
+- 2026-11-04 17:40:47 deepseek/15: done (exit 0, 0 min)
