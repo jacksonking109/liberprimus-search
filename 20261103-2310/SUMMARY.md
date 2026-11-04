@@ -1,6 +1,6 @@
 # Overnight run 20261103-2310
 
-Started 2026-11-03 23:10:06, updated 2026-11-04 00:22:25, status **running**. Jobs: pending 34, running 1, done 27
+Started 2026-11-03 23:10:06, updated 2026-11-04 00:26:43, status **running**. Jobs: pending 32, running 2, done 28
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -28,7 +28,7 @@ Started 2026-11-03 23:10:06, updated 2026-11-04 00:22:25, status **running**. Jo
 | codex/19 | done | 2026-11-03 23:57:35 | 2026-11-04 00:00:55 | Codex (exploratory) |
 | codex/18 | done | 2026-11-04 00:01:11 | 2026-11-04 00:10:36 | Codex (exploratory) |
 | codex/17 | done | 2026-11-04 00:10:51 | 2026-11-04 00:22:10 | Codex (exploratory) |
-| codex/16 | pending |  |  | Codex (exploratory) |
+| codex/16 | running | 2026-11-04 00:22:27 |  | Codex (exploratory) |
 | codex/15 | pending |  |  | Codex (exploratory) |
 | codex/14 | pending |  |  | Codex (exploratory) |
 | codex/13 | pending |  |  | Codex (exploratory) |
@@ -47,7 +47,7 @@ Started 2026-11-03 23:10:06, updated 2026-11-04 00:22:25, status **running**. Jo
 | local/22 | done | 2026-11-04 00:02:22 | 2026-11-04 00:10:07 | local models |
 | local/12 | done | 2026-11-04 00:10:31 | 2026-11-04 00:15:17 | local models |
 | local/24 | done | 2026-11-04 00:15:33 | 2026-11-04 00:22:25 | local models |
-| local/11 | pending |  |  | local models |
+| local/11 | done | 2026-11-04 00:22:27 | 2026-11-04 00:26:43 | local models |
 | local/25 | pending |  |  | local models |
 | local/10 | pending |  |  | local models |
 | deepseek/10 | pending |  |  | DeepSeek (volume) |
@@ -71,9 +71,23 @@ Started 2026-11-03 23:10:06, updated 2026-11-04 00:22:25, status **running**. Jo
 
 **sonnet/16** (since 2026-11-04 00:22:05), latest log lines:
 ```
-===== 2026-11-04 00:22:05 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 16 --gen
+  | - plain constant shifts (Caesar)
+  | - map reverse plus constant (Atbash)
+  | - unskipped Vigenère with a key at offset 0
+  | - sequences only at offset 0
+  | The 211 prior attempts with no near miss suggest these simple cases are exhausted. If anything r
+00:22:26 [model] claude-sonnet (proposer) calling...
+00:22:33 [model] claude-sonnet (proposer) ok 7.0s, tokens in/out 4180/880, reply 1927 chars
+round 1 [claude-sonnet] proposals=8 valid=5 attempts=17 passes=0 near=0 invalid=3
+00:22:47 [model] claude-sonnet (proposer) calling...
+00:23:00 [model] claude-sonnet (proposer) ok 12.6s, tokens in/out 4784/1620, reply 2008 chars
+```
+**codex/16** (since 2026-11-04 00:22:27), latest log lines:
+```
+===== 2026-11-04 00:22:27 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 16 --gen
 == LP2:15.jpg/2- - 32.jpg/2-39.jpg  (1894 symbols)
-00:22:06 [model] claude-supervisor (supervisor) calling...
+00:22:29 [model] codex (proposer) calling...
+00:22:49 [model] codex (proposer) ok 19.8s, tokens in/out 17045/455, reply 1717 chars
 ```
 
 ## Results so far
@@ -134,16 +148,18 @@ Started 2026-11-03 23:10:06, updated 2026-11-04 00:22:25, status **running**. Jo
   - LP2:20.jpg/2-23.jpg/1 - 3.jpg/2-6.jpg/1: 330 attempts, 87 hypotheses, **0 final pass(es)**
 - **local/24** (done)
   - LP2:51.jpg/2-53.jpg - 68.jpg/2-70.jpg: 174 attempts, 83 hypotheses, **0 final pass(es)**
+- **local/11** (done)
+  - LP2:20.jpg/1 - 3.jpg/1: 220 attempts, 84 hypotheses, **0 final pass(es)**
 
 ## Model usage
 
-- qwen-local: 106 call(s) in the last 5h (cap none), spent $0.0000
-- gemma-local: 106 call(s) in the last 5h (cap none), spent $0.0000
+- qwen-local: 112 call(s) in the last 5h (cap none), spent $0.0000
+- gemma-local: 112 call(s) in the last 5h (cap none), spent $0.0000
 - granite: 2 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 156 call(s) in the last 5h (cap 120), spent $0.0000, paused until 01:45 (local cap, raise max_calls_per_window to allow more)
-- claude-sonnet: 156 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-supervisor: 156 call(s) in the last 5h (cap 200), spent $0.0000
-- codex: 87 call(s) in the last 5h (cap 750), spent $0.0000
+- claude-opus: 159 call(s) in the last 5h (cap 120), spent $0.0000, paused until 01:46 (local cap, raise max_calls_per_window to allow more)
+- claude-sonnet: 159 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-supervisor: 159 call(s) in the last 5h (cap 200), spent $0.0000
+- codex: 88 call(s) in the last 5h (cap 750), spent $0.0000
 - dry: 2 call(s) in the last 5h (cap none), spent $0.0000
 
 ## Supervisor notes
@@ -158,13 +174,6 @@ Started 2026-11-03 23:10:06, updated 2026-11-04 00:22:25, status **running**. Jo
 
 ## Events
 
-- 2026-11-04 00:12:16 sonnet/13: done (exit 0, 12 min)
-- 2026-11-04 00:12:32 published: 25 file(s) to branch results
-- 2026-11-04 00:12:32 sonnet/14: start (uses claude-plan)
-- 2026-11-04 00:12:32 3 running: local/12, codex/17, sonnet/14
-- 2026-11-04 00:15:17 local/12: done (exit 0, 5 min)
-- 2026-11-04 00:15:32 published: 26 file(s) to branch results
-- 2026-11-04 00:15:33 local/24: start (uses ollama:http://127.0.0.1:11434)
 - 2026-11-04 00:15:33 3 running: codex/17, sonnet/14, local/24
 - 2026-11-04 00:15:33 sonnet/15 waiting: claude-plan in use by sonnet/14
 - 2026-11-04 00:15:53 codex/17: running 5 min | 00:15:32 [model] codex (proposer) ok 14.0s, tokens in/out 17675/535, reply 1672 chars
@@ -183,3 +192,10 @@ Started 2026-11-03 23:10:06, updated 2026-11-04 00:22:25, status **running**. Jo
 - 2026-11-04 00:22:10 codex/17: done (exit 0, 11 min)
 - 2026-11-04 00:22:25 published: 29 file(s) to branch results
 - 2026-11-04 00:22:25 local/24: done (exit 0, 7 min)
+- 2026-11-04 00:22:27 published: 29 file(s) to branch results
+- 2026-11-04 00:22:27 codex/16: start (uses codex-plan)
+- 2026-11-04 00:22:27 2 running: sonnet/16, codex/16
+- 2026-11-04 00:22:27 local/11: start (uses ollama:http://127.0.0.1:11434)
+- 2026-11-04 00:22:27 3 running: sonnet/16, codex/16, local/11
+- 2026-11-04 00:22:27 sonnet/17 waiting: claude-plan in use by sonnet/16
+- 2026-11-04 00:26:43 local/11: done (exit 0, 4 min)
