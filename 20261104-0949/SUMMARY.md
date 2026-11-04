@@ -1,6 +1,6 @@
 # Overnight run 20261104-0949
 
-Started 2026-11-04 09:49:00, updated 2026-11-04 11:56:21, status **running**. Jobs: pending 17, running 1, done 43, blocked 15
+Started 2026-11-04 09:49:00, updated 2026-11-04 11:56:56, status **running**. Jobs: pending 16, running 1, done 44, blocked 15
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -18,7 +18,7 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 11:56:21, status **running**. Jo
 | sonnet/20 | done | 2026-11-04 11:29:45 | 2026-11-04 11:38:07 | Sonnet, briefed by Opus |
 | sonnet/21 | done | 2026-11-04 11:38:39 | 2026-11-04 11:40:49 | Sonnet, briefed by Opus |
 | sonnet/22 | done | 2026-11-04 11:51:20 | 2026-11-04 11:56:21 | Sonnet, briefed by Opus |
-| sonnet/24 | pending |  |  | Sonnet, briefed by Opus |
+| sonnet/24 | running | 2026-11-04 11:56:36 |  | Sonnet, briefed by Opus |
 | sonnet/25 | pending |  |  | Sonnet, briefed by Opus |
 | codex/25 | done | 2026-11-04 09:49:00 | 2026-11-04 09:56:14 | Codex (exploratory) |
 | codex/24 | done | 2026-11-04 09:56:29 | 2026-11-04 10:02:45 | Codex (exploratory) |
@@ -34,7 +34,7 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 11:56:21, status **running**. Jo
 | codex/13 | done | 2026-11-04 11:31:01 | 2026-11-04 11:36:01 | Codex (exploratory) |
 | codex/12 | done | 2026-11-04 11:36:17 | 2026-11-04 11:40:34 | Codex (exploratory) |
 | codex/11 | done | 2026-11-04 11:51:20 | 2026-11-04 11:54:10 | Codex (exploratory) |
-| codex/10 | running | 2026-11-04 11:51:20 |  | Codex (exploratory) |
+| codex/10 | done | 2026-11-04 11:51:20 | 2026-11-04 11:56:56 | Codex (exploratory) |
 | local/17 | done | 2026-11-04 09:49:00 | 2026-11-04 09:55:18 | local models |
 | local/18 | done | 2026-11-04 09:55:34 | 2026-11-04 10:05:01 | local models |
 | local/16 | done | 2026-11-04 10:05:16 | 2026-11-04 10:09:57 | local models |
@@ -83,18 +83,11 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 11:56:21, status **running**. Jo
 
 ## Now running
 
-**codex/10** (since 2026-11-04 11:51:20), latest log lines:
+**sonnet/24** (since 2026-11-04 11:56:36), latest log lines:
 ```
-11:53:54 [model] codex (proposer) ok 21.5s, tokens in/out 19026/860, reply 3034 chars
-round 2 [codex] proposals=16 valid=16 attempts=26043 passes=0 near=0 invalid=1
-11:54:00 [model] codex (proposer) calling...
-11:54:24 [model] codex (proposer) ok 23.7s, tokens in/out 19293/947, reply 3052 chars
-round 3 [codex] proposals=16 valid=16 attempts=38066 passes=0 near=0 invalid=1
-11:54:30 [model] codex (proposer) calling...
-11:54:50 [model] codex (proposer) ok 20.5s, tokens in/out 20151/802, reply 2964 chars
-round 4 [codex] proposals=16 valid=16 attempts=48076 passes=0 near=0 invalid=1
-11:54:55 [model] codex (proposer) calling...
-11:55:16 [model] codex (proposer) ok 20.9s, tokens in/out 20178/819, reply 2944 chars
+===== 2026-11-04 11:56:36 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 24 --gen
+== LP2:51.jpg/2-53.jpg - 68.jpg/2-70.jpg  (534 symbols)
+11:56:38 [model] claude-supervisor (supervisor) calling...
 ```
 
 ## Results so far
@@ -157,6 +150,8 @@ round 4 [codex] proposals=16 valid=16 attempts=48076 passes=0 near=0 invalid=1
   - LP2:20.jpg/2-23.jpg/1 - 3.jpg/2-6.jpg/1: 11780 attempts, 20 hypotheses, **0 final pass(es)**, stopped: stop_file
 - **codex/11** (done)
   - LP2:20.jpg/1 - 3.jpg/1: 23039 attempts, 89 hypotheses, **0 final pass(es)**
+- **codex/10** (done)
+  - LP2:17.jpg, 18.jpg, 19.jpg - 0.jpg-2.jpg: 60000 attempts, 89 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **local/17** (done)
   - LP2:- - 40.jpg-43.jpg: 298 attempts, 82 hypotheses, **0 final pass(es)**
 - **local/18** (done)
@@ -195,7 +190,7 @@ round 4 [codex] proposals=16 valid=16 attempts=48076 passes=0 near=0 invalid=1
 - claude-opus: 138 call(s) in the last 5h (cap 550), spent $0.0000
 - claude-sonnet: 138 call(s) in the last 5h (cap 550), spent $0.0000
 - claude-supervisor: 138 call(s) in the last 5h (cap 550), spent $0.0000
-- codex: 80 call(s) in the last 5h (cap 750), spent $0.0000
+- codex: 81 call(s) in the last 5h (cap 750), spent $0.0000
 
 ## Supervisor notes
 
@@ -222,12 +217,6 @@ Prefer the longer sections (1000+ runes). On short ones (91 and 121 runes) noise
 
 ## Events
 
-- 2026-11-04 11:38:07 sonnet/20: done (exit 0, 8 min)
-- 2026-11-04 11:38:22 published: 40 file(s) to branch results
-- 2026-11-04 11:38:39 supervisor: note: 11:38 check: the run is healthy. sonnet/19, sonnet/20, codex/14 and codex/13 have finished, and codex/12 is running. There are still 0 final passes across about 37 finished jobs. The near misses are all at noise level. On section 13, codex hit e_digits sub @1553-1554 with skip [27], and section 1...
-- 2026-11-04 11:38:39 supervisor: added sup1: swarm on 15 section(s) with claude-opus; brief: Most of the swarm's attempts on every section so far have been sub/add/beaufort with primes, prime_totients, e_digits or pi_digits sequences, *1+0, skip [0] resolve, at offsets across about 0-2000. No...
-- 2026-11-04 11:38:39 sonnet/21: start (uses claude-plan)
-- 2026-11-04 11:38:39 2 running: codex/12, sonnet/21
 - 2026-11-04 11:38:39 sonnet/22 waiting: claude-plan in use by sonnet/21
 - 2026-11-04 11:40:34 codex/12: done (exit 0, 4 min)
 - 2026-11-04 11:40:49 published: 42 file(s) to branch results
@@ -247,3 +236,9 @@ Prefer the longer sections (1000+ runes). On short ones (91 and 121 runes) noise
 - 2026-11-04 11:54:10 codex/11: done (exit 0, 3 min)
 - 2026-11-04 11:54:26 published: 43 file(s) to branch results
 - 2026-11-04 11:56:21 sonnet/22: done (exit 0, 5 min)
+- 2026-11-04 11:56:36 published: 44 file(s) to branch results
+- 2026-11-04 11:56:36 codex/10: running 5 min | 11:56:34 [model] codex (proposer) calling...
+- 2026-11-04 11:56:36 sonnet/24: start (uses claude-plan)
+- 2026-11-04 11:56:36 2 running: codex/10, sonnet/24
+- 2026-11-04 11:56:36 sonnet/25 waiting: claude-plan in use by sonnet/24
+- 2026-11-04 11:56:56 codex/10: done (exit 0, 6 min)
