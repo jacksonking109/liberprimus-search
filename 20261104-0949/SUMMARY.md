@@ -1,6 +1,6 @@
 # Overnight run 20261104-0949
 
-Started 2026-11-04 09:49:00, updated 2026-11-04 10:47:24, status **running**. Jobs: pending 37, running 2, done 22
+Started 2026-11-04 09:49:00, updated 2026-11-04 10:47:54, status **running**. Jobs: pending 36, running 2, done 23
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -10,7 +10,7 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 10:47:24, status **running**. Jo
 | sonnet/12 | done | 2026-11-04 10:18:53 | 2026-11-04 10:37:20 | Sonnet, briefed by Opus |
 | sonnet/13 | done | 2026-11-04 10:37:36 | 2026-11-04 10:41:22 | Sonnet, briefed by Opus |
 | sonnet/14 | done | 2026-11-04 10:41:37 | 2026-11-04 10:47:24 | Sonnet, briefed by Opus |
-| sonnet/15 | pending |  |  | Sonnet, briefed by Opus |
+| sonnet/15 | done | 2026-11-04 10:47:49 | 2026-11-04 10:47:54 | Sonnet, briefed by Opus |
 | sonnet/16 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/17 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/18 | pending |  |  | Sonnet, briefed by Opus |
@@ -79,6 +79,7 @@ round 1 [codex] proposals=8 valid=8 attempts=6046 passes=0 near=0 invalid=0
 10:47:04 [model] codex (proposer) ok 22.2s, tokens in/out 18041/395, reply 1559 chars
 round 2 [codex] proposals=8 valid=8 attempts=10114 passes=0 near=0 invalid=0
 10:47:08 [model] codex (proposer) calling...
+10:47:25 [model] codex (proposer) ok 16.8s, tokens in/out 18413/472, reply 1613 chars
 ```
 **local/12** (since 2026-11-04 10:44:03), latest log lines:
 ```
@@ -110,6 +111,8 @@ round 2 [gemma-local] proposals=8 valid=8 attempts=92 passes=0 near=0 invalid=1
   - LP2:6.jpg/2-7.jpg - 23.jpg/2-24.jpg: 16277 attempts, 34 hypotheses, **0 final pass(es)**
 - **sonnet/14** (done)
   - LP2:8.jpg-14.jpg - 25.jpg-31.jpg: 23048 attempts, 41 hypotheses, **0 final pass(es)**
+- **sonnet/15** (done)
+  - skip LP2:15.jpg/1 - 32.jpg/1: only 9 symbols (minimum 20, --min-length); too short to judge
 - **codex/25** (done)
   - LP2:54.jpg-55.jpg - 71.jpg-72.jpg: 30269 attempts, 47 hypotheses, **0 final pass(es)**
 - **codex/24** (done)
@@ -147,10 +150,10 @@ round 2 [gemma-local] proposals=8 valid=8 attempts=92 passes=0 near=0 invalid=1
 
 - qwen-local: 57 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 57 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 84 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-sonnet: 84 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-supervisor: 84 call(s) in the last 5h (cap 550), spent $0.0000
-- codex: 38 call(s) in the last 5h (cap 750), spent $0.0000
+- claude-opus: 85 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-sonnet: 85 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-supervisor: 85 call(s) in the last 5h (cap 550), spent $0.0000
+- codex: 39 call(s) in the last 5h (cap 750), spent $0.0000
 
 ## Supervisor notes
 
@@ -158,14 +161,10 @@ round 2 [gemma-local] proposals=8 valid=8 attempts=92 passes=0 near=0 invalid=1
 - 2026-11-04 10:14:06: 10:14 check: the run is healthy at 7 of 61 jobs done, with 2 running. There are no final passes yet. The tier-claude benchmark has finished: opus recall 0.33 (2/6), sonnet 0.33 (2/6), random control 0.00. This corrects my 10:03 note, which gave sonnet 0.50 from an incomplete count. sonnet/10 on section 10 made 20k attempts and produced 0 final passes and no near misses. The section 25 near misses are still at noise level. The queue covers every section, so I added no jobs.
 - 2026-11-04 10:25:24: 10:25 check: the run is healthy. codex/21 and codex/22 have finished, and local/14 and sonnet/12 are running. There are still 0 final passes across all sections done so far. The near misses on sections 11, 21, 22 and 25 are at noise level. They are mostly prime/prime_totients/e_digits sub with skip [0] resolve, and they don't point at any one key. The local models make few attempts per job (about 130 to 300) next to sonnet/codex (20k to 35k). Pending codex/deepseek/local jobs still cover every section, so I added no jobs.
 - 2026-11-04 10:36:15: 10:36 check: the run is healthy. local/13, local/14 and local/21 have finished, and sonnet/12 and codex/20 are running. Pending local and deepseek jobs cover the remaining sections. Every section done so far has 0 final passes. The near misses (sub with primes/prime_totients/e_digits, skip [0] resolve) are all at noise level and don't settle on any one key or offset. The local models still make very few attempts per job (about 130 to 300) compared with sonnet/codex (20k to 35k). sonnet/12 had 6 of 8 proposals invalid in round 4, but it recovered in round 5. I added no jobs because the queue already covers every section.
+- 2026-11-04 10:47:49: 10:47 check: the run is healthy. sonnet/14 has finished, and codex/18 and local/12 are running. There are still 0 final passes across about 22 finished jobs. New near misses on section 19 (primes sub @1605-1607 with skip [0,7]) cluster tightly, but they are noise level on a 91-rune section, so I don't count them as a lead. The other near misses repeat the earlier pattern (primes/prime_totients/e_digits sub, skip [0] resolve) and don't settle on any one key. Pending deepseek/local/codex jobs still cover the remaining sections, so I added no jobs.
 
 ## Events
 
-- 2026-11-04 10:37:36 published: 20 file(s) to branch results
-- 2026-11-04 10:37:36 sonnet/13: start (uses claude-plan)
-- 2026-11-04 10:37:36 3 running: codex/20, local/22, sonnet/13
-- 2026-11-04 10:39:11 codex/20: done (exit 0, 14 min)
-- 2026-11-04 10:39:26 published: 21 file(s) to branch results
 - 2026-11-04 10:39:26 codex/19: start (uses codex-plan)
 - 2026-11-04 10:39:26 3 running: local/22, sonnet/13, codex/19
 - 2026-11-04 10:39:26 sonnet/14 waiting: claude-plan in use by sonnet/13
@@ -186,3 +185,8 @@ round 2 [gemma-local] proposals=8 valid=8 attempts=92 passes=0 near=0 invalid=1
 - 2026-11-04 10:44:03 sonnet/15 waiting: claude-plan in use by sonnet/14
 - 2026-11-04 10:46:38 sonnet/14: running 5 min | 10:45:07 [model] claude-sonnet (proposer) ok 13.7s, tokens in/out 5300/846, reply 1836 chars
 - 2026-11-04 10:47:24 sonnet/14: done (exit 0, 6 min)
+- 2026-11-04 10:47:39 published: 25 file(s) to branch results
+- 2026-11-04 10:47:49 supervisor: note: 10:47 check: the run is healthy. sonnet/14 has finished, and codex/18 and local/12 are running. There are still 0 final passes across about 22 finished jobs. New near misses on section 19 (primes sub @1605-1607 with skip [0,7]) cluster tightly, but they are noise level on a 91-rune section, so I ...
+- 2026-11-04 10:47:49 sonnet/15: start (uses claude-plan)
+- 2026-11-04 10:47:49 3 running: codex/18, local/12, sonnet/15
+- 2026-11-04 10:47:54 sonnet/15: done (exit 0, 0 min)
