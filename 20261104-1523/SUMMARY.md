@@ -1,6 +1,6 @@
 # Overnight run 20261104-1523
 
-Started 2026-11-04 15:23:11, updated 2026-11-04 16:01:55, status **running**. Jobs: pending 40, running 3, done 18
+Started 2026-11-04 15:23:11, updated 2026-11-04 16:02:16, status **running**. Jobs: pending 39, running 3, done 19
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -10,7 +10,7 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 16:01:55, status **running**. Jo
 | sonnet/12 | done | 2026-11-04 15:44:52 | 2026-11-04 15:49:24 | Sonnet, briefed by Opus |
 | sonnet/13 | done | 2026-11-04 15:49:40 | 2026-11-04 15:51:10 | Sonnet, briefed by Opus |
 | sonnet/14 | done | 2026-11-04 15:51:25 | 2026-11-04 16:01:55 | Sonnet, briefed by Opus |
-| sonnet/15 | pending |  |  | Sonnet, briefed by Opus |
+| sonnet/15 | done | 2026-11-04 16:02:11 | 2026-11-04 16:02:16 | Sonnet, briefed by Opus |
 | sonnet/16 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/17 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/18 | pending |  |  | Sonnet, briefed by Opus |
@@ -70,8 +70,6 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 16:01:55, status **running**. Jo
 
 **codex/18** (since 2026-11-04 15:54:33), latest log lines:
 ```
-15:54:55 [model] claude-supervisor (supervisor) ok 19.8s, tokens in/out 3389/1453, reply 2321 chars
-brief from claude-supervisor (2000 chars):
   | 1. Ciphertext autokey, primer length 1 to 4. Use {"kind":"autokey","source":"ciphertext"} with combine sub, add and beaufort, under both map identity and map reverse. Try primers [0] through [28] 
   | 2. Prime totient stream with F handled as a literal. Use sequence prime_totients with combine sub and also beaufort. Set offset_range [0,2000], skip [0] and skip_mode "resolve". Repeat with map re
   | 3. Other sequences with scaling. Use primes, fibonacci, pi_digits, e_digits, squares and triangular. Use scale 1, 2 and -1 (written as 28) and add values 0 to 28. Use offset_range [0,1500] and com
@@ -80,6 +78,8 @@ brief from claude-supervisor (2000 chars):
   | 6. reverse_text: true combined with directions 1 and 2. The scheme may have been run from the end of the section.
 15:54:55 [model] codex (proposer) calling...
 15:55:22 [model] codex (proposer) ok 27.0s, tokens in/out 17627/1090, reply 3487 chars, model not reported (pin one with model = "..." in the models config)
+round 1 [codex] proposals=16 valid=16 attempts=9525 passes=0 near=0 invalid=0
+16:02:00 [model] codex (proposer) calling...
 ```
 **codex/17** (since 2026-11-04 16:00:20), latest log lines:
 ```
@@ -124,6 +124,8 @@ round 2 [qwen-local] proposals=8 valid=6 attempts=353 passes=0 near=0 invalid=3
   - LP2:6.jpg/2-7.jpg - 23.jpg/2-24.jpg: 22 attempts, 10 hypotheses, **0 final pass(es)**
 - **sonnet/14** (done)
   - LP2:8.jpg-14.jpg - 25.jpg-31.jpg: 34302 attempts, 69 hypotheses, **0 final pass(es)**
+- **sonnet/15** (done)
+  - skip LP2:15.jpg/1 - 32.jpg/1: only 9 symbols (minimum 20, --min-length); too short to judge
 - **codex/25** (done)
   - LP2:54.jpg-55.jpg - 71.jpg-72.jpg: 60000 attempts, 57 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **codex/24** (done)
@@ -152,7 +154,7 @@ round 2 [qwen-local] proposals=8 valid=6 attempts=353 passes=0 near=0 invalid=3
 ## Model usage
 
 - qwen-local: 45 call(s) in the last 5h (cap none), spent $0.0000
-- gemma-local: 46 call(s) in the last 5h (cap none), spent $0.0000
+- gemma-local: 45 call(s) in the last 5h (cap none), spent $0.0000
 - claude-opus: 213 call(s) in the last 5h (cap 550), spent $0.0000
 - claude-sonnet: 213 call(s) in the last 5h (cap 550), spent $0.0000
 - claude-supervisor: 213 call(s) in the last 5h (cap 550), spent $0.0000
@@ -164,10 +166,6 @@ round 2 [qwen-local] proposals=8 valid=6 attempts=353 passes=0 near=0 invalid=3
 
 ## Events
 
-- 2026-11-04 15:52:51 published: 17 file(s) to branch results
-- 2026-11-04 15:52:52 local/20: start (uses ollama:http://127.0.0.1:11434)
-- 2026-11-04 15:52:52 4 running: codex/20, codex/19, sonnet/14, local/20
-- 2026-11-04 15:54:12 codex/19: done (exit 0, 5 min)
 - 2026-11-04 15:54:27 published: 18 file(s) to branch results
 - 2026-11-04 15:54:33 supervisor: note: 15:54 check: no final passes yet in any section. Many codex, local and deepseek jobs are still pending, so I added no jobs. Two things to look at: (1) sonnet/13 on LP2:6.jpg/2-7.jpg - 23.jpg/2-24.jpg (333 runes) made only 22 attempts from 10 hypotheses, far fewer than other jobs, so its proposals...
 - 2026-11-04 15:54:33 codex/18: start (uses codex-plan)
@@ -189,3 +187,7 @@ round 2 [qwen-local] proposals=8 valid=6 attempts=353 passes=0 near=0 invalid=3
 - 2026-11-04 16:00:20 sonnet/15 waiting: claude-plan in use by sonnet/14
 - 2026-11-04 16:01:30 sonnet/14: running 10 min | 16:00:06 [model] claude-sonnet (proposer) ok 18.2s, tokens in/out 6792/1811, reply 2415 chars
 - 2026-11-04 16:01:55 sonnet/14: done (exit 0, 10 min)
+- 2026-11-04 16:02:10 published: 21 file(s) to branch results
+- 2026-11-04 16:02:11 sonnet/15: start (uses claude-plan)
+- 2026-11-04 16:02:11 4 running: codex/18, local/14, codex/17, sonnet/15
+- 2026-11-04 16:02:16 sonnet/15: done (exit 0, 0 min)
