@@ -1,6 +1,6 @@
 # Overnight run 20261104-1523
 
-Started 2026-11-04 15:23:11, updated 2026-11-04 18:38:55, status **running**. Jobs: pending 5, running 1, done 56
+Started 2026-11-04 15:23:11, updated 2026-11-04 18:44:37, status **running**. Jobs: pending 6, running 3, done 57
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -63,9 +63,13 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 18:38:55, status **running**. Jo
 | deepseek/20 | done | 2026-11-04 17:51:15 | 2026-11-04 17:52:16 | DeepSeek (volume) |
 | deepseek/21 | done | 2026-11-04 17:52:31 | 2026-11-04 17:53:06 | DeepSeek (volume) |
 | deepseek/22 | done | 2026-11-04 17:54:46 | 2026-11-04 18:38:55 | DeepSeek (volume) |
-| deepseek/24 | pending |  | 2026-11-04 16:54:25 | retry requested |
+| deepseek/24 | done | 2026-11-04 18:39:26 | 2026-11-04 18:44:37 | DeepSeek (volume) |
 | deepseek/25 | pending |  | 2026-11-04 16:54:25 | retry requested |
 | sup1/13 | pending |  |  | added by supervisor. sonnet/13 made only 22 attempts from 10 hypotheses on the 333-rune section 13, so its proposals exp |
+| sup2/10 | running | 2026-11-04 18:39:26 |  | added by supervisor. Transposition-before-substitution looks under-covered on sections whose lengths factor neatly; code |
+| sup2/12 | running | 2026-11-04 18:39:26 |  | added by supervisor. Transposition-before-substitution looks under-covered on sections whose lengths factor neatly; code |
+| sup2/13 | pending |  |  | added by supervisor. Transposition-before-substitution looks under-covered on sections whose lengths factor neatly; code |
+| sup2/14 | pending |  |  | added by supervisor. Transposition-before-substitution looks under-covered on sections whose lengths factor neatly; code |
 
 ## Now running
 
@@ -81,6 +85,27 @@ round 3 [claude-sonnet] proposals=12 valid=12 attempts=8193 passes=0 near=0 inva
 round 4 [claude-sonnet] proposals=12 valid=12 attempts=14270 passes=0 near=0 invalid=6
 18:36:04 [model] claude-sonnet (proposer) calling...
 18:36:16 [model] claude-sonnet (proposer) ok 11.7s, tokens in/out 9621/1325, reply 2784 chars
+```
+**sup2/10** (since 2026-11-04 18:39:26), latest log lines:
+```
+===== 2026-11-04 18:39:26 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 10 --gen
+brief for the generators (1096 chars): Sections and lengths: 10 = 729 (27*27, 9*81, 3^6), 12 = 693 (7*9*11), 13 = 333 (9*37), 14 = 1729 (7*13*19). Every earlier pass from sonnet, codex, deepseek and l
+== LP2:17.jpg, 18.jpg, 19.jpg - 0.jpg-2.jpg  (729 symbols)
+18:39:29 [model] codex (proposer) calling...
+18:40:19 [model] codex (proposer) ok 49.8s, tokens in/out 19180/2295, reply 5996 chars, model not reported (pin one with model = "..." in the models config)
+round 1 [codex] proposals=16 valid=8 attempts=16000 passes=0 near=0 invalid=8
+18:43:56 [model] codex (proposer) calling...
+18:44:29 [model] codex (proposer) ok 32.9s, tokens in/out 20670/1402, reply 4147 chars, model not reported (pin one with model = "..." in the models config)
+```
+**sup2/12** (since 2026-11-04 18:39:26), latest log lines:
+```
+===== 2026-11-04 18:39:26 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 12 --gen
+brief for the generators (1096 chars): Sections and lengths: 10 = 729 (27*27, 9*81, 3^6), 12 = 693 (7*9*11), 13 = 333 (9*37), 14 = 1729 (7*13*19). Every earlier pass from sonnet, codex, deepseek and l
+== LP2:20.jpg/2-23.jpg/1 - 3.jpg/2-6.jpg/1  (693 symbols)
+18:39:29 [model] codex (proposer) calling...
+18:40:08 [model] codex (proposer) ok 38.9s, tokens in/out 19264/1767, reply 4417 chars, model not reported (pin one with model = "..." in the models config)
+round 1 [codex] proposals=16 valid=10 attempts=18014 passes=0 near=0 invalid=6
+18:44:25 [model] codex (proposer) calling...
 ```
 
 ## Results so far
@@ -201,22 +226,24 @@ round 4 [claude-sonnet] proposals=12 valid=12 attempts=14270 passes=0 near=0 inv
   - LP2:56.jpg/2: 3898 attempts, 70 hypotheses, **0 final pass(es)**
 - **deepseek/22** (done)
   - LP2:57.jpg-66.jpg/1: 30674 attempts, 70 hypotheses, **0 final pass(es)**
+- **deepseek/24** (done)
+  - LP2:51.jpg/2-53.jpg - 68.jpg/2-70.jpg: 14725 attempts, 62 hypotheses, **0 final pass(es)**
 
 ## Model usage
 
-- deepseek: 74 call(s) in the last 5h (cap none), spent $0.1545
+- deepseek: 80 call(s) in the last 5h (cap none), spent $0.1697
 - qwen-local: 88 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 88 call(s) in the last 5h (cap none), spent $0.0000
 - granite: 4 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 167 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-sonnet: 167 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-supervisor: 167 call(s) in the last 5h (cap 550), spent $0.0000
-- codex: 85 call(s) in the last 5h (cap 850), spent $0.0000
+- claude-opus: 166 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-sonnet: 166 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-supervisor: 166 call(s) in the last 5h (cap 550), spent $0.0000
+- codex: 88 call(s) in the last 5h (cap 850), spent $0.0000
 - dry: 4 call(s) in the last 5h (cap none), spent $0.0000
 
 ## Current strategy note (read by every lane each round)
 
-No final passes after about 20-60k attempts per section from sonnet, codex and deepseek. Treat these as low-yield everywhere: plain Caesar, plain Atbash, Atbash+shift, single-keyword Vigenere with common Cicada words, and plain prime or p-1 streams starting at offset 0. Favour next: (1) p-1 (totient) streams with an interrupter skip on F runes, plus a sweep of the stream start index (not just the shift). (2) Running keys taken from the other LP2 sections, or the section read backwards. (3) Columnar or route transposition keyed to the section length's factors (1729=7*13*19, 333=9*37, 693=7*9*11, 729=27*27) before substitution. (4) Ciphertext autokey with primers of 1-6. (5) Two-stage programs, such as Atbash then a sequence stream, or Fibonacci/Lucas mod 29 with a skip rule. Each hypothesis
+0 finals after 20-60k attempts per section from sonnet, codex and deepseek. Treat as exhausted: plain Caesar, Atbash, Atbash+shift, single-keyword Vigenere with common Cicada words, and prime or p-1 streams starting at index 0. Favour: (1) p-1 streams that skip F runes, sweeping the stream start index 0-200 as well as the shift. (2) Running keys from other LP2 sections or the reversed section. (3) Columnar or route transposition keyed to the length's factors before substitution. (4) Ciphertext autokey with primers of length 1-6. (5) Two-stage programs: Atbash then a sequence stream, or Fibonacci/Lucas mod 29 with a skip rule. Each hypothesis should expand to hundreds of keys or more.
 
 ## Supervisor notes
 
@@ -227,24 +254,12 @@ No final passes after about 20-60k attempts per section from sonnet, codex and d
 - 2026-11-04 17:32:33: 17:32 check: the run resumed after the STOP file at 17:16, and there are still no final passes in any section. --retry-failed put the 15 blocked deepseek jobs back to pending, and deepseek/10 has started. If the models config still has the literal key (sk-150a...) where the environment variable name should go, these jobs will block again. Fix the config and revoke the key if the config or the results branch is shared. sonnet/21 is running, and the sup1 re-run of section 13 (333 runes) should follow. I added no jobs, to let the queue drain first.
 - 2026-11-04 17:55:03: strategy note set: No final passes after about 20-60k attempts per section from sonnet, codex and deepseek. Treat these as low-yield everywhere: plain Caesar, plain Atbash, Atbash+shift, single-keyword Vigenere with common Cicada words, and plain prime or p-1 streams starting at offset 0. Favour next: (1) p-1 (totient) streams with an interrupter skip on F runes, plus a sweep of the stream start index (not just the shift). (2) Running keys taken from the other LP2 sections, or the section read backwards. (3) Columnar or route transposition keyed to the section length's factors (1729=7*13*19, 333=9*37, 693=7*9*11, 729=27*27) before substitution. (4) Ciphertext autokey with primers of 1-6. (5) Two-stage programs, such as Atbash then a sequence stream, or Fibonacci/Lucas mod 29 with a skip rule. Each hypothesis
 - 2026-11-04 17:55:03: 17:55 check: there are still 0 final passes across all sections. The deepseek jobs now complete (deepseek/10-21 done), so they are no longer blocked. If the literal key is still in the config, still revoke it as noted earlier. Sections 24 and 25 (534 and 308 runes) have only codex and local coverage; I assume the queued sonnet and deepseek jobs will cover them. I updated the strategy note to steer lanes away from directions that look exhausted, and added no jobs.
+- 2026-11-04 18:39:26: 18:39 check: still 0 final passes in any section. deepseek/22 finished (30.7k attempts, 0 final). sonnet/22 is still running and sonnet/24 is waiting on claude-plan. Sections 24 and 25 still have no sonnet or deepseek coverage. I added one codex job testing transposition before substitution on the sections whose lengths factor neatly (10, 12, 13, 14). I also rewrote the strategy note because the previous one was cut off at 800 characters.
+- 2026-11-04 18:39:26: strategy note set: 0 finals after 20-60k attempts per section from sonnet, codex and deepseek. Treat as exhausted: plain Caesar, Atbash, Atbash+shift, single-keyword Vigenere with common Cicada words, and prime or p-1 streams starting at index 0. Favour: (1) p-1 streams that skip F runes, sweeping the stream start index 0-200 as well as the shift. (2) Running keys from other LP2 sections or the reversed section. (3) Columnar or route transposition keyed to the length's factors before substitution. (4) Ciphertext autokey with primers of length 1-6. (5) Two-stage programs: Atbash then a sequence stream, or Fibonacci/Lucas mod 29 with a skip rule. Each hypothesis should expand to hundreds of keys or more.
+- 2026-11-04 18:39:26: brief for sup2 (codex): Sections and lengths: 10 = 729 (27*27, 9*81, 3^6), 12 = 693 (7*9*11), 13 = 333 (9*37), 14 = 1729 (7*13*19). Every earlier pass from sonnet, codex, deepseek and local found 0 finals, and those passes were mostly pure substitution or stream programs. Focus on two-stage programs: a transposition first, then a substitution. Transpositions to try: (a) columnar write/read with widths taken from the factors (for example 27, 9, 81 for 729; 7, 9, 11, 63, 77, 99 for 693; 9, 37 for 333; 7, 13, 19, 91, 133 for 1729), reading by columns in natural, reversed and alternating (boustrophedon) order; (b) a 27x27 grid for 729 read by rows, columns, diagonals or spiral; (c) a rail-fence or skip-k decimation, taking every k-th rune with k coprime to the length, sweeping k. Substitutions after the transposition: Caesar shifts 0-28 in both directions, Atbash, Atbash+shift, and p-1 (totient) prime streams with and without an F skip, sweeping the stream start index. Each hypothesis should expand to hundreds or thousands of keys. Do not propose substitution-only programs, which are already exhausted here.
 
 ## Events
 
-- 2026-11-04 17:54:46 resumed
-- 2026-11-04 17:54:46 failed and blocked jobs reset to pending (--retry-failed)
-- 2026-11-04 17:54:46 sonnet/22: start (uses claude-plan)
-- 2026-11-04 17:54:46 deepseek/22: start (uses api:https://api.deepseek.com)
-- 2026-11-04 17:54:46 2 running: sonnet/22, deepseek/22
-- 2026-11-04 17:54:46 sonnet/24 waiting: claude-plan in use by sonnet/22
-- 2026-11-04 17:55:03 supervisor: strategy note set (800 chars): No final passes after about 20-60k attempts per section from sonnet, codex and deepseek. Treat these as low-yield everywhere: plain Caesar, plain Atbash, Atbash+shift, single-keyword Vigenere with com
-- 2026-11-04 17:55:03 supervisor: note: 17:55 check: there are still 0 final passes across all sections. The deepseek jobs now complete (deepseek/10-21 done), so they are no longer blocked. If the literal key is still in the config, still revoke it as noted earlier. Sections 24 and 25 (534 and 308 runes) have only codex and local cover...
-- 2026-11-04 17:59:49 sonnet/22: running 5 min | 17:55:34 [model] claude-sonnet (proposer) ok 9.2s, tokens in/out 7838/1296, reply 2723 chars
-- 2026-11-04 17:59:49 deepseek/22: running 5 min | 17:55:18 [model] deepseek (proposer) ok 4.6s, tokens in/out 4226/842, reply 2833 chars
-- 2026-11-04 18:04:49 sonnet/22: running 10 min | 17:55:34 [model] claude-sonnet (proposer) ok 9.2s, tokens in/out 7838/1296, reply 2723 chars
-- 2026-11-04 18:04:49 deepseek/22: running 10 min | 18:03:15 [model] deepseek (proposer) ok 4.7s, tokens in/out 5390/1095, reply 3202 chars
-- 2026-11-04 18:09:49 sonnet/22: running 15 min | 18:05:31 [model] claude-sonnet (proposer) ok 11.0s, tokens in/out 8461/1381, reply 2929 chars
-- 2026-11-04 18:09:49 deepseek/22: running 15 min | 18:03:15 [model] deepseek (proposer) ok 4.7s, tokens in/out 5390/1095, reply 3202 chars
-- 2026-11-04 18:14:49 sonnet/22: running 20 min | 18:05:31 [model] claude-sonnet (proposer) ok 11.0s, tokens in/out 8461/1381, reply 2929 chars
 - 2026-11-04 18:14:49 deepseek/22: running 20 min | 18:03:15 [model] deepseek (proposer) ok 4.7s, tokens in/out 5390/1095, reply 3202 chars
 - 2026-11-04 18:19:49 sonnet/22: running 25 min | 18:19:44 [model] claude-sonnet (proposer) calling...
 - 2026-11-04 18:19:49 deepseek/22: running 25 min | 18:18:04 [model] deepseek (proposer) ok 12.7s, tokens in/out 5740/1179, reply 3399 chars
@@ -255,3 +270,18 @@ No final passes after about 20-60k attempts per section from sonnet, codex and d
 - 2026-11-04 18:34:49 sonnet/22: running 40 min | 18:19:56 [model] claude-sonnet (proposer) ok 12.8s, tokens in/out 9109/1745, reply 3319 chars
 - 2026-11-04 18:34:50 deepseek/22: running 40 min | 18:18:04 [model] deepseek (proposer) ok 12.7s, tokens in/out 5740/1179, reply 3399 chars
 - 2026-11-04 18:38:55 deepseek/22: done (exit 0, 44 min)
+- 2026-11-04 18:39:10 published: 57 file(s) to branch results
+- 2026-11-04 18:39:26 supervisor: note: 18:39 check: still 0 final passes in any section. deepseek/22 finished (30.7k attempts, 0 final). sonnet/22 is still running and sonnet/24 is waiting on claude-plan. Sections 24 and 25 still have no sonnet or deepseek coverage. I added one codex job testing transposition before substitution on th...
+- 2026-11-04 18:39:26 supervisor: strategy note set (692 chars): 0 finals after 20-60k attempts per section from sonnet, codex and deepseek. Treat as exhausted: plain Caesar, Atbash, Atbash+shift, single-keyword Vigenere with common Cicada words, and prime or p-1 s
+- 2026-11-04 18:39:26 supervisor: added sup2: swarm on 4 section(s) with codex; brief: Sections and lengths: 10 = 729 (27*27, 9*81, 3^6), 12 = 693 (7*9*11), 13 = 333 (9*37), 14 = 1729 (7*13*19). Every earlier pass from sonnet, codex, deepseek and local found 0 finals, and those passes w...
+- 2026-11-04 18:39:26 deepseek/24: start (uses api:https://api.deepseek.com)
+- 2026-11-04 18:39:26 2 running: sonnet/22, deepseek/24
+- 2026-11-04 18:39:26 sup2/10: start (uses codex-plan)
+- 2026-11-04 18:39:26 3 running: sonnet/22, deepseek/24, sup2/10
+- 2026-11-04 18:39:26 sup2/12: start (uses codex-plan)
+- 2026-11-04 18:39:26 4 running: sonnet/22, deepseek/24, sup2/10, sup2/12
+- 2026-11-04 18:39:51 sonnet/22: running 45 min | 18:36:16 [model] claude-sonnet (proposer) ok 11.7s, tokens in/out 9621/1325, reply 2784 chars
+- 2026-11-04 18:44:26 deepseek/24: running 5 min | 18:43:01 [model] deepseek (proposer) ok 4.3s, tokens in/out 5778/908, reply 3075 chars
+- 2026-11-04 18:44:27 sup2/10: running 5 min | 18:43:56 [model] codex (proposer) calling...
+- 2026-11-04 18:44:27 sup2/12: running 5 min | 18:44:25 [model] codex (proposer) calling...
+- 2026-11-04 18:44:37 deepseek/24: done (exit 0, 5 min)
