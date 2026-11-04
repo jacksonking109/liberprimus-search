@@ -1,6 +1,6 @@
 # Overnight run 20261104-0949
 
-Started 2026-11-04 09:49:00, updated 2026-11-04 10:27:04, status **running**. Jobs: pending 45, running 2, done 14
+Started 2026-11-04 09:49:00, updated 2026-11-04 10:31:40, status **running**. Jobs: pending 44, running 2, done 15
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -42,7 +42,7 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 10:27:04, status **running**. Jo
 | local/15 | done | 2026-11-04 10:14:41 | 2026-11-04 10:14:46 | local models |
 | local/20 | done | 2026-11-04 10:15:02 | 2026-11-04 10:19:48 | local models |
 | local/14 | done | 2026-11-04 10:20:04 | 2026-11-04 10:27:04 | local models |
-| local/21 | pending |  |  | local models |
+| local/21 | done | 2026-11-04 10:27:20 | 2026-11-04 10:31:40 | local models |
 | local/13 | pending |  |  | local models |
 | local/22 | pending |  |  | local models |
 | local/12 | pending |  |  | local models |
@@ -70,23 +70,29 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 10:27:04, status **running**. Jo
 
 **sonnet/12** (since 2026-11-04 10:18:53), latest log lines:
 ```
-  | 6. Transposition followed by a sequence. Use columnar orders of width 3 to 7 (identity-like orders and simple reversals), then prime_totients sub with skip [0] resolve. Reason: a hidden layer is p
-  | Do NOT repeat: con
-10:19:08 [model] claude-sonnet (proposer) calling...
-10:19:18 [model] claude-sonnet (proposer) ok 9.5s, tokens in/out 4193/844, reply 1859 chars
-round 1 [claude-sonnet] proposals=8 valid=8 attempts=6021 passes=0 near=1 invalid=0
-10:22:27 [model] claude-sonnet (proposer) calling...
 10:22:38 [model] claude-sonnet (proposer) ok 10.3s, tokens in/out 4857/1049, reply 2409 chars
 round 2 [claude-sonnet] proposals=8 valid=8 attempts=13528 passes=0 near=2 invalid=0
 10:25:38 [model] claude-sonnet (proposer) calling...
 10:25:46 [model] claude-sonnet (proposer) ok 7.3s, tokens in/out 5506/897, reply 1936 chars
+round 3 [claude-sonnet] proposals=8 valid=8 attempts=18119 passes=0 near=3 invalid=0
+10:29:26 [model] claude-sonnet (proposer) calling...
+10:29:38 [model] claude-sonnet (proposer) ok 11.8s, tokens in/out 6178/1364, reply 1991 chars
+round 4 [claude-sonnet] proposals=8 valid=2 attempts=18121 passes=0 near=3 invalid=6
+10:29:38 [model] claude-sonnet (proposer) calling...
+10:29:53 [model] claude-sonnet (proposer) ok 15.3s, tokens in/out 6814/1475, reply 2221 chars
 ```
 **codex/20** (since 2026-11-04 10:25:24), latest log lines:
 ```
-===== 2026-11-04 10:25:24 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 20 --gen
-== LP2:50.jpg/2-56.jpg/1  (1468 symbols)
-10:25:26 [model] codex (proposer) calling...
 10:25:40 [model] codex (proposer) ok 14.3s, tokens in/out 17064/505, reply 1730 chars
+round 1 [codex] proposals=8 valid=8 attempts=6046 passes=0 near=0 invalid=0
+10:28:39 [model] codex (proposer) calling...
+10:28:58 [model] codex (proposer) ok 19.0s, tokens in/out 18051/472, reply 1617 chars
+round 2 [codex] proposals=8 valid=8 attempts=10108 passes=0 near=0 invalid=0
+10:29:01 [model] codex (proposer) calling...
+10:29:16 [model] codex (proposer) ok 14.9s, tokens in/out 17861/455, reply 1655 chars
+round 3 [codex] proposals=8 valid=8 attempts=16146 passes=0 near=0 invalid=0
+10:30:55 [model] codex (proposer) calling...
+10:31:09 [model] codex (proposer) ok 14.1s, tokens in/out 18258/402, reply 1482 chars
 ```
 
 ## Results so far
@@ -121,15 +127,17 @@ round 2 [claude-sonnet] proposals=8 valid=8 attempts=13528 passes=0 near=2 inval
   - LP2:50.jpg/2-56.jpg/1: 189 attempts, 89 hypotheses, **0 final pass(es)**
 - **local/14** (done)
   - LP2:8.jpg-14.jpg - 25.jpg-31.jpg: 247 attempts, 83 hypotheses, **0 final pass(es)**
+- **local/21** (done)
+  - LP2:56.jpg/2: 152 attempts, 86 hypotheses, **0 final pass(es)**
 
 ## Model usage
 
-- qwen-local: 36 call(s) in the last 5h (cap none), spent $0.0000
-- gemma-local: 36 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 66 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-sonnet: 66 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-supervisor: 66 call(s) in the last 5h (cap 550), spent $0.0000
-- codex: 25 call(s) in the last 5h (cap 750), spent $0.0000
+- qwen-local: 42 call(s) in the last 5h (cap none), spent $0.0000
+- gemma-local: 42 call(s) in the last 5h (cap none), spent $0.0000
+- claude-opus: 68 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-sonnet: 68 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-supervisor: 68 call(s) in the last 5h (cap 550), spent $0.0000
+- codex: 28 call(s) in the last 5h (cap 750), spent $0.0000
 
 ## Supervisor notes
 
@@ -139,13 +147,6 @@ round 2 [claude-sonnet] proposals=8 valid=8 attempts=13528 passes=0 near=2 inval
 
 ## Events
 
-- 2026-11-04 10:15:02 3 running: codex/22, sonnet/11, local/20
-- 2026-11-04 10:18:12 codex/22: running 15 min | 10:16:43 [model] codex (proposer) ok 31.0s, tokens in/out 19455/520, reply 1659 chars
-- 2026-11-04 10:18:37 sonnet/11: done (exit 0, 5 min)
-- 2026-11-04 10:18:53 published: 13 file(s) to branch results
-- 2026-11-04 10:18:53 sonnet/12: start (uses claude-plan)
-- 2026-11-04 10:18:53 3 running: codex/22, local/20, sonnet/12
-- 2026-11-04 10:19:48 local/20: done (exit 0, 5 min)
 - 2026-11-04 10:20:03 published: 14 file(s) to branch results
 - 2026-11-04 10:20:04 local/14: start (uses ollama:http://127.0.0.1:11434)
 - 2026-11-04 10:20:04 3 running: codex/22, sonnet/12, local/14
@@ -164,3 +165,10 @@ round 2 [claude-sonnet] proposals=8 valid=8 attempts=13528 passes=0 near=2 inval
 - 2026-11-04 10:25:24 sonnet/13 waiting: claude-plan in use by sonnet/12
 - 2026-11-04 10:25:29 local/14: running 5 min | 10:25:16 [model] qwen-local (proposer) calling...
 - 2026-11-04 10:27:04 local/14: done (exit 0, 7 min)
+- 2026-11-04 10:27:20 published: 17 file(s) to branch results
+- 2026-11-04 10:27:20 local/21: start (uses ollama:http://127.0.0.1:11434)
+- 2026-11-04 10:27:20 3 running: sonnet/12, codex/20, local/21
+- 2026-11-04 10:27:20 sonnet/13 waiting: claude-plan in use by sonnet/12
+- 2026-11-04 10:28:55 sonnet/12: running 10 min | 10:25:46 [model] claude-sonnet (proposer) ok 7.3s, tokens in/out 5506/897, reply 1936 chars
+- 2026-11-04 10:30:25 codex/20: running 5 min | 10:29:16 [model] codex (proposer) ok 14.9s, tokens in/out 17861/455, reply 1655 chars
+- 2026-11-04 10:31:40 local/21: done (exit 0, 4 min)
