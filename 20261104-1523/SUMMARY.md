@@ -1,6 +1,6 @@
 # Overnight run 20261104-1523
 
-Started 2026-11-04 15:23:11, updated 2026-11-04 17:39:01, status **running**. Jobs: pending 14, running 1, done 47
+Started 2026-11-04 15:23:11, updated 2026-11-04 17:40:26, status **running**. Jobs: pending 13, running 1, done 48
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -54,7 +54,7 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 17:39:01, status **running**. Jo
 | deepseek/11 | done | 2026-11-04 17:34:49 | 2026-11-04 17:35:44 | DeepSeek (volume) |
 | deepseek/12 | done | 2026-11-04 17:35:59 | 2026-11-04 17:37:05 | DeepSeek (volume) |
 | deepseek/13 | done | 2026-11-04 17:37:21 | 2026-11-04 17:39:01 | DeepSeek (volume) |
-| deepseek/14 | pending |  | 2026-11-04 16:54:25 | retry requested |
+| deepseek/14 | done | 2026-11-04 17:39:16 | 2026-11-04 17:40:26 | DeepSeek (volume) |
 | deepseek/15 | pending |  | 2026-11-04 16:54:25 | retry requested |
 | deepseek/16 | pending |  | 2026-11-04 16:54:25 | retry requested |
 | deepseek/17 | pending |  | 2026-11-04 16:54:25 | retry requested |
@@ -71,9 +71,6 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 17:39:01, status **running**. Jo
 
 **sonnet/22** (since 2026-11-04 17:36:20), latest log lines:
 ```
-  | 3. **Totient stream with a skipped F.** Use sequence prime_totients with combine sub, skip [0] and skip_mode "resolve" (the page 56 solution used this style). Set offset_range [0,2000], with scale
-  | 4. **Scaled sequences.** Use primes, fibonacci, triangular, squares, pi_digits and e_digits with scale in {2,3,5,7,28} and add in {0,1,2}. Cover offset_range [0,500] under sub, add and beaufort. R
-  | 5. **Reversed text before the key.** Set reverse_text true, then apply directions 1 and 3. Reason: Liber Primus pages are sometimes read backwards, and any key stream anchored at the end would be 
   | 6. **Transposition plus key.** Undo a columnar transposition with widths 2–8, using identity order and reversed order. Follow it with a prime_totients or primes sequence over offset_range [0,200].
   | 7. **Two-symbol skip sets.** Try skip [0,10] (F and I) and skip [2] (TH) in resolve mode, with the totient and primes streams. Reason: literal
 17:36:40 [model] claude-sonnet (proposer) calling...
@@ -81,6 +78,9 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 17:39:01, status **running**. Jo
 round 1 [claude-sonnet] proposals=12 valid=9 attempts=1222 passes=0 near=0 invalid=3
 17:38:33 [model] claude-sonnet (proposer) calling...
 17:38:42 [model] claude-sonnet (proposer) ok 8.5s, tokens in/out 5036/1224, reply 2665 chars
+round 2 [claude-sonnet] proposals=12 valid=9 attempts=1986 passes=0 near=0 invalid=6
+17:39:24 [model] claude-sonnet (proposer) calling...
+17:39:33 [model] claude-sonnet (proposer) ok 9.2s, tokens in/out 5875/1336, reply 2890 chars
 ```
 
 ## Results so far
@@ -181,16 +181,18 @@ round 1 [claude-sonnet] proposals=12 valid=9 attempts=1222 passes=0 near=0 inval
   - LP2:20.jpg/2-23.jpg/1 - 3.jpg/2-6.jpg/1: 48478 attempts, 84 hypotheses, **0 final pass(es)**
 - **deepseek/13** (done)
   - LP2:6.jpg/2-7.jpg - 23.jpg/2-24.jpg: 24432 attempts, 53 hypotheses, **0 final pass(es)**
+- **deepseek/14** (done)
+  - LP2:8.jpg-14.jpg - 25.jpg-31.jpg: 22725 attempts, 44 hypotheses, **0 final pass(es)**
 
 ## Model usage
 
-- deepseek: 26 call(s) in the last 5h (cap none), spent $0.0505
+- deepseek: 32 call(s) in the last 5h (cap none), spent $0.0643
 - qwen-local: 88 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 88 call(s) in the last 5h (cap none), spent $0.0000
 - granite: 4 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 193 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-sonnet: 193 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-supervisor: 193 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-opus: 194 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-sonnet: 194 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-supervisor: 194 call(s) in the last 5h (cap 550), spent $0.0000
 - codex: 85 call(s) in the last 5h (cap 850), spent $0.0000
 - dry: 4 call(s) in the last 5h (cap none), spent $0.0000
 
@@ -204,10 +206,6 @@ round 1 [claude-sonnet] proposals=12 valid=9 attempts=1222 passes=0 near=0 inval
 
 ## Events
 
-- 2026-11-04 17:32:18 resumed
-- 2026-11-04 17:32:18 failed and blocked jobs reset to pending (--retry-failed)
-- 2026-11-04 17:32:18 sonnet/21: start (uses claude-plan)
-- 2026-11-04 17:32:18 deepseek/10: start (uses api:https://api.deepseek.com)
 - 2026-11-04 17:32:18 2 running: sonnet/21, deepseek/10
 - 2026-11-04 17:32:18 sonnet/22 waiting: claude-plan in use by sonnet/21
 - 2026-11-04 17:32:33 supervisor: note: 17:32 check: the run resumed after the STOP file at 17:16, and there are still no final passes in any section. --retry-failed put the 15 blocked deepseek jobs back to pending, and deepseek/10 has started. If the models config still has the literal key (sk-150a...) where the environment variable n...
@@ -229,3 +227,7 @@ round 1 [claude-sonnet] proposals=12 valid=9 attempts=1222 passes=0 near=0 inval
 - 2026-11-04 17:37:21 deepseek/13: start (uses api:https://api.deepseek.com)
 - 2026-11-04 17:37:21 2 running: sonnet/22, deepseek/13
 - 2026-11-04 17:39:01 deepseek/13: done (exit 0, 2 min)
+- 2026-11-04 17:39:16 published: 48 file(s) to branch results
+- 2026-11-04 17:39:16 deepseek/14: start (uses api:https://api.deepseek.com)
+- 2026-11-04 17:39:16 2 running: sonnet/22, deepseek/14
+- 2026-11-04 17:40:26 deepseek/14: done (exit 0, 1 min)
