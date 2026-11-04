@@ -1,6 +1,6 @@
 # Overnight run 20261104-0949
 
-Started 2026-11-04 09:49:00, updated 2026-11-04 11:56:56, status **running**. Jobs: pending 16, running 1, done 44, blocked 15
+Started 2026-11-04 09:49:00, updated 2026-11-04 12:02:22, status **running**. Jobs: pending 16, done 45, blocked 15
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -18,7 +18,7 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 11:56:56, status **running**. Jo
 | sonnet/20 | done | 2026-11-04 11:29:45 | 2026-11-04 11:38:07 | Sonnet, briefed by Opus |
 | sonnet/21 | done | 2026-11-04 11:38:39 | 2026-11-04 11:40:49 | Sonnet, briefed by Opus |
 | sonnet/22 | done | 2026-11-04 11:51:20 | 2026-11-04 11:56:21 | Sonnet, briefed by Opus |
-| sonnet/24 | running | 2026-11-04 11:56:36 |  | Sonnet, briefed by Opus |
+| sonnet/24 | done | 2026-11-04 11:56:36 | 2026-11-04 12:02:22 | Sonnet, briefed by Opus |
 | sonnet/25 | pending |  |  | Sonnet, briefed by Opus |
 | codex/25 | done | 2026-11-04 09:49:00 | 2026-11-04 09:56:14 | Codex (exploratory) |
 | codex/24 | done | 2026-11-04 09:56:29 | 2026-11-04 10:02:45 | Codex (exploratory) |
@@ -81,15 +81,6 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 11:56:56, status **running**. Jo
 | sup1/24 | pending |  |  | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
 | sup1/25 | pending |  |  | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
 
-## Now running
-
-**sonnet/24** (since 2026-11-04 11:56:36), latest log lines:
-```
-===== 2026-11-04 11:56:36 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 24 --gen
-== LP2:51.jpg/2-53.jpg - 68.jpg/2-70.jpg  (534 symbols)
-11:56:38 [model] claude-supervisor (supervisor) calling...
-```
-
 ## Results so far
 
 - **tier-claude** (done)
@@ -122,6 +113,8 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 11:56:56, status **running**. Jo
   - LP2:56.jpg/2: 6575 attempts, 16 hypotheses, **0 final pass(es)**, stopped: stop_file
 - **sonnet/22** (done)
   - LP2:57.jpg-66.jpg/1: 14163 attempts, 36 hypotheses, **0 final pass(es)**
+- **sonnet/24** (done)
+  - LP2:51.jpg/2-53.jpg - 68.jpg/2-70.jpg: 32246 attempts, 40 hypotheses, **0 final pass(es)**
 - **codex/25** (done)
   - LP2:54.jpg-55.jpg - 71.jpg-72.jpg: 30269 attempts, 47 hypotheses, **0 final pass(es)**
 - **codex/24** (done)
@@ -187,9 +180,9 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 11:56:56, status **running**. Jo
 
 - qwen-local: 84 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 84 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 138 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-sonnet: 138 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-supervisor: 138 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-opus: 145 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-sonnet: 145 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-supervisor: 145 call(s) in the last 5h (cap 550), spent $0.0000
 - codex: 81 call(s) in the last 5h (cap 750), spent $0.0000
 
 ## Supervisor notes
@@ -217,9 +210,6 @@ Prefer the longer sections (1000+ runes). On short ones (91 and 121 runes) noise
 
 ## Events
 
-- 2026-11-04 11:38:39 sonnet/22 waiting: claude-plan in use by sonnet/21
-- 2026-11-04 11:40:34 codex/12: done (exit 0, 4 min)
-- 2026-11-04 11:40:49 published: 42 file(s) to branch results
 - 2026-11-04 11:40:49 sonnet/21: done (exit 0, 2 min)
 - 2026-11-04 11:40:53 published: 42 file(s) to branch results
 - 2026-11-04 11:40:53 stopping: STOP file
@@ -242,3 +232,6 @@ Prefer the longer sections (1000+ runes). On short ones (91 and 121 runes) noise
 - 2026-11-04 11:56:36 2 running: codex/10, sonnet/24
 - 2026-11-04 11:56:36 sonnet/25 waiting: claude-plan in use by sonnet/24
 - 2026-11-04 11:56:56 codex/10: done (exit 0, 6 min)
+- 2026-11-04 11:57:12 published: 45 file(s) to branch results
+- 2026-11-04 12:01:37 sonnet/24: running 5 min | 12:01:30 [model] claude-sonnet (proposer) calling...
+- 2026-11-04 12:02:22 sonnet/24: done (exit 0, 6 min)
