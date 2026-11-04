@@ -1,13 +1,13 @@
 # Overnight run 20261104-0949
 
-Started 2026-11-04 09:49:00, updated 2026-11-04 10:35:46, status **running**. Jobs: pending 43, running 2, done 16
+Started 2026-11-04 09:49:00, updated 2026-11-04 10:37:20, status **running**. Jobs: pending 42, running 2, done 17
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
 | tier-claude | done | 2026-11-04 09:49:00 | 2026-11-04 10:05:41 | Claude Code proposers vs the random control |
 | sonnet/10 | done | 2026-11-04 10:05:57 | 2026-11-04 10:13:38 | Sonnet, briefed by Opus |
 | sonnet/11 | done | 2026-11-04 10:14:06 | 2026-11-04 10:18:37 | Sonnet, briefed by Opus |
-| sonnet/12 | running | 2026-11-04 10:18:53 |  | Sonnet, briefed by Opus |
+| sonnet/12 | done | 2026-11-04 10:18:53 | 2026-11-04 10:37:20 | Sonnet, briefed by Opus |
 | sonnet/13 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/14 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/15 | pending |  |  | Sonnet, briefed by Opus |
@@ -44,7 +44,7 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 10:35:46, status **running**. Jo
 | local/14 | done | 2026-11-04 10:20:04 | 2026-11-04 10:27:04 | local models |
 | local/21 | done | 2026-11-04 10:27:20 | 2026-11-04 10:31:40 | local models |
 | local/13 | done | 2026-11-04 10:31:56 | 2026-11-04 10:35:46 | local models |
-| local/22 | pending |  |  | local models |
+| local/22 | running | 2026-11-04 10:36:15 |  | local models |
 | local/12 | pending |  |  | local models |
 | local/24 | pending |  |  | local models |
 | local/11 | pending |  |  | local models |
@@ -68,24 +68,8 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 10:35:46, status **running**. Jo
 
 ## Now running
 
-**sonnet/12** (since 2026-11-04 10:18:53), latest log lines:
-```
-10:25:46 [model] claude-sonnet (proposer) ok 7.3s, tokens in/out 5506/897, reply 1936 chars
-round 3 [claude-sonnet] proposals=8 valid=8 attempts=18119 passes=0 near=3 invalid=0
-10:29:26 [model] claude-sonnet (proposer) calling...
-10:29:38 [model] claude-sonnet (proposer) ok 11.8s, tokens in/out 6178/1364, reply 1991 chars
-round 4 [claude-sonnet] proposals=8 valid=2 attempts=18121 passes=0 near=3 invalid=6
-10:29:38 [model] claude-sonnet (proposer) calling...
-10:29:53 [model] claude-sonnet (proposer) ok 15.3s, tokens in/out 6814/1475, reply 2221 chars
-round 5 [claude-sonnet] proposals=8 valid=8 attempts=27142 passes=0 near=3 invalid=6
-10:33:42 [model] claude-sonnet (proposer) calling...
-10:34:07 [model] claude-sonnet (proposer) ok 25.1s, tokens in/out 7455/1446, reply 2140 chars
-```
 **codex/20** (since 2026-11-04 10:25:24), latest log lines:
 ```
-10:28:58 [model] codex (proposer) ok 19.0s, tokens in/out 18051/472, reply 1617 chars
-round 2 [codex] proposals=8 valid=8 attempts=10108 passes=0 near=0 invalid=0
-10:29:01 [model] codex (proposer) calling...
 10:29:16 [model] codex (proposer) ok 14.9s, tokens in/out 17861/455, reply 1655 chars
 round 3 [codex] proposals=8 valid=8 attempts=16146 passes=0 near=0 invalid=0
 10:30:55 [model] codex (proposer) calling...
@@ -93,6 +77,21 @@ round 3 [codex] proposals=8 valid=8 attempts=16146 passes=0 near=0 invalid=0
 round 4 [codex] proposals=8 valid=8 attempts=18194 passes=0 near=0 invalid=0
 10:32:57 [model] codex (proposer) calling...
 10:33:14 [model] codex (proposer) ok 17.4s, tokens in/out 19114/468, reply 1607 chars
+round 5 [codex] proposals=8 valid=8 attempts=22267 passes=0 near=0 invalid=0
+10:36:01 [model] codex (proposer) calling...
+10:36:28 [model] codex (proposer) ok 26.4s, tokens in/out 19352/493, reply 1628 chars
+```
+**local/22** (since 2026-11-04 10:36:15), latest log lines:
+```
+===== 2026-11-04 10:36:15 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 22 --gen
+== LP2:57.jpg-66.jpg/1  (2474 symbols)
+10:36:17 [model] qwen-local (proposer) calling...
+10:36:36 [model] qwen-local (proposer) ok 18.7s, tokens in/out 2340/574, reply 2144 chars
+10:36:36 [model] gemma-local (proposer) calling...
+10:36:50 [model] gemma-local (proposer) ok 15.0s, tokens in/out 2393/448, reply 1295 chars
+round 1 [qwen-local] proposals=8 valid=8 attempts=8 passes=0 near=0 invalid=0
+round 1 [gemma-local] proposals=8 valid=6 attempts=6 passes=0 near=0 invalid=2
+10:37:03 [model] qwen-local (proposer) calling...
 ```
 
 ## Results so far
@@ -105,6 +104,8 @@ round 4 [codex] proposals=8 valid=8 attempts=18194 passes=0 near=0 invalid=0
   - LP2:17.jpg, 18.jpg, 19.jpg - 0.jpg-2.jpg: 20273 attempts, 37 hypotheses, **0 final pass(es)**
 - **sonnet/11** (done)
   - LP2:20.jpg/1 - 3.jpg/1: 35202 attempts, 34 hypotheses, **0 final pass(es)**
+- **sonnet/12** (done)
+  - LP2:20.jpg/2-23.jpg/1 - 3.jpg/2-6.jpg/1: 34650 attempts, 40 hypotheses, **0 final pass(es)**
 - **codex/25** (done)
   - LP2:54.jpg-55.jpg - 71.jpg-72.jpg: 30269 attempts, 47 hypotheses, **0 final pass(es)**
 - **codex/24** (done)
@@ -134,27 +135,22 @@ round 4 [codex] proposals=8 valid=8 attempts=18194 passes=0 near=0 invalid=0
 
 ## Model usage
 
-- qwen-local: 48 call(s) in the last 5h (cap none), spent $0.0000
-- gemma-local: 48 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 69 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-sonnet: 69 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-supervisor: 69 call(s) in the last 5h (cap 550), spent $0.0000
-- codex: 29 call(s) in the last 5h (cap 750), spent $0.0000
+- qwen-local: 49 call(s) in the last 5h (cap none), spent $0.0000
+- gemma-local: 49 call(s) in the last 5h (cap none), spent $0.0000
+- claude-opus: 70 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-sonnet: 70 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-supervisor: 70 call(s) in the last 5h (cap 550), spent $0.0000
+- codex: 30 call(s) in the last 5h (cap 750), spent $0.0000
 
 ## Supervisor notes
 
 - 2026-11-04 10:03:06: 10:03 check: the run is healthy at 3 of 59 jobs done. There are no final passes. Codex near misses on section 25 (primes/e_digits sub, margin about -0.23) are at noise level. The tier-claude benchmark so far: sonnet recall 0.50, opus 0.33, random control 0.00. The queue already covers every section, so no jobs were added.
 - 2026-11-04 10:14:06: 10:14 check: the run is healthy at 7 of 61 jobs done, with 2 running. There are no final passes yet. The tier-claude benchmark has finished: opus recall 0.33 (2/6), sonnet 0.33 (2/6), random control 0.00. This corrects my 10:03 note, which gave sonnet 0.50 from an incomplete count. sonnet/10 on section 10 made 20k attempts and produced 0 final passes and no near misses. The section 25 near misses are still at noise level. The queue covers every section, so I added no jobs.
 - 2026-11-04 10:25:24: 10:25 check: the run is healthy. codex/21 and codex/22 have finished, and local/14 and sonnet/12 are running. There are still 0 final passes across all sections done so far. The near misses on sections 11, 21, 22 and 25 are at noise level. They are mostly prime/prime_totients/e_digits sub with skip [0] resolve, and they don't point at any one key. The local models make few attempts per job (about 130 to 300) next to sonnet/codex (20k to 35k). Pending codex/deepseek/local jobs still cover every section, so I added no jobs.
+- 2026-11-04 10:36:15: 10:36 check: the run is healthy. local/13, local/14 and local/21 have finished, and sonnet/12 and codex/20 are running. Pending local and deepseek jobs cover the remaining sections. Every section done so far has 0 final passes. The near misses (sub with primes/prime_totients/e_digits, skip [0] resolve) are all at noise level and don't settle on any one key or offset. The local models still make very few attempts per job (about 130 to 300) compared with sonnet/codex (20k to 35k). sonnet/12 had 6 of 8 proposals invalid in round 4, but it recovered in round 5. I added no jobs because the queue already covers every section.
 
 ## Events
 
-- 2026-11-04 10:21:19 3 running: sonnet/12, local/14, codex/21
-- 2026-11-04 10:21:19 sonnet/13 waiting: claude-plan in use by sonnet/12
-- 2026-11-04 10:23:54 sonnet/12: running 5 min | 10:22:38 [model] claude-sonnet (proposer) ok 10.3s, tokens in/out 4857/1049, reply 2409 chars
-- 2026-11-04 10:24:54 codex/21: done (exit 0, 4 min)
-- 2026-11-04 10:25:10 published: 16 file(s) to branch results
-- 2026-11-04 10:25:24 supervisor: note: 10:25 check: the run is healthy. codex/21 and codex/22 have finished, and local/14 and sonnet/12 are running. There are still 0 final passes across all sections done so far. The near misses on sections 11, 21, 22 and 25 are at noise level. They are mostly prime/prime_totients/e_digits sub with sk...
 - 2026-11-04 10:25:24 codex/20: start (uses codex-plan)
 - 2026-11-04 10:25:24 3 running: sonnet/12, local/14, codex/20
 - 2026-11-04 10:25:24 sonnet/13 waiting: claude-plan in use by sonnet/12
@@ -174,3 +170,9 @@ round 4 [codex] proposals=8 valid=8 attempts=18194 passes=0 near=0 invalid=0
 - 2026-11-04 10:33:56 sonnet/12: running 15 min | 10:33:42 [model] claude-sonnet (proposer) calling...
 - 2026-11-04 10:35:26 codex/20: running 10 min | 10:33:14 [model] codex (proposer) ok 17.4s, tokens in/out 19114/468, reply 1607 chars
 - 2026-11-04 10:35:46 local/13: done (exit 0, 4 min)
+- 2026-11-04 10:36:02 published: 19 file(s) to branch results
+- 2026-11-04 10:36:15 supervisor: note: 10:36 check: the run is healthy. local/13, local/14 and local/21 have finished, and sonnet/12 and codex/20 are running. Pending local and deepseek jobs cover the remaining sections. Every section done so far has 0 final passes. The near misses (sub with primes/prime_totients/e_digits, skip [0] re...
+- 2026-11-04 10:36:15 local/22: start (uses ollama:http://127.0.0.1:11434)
+- 2026-11-04 10:36:15 3 running: sonnet/12, codex/20, local/22
+- 2026-11-04 10:36:15 sonnet/13 waiting: claude-plan in use by sonnet/12
+- 2026-11-04 10:37:20 sonnet/12: done (exit 0, 18 min)
