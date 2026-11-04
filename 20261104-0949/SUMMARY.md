@@ -1,6 +1,6 @@
 # Overnight run 20261104-0949
 
-Started 2026-11-04 09:49:00, updated 2026-11-04 13:16:20, status **running**. Jobs: pending 4, done 57, blocked 15
+Started 2026-11-04 09:49:00, updated 2026-11-04 13:18:12, status **running**. Jobs: pending 3, done 58, blocked 15
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -76,7 +76,7 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 13:16:20, status **running**. Jo
 | sup1/18 | done | 2026-11-04 12:56:19 | 2026-11-04 13:02:04 | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
 | sup1/19 | done | 2026-11-04 13:02:19 | 2026-11-04 13:03:50 | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
 | sup1/20 | done | 2026-11-04 13:04:05 | 2026-11-04 13:16:20 | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
-| sup1/21 | pending |  |  | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
+| sup1/21 | done | 2026-11-04 13:16:42 | 2026-11-04 13:18:12 | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
 | sup1/22 | pending |  |  | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
 | sup1/24 | pending |  |  | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
 | sup1/25 | pending |  |  | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
@@ -199,14 +199,16 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 13:16:20, status **running**. Jo
   - LP2:33.jpg - 50.jpg/1: 2605 attempts, 23 hypotheses, **0 final pass(es)** (caution: short section (91 runes): many keys give plausible-looking text this short; treat any lead with extra caution)
 - **sup1/20** (done)
   - LP2:50.jpg/2-56.jpg/1: 7654 attempts, 16 hypotheses, **0 final pass(es)**
+- **sup1/21** (done)
+  - LP2:56.jpg/2: 2652 attempts, 24 hypotheses, **0 final pass(es)**
 
 ## Model usage
 
 - qwen-local: 84 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 84 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 197 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-sonnet: 197 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-supervisor: 197 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-opus: 202 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-sonnet: 202 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-supervisor: 202 call(s) in the last 5h (cap 550), spent $0.0000
 - codex: 81 call(s) in the last 5h (cap 750), spent $0.0000
 
 ## Supervisor notes
@@ -236,14 +238,10 @@ Prefer the longer sections (1000+ runes). On short ones (91 and 121 runes) noise
 - 2026-11-04 12:31:34: 12:31 check: the run is healthy. sup1/13 (9.3k attempts) and sup1/14 (15.2k attempts on the 1729-rune section) have finished with 0 final passes. sup1/15 is next on claude-plan. There are still 0 final passes across about 50 finished jobs. sup1/13 found near misses with squares*2+3 and primes*5+4 under skip [27], but they are at noise level (chance 27-71). The new cipher families have shown nothing so far. The deepseek jobs are still blocked until price_in_per_mtok/price_out_per_mtok are filled in config/models.toml. I added no jobs, so I can see the rest of sup1 first (1 of 5 jobs used tonight).
 - 2026-11-04 12:45:49: 12:45 check: the run is healthy. sup1/15 finished at once (likely a short section), and sup1/16 made 11.3k attempts on the 1894-rune section with 0 final passes. sup1/17 is next on claude-plan. There are still 0 final passes across about 52 finished jobs. sup1/16's near misses (beaufort primes*3+2 with map reverse, and add prime_totients*5+3 with skip [27]) are at noise level, like codex/16's on the same section. So far the new cipher families do no better than the original primes/totients/e_digits sweeps. The deepseek jobs are still blocked until price_in_per_mtok/price_out_per_mtok are filled in config/models.toml. I added no jobs, so I can see the rest of sup1 first (1 of 5 jobs used tonight).
 - 2026-11-04 12:56:19: 12:56 check: the run is healthy. sup1/17 finished: 9.2k attempts on the 1021-rune section and 0 final passes, with no near misses. sup1/18 is next on claude-plan. There are still 0 final passes across about 53 finished jobs. The new cipher families tried by sup1 (sequences with non-trivial mult/add, other skip rules, map reverse) have done no better than the original sweeps, and every near miss is at noise level. The deepseek jobs are still blocked until price_in_per_mtok/price_out_per_mtok are filled in config/models.toml. I added no jobs and will let sup1 finish first (1 of 5 jobs used tonight).
+- 2026-11-04 13:16:42: 13:16 check: the run is healthy. sup1/18 (7.3k attempts, 1433-rune section), sup1/19 (2.6k attempts, 91-rune section) and sup1/20 (7.7k attempts, 1468-rune section) have finished, all with 0 final passes. sup1/21 is next on claude-plan. There are still 0 final passes across about 56 finished jobs. sup1/19's near misses on the 91-rune section (add primes*5+4 with skip [8,15], sub squares with skip [27]) are at noise level, and that section is too short to trust. sup1/18 and sup1/20 had no near misses. The deepseek jobs are still blocked until price_in_per_mtok/price_out_per_mtok are filled in config/models.toml. I added no jobs and will let sup1 finish before using more of tonight's budget (1 of 5 jobs used).
 
 ## Events
 
-- 2026-11-04 12:41:55 sup1/16: running 10 min | 12:41:17 [model] claude-opus (proposer) ok 8.4s, tokens in/out 5245/735, reply 1565 chars
-- 2026-11-04 12:45:25 sup1/16: done (exit 0, 14 min)
-- 2026-11-04 12:45:41 published: 53 file(s) to branch results
-- 2026-11-04 12:45:49 supervisor: note: 12:45 check: the run is healthy. sup1/15 finished at once (likely a short section), and sup1/16 made 11.3k attempts on the 1894-rune section with 0 final passes. sup1/17 is next on claude-plan. There are still 0 final passes across about 52 finished jobs. sup1/16's near misses (beaufort primes*3+...
-- 2026-11-04 12:45:49 sup1/17: start (uses claude-plan)
 - 2026-11-04 12:45:49 sup1/18 waiting: claude-plan in use by sup1/17
 - 2026-11-04 12:50:49 sup1/17: running 5 min | 12:49:40 [model] claude-opus (proposer) ok 7.9s, tokens in/out 4240/734, reply 1569 chars
 - 2026-11-04 12:55:49 sup1/17: running 10 min | 12:53:24 [model] claude-opus (proposer) ok 11.6s, tokens in/out 4827/739, reply 1534 chars
@@ -264,3 +262,8 @@ Prefer the longer sections (1000+ runes). On short ones (91 and 121 runes) noise
 - 2026-11-04 13:09:05 sup1/20: running 5 min | 13:04:14 [model] claude-opus (proposer) ok 7.4s, tokens in/out 3718/694, reply 1459 chars
 - 2026-11-04 13:14:05 sup1/20: running 10 min | 13:12:55 [model] claude-opus (proposer) ok 16.1s, tokens in/out 4722/749, reply 1610 chars
 - 2026-11-04 13:16:20 sup1/20: done (exit 0, 12 min)
+- 2026-11-04 13:16:36 published: 57 file(s) to branch results
+- 2026-11-04 13:16:42 supervisor: note: 13:16 check: the run is healthy. sup1/18 (7.3k attempts, 1433-rune section), sup1/19 (2.6k attempts, 91-rune section) and sup1/20 (7.7k attempts, 1468-rune section) have finished, all with 0 final passes. sup1/21 is next on claude-plan. There are still 0 final passes across about 56 finished jobs...
+- 2026-11-04 13:16:42 sup1/21: start (uses claude-plan)
+- 2026-11-04 13:16:42 sup1/22 waiting: claude-plan in use by sup1/21
+- 2026-11-04 13:18:12 sup1/21: done (exit 0, 2 min)
