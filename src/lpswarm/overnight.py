@@ -229,6 +229,7 @@ class Overnight:
         self.max_parallel = max(1, int(cfg.max_parallel))
         self.running: dict[str, _Running] = {}
         self._last_wait = ""
+        self._blocked_sink: dict | None = None
         self._specs_cache: tuple[float, dict] | None = None
         self.state = self._load_state()
         self.last_tick = 0.0
@@ -416,6 +417,8 @@ class Overnight:
             for res in self.job_resources(r.job):
                 busy[res] = r.job["id"]
         waiting = ""
+        blocked: dict[str, list[str]] = {}       # reason -> job ids (one console line each)
+        self._blocked_sink = blocked
         for job in self.state["jobs"]:
             if len(self.running) >= self.max_parallel:
                 break
@@ -436,6 +439,12 @@ class Overnight:
             elif job["status"] != "blocked":
                 after = job["status"]
                 self.log(f"{job['id']}: {after}")
+        self._blocked_sink = None
+        for reason, ids in blocked.items():
+            if len(ids) == 1:
+                self.log(f"{ids[0]}: blocked: {reason}")
+            else:
+                self.log(f"blocked {len(ids)} jobs ({ids[0]} ... {ids[-1]}): {reason}")
         if waiting and waiting != self._last_wait:
             self.log(waiting)
         self._last_wait = waiting
@@ -444,7 +453,11 @@ class Overnight:
         refuse = self.preflight(job)
         if refuse:
             job.update(status="blocked", reason=refuse, ended=_now())
-            self.log(f"{job['id']}: blocked: {refuse}")
+            sink = getattr(self, "_blocked_sink", None)
+            if sink is not None:
+                sink.setdefault(refuse, []).append(job["id"])
+            else:
+                self.log(f"{job['id']}: blocked: {refuse}")
             self.save()
             return None
         d = self.job_dir(job)

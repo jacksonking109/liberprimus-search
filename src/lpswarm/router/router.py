@@ -109,6 +109,8 @@ class Router:
         # Models may be called from several threads (one per backend, see backend_key);
         # budget/limit checks and ledger writes are serialised here.
         self._lock = threading.RLock()
+        self._config_path: str | None = None    # set by from_toml: caps are re-read on change
+        self._config_mtime: float | None = None
         if ledger is None and (global_max_usd is not None or any(s.max_usd is not None for s in specs)):
             raise ValueError("USD caps need a ledger to count spending; pass ledger=...")
         if ledger is None and any(s.extra.get("max_calls_per_window") for s in specs):
@@ -125,7 +127,53 @@ class Router:
     @classmethod
     def from_toml(cls, path, ledger=None, **kw) -> "Router":
         from lpswarm.router.base import load_model_specs
-        return cls(load_model_specs(path), ledger=ledger, **kw)
+        r = cls(load_model_specs(path), ledger=ledger, **kw)
+        r._config_path = str(path)
+        try:
+            r._config_mtime = os.stat(path).st_mtime
+        except OSError:
+            pass
+        return r
+
+    LIVE_KEYS = ("max_calls_per_window", "window_hours", "quota_group")
+
+    def refresh_limits(self) -> bool:
+        """Re-read the plan-cap settings (LIVE_KEYS) from the models config if the file
+        changed since it was loaded, so raising max_calls_per_window takes effect in a
+        running job without a restart. Adapters, roles and prices are never reloaded.
+        Returns True if anything was updated."""
+        path = self._config_path
+        if not path:
+            return False
+        try:
+            mtime = os.stat(path).st_mtime
+        except OSError:
+            return False
+        if mtime == self._config_mtime:
+            return False
+        self._config_mtime = mtime
+        try:
+            from lpswarm.router.base import load_model_specs
+            fresh = {s.name: s for s in load_model_specs(path)}
+        except Exception:  # noqa: BLE001 - a half-saved or broken file: keep the old settings
+            self._config_mtime = None   # try again next time
+            return False
+        changed = False
+        with self._lock:
+            for name, e in self._models.items():
+                f = fresh.get(name)
+                if f is None:
+                    continue
+                for k in self.LIVE_KEYS:
+                    if e.spec.extra.get(k) != f.extra.get(k):
+                        changed = True
+                        if k in f.extra:
+                            e.spec.extra[k] = f.extra[k]
+                        else:
+                            e.spec.extra.pop(k, None)
+        if changed:
+            self._log_call(f"[model] plan caps reloaded from {path}")
+        return changed
 
     def names(self, role: Role | str | None = None) -> list[str]:
         if role is None:
@@ -174,6 +222,7 @@ class Router:
         its reset) or 'window' (the local call cap is full; worked out live from the
         call count and the current cap, so raising the cap ends it at once)."""
         now = time.time() if now is None else now
+        self.refresh_limits()
         spec = self.spec(name)
         hours = float(spec.extra.get("window_hours", 5))
         cap = spec.extra.get("max_calls_per_window")

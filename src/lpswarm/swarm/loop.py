@@ -235,7 +235,9 @@ def run_swarm(target: Target, ledger: Ledger, oracle: FullOracle, generators: Se
             if idle_rounds > 500:
                 stopped = "rate_limited: too many paused rounds in a row"
                 break
-            stopped = _wait_until(resume, stop_path, time_left, progress)
+            paused_gens = [g for g in generators if g.model in limited]
+            stopped = _wait_until(resume, stop_path, time_left, progress,
+                                  still_paused=lambda: _any_still_paused(paused_gens))
             if stopped:
                 break
             rnd -= 1   # the round produced nothing; do not count it
@@ -299,21 +301,45 @@ def _fetch_proposals(generators, ctxs: dict, parallel: bool, rnd: int,
     return out
 
 
-def _wait_until(resume_at: float, stop_path, time_left, progress: bool) -> str | None:
-    """Sleep until resume_at, checking the STOP file and the run timeout every 30 s."""
+def _any_still_paused(gens) -> bool:
+    """False once any paused generator's model is free again (e.g. its cap was raised
+    in the models config). Generators without a router count as still paused."""
+    for g in gens:
+        router = getattr(g, "router", None)
+        try:
+            if router is not None and router.window_status(g.model)["paused_until"] is None:
+                return False
+        except Exception:  # noqa: BLE001
+            continue
+    return True
+
+
+def _wait_until(resume_at: float, stop_path, time_left, progress: bool,
+                still_paused=None, recheck_s: float = 60.0) -> str | None:
+    """Sleep until resume_at, checking the STOP file and the run timeout every 30 s, and
+    (still_paused) every recheck_s whether a pause has been lifted early."""
     from datetime import datetime
     if progress:
         print(f"all generators are paused by usage limits; waiting until "
               f"{datetime.fromtimestamp(resume_at):%Y-%m-%d %H:%M} (create a STOP file to end)",
               flush=True)
+    last_check = time.monotonic()
     while True:
         now = time.time()
         if now >= resume_at:
             return None
+        if still_paused is not None and time.monotonic() - last_check >= recheck_s:
+            last_check = time.monotonic()
+            if not still_paused():
+                if progress:
+                    print("a paused model is available again (cap raised?); carrying on", flush=True)
+                return None
         if stop_path is not None and stop_path.exists():
             return "stop_file"
         left = time_left()
         if left is not None and left <= 0:
             return "timeout"
         step = min(30.0, resume_at - now) if left is None else min(30.0, resume_at - now, left)
-        time.sleep(max(0.5, step))
+        if still_paused is not None:
+            step = min(step, recheck_s)
+        time.sleep(max(0.1, step))

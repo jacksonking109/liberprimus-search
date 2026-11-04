@@ -215,3 +215,50 @@ def test_serial_mode_and_stop_kills_all(tmp_path):
     assert time.monotonic() - t0 < 30
     assert [j["status"] for j in st2["jobs"]] == ["interrupted", "interrupted"]
     assert st2["status"] == "stopped"
+
+
+def test_cap_raised_in_config_lifts_pause_without_restart(tmp_path):
+    cfg = tmp_path / "m.toml"
+    body = ('[models.opus]\nprovider = "scripted"\nmodel = "x"\nroles = ["proposer"]\n'
+            'replies = ["ok"]\nquota_group = "claude-plan"\nmax_calls_per_window = {cap}\n')
+    cfg.write_text(body.format(cap=1), encoding="utf-8")
+    r = Router.from_toml(cfg, ledger=Ledger(tmp_path / "s.sqlite"))
+    r.complete("opus", [], role="proposer")
+    try:
+        r.complete("opus", [], role="proposer")
+        raise AssertionError("cap should pause")
+    except RateLimited:
+        pass
+    import os
+    cfg.write_text(body.format(cap=50), encoding="utf-8")
+    st = os.stat(cfg)
+    os.utime(cfg, (st.st_atime, st.st_mtime + 5))      # make sure the mtime moves
+    r.complete("opus", [], role="proposer")             # same router, new cap
+    assert r.spec("opus").extra["max_calls_per_window"] == 50
+
+
+def test_swarm_wait_ends_when_pause_lifts():
+    from lpswarm.swarm.loop import _wait_until
+    t0 = time.monotonic()
+    flag = {"n": 0}
+
+    def still():
+        flag["n"] += 1
+        return flag["n"] < 2
+    assert _wait_until(time.time() + 3600, None, lambda: None, False, still_paused=still,
+                       recheck_s=0.2) is None
+    assert time.monotonic() - t0 < 5
+
+
+def test_blocked_jobs_are_reported_once(tmp_path, capsys):
+    models = tmp_path / "m.toml"
+    models.write_text('[models.ds]\nprovider = "openai_compatible"\nendpoint = "https://x.invalid"\n'
+                      'model = "m"\napi_key_env = "K"\nroles = ["proposer"]\nmax_usd = 1.0\n',
+                      encoding="utf-8")
+    jobs = [{"id": f"u/{i}", "kind": "swarm", "args": ["--generators", "ds"]} for i in range(3)]
+    cfg = OvernightConfig(models=str(models), spend_ledger=str(tmp_path / "s.sqlite"), publish=False,
+                          jobs=jobs)
+    st = Overnight(cfg, tmp_path / "run", stop_file=tmp_path / "STOP", poll_s=0.1).run()
+    out = capsys.readouterr().out
+    assert out.count("prices are 0") == 1 and "blocked 3 jobs (u/0 ... u/2)" in out
+    assert all(j["status"] == "blocked" and "prices are 0" in j["reason"] for j in st["jobs"])

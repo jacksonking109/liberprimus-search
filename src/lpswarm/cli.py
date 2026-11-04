@@ -365,7 +365,12 @@ def cmd_overnight(args) -> int:
     spend = None
     if Path(cfg.models).is_file():
         spend = Ledger(cfg.spend_ledger)
-        router = Router.from_toml(cfg.models, ledger=spend)
+        import warnings
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            router = Router.from_toml(cfg.models, ledger=spend)
+        for w in caught:   # e.g. "prices are 0": one readable line instead of a traceback-ish warning
+            print(f"[overnight] note: {w.message}", flush=True)
         if cfg.supervisor:
             if Role.SUPERVISOR not in router.spec(cfg.supervisor).roles:
                 raise SystemExit(f"model {cfg.supervisor} needs roles = [\"supervisor\"] in {cfg.models}")
