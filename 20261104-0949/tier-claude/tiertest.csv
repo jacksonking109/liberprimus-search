@@ -1,0 +1,6 @@
+arm,length,cases,recovered,recall,recall_ci_lo,recall_ci_hi,median_attempts_to_solve,attempts,false_passes,model_calls,tokens_in,tokens_out,usd
+random_program:40,80,3,0,0.0,0.0,0.5615060804490177,,96,0,0,0,0,0.0
+random_program:40,160,3,0,0.0,0.0,0.5615060804490177,,96,0,0,0,0,0.0
+random_program:40,all,6,0,0.0,0.0,0.3903430336530645,,192,0,0,0,0,0.0
+claude-opus,80,2,1,0.5,0.09452865480086614,0.9054713451991339,3,6512,0,6,19829,5050,0.0
+claude-opus,all,2,1,0.5,0.09452865480086614,0.9054713451991339,3,6512,0,6,19829,5050,0.0
