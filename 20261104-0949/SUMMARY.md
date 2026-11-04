@@ -1,6 +1,6 @@
 # Overnight run 20261104-0949
 
-Started 2026-11-04 09:49:00, updated 2026-11-04 13:36:21, status **running**. Jobs: pending 1, done 60, blocked 15
+Started 2026-11-04 09:49:00, updated 2026-11-04 13:40:11, status **running**. Jobs: done 61, blocked 15
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -79,7 +79,7 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 13:36:21, status **running**. Jo
 | sup1/21 | done | 2026-11-04 13:16:42 | 2026-11-04 13:18:12 | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
 | sup1/22 | done | 2026-11-04 13:18:28 | 2026-11-04 13:33:58 | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
 | sup1/24 | done | 2026-11-04 13:34:21 | 2026-11-04 13:36:21 | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
-| sup1/25 | pending |  |  | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
+| sup1/25 | done | 2026-11-04 13:36:36 | 2026-11-04 13:40:11 | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
 
 ## Results so far
 
@@ -205,14 +205,16 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 13:36:21, status **running**. Jo
   - LP2:57.jpg-66.jpg/1: 11228 attempts, 23 hypotheses, **0 final pass(es)**
 - **sup1/24** (done)
   - LP2:51.jpg/2-53.jpg - 68.jpg/2-70.jpg: 5030 attempts, 24 hypotheses, **0 final pass(es)**
+- **sup1/25** (done)
+  - LP2:54.jpg-55.jpg - 71.jpg-72.jpg: 6265 attempts, 24 hypotheses, **0 final pass(es)**
 
 ## Model usage
 
 - qwen-local: 84 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 84 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 211 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-sonnet: 211 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-supervisor: 211 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-opus: 215 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-sonnet: 215 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-supervisor: 215 call(s) in the last 5h (cap 550), spent $0.0000
 - codex: 81 call(s) in the last 5h (cap 750), spent $0.0000
 
 ## Supervisor notes
@@ -247,9 +249,6 @@ Prefer the longer sections (1000+ runes). On short ones (91 and 121 runes) noise
 
 ## Events
 
-- 2026-11-04 13:02:19 sup1/20 waiting: claude-plan in use by sup1/19
-- 2026-11-04 13:03:50 sup1/19: done (exit 0, 2 min)
-- 2026-11-04 13:04:05 published: 56 file(s) to branch results
 - 2026-11-04 13:04:05 sup1/20: start (uses claude-plan)
 - 2026-11-04 13:04:05 sup1/21 waiting: claude-plan in use by sup1/20
 - 2026-11-04 13:09:05 sup1/20: running 5 min | 13:04:14 [model] claude-opus (proposer) ok 7.4s, tokens in/out 3718/694, reply 1459 chars
@@ -272,3 +271,6 @@ Prefer the longer sections (1000+ runes). On short ones (91 and 121 runes) noise
 - 2026-11-04 13:34:21 sup1/24: start (uses claude-plan)
 - 2026-11-04 13:34:21 sup1/25 waiting: claude-plan in use by sup1/24
 - 2026-11-04 13:36:21 sup1/24: done (exit 0, 2 min)
+- 2026-11-04 13:36:36 published: 60 file(s) to branch results
+- 2026-11-04 13:36:36 sup1/25: start (uses claude-plan)
+- 2026-11-04 13:40:11 sup1/25: done (exit 0, 4 min)
