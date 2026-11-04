@@ -1,6 +1,6 @@
 # Overnight run 20261104-0949
 
-Started 2026-11-04 09:49:00, updated 2026-11-04 11:30:45, status **running**. Jobs: pending 8, running 1, done 37, blocked 15
+Started 2026-11-04 09:49:00, updated 2026-11-04 11:36:01, status **running**. Jobs: pending 7, running 1, done 38, blocked 15
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -31,7 +31,7 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 11:30:45, status **running**. Jo
 | codex/16 | done | 2026-11-04 11:05:18 | 2026-11-04 11:20:52 | Codex (exploratory) |
 | codex/15 | done | 2026-11-04 11:21:08 | 2026-11-04 11:21:13 | Codex (exploratory) |
 | codex/14 | done | 2026-11-04 11:21:28 | 2026-11-04 11:30:45 | Codex (exploratory) |
-| codex/13 | pending |  |  | Codex (exploratory) |
+| codex/13 | done | 2026-11-04 11:31:01 | 2026-11-04 11:36:01 | Codex (exploratory) |
 | codex/12 | pending |  |  | Codex (exploratory) |
 | codex/11 | pending |  |  | Codex (exploratory) |
 | codex/10 | pending |  |  | Codex (exploratory) |
@@ -70,16 +70,16 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 11:30:45, status **running**. Jo
 
 **sonnet/20** (since 2026-11-04 11:29:45), latest log lines:
 ```
-  | 6. **Scaled sequences.** Use naturals, squares and triangular with scale 2, 3, 5 and 7, add from 0 to 28 where feasible, offset_range [0, 1000], combine sub and beaufort. The aim is affine-like ke
-  | **Do NOT repeat:**
-  | - Plain repeat-word Vigenère with common words.
-  | - Unscaled pi_digits and e_digits at offset 0.
-  | - Constant shifts without a
-11:30:10 [model] claude-sonnet (proposer) calling...
-11:30:17 [model] claude-sonnet (proposer) ok 7.3s, tokens in/out 4142/845, reply 1877 chars
-round 1 [claude-sonnet] proposals=8 valid=6 attempts=47 passes=0 near=0 invalid=2
-11:30:28 [model] claude-sonnet (proposer) calling...
 11:30:35 [model] claude-sonnet (proposer) ok 7.1s, tokens in/out 4744/783, reply 1685 chars
+round 2 [claude-sonnet] proposals=8 valid=8 attempts=3083 passes=0 near=0 invalid=2
+11:33:46 [model] claude-sonnet (proposer) calling...
+11:33:58 [model] claude-sonnet (proposer) ok 12.7s, tokens in/out 5285/849, reply 1843 chars
+round 3 [claude-sonnet] proposals=8 valid=4 attempts=3087 passes=0 near=0 invalid=6
+11:33:58 [model] claude-sonnet (proposer) calling...
+11:34:09 [model] claude-sonnet (proposer) ok 10.8s, tokens in/out 5841/827, reply 1833 chars
+round 4 [claude-sonnet] proposals=8 valid=7 attempts=5147 passes=0 near=0 invalid=7
+11:35:47 [model] claude-sonnet (proposer) calling...
+11:36:00 [model] claude-sonnet (proposer) ok 13.2s, tokens in/out 6364/1570, reply 1863 chars
 ```
 
 ## Results so far
@@ -130,6 +130,8 @@ round 1 [claude-sonnet] proposals=8 valid=6 attempts=47 passes=0 near=0 invalid=
   - skip LP2:15.jpg/1 - 32.jpg/1: only 9 symbols (minimum 20, --min-length); too short to judge
 - **codex/14** (done)
   - LP2:8.jpg-14.jpg - 25.jpg-31.jpg: 22286 attempts, 40 hypotheses, **0 final pass(es)**
+- **codex/13** (done)
+  - LP2:6.jpg/2-7.jpg - 23.jpg/2-24.jpg: 22330 attempts, 46 hypotheses, **0 final pass(es)**
 - **local/17** (done)
   - LP2:- - 40.jpg-43.jpg: 298 attempts, 82 hypotheses, **0 final pass(es)**
 - **local/18** (done)
@@ -165,10 +167,10 @@ round 1 [claude-sonnet] proposals=8 valid=6 attempts=47 passes=0 near=0 invalid=
 
 - qwen-local: 84 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 84 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 119 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-sonnet: 119 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-supervisor: 119 call(s) in the last 5h (cap 550), spent $0.0000
-- codex: 60 call(s) in the last 5h (cap 750), spent $0.0000
+- claude-opus: 122 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-sonnet: 122 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-supervisor: 122 call(s) in the last 5h (cap 550), spent $0.0000
+- codex: 66 call(s) in the last 5h (cap 750), spent $0.0000
 
 ## Supervisor notes
 
@@ -183,11 +185,6 @@ round 1 [claude-sonnet] proposals=8 valid=6 attempts=47 passes=0 near=0 invalid=
 
 ## Events
 
-- 2026-11-04 11:15:22 codex/16: running 10 min | 11:14:58 [model] codex (proposer) ok 15.0s, tokens in/out 19356/461, reply 1703 chars
-- 2026-11-04 11:18:42 sonnet/18: running 5 min | 11:18:22 [model] claude-sonnet (proposer) ok 15.2s, tokens in/out 5322/909, reply 2025 chars
-- 2026-11-04 11:20:22 codex/16: running 15 min | 11:14:58 [model] codex (proposer) ok 15.0s, tokens in/out 19356/461, reply 1703 chars
-- 2026-11-04 11:20:52 codex/16: done (exit 0, 16 min)
-- 2026-11-04 11:21:08 published: 35 file(s) to branch results
 - 2026-11-04 11:21:08 codex/15: start (uses codex-plan)
 - 2026-11-04 11:21:08 2 running: sonnet/18, codex/15
 - 2026-11-04 11:21:13 codex/15: done (exit 0, 0 min)
@@ -208,3 +205,8 @@ round 1 [claude-sonnet] proposals=8 valid=6 attempts=47 passes=0 near=0 invalid=
 - 2026-11-04 11:29:45 2 running: codex/14, sonnet/20
 - 2026-11-04 11:29:45 sonnet/21 waiting: claude-plan in use by sonnet/20
 - 2026-11-04 11:30:45 codex/14: done (exit 0, 9 min)
+- 2026-11-04 11:31:01 published: 38 file(s) to branch results
+- 2026-11-04 11:31:01 codex/13: start (uses codex-plan)
+- 2026-11-04 11:31:01 2 running: sonnet/20, codex/13
+- 2026-11-04 11:34:46 sonnet/20: running 5 min | 11:34:09 [model] claude-sonnet (proposer) ok 10.8s, tokens in/out 5841/827, reply 1833 chars
+- 2026-11-04 11:36:01 codex/13: done (exit 0, 5 min)
