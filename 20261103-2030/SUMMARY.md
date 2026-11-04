@@ -1,10 +1,10 @@
 # Overnight run 20261103-2030
 
-Started 2026-11-03 20:30:23, updated 2026-11-03 22:33:04, status **running**. Jobs: pending 10, running 1, done 5, blocked 15
+Started 2026-11-03 20:30:23, updated 2026-11-03 22:33:16, status **stopped**. Jobs: pending 10, done 5, interrupted 1, blocked 15
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
-| tier-claude | running | 2026-11-03 20:30:23 | 2026-11-03 20:32:42 | Claude Code proposers vs the random control |
+| tier-claude | interrupted | 2026-11-03 20:30:23 | 2026-11-03 22:33:16 | STOP file |
 | unsolved/10 | blocked |  | 2026-11-03 22:08:49 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
 | unsolved/11 | blocked |  | 2026-11-03 22:08:49 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
 | unsolved/12 | blocked |  | 2026-11-03 22:08:49 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
@@ -36,21 +36,9 @@ Started 2026-11-03 20:30:23, updated 2026-11-03 22:33:04, status **running**. Jo
 | sup1/24 | pending |  |  | added by supervisor. The DeepSeek-based unsolved jobs are blocked by the zero-price config. This covers the same section |
 | sup1/25 | pending |  |  | added by supervisor. The DeepSeek-based unsolved jobs are blocked by the zero-price config. This covers the same section |
 
-## Now running
-
-**tier-claude** (since 2026-11-03 20:30:23), latest log lines:
-```
-===== 2026-11-03 20:30:23 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm tiertest --arms random_program:40,claude-opus,claude-sonnet --lengths 80,160 --cases 3 --word-breaks --o
-lpswarm: error: skip_mode "resolve" needs a language model (lm=bigram table)
-===== 2026-11-03 20:39:54 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm tiertest --arms random_program:40,claude-opus,claude-sonnet --lengths 80,160 --cases 3 --word-breaks --o
-===== 2026-11-03 22:08:49 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm tiertest --arms random_program:40,claude-opus,claude-sonnet --lengths 80,160 --cases 3 --word-breaks --o
-resuming run 20261103T203025: 12 case(s) already done
-22:08:50 [model] claude-sonnet (proposer) paused: claude-sonnet is paused until 2026-11-04 01:27 (local cap 40/40 calls per 5h for claude-plan; raise max_calls_per_window in the models config to allow
-```
-
 ## Results so far
 
-- **tier-claude** (running)
+- **tier-claude** (interrupted)
   - random_program:40: recall 0.00 (0/6), 192 attempts, 0 model calls, $0.0000
   - claude-opus: recall 0.50 (3/6), 41822 attempts, 21 model calls, $0.0000
 - **sup1/10** (done)
@@ -83,9 +71,6 @@ resuming run 20261103T203025: 12 case(s) already done
 
 ## Events
 
-- 2026-11-03 22:13:49 tier-claude: running 5 min | 22:08:50 [model] claude-sonnet (proposer) paused: claude-sonnet is paused until 2026-11-04 01:27 (local cap 40/40 calls per 5h for claude-plan; raise max_calls_per_window in the models config to allow
-- 2026-11-03 22:13:49 sup1/10: running 5 min | 22:13:22 [model] gemma-local (proposer) ok 14.6s, tokens in/out 3294/253, reply 735 chars
-- 2026-11-03 22:15:29 sup1/10: done (exit 0, 7 min)
 - 2026-11-03 22:15:45 published: 6 file(s) to branch results
 - 2026-11-03 22:15:45 sup1/11: start (uses codex-plan, ollama:http://127.0.0.1:11434)
 - 2026-11-03 22:15:45 2 running: tier-claude, sup1/11
@@ -108,3 +93,6 @@ resuming run 20261103T203025: 12 case(s) already done
 - 2026-11-03 22:31:29 sup1/14: start (uses codex-plan, ollama:http://127.0.0.1:11434)
 - 2026-11-03 22:31:29 2 running: tier-claude, sup1/14
 - 2026-11-03 22:33:04 sup1/14: done (exit 0, 2 min)
+- 2026-11-03 22:33:16 published: 10 file(s) to branch results
+- 2026-11-03 22:33:16 stopping: STOP file
+- 2026-11-03 22:33:16 tier-claude: interrupted (exit 1, 24 min)
