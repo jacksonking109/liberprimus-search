@@ -1,6 +1,6 @@
 # Overnight run 20261104-1523
 
-Started 2026-11-04 15:23:11, updated 2026-11-04 16:20:00, status **running**. Jobs: pending 33, running 3, done 25
+Started 2026-11-04 15:23:11, updated 2026-11-04 16:20:21, status **running**. Jobs: pending 32, running 3, done 26
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -29,7 +29,7 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 16:20:00, status **running**. Jo
 | codex/18 | done | 2026-11-04 15:54:33 | 2026-11-04 16:12:28 | Codex (exploratory) |
 | codex/17 | done | 2026-11-04 16:00:20 | 2026-11-04 16:20:00 | Codex (exploratory) |
 | codex/16 | running | 2026-11-04 16:12:44 |  | Codex (exploratory) |
-| codex/15 | pending |  |  | Codex (exploratory) |
+| codex/15 | done | 2026-11-04 16:20:16 | 2026-11-04 16:20:21 | Codex (exploratory) |
 | codex/14 | pending |  |  | Codex (exploratory) |
 | codex/13 | pending |  |  | Codex (exploratory) |
 | codex/12 | pending |  |  | Codex (exploratory) |
@@ -96,7 +96,6 @@ round 4 [claude-sonnet] proposals=12 valid=12 attempts=12230 passes=0 near=0 inv
 ```
 **local/22** (since 2026-11-04 16:19:00), latest log lines:
 ```
-===== 2026-11-04 16:19:00 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 22 --gen
 == LP2:57.jpg-66.jpg/1  (2474 symbols)
 16:19:02 [model] qwen-local (proposer) calling...
 16:19:23 [model] qwen-local (proposer) ok 20.8s, tokens in/out 2409/652, reply 2442 chars
@@ -105,6 +104,8 @@ round 4 [claude-sonnet] proposals=12 valid=12 attempts=12230 passes=0 near=0 inv
 round 1 [qwen-local] proposals=8 valid=7 attempts=7 passes=0 near=0 invalid=1
 round 1 [gemma-local] proposals=8 valid=6 attempts=9 passes=0 near=0 invalid=2
 16:19:49 [model] qwen-local (proposer) calling...
+16:20:11 [model] qwen-local (proposer) ok 22.0s, tokens in/out 2830/696, reply 2563 chars
+16:20:11 [model] gemma-local (proposer) calling...
 ```
 
 ## Results so far
@@ -143,6 +144,8 @@ round 1 [gemma-local] proposals=8 valid=6 attempts=9 passes=0 near=0 invalid=2
   - LP2:- - 44.jpg-49.jpg: 30741 attempts, 87 hypotheses, **0 final pass(es)**
 - **codex/17** (done)
   - LP2:- - 40.jpg-43.jpg: 40153 attempts, 93 hypotheses, **0 final pass(es)**
+- **codex/15** (done)
+  - skip LP2:15.jpg/1 - 32.jpg/1: only 9 symbols (minimum 20, --min-length); too short to judge
 - **local/17** (done)
   - LP2:- - 40.jpg-43.jpg: 2063 attempts, 70 hypotheses, **0 final pass(es)**
 - **local/18** (done)
@@ -164,7 +167,7 @@ round 1 [gemma-local] proposals=8 valid=6 attempts=9 passes=0 near=0 invalid=2
 
 ## Model usage
 
-- qwen-local: 49 call(s) in the last 5h (cap none), spent $0.0000
+- qwen-local: 50 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 49 call(s) in the last 5h (cap none), spent $0.0000
 - claude-opus: 213 call(s) in the last 5h (cap 550), spent $0.0000
 - claude-sonnet: 213 call(s) in the last 5h (cap 550), spent $0.0000
@@ -177,11 +180,6 @@ round 1 [gemma-local] proposals=8 valid=6 attempts=9 passes=0 near=0 invalid=2
 
 ## Events
 
-- 2026-11-04 16:11:27 local/21: done (exit 0, 5 min)
-- 2026-11-04 16:11:43 published: 23 file(s) to branch results
-- 2026-11-04 16:11:43 local/13: start (uses ollama:http://127.0.0.1:11434)
-- 2026-11-04 16:11:43 4 running: codex/18, codex/17, sonnet/16, local/13
-- 2026-11-04 16:11:43 sonnet/17 waiting: claude-plan in use by sonnet/16
 - 2026-11-04 16:12:28 codex/18: done (exit 0, 18 min)
 - 2026-11-04 16:12:43 published: 24 file(s) to branch results
 - 2026-11-04 16:12:43 sonnet/16: running 10 min | 16:10:18 [model] claude-sonnet (proposer) ok 14.4s, tokens in/out 7566/1769, reply 2856 chars
@@ -202,3 +200,8 @@ round 1 [gemma-local] proposals=8 valid=6 attempts=9 passes=0 near=0 invalid=2
 - 2026-11-04 16:19:00 4 running: codex/17, codex/16, sonnet/17, local/22
 - 2026-11-04 16:19:00 sonnet/18 waiting: claude-plan in use by sonnet/17
 - 2026-11-04 16:20:00 codex/17: done (exit 0, 20 min)
+- 2026-11-04 16:20:16 published: 27 file(s) to branch results
+- 2026-11-04 16:20:16 codex/15: start (uses codex-plan)
+- 2026-11-04 16:20:16 4 running: codex/16, sonnet/17, local/22, codex/15
+- 2026-11-04 16:20:16 sonnet/18 waiting: claude-plan in use by sonnet/17
+- 2026-11-04 16:20:21 codex/15: done (exit 0, 0 min)
