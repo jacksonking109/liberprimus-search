@@ -1,6 +1,6 @@
 # Overnight run 20261103-2310
 
-Started 2026-11-03 23:10:06, updated 2026-11-03 23:36:28, status **running**. Jobs: pending 52, running 2, done 7
+Started 2026-11-03 23:10:06, updated 2026-11-03 23:36:49, status **running**. Jobs: pending 51, running 2, done 8
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -39,7 +39,7 @@ Started 2026-11-03 23:10:06, updated 2026-11-03 23:36:28, status **running**. Jo
 | local/18 | done | 2026-11-03 23:15:08 | 2026-11-03 23:21:43 | local models |
 | local/16 | done | 2026-11-03 23:21:59 | 2026-11-03 23:32:05 | local models |
 | local/19 | done | 2026-11-03 23:32:28 | 2026-11-03 23:36:28 | local models |
-| local/15 | pending |  |  | local models |
+| local/15 | done | 2026-11-03 23:36:44 | 2026-11-03 23:36:49 | local models |
 | local/20 | pending |  |  | local models |
 | local/14 | pending |  |  | local models |
 | local/21 | pending |  |  | local models |
@@ -113,6 +113,8 @@ round 5 [codex] proposals=8 valid=8 attempts=24508 passes=0 near=2 invalid=0
   - LP2:15.jpg/2- - 32.jpg/2-39.jpg: 211 attempts, 89 hypotheses, **0 final pass(es)**
 - **local/19** (done)
   - LP2:33.jpg - 50.jpg/1: 120 attempts, 88 hypotheses, **0 final pass(es)** (caution: short section (91 runes): many keys give plausible-looking text this short; treat any lead with extra caution)
+- **local/15** (done)
+  - skip LP2:15.jpg/1 - 32.jpg/1: only 9 symbols (minimum 20, --min-length); too short to judge
 
 ## Model usage
 
@@ -132,12 +134,6 @@ round 5 [codex] proposals=8 valid=8 attempts=24508 passes=0 near=2 invalid=0
 
 ## Events
 
-- 2026-11-03 23:21:38 supervisor: note: 23:21 check: run healthy, 2 running, 56 pending, no failures. No FINAL leads yet; best is codex/25 (section 54-55..71-72), with near misses at margins -0.23 to -0.29 (sub/add with a primes stream, pi_digits). Watch claude-opus quota: 101 of 120 calls in the last 5h, so it may hit its cap during t...
-- 2026-11-03 23:21:38 codex/22: start (uses codex-plan)
-- 2026-11-03 23:21:38 3 running: tier-claude, local/18, codex/22
-- 2026-11-03 23:21:38 sonnet/10 waiting: claude-plan in use by tier-claude
-- 2026-11-03 23:21:43 local/18: done (exit 0, 7 min)
-- 2026-11-03 23:21:59 published: 9 file(s) to branch results
 - 2026-11-03 23:21:59 local/16: start (uses ollama:http://127.0.0.1:11434)
 - 2026-11-03 23:21:59 3 running: tier-claude, codex/22, local/16
 - 2026-11-03 23:25:14 tier-claude: running 15 min | 23:25:14 [model] claude-sonnet (proposer) ok 8.2s, tokens in/out 3333/835, reply 1839 chars
@@ -157,3 +153,9 @@ round 5 [codex] proposals=8 valid=8 attempts=24508 passes=0 near=2 invalid=0
 - 2026-11-03 23:32:28 sonnet/11 waiting: claude-plan in use by sonnet/10
 - 2026-11-03 23:33:03 sonnet/10: running 5 min | 23:32:54 [model] claude-sonnet (proposer) ok 7.2s, tokens in/out 5375/918, reply 2041 chars
 - 2026-11-03 23:36:28 local/19: done (exit 0, 4 min)
+- 2026-11-03 23:36:44 published: 11 file(s) to branch results
+- 2026-11-03 23:36:44 local/15: start (uses ollama:http://127.0.0.1:11434)
+- 2026-11-03 23:36:44 3 running: codex/22, sonnet/10, local/15
+- 2026-11-03 23:36:44 sonnet/11 waiting: claude-plan in use by sonnet/10
+- 2026-11-03 23:36:49 codex/22: running 15 min | 23:34:26 [model] codex (proposer) ok 22.1s, tokens in/out 18704/487, reply 1685 chars
+- 2026-11-03 23:36:49 local/15: done (exit 0, 0 min)
