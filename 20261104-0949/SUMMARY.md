@@ -1,6 +1,6 @@
 # Overnight run 20261104-0949
 
-Started 2026-11-04 09:49:00, updated 2026-11-04 11:29:30, status **running**. Jobs: pending 9, running 1, done 36, blocked 15
+Started 2026-11-04 09:49:00, updated 2026-11-04 11:30:45, status **running**. Jobs: pending 8, running 1, done 37, blocked 15
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -15,7 +15,7 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 11:29:30, status **running**. Jo
 | sonnet/17 | done | 2026-11-04 11:05:18 | 2026-11-04 11:13:04 | Sonnet, briefed by Opus |
 | sonnet/18 | done | 2026-11-04 11:13:42 | 2026-11-04 11:26:43 | Sonnet, briefed by Opus |
 | sonnet/19 | done | 2026-11-04 11:27:10 | 2026-11-04 11:29:30 | Sonnet, briefed by Opus |
-| sonnet/20 | pending |  |  | Sonnet, briefed by Opus |
+| sonnet/20 | running | 2026-11-04 11:29:45 |  | Sonnet, briefed by Opus |
 | sonnet/21 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/22 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/24 | pending |  |  | Sonnet, briefed by Opus |
@@ -30,7 +30,7 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 11:29:30, status **running**. Jo
 | codex/17 | done | 2026-11-04 10:54:26 | 2026-11-04 11:05:15 | Codex (exploratory) |
 | codex/16 | done | 2026-11-04 11:05:18 | 2026-11-04 11:20:52 | Codex (exploratory) |
 | codex/15 | done | 2026-11-04 11:21:08 | 2026-11-04 11:21:13 | Codex (exploratory) |
-| codex/14 | running | 2026-11-04 11:21:28 |  | Codex (exploratory) |
+| codex/14 | done | 2026-11-04 11:21:28 | 2026-11-04 11:30:45 | Codex (exploratory) |
 | codex/13 | pending |  |  | Codex (exploratory) |
 | codex/12 | pending |  |  | Codex (exploratory) |
 | codex/11 | pending |  |  | Codex (exploratory) |
@@ -68,18 +68,18 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 11:29:30, status **running**. Jo
 
 ## Now running
 
-**codex/14** (since 2026-11-04 11:21:28), latest log lines:
+**sonnet/20** (since 2026-11-04 11:29:45), latest log lines:
 ```
-11:21:30 [model] codex (proposer) calling...
-11:21:53 [model] codex (proposer) ok 23.2s, tokens in/out 17623/489, reply 1687 chars
-round 1 [codex] proposals=8 valid=7 attempts=4053 passes=0 near=0 invalid=1
-11:25:02 [model] codex (proposer) calling...
-11:25:18 [model] codex (proposer) ok 15.7s, tokens in/out 18075/457, reply 1614 chars
-round 2 [codex] proposals=8 valid=8 attempts=8120 passes=0 near=0 invalid=1
-11:27:11 [model] codex (proposer) calling...
-11:27:32 [model] codex (proposer) ok 20.6s, tokens in/out 18457/416, reply 1614 chars
-round 3 [codex] proposals=8 valid=8 attempts=12185 passes=0 near=0 invalid=1
-11:29:17 [model] codex (proposer) calling...
+  | 6. **Scaled sequences.** Use naturals, squares and triangular with scale 2, 3, 5 and 7, add from 0 to 28 where feasible, offset_range [0, 1000], combine sub and beaufort. The aim is affine-like ke
+  | **Do NOT repeat:**
+  | - Plain repeat-word Vigenère with common words.
+  | - Unscaled pi_digits and e_digits at offset 0.
+  | - Constant shifts without a
+11:30:10 [model] claude-sonnet (proposer) calling...
+11:30:17 [model] claude-sonnet (proposer) ok 7.3s, tokens in/out 4142/845, reply 1877 chars
+round 1 [claude-sonnet] proposals=8 valid=6 attempts=47 passes=0 near=0 invalid=2
+11:30:28 [model] claude-sonnet (proposer) calling...
+11:30:35 [model] claude-sonnet (proposer) ok 7.1s, tokens in/out 4744/783, reply 1685 chars
 ```
 
 ## Results so far
@@ -128,6 +128,8 @@ round 3 [codex] proposals=8 valid=8 attempts=12185 passes=0 near=0 invalid=1
   - LP2:15.jpg/2- - 32.jpg/2-39.jpg: 24778 attempts, 48 hypotheses, **0 final pass(es)**
 - **codex/15** (done)
   - skip LP2:15.jpg/1 - 32.jpg/1: only 9 symbols (minimum 20, --min-length); too short to judge
+- **codex/14** (done)
+  - LP2:8.jpg-14.jpg - 25.jpg-31.jpg: 22286 attempts, 40 hypotheses, **0 final pass(es)**
 - **local/17** (done)
   - LP2:- - 40.jpg-43.jpg: 298 attempts, 82 hypotheses, **0 final pass(es)**
 - **local/18** (done)
@@ -163,10 +165,10 @@ round 3 [codex] proposals=8 valid=8 attempts=12185 passes=0 near=0 invalid=1
 
 - qwen-local: 84 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 84 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 116 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-sonnet: 116 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-supervisor: 116 call(s) in the last 5h (cap 550), spent $0.0000
-- codex: 57 call(s) in the last 5h (cap 750), spent $0.0000
+- claude-opus: 119 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-sonnet: 119 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-supervisor: 119 call(s) in the last 5h (cap 550), spent $0.0000
+- codex: 60 call(s) in the last 5h (cap 750), spent $0.0000
 
 ## Supervisor notes
 
@@ -181,11 +183,6 @@ round 3 [codex] proposals=8 valid=8 attempts=12185 passes=0 near=0 invalid=1
 
 ## Events
 
-- 2026-11-04 11:13:42 published: 34 file(s) to branch results
-- 2026-11-04 11:13:42 sonnet/18: start (uses claude-plan)
-- 2026-11-04 11:13:42 2 running: codex/16, sonnet/18
-- 2026-11-04 11:13:42 blocked 15 jobs (deepseek/10 ... deepseek/25): model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_per_mtok
-- 2026-11-04 11:13:42 sonnet/19 waiting: claude-plan in use by sonnet/18
 - 2026-11-04 11:15:22 codex/16: running 10 min | 11:14:58 [model] codex (proposer) ok 15.0s, tokens in/out 19356/461, reply 1703 chars
 - 2026-11-04 11:18:42 sonnet/18: running 5 min | 11:18:22 [model] claude-sonnet (proposer) ok 15.2s, tokens in/out 5322/909, reply 2025 chars
 - 2026-11-04 11:20:22 codex/16: running 15 min | 11:14:58 [model] codex (proposer) ok 15.0s, tokens in/out 19356/461, reply 1703 chars
@@ -206,3 +203,8 @@ round 3 [codex] proposals=8 valid=8 attempts=12185 passes=0 near=0 invalid=1
 - 2026-11-04 11:27:10 2 running: codex/14, sonnet/19
 - 2026-11-04 11:27:10 sonnet/20 waiting: claude-plan in use by sonnet/19
 - 2026-11-04 11:29:30 sonnet/19: done (exit 0, 2 min)
+- 2026-11-04 11:29:45 published: 37 file(s) to branch results
+- 2026-11-04 11:29:45 sonnet/20: start (uses claude-plan)
+- 2026-11-04 11:29:45 2 running: codex/14, sonnet/20
+- 2026-11-04 11:29:45 sonnet/21 waiting: claude-plan in use by sonnet/20
+- 2026-11-04 11:30:45 codex/14: done (exit 0, 9 min)
