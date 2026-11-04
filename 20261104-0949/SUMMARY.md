@@ -1,6 +1,6 @@
 # Overnight run 20261104-0949
 
-Started 2026-11-04 09:49:00, updated 2026-11-04 10:24:54, status **running**. Jobs: pending 46, running 2, done 13
+Started 2026-11-04 09:49:00, updated 2026-11-04 10:27:04, status **running**. Jobs: pending 45, running 2, done 14
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -24,7 +24,7 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 10:24:54, status **running**. Jo
 | codex/24 | done | 2026-11-04 09:56:29 | 2026-11-04 10:02:45 | Codex (exploratory) |
 | codex/22 | done | 2026-11-04 10:03:06 | 2026-11-04 10:21:04 | Codex (exploratory) |
 | codex/21 | done | 2026-11-04 10:21:19 | 2026-11-04 10:24:54 | Codex (exploratory) |
-| codex/20 | pending |  |  | Codex (exploratory) |
+| codex/20 | running | 2026-11-04 10:25:24 |  | Codex (exploratory) |
 | codex/19 | pending |  |  | Codex (exploratory) |
 | codex/18 | pending |  |  | Codex (exploratory) |
 | codex/17 | pending |  |  | Codex (exploratory) |
@@ -41,7 +41,7 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 10:24:54, status **running**. Jo
 | local/19 | done | 2026-11-04 10:10:13 | 2026-11-04 10:14:26 | local models |
 | local/15 | done | 2026-11-04 10:14:41 | 2026-11-04 10:14:46 | local models |
 | local/20 | done | 2026-11-04 10:15:02 | 2026-11-04 10:19:48 | local models |
-| local/14 | running | 2026-11-04 10:20:04 |  | local models |
+| local/14 | done | 2026-11-04 10:20:04 | 2026-11-04 10:27:04 | local models |
 | local/21 | pending |  |  | local models |
 | local/13 | pending |  |  | local models |
 | local/22 | pending |  |  | local models |
@@ -70,9 +70,6 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 10:24:54, status **running**. Jo
 
 **sonnet/12** (since 2026-11-04 10:18:53), latest log lines:
 ```
-  | 3. Autokey with source "ciphertext". Use sub and beaufort. Try primers "DIVINITY", "FIRFUMFERENFE", "CIRCUMFERENCE", "INSTAR", "PARABLE", "WELCOME", and single-symbol primers [0] through [28]. Rea
-  | 4. Autokey with source "plaintext". Use the same primers with sub, add and beaufort. Do not use skip_mode "resolve" here, since autokey does not support it. Use skip [0] with mode "all" instead.
-  | 5. Long repeat keys. Use words "DIVINITY", "CICADA", "PRIMES", "TOTIENT", "KOAN", "MOBIUS", "LIBERPRIMUS", "THEINSTAR", each with sub and beaufort. Combine with reverse_text true as one variant. R
   | 6. Transposition followed by a sequence. Use columnar orders of width 3 to 7 (identity-like orders and simple reversals), then prime_totients sub with skip [0] resolve. Reason: a hidden layer is p
   | Do NOT repeat: con
 10:19:08 [model] claude-sonnet (proposer) calling...
@@ -80,19 +77,16 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 10:24:54, status **running**. Jo
 round 1 [claude-sonnet] proposals=8 valid=8 attempts=6021 passes=0 near=1 invalid=0
 10:22:27 [model] claude-sonnet (proposer) calling...
 10:22:38 [model] claude-sonnet (proposer) ok 10.3s, tokens in/out 4857/1049, reply 2409 chars
+round 2 [claude-sonnet] proposals=8 valid=8 attempts=13528 passes=0 near=2 invalid=0
+10:25:38 [model] claude-sonnet (proposer) calling...
+10:25:46 [model] claude-sonnet (proposer) ok 7.3s, tokens in/out 5506/897, reply 1936 chars
 ```
-**local/14** (since 2026-11-04 10:20:04), latest log lines:
+**codex/20** (since 2026-11-04 10:25:24), latest log lines:
 ```
-10:20:40 [model] gemma-local (proposer) ok 14.3s, tokens in/out 2391/417, reply 1250 chars
-round 1 [qwen-local] proposals=8 valid=8 attempts=71 passes=0 near=0 invalid=0
-round 1 [gemma-local] proposals=8 valid=8 attempts=36 passes=0 near=0 invalid=0
-10:21:48 [model] qwen-local (proposer) calling...
-10:22:09 [model] qwen-local (proposer) ok 20.6s, tokens in/out 2819/635, reply 2126 chars
-10:22:09 [model] gemma-local (proposer) calling...
-10:22:23 [model] gemma-local (proposer) ok 14.5s, tokens in/out 2828/424, reply 1351 chars
-round 2 [qwen-local] proposals=8 valid=8 attempts=128 passes=0 near=0 invalid=0
-round 2 [gemma-local] proposals=8 valid=8 attempts=44 passes=0 near=0 invalid=0
-10:24:35 [model] qwen-local (proposer) calling...
+===== 2026-11-04 10:25:24 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 20 --gen
+== LP2:50.jpg/2-56.jpg/1  (1468 symbols)
+10:25:26 [model] codex (proposer) calling...
+10:25:40 [model] codex (proposer) ok 14.3s, tokens in/out 17064/505, reply 1730 chars
 ```
 
 ## Results so far
@@ -125,30 +119,26 @@ round 2 [gemma-local] proposals=8 valid=8 attempts=44 passes=0 near=0 invalid=0
   - skip LP2:15.jpg/1 - 32.jpg/1: only 9 symbols (minimum 20, --min-length); too short to judge
 - **local/20** (done)
   - LP2:50.jpg/2-56.jpg/1: 189 attempts, 89 hypotheses, **0 final pass(es)**
+- **local/14** (done)
+  - LP2:8.jpg-14.jpg - 25.jpg-31.jpg: 247 attempts, 83 hypotheses, **0 final pass(es)**
 
 ## Model usage
 
-- qwen-local: 32 call(s) in the last 5h (cap none), spent $0.0000
-- gemma-local: 32 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 64 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-sonnet: 64 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-supervisor: 64 call(s) in the last 5h (cap 550), spent $0.0000
-- codex: 24 call(s) in the last 5h (cap 750), spent $0.0000
+- qwen-local: 36 call(s) in the last 5h (cap none), spent $0.0000
+- gemma-local: 36 call(s) in the last 5h (cap none), spent $0.0000
+- claude-opus: 66 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-sonnet: 66 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-supervisor: 66 call(s) in the last 5h (cap 550), spent $0.0000
+- codex: 25 call(s) in the last 5h (cap 750), spent $0.0000
 
 ## Supervisor notes
 
 - 2026-11-04 10:03:06: 10:03 check: the run is healthy at 3 of 59 jobs done. There are no final passes. Codex near misses on section 25 (primes/e_digits sub, margin about -0.23) are at noise level. The tier-claude benchmark so far: sonnet recall 0.50, opus 0.33, random control 0.00. The queue already covers every section, so no jobs were added.
 - 2026-11-04 10:14:06: 10:14 check: the run is healthy at 7 of 61 jobs done, with 2 running. There are no final passes yet. The tier-claude benchmark has finished: opus recall 0.33 (2/6), sonnet 0.33 (2/6), random control 0.00. This corrects my 10:03 note, which gave sonnet 0.50 from an incomplete count. sonnet/10 on section 10 made 20k attempts and produced 0 final passes and no near misses. The section 25 near misses are still at noise level. The queue covers every section, so I added no jobs.
+- 2026-11-04 10:25:24: 10:25 check: the run is healthy. codex/21 and codex/22 have finished, and local/14 and sonnet/12 are running. There are still 0 final passes across all sections done so far. The near misses on sections 11, 21, 22 and 25 are at noise level. They are mostly prime/prime_totients/e_digits sub with skip [0] resolve, and they don't point at any one key. The local models make few attempts per job (about 130 to 300) next to sonnet/codex (20k to 35k). Pending codex/deepseek/local jobs still cover every section, so I added no jobs.
 
 ## Events
 
-- 2026-11-04 10:14:41 published: 12 file(s) to branch results
-- 2026-11-04 10:14:41 local/15: start (uses ollama:http://127.0.0.1:11434)
-- 2026-11-04 10:14:41 3 running: codex/22, sonnet/11, local/15
-- 2026-11-04 10:14:41 sonnet/12 waiting: claude-plan in use by sonnet/11
-- 2026-11-04 10:14:46 local/15: done (exit 0, 0 min)
-- 2026-11-04 10:15:02 published: 12 file(s) to branch results
-- 2026-11-04 10:15:02 local/20: start (uses ollama:http://127.0.0.1:11434)
 - 2026-11-04 10:15:02 3 running: codex/22, sonnet/11, local/20
 - 2026-11-04 10:18:12 codex/22: running 15 min | 10:16:43 [model] codex (proposer) ok 31.0s, tokens in/out 19455/520, reply 1659 chars
 - 2026-11-04 10:18:37 sonnet/11: done (exit 0, 5 min)
@@ -167,3 +157,10 @@ round 2 [gemma-local] proposals=8 valid=8 attempts=44 passes=0 near=0 invalid=0
 - 2026-11-04 10:21:19 sonnet/13 waiting: claude-plan in use by sonnet/12
 - 2026-11-04 10:23:54 sonnet/12: running 5 min | 10:22:38 [model] claude-sonnet (proposer) ok 10.3s, tokens in/out 4857/1049, reply 2409 chars
 - 2026-11-04 10:24:54 codex/21: done (exit 0, 4 min)
+- 2026-11-04 10:25:10 published: 16 file(s) to branch results
+- 2026-11-04 10:25:24 supervisor: note: 10:25 check: the run is healthy. codex/21 and codex/22 have finished, and local/14 and sonnet/12 are running. There are still 0 final passes across all sections done so far. The near misses on sections 11, 21, 22 and 25 are at noise level. They are mostly prime/prime_totients/e_digits sub with sk...
+- 2026-11-04 10:25:24 codex/20: start (uses codex-plan)
+- 2026-11-04 10:25:24 3 running: sonnet/12, local/14, codex/20
+- 2026-11-04 10:25:24 sonnet/13 waiting: claude-plan in use by sonnet/12
+- 2026-11-04 10:25:29 local/14: running 5 min | 10:25:16 [model] qwen-local (proposer) calling...
+- 2026-11-04 10:27:04 local/14: done (exit 0, 7 min)
