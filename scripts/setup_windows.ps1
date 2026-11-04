@@ -187,14 +187,14 @@ if ((Test-Path $ModelsToml) -and -not $Force) {
     if ($proposerTag) {
         $lines += @("[models.qwen-local]", 'provider = "ollama"', 'endpoint = "http://127.0.0.1:11434"',
             "model = `"$proposerTag`"", 'roles = ["proposer"]', "json_mode = true", "timeout = 600",
-            "options = { num_ctx = 16384 }")
+            "options = { num_ctx = 16384 }", 'style = "volume"   # sweep offset ranges: cheap local calls, many attempts')
         if ($proposerTag -like "qwen3*") { $lines += "think = false   # Qwen3 thinks by default; skip hidden reasoning" }
         $lines += ""
     }
     if ($extraTag) {
         $lines += @("[models.gemma-local]", 'provider = "ollama"', 'endpoint = "http://127.0.0.1:11434"',
             "model = `"$extraTag`"", 'roles = ["proposer"]', "json_mode = true", "timeout = 600",
-            "options = { num_ctx = 16384 }")
+            "options = { num_ctx = 16384 }", 'style = "volume"   # sweep offset ranges: cheap local calls, many attempts')
         if ($extraTag -like "qwen3*") { $lines += "think = false   # Qwen3 thinks by default; skip hidden reasoning" }
         $lines += ""
     }

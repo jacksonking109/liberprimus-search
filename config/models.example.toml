@@ -49,6 +49,7 @@ json_mode = true
 timeout = 600
 options = { num_ctx = 16384 }      # context window; default 16384 if omitted
 think = false                      # Qwen3 is a thinking model: skip hidden reasoning
+style = "volume"                   # sweep offset ranges: cheap calls, many attempts
 
 [models.gemma-local]
 provider = "ollama"
@@ -57,6 +58,7 @@ model = "gemma3:12b"               # placeholder; confirm with `ollama list`
 roles = ["proposer"]
 json_mode = true
 timeout = 600
+style = "volume"
 
 # The ranker: always port 11435, which start_ollama.ps1 puts on the second GPU, or on the
 # CPU when there is only one GPU (slower, but it leaves the big GPU to the proposers).

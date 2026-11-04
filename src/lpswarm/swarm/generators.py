@@ -164,9 +164,10 @@ STYLE_HINTS = {
     "exploratory": ("Your role: explorer. Favour structurally different ideas (different stream "
                     "kinds, maps, skip rules, transpositions) over small variations, and say in "
                     "'why' what each one tests."),
-    "volume": ("Your role: brute force. Favour wide searches: sequence and repeat streams with "
-               "an offset_range of up to 2000 values, and systematic variations of the most "
-               "promising families tried so far."),
+    "volume": ("Your role: brute force. Every proposal should sweep: give sequence and repeat "
+               "streams an \"offset_range\": [lo, hi] of up to 2000 values (one proposal then "
+               "tests every offset), rather than a single fixed offset. Vary the stream, combine "
+               "mode and skip rule between proposals, and avoid families already tried."),
 }
 
 

@@ -556,3 +556,25 @@ def test_supervisor_generators_and_checkin_gap(tmp_path):
     run.last_tick = time.time() - 31 * 60
     run.maybe_tick(force=True)
     assert run.state["ticks"] == 1
+
+
+def test_near_miss_means_better_than_the_best_noise():
+    from lpswarm.alphabet import Alphabet
+    from lpswarm.oracle import FullOracle, OracleConfig
+    a = Alphabet.latin26()
+    new, old = FullOracle(a, OracleConfig()), FullOracle(a, OracleConfig(near_miss="alpha"))
+    L, N = 200, 500      # 1/N below alpha, and both quantiles inside the null sample
+    thr0 = old.threshold(L, 1)
+    final = new.final_threshold(L, N)[1]
+    near = max(new._upper_quantile(v, 1.0 / N, clamp=False) for v in new.calibrate(L).combined.values())
+    assert thr0 < near < final
+    # a score between the alpha line and the noise ceiling: near miss before, fail now
+    x = (thr0 + near) / 2
+    def verdict(o):
+        import numpy as np
+        from unittest import mock
+        with mock.patch.object(o, "_full", return_value=(x, "en", 0.0, 0.0, None)), \
+                mock.patch.object(o, "_screen", return_value=1e9):
+            return o.score(np.zeros(L, dtype=np.int16), attempt_count=N).verdict
+    assert verdict(old) == "near_miss" and verdict(new) == "fail"
+    assert new.chance_level(near, L, N) <= 1.5

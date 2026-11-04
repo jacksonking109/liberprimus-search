@@ -78,6 +78,10 @@ class OracleConfig:
     tail_fraction: float = 0.1          # top fraction used for exponential tail fit
     min_tail_exceedances: int = 10      # below alpha_eff * M < this, use the tail fit
     multiple_comparisons: str = "bonferroni"   # "bonferroni" | "spending" | "none" (see module doc)
+    # near_miss: "chance" = only scores that beat what the best of pure noise reaches after
+    # this many attempts (tail probability below 1/attempt_count); "alpha" = anything over
+    # the unadjusted alpha line (the old rule: hundreds of noise hits per 30k attempts).
+    near_miss: str = "chance"
     languages: tuple[str, ...] = ("english",)
     max_table_size: int = 20_000_000    # n-gram order is lowered until N**order fits
     max_score_length: int = 500         # longer candidates are scored on their first N symbols
@@ -94,6 +98,8 @@ class OracleConfig:
             bad("order must be >= 1")
         if self.smoothing <= 0:
             bad("smoothing must be > 0")
+        if self.near_miss not in ("chance", "alpha"):
+            bad(f'near_miss must be "chance" or "alpha", got {self.near_miss!r}')
         if self.variant_null_samples < 100:
             bad("variant_null_samples must be >= 100")
         if self.null_samples < 100:
@@ -414,7 +420,7 @@ class FullOracle:
         return ns
 
     # ------------------------------------------------------------- thresholds
-    def _upper_quantile(self, sorted_vals: np.ndarray, a: float) -> float:
+    def _upper_quantile(self, sorted_vals: np.ndarray, a: float, clamp: bool = True) -> float:
         M = len(sorted_vals)
         if a * M >= self.cfg.min_tail_exceedances:
             return float(np.quantile(sorted_vals, 1.0 - a, method="higher"))
@@ -426,7 +432,9 @@ class FullOracle:
         beta = max(float((tail - u).mean()), 1e-9)
         p_u = k / M
         x = u + beta * math.log(p_u / a)
-        return max(x, float(sorted_vals[-1]))
+        # Pass thresholds never go below the largest null seen (conservative); the soft
+        # near-miss line uses the fit as is (clamp=False).
+        return max(x, float(sorted_vals[-1])) if clamp else x
 
     def _tail_prob(self, sorted_vals: np.ndarray, x: float) -> float:
         """P(null >= x): empirical where the sample has data, else the same exponential
@@ -511,9 +519,13 @@ class FullOracle:
             pct[f"combined_vs_{kind}"] = float(np.searchsorted(v, comb, side="right") / len(v))
         null_pct = float(np.searchsorted(ns.pooled["combined"], comb, side="right")
                          / len(ns.pooled["combined"]))
+        near_floor = thr0
+        if self.cfg.near_miss == "chance" and attempt_count > 1:
+            near_floor = max(thr0, max(self._upper_quantile(v, 1.0 / attempt_count, clamp=False)
+                                       for v in ns.combined.values()))
         if comb >= thr:
             verdict = PASS
-        elif comb >= thr0:
+        elif comb >= near_floor:
             verdict = NEAR_MISS
         else:
             verdict = FAIL
