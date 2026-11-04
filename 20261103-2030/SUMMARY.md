@@ -1,6 +1,6 @@
 # Overnight run 20261103-2030
 
-Started 2026-11-03 20:30:23, updated 2026-11-03 23:05:42, status **running**. Jobs: pending 5, done 11, blocked 15
+Started 2026-11-03 20:30:23, updated 2026-11-03 23:08:33, status **running**. Jobs: pending 4, done 12, blocked 15
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -30,7 +30,7 @@ Started 2026-11-03 20:30:23, updated 2026-11-03 23:05:42, status **running**. Jo
 | sup1/17 | done | 2026-11-03 22:45:26 | 2026-11-03 22:52:21 | added by supervisor. The DeepSeek-based unsolved jobs are blocked by the zero-price config. This covers the same section |
 | sup1/18 | done | 2026-11-03 22:52:37 | 2026-11-03 23:02:12 | added by supervisor. The DeepSeek-based unsolved jobs are blocked by the zero-price config. This covers the same section |
 | sup1/19 | done | 2026-11-03 23:02:37 | 2026-11-03 23:05:42 | added by supervisor. The DeepSeek-based unsolved jobs are blocked by the zero-price config. This covers the same section |
-| sup1/20 | pending |  |  | added by supervisor. The DeepSeek-based unsolved jobs are blocked by the zero-price config. This covers the same section |
+| sup1/20 | done | 2026-11-03 23:05:58 | 2026-11-03 23:08:33 | added by supervisor. The DeepSeek-based unsolved jobs are blocked by the zero-price config. This covers the same section |
 | sup1/21 | pending |  |  | added by supervisor. The DeepSeek-based unsolved jobs are blocked by the zero-price config. This covers the same section |
 | sup1/22 | pending |  |  | added by supervisor. The DeepSeek-based unsolved jobs are blocked by the zero-price config. This covers the same section |
 | sup1/24 | pending |  |  | added by supervisor. The DeepSeek-based unsolved jobs are blocked by the zero-price config. This covers the same section |
@@ -62,16 +62,18 @@ Started 2026-11-03 20:30:23, updated 2026-11-03 23:05:42, status **running**. Jo
   - LP2:- - 44.jpg-49.jpg: 24290 attempts, 61 hypotheses, **0 final pass(es)**
 - **sup1/19** (done)
   - LP2:33.jpg - 50.jpg/1: 16512 attempts, 59 hypotheses, **0 final pass(es)**
+- **sup1/20** (done)
+  - LP2:50.jpg/2-56.jpg/1: 3940 attempts, 4 hypotheses, **0 final pass(es)**, stopped: stop_file
 
 ## Model usage
 
-- qwen-local: 39 call(s) in the last 5h (cap none), spent $0.0000
-- gemma-local: 39 call(s) in the last 5h (cap none), spent $0.0000
+- qwen-local: 40 call(s) in the last 5h (cap none), spent $0.0000
+- gemma-local: 40 call(s) in the last 5h (cap none), spent $0.0000
 - granite: 2 call(s) in the last 5h (cap none), spent $0.0000
 - claude-opus: 65 call(s) in the last 5h (cap 120), spent $0.0000
-- claude-sonnet: 65 call(s) in the last 5h (cap 120), spent $0.0000
+- claude-sonnet: 65 call(s) in the last 5h (cap 550), spent $0.0000
 - claude-supervisor: 65 call(s) in the last 5h (cap 200), spent $0.0000
-- codex: 38 call(s) in the last 5h (cap 100), spent $0.0000
+- codex: 39 call(s) in the last 5h (cap 750), spent $0.0000
 - dry: 2 call(s) in the last 5h (cap none), spent $0.0000
 
 ## Supervisor notes
@@ -84,10 +86,6 @@ Started 2026-11-03 20:30:23, updated 2026-11-03 23:05:42, status **running**. Jo
 
 ## Events
 
-- 2026-11-03 22:35:46 sup1/15: done (exit 0, 2 min)
-- 2026-11-03 22:36:02 published: 11 file(s) to branch results
-- 2026-11-03 22:36:02 sup1/16: start (uses codex-plan, ollama:http://127.0.0.1:11434)
-- 2026-11-03 22:36:02 2 running: tier-claude, sup1/16
 - 2026-11-03 22:38:47 tier-claude: running 5 min | 22:38:46 [model] claude-sonnet (proposer) calling...
 - 2026-11-03 22:39:52 tier-claude: done (exit 0, 6 min)
 - 2026-11-03 22:40:08 published: 11 file(s) to branch results
@@ -109,3 +107,7 @@ Started 2026-11-03 20:30:23, updated 2026-11-03 23:05:42, status **running**. Jo
 - 2026-11-03 23:02:37 sup1/19: start (uses codex-plan, ollama:http://127.0.0.1:11434)
 - 2026-11-03 23:02:37 sup1/20 waiting: codex-plan in use by sup1/19
 - 2026-11-03 23:05:42 sup1/19: done (exit 0, 3 min)
+- 2026-11-03 23:05:58 published: 15 file(s) to branch results
+- 2026-11-03 23:05:58 sup1/20: start (uses codex-plan, ollama:http://127.0.0.1:11434)
+- 2026-11-03 23:05:58 sup1/21 waiting: codex-plan in use by sup1/20
+- 2026-11-03 23:08:33 sup1/20: done (exit 0, 3 min)
