@@ -1,6 +1,6 @@
 # Overnight run 20261103-2310
 
-Started 2026-11-03 23:10:06, updated 2026-11-04 02:19:34, status **running**. Jobs: pending 1, done 46, blocked 15
+Started 2026-11-03 23:10:06, updated 2026-11-04 02:24:52, status **running**. Jobs: pending 3, done 47, blocked 15
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -65,7 +65,10 @@ Started 2026-11-03 23:10:06, updated 2026-11-04 02:19:34, status **running**. Jo
 | deepseek/22 | blocked |  | 2026-11-04 00:39:21 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
 | deepseek/24 | blocked |  | 2026-11-04 00:39:21 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
 | deepseek/25 | blocked |  | 2026-11-04 00:39:21 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
-| sup1/25 | pending |  |  | added by supervisor. Section 25 has near misses at margin -0.23 to -0.29, an order of magnitude closer than any other se |
+| sup1/25 | done | 2026-11-04 02:20:07 | 2026-11-04 02:24:52 | added by supervisor. Section 25 has near misses at margin -0.23 to -0.29, an order of magnitude closer than any other se |
+| sup2/14 | pending |  |  | added by supervisor. Largest sections have thin sonnet coverage (5k-11k attempts vs 30-60k elsewhere); fill gap with del |
+| sup2/17 | pending |  |  | added by supervisor. Largest sections have thin sonnet coverage (5k-11k attempts vs 30-60k elsewhere); fill gap with del |
+| sup2/22 | pending |  |  | added by supervisor. Largest sections have thin sonnet coverage (5k-11k attempts vs 30-60k elsewhere); fill gap with del |
 
 ## Results so far
 
@@ -163,15 +166,17 @@ Started 2026-11-03 23:10:06, updated 2026-11-04 02:19:34, status **running**. Jo
   - LP2:54.jpg-55.jpg - 71.jpg-72.jpg: 85 attempts, 81 hypotheses, **0 final pass(es)**
 - **local/10** (done)
   - LP2:17.jpg, 18.jpg, 19.jpg - 0.jpg-2.jpg: 249 attempts, 90 hypotheses, **0 final pass(es)**
+- **sup1/25** (done)
+  - LP2:54.jpg-55.jpg - 71.jpg-72.jpg: 5713 attempts, 73 hypotheses, **0 final pass(es)**
 
 ## Model usage
 
 - qwen-local: 122 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 122 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 186 call(s) in the last 5h (cap 120), spent $0.0000, paused until 04:23 (local cap, raise max_calls_per_window to allow more)
-- claude-sonnet: 186 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-supervisor: 186 call(s) in the last 5h (cap 200), spent $0.0000
-- codex: 122 call(s) in the last 5h (cap 750), spent $0.0000
+- claude-opus: 193 call(s) in the last 5h (cap 120), spent $0.0000, paused until 04:25 (local cap, raise max_calls_per_window to allow more)
+- claude-sonnet: 193 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-supervisor: 193 call(s) in the last 5h (cap 200), spent $0.0000
+- codex: 128 call(s) in the last 5h (cap 750), spent $0.0000
 
 ## Supervisor notes
 
@@ -189,15 +194,21 @@ Started 2026-11-03 23:10:06, updated 2026-11-04 02:19:34, status **running**. Jo
 - 2026-11-04 01:39:56: 01:39 check: run healthy, no failures and no FINAL leads. codex/12, codex/11, sonnet/17 and codex/10 finished. codex/12 and sonnet/12 found nothing better than about -2.4 on section 20..6 (693 runes), and those hits are noise at adjacent pi_digits offsets 293/294. sonnet/17 ran only 3 min (5k attempts) on section 40..43 (1021 runes), but codex/17 already covered it with 34k attempts and found nothing. sonnet/18 is running. Section 25 (-0.23) is still the only lead and the sup1 job covers it. It may be the same scoring baseline seen on other ~300-rune sections. deepseek stays blocked until its prices are set in config/models.toml. No jobs added.
 - 2026-11-04 01:50:01: 01:49 check: run healthy, no failures and no FINAL leads. sonnet/18 finished on section 44..49 (1433 runes) with 35k attempts and no near misses. codex/18 had already covered that section and also found nothing. sonnet/19 ran 3 min (26k attempts) on the 91-rune section 33..50/1. Its best results were about -2.0, from beaufort with pi_digits at adjacent offsets 1338-1340. codex/19 got similar scores from primes at 1605-1607. These are short-section noise. sonnet/20 is starting. Section 25 (-0.23) is still the only lead and the sup1 job covers it. It may be the same ~300-rune scoring baseline. deepseek stays blocked until its prices are set in config/models.toml. No jobs added.
 - 2026-11-04 02:08:52: 02:08 check: run healthy, no failures and no FINAL leads. sonnet/20 finished on section 50..56/1 (1468 runes) after 18 min and 44k attempts with no near misses. codex/20 had already found nothing there. sonnet/21 should start next. Section 25 (-0.23) is still the only lead and the sup1 job covers it, though it may be the same scoring baseline seen on other ~300-rune sections. The sections without a sonnet pass yet (51..70, 57..66, 56.jpg/2, 54..72) should be covered by the pending sonnet jobs. deepseek stays blocked until its prices are set in config/models.toml. No jobs added.
+- 2026-11-04 02:20:07: 02:19 check: run healthy, no failures and no FINAL leads. sonnet/21, 22, 24 and 25 all finished. On 56.jpg/2, sonnet/21 reached -0.24 with prime_totients and a reversed map at adjacent offsets 1352/1353. That is the same adjacent-offset pattern as the ~300-rune scoring baseline, so I treat it as noise. sonnet/25 ran only 1 min (508 attempts) on section 25, so section 25's -0.23 still rests on codex/25 alone. sup1/25 is now next for claude-plan. Coverage on the largest sections is still thin: sonnet/22 ran only 6.6k attempts on the 2474-rune section 57..66, sonnet/14 11k on 8..31 and sonnet/17 5k on 40..43. I queued one sonnet job on those three sections to fill the gap. deepseek stays blocked until its prices are set in config/models.toml.
+- 2026-11-04 02:20:07: brief for sup2 (claude-sonnet): Sections: 8..31 (1729 runes), 40..43 (1021), 57..66 (2474). Earlier sonnet passes here were short (5k-11k attempts). codex passes (32-44k) found nothing better than about -2.4. Those hits were plain sub/add/beaufort with pi_digits, e_digits, primes*2 or prime_totients at single offsets, and they are noise.
+
+AVOID re-sweeping plain offsets of pi_digits, e_digits, primes or prime_totients with skip [0] or [28]; that ground is covered. prime_totients and primes*1+28 give the same key mod 29, so do not test both.
+
+PRIORITISE structurally different hypotheses:
+- Streams with a non-trivial multiplier or addend (e.g. primes*k+c, totients, fibonacci-like or other sequences the language offers), combined with skip rules other than [0] (single or multiple interrupter runes, especially rune indexes that are frequent in these sections).
+- Transpositions: columnar with 4-8 columns, and reversed text combined with a stream. Long sections give columnar enough material to show signal.
+- Map variants (reverse map) combined with beaufort.
+- Offsets tied to the section's position in the full text (cumulative rune count of earlier sections), not arbitrary ones.
+
+Spread attempts across all three sections; do not spend everything on one. On sections this long, margins worse than -1 are noise; only report something clearly better than -1.
 
 ## Events
 
-- 2026-11-04 01:49:52 published: 42 file(s) to branch results
-- 2026-11-04 01:50:01 supervisor: note: 01:49 check: run healthy, no failures and no FINAL leads. sonnet/18 finished on section 44..49 (1433 runes) with 35k attempts and no near misses. codex/18 had already covered that section and also found nothing. sonnet/19 ran 3 min (26k attempts) on the 91-rune section 33..50/1. Its best results ...
-- 2026-11-04 01:50:01 sonnet/20: start (uses claude-plan)
-- 2026-11-04 01:50:01 sonnet/21 waiting: claude-plan in use by sonnet/20
-- 2026-11-04 01:55:01 sonnet/20: running 5 min | 01:52:37 [model] claude-sonnet (proposer) ok 7.4s, tokens in/out 4800/903, reply 2059 chars
-- 2026-11-04 02:00:01 sonnet/20: running 10 min | 01:57:24 [model] claude-sonnet (proposer) ok 7.3s, tokens in/out 5969/845, reply 1862 chars
 - 2026-11-04 02:05:01 sonnet/20: running 15 min | 02:04:39 [model] claude-sonnet (proposer) ok 14.6s, tokens in/out 6954/921, reply 2054 chars
 - 2026-11-04 02:08:26 sonnet/20: done (exit 0, 18 min)
 - 2026-11-04 02:08:42 published: 43 file(s) to branch results
@@ -217,3 +228,9 @@ Started 2026-11-03 23:10:06, updated 2026-11-04 02:19:34, status **running**. Jo
 - 2026-11-04 02:18:08 sonnet/25: start (uses claude-plan)
 - 2026-11-04 02:18:09 sup1/25 waiting: claude-plan in use by sonnet/25
 - 2026-11-04 02:19:34 sonnet/25: done (exit 0, 1 min)
+- 2026-11-04 02:19:49 published: 47 file(s) to branch results
+- 2026-11-04 02:20:07 supervisor: note: 02:19 check: run healthy, no failures and no FINAL leads. sonnet/21, 22, 24 and 25 all finished. On 56.jpg/2, sonnet/21 reached -0.24 with prime_totients and a reversed map at adjacent offsets 1352/1353. That is the same adjacent-offset pattern as the ~300-rune scoring baseline, so I treat it as ...
+- 2026-11-04 02:20:07 supervisor: added sup2: swarm on 3 section(s) with claude-sonnet; brief: Sections: 8..31 (1729 runes), 40..43 (1021), 57..66 (2474). Earlier sonnet passes here were short (5k-11k attempts). codex passes (32-44k) found nothing better than about -2.4. Those hits were plain s...
+- 2026-11-04 02:20:07 sup1/25: start (uses claude-plan, codex-plan)
+- 2026-11-04 02:20:07 sup2/14 waiting: claude-plan in use by sup1/25
+- 2026-11-04 02:24:52 sup1/25: done (exit 0, 5 min)
