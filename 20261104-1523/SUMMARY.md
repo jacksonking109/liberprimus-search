@@ -1,6 +1,6 @@
 # Overnight run 20261104-1523
 
-Started 2026-11-04 15:23:11, updated 2026-11-04 17:36:04, status **running**. Jobs: pending 16, running 1, done 45
+Started 2026-11-04 15:23:11, updated 2026-11-04 17:37:05, status **running**. Jobs: pending 15, running 1, done 46
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -17,7 +17,7 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 17:36:04, status **running**. Jo
 | sonnet/19 | done | 2026-11-04 16:33:19 | 2026-11-04 16:36:29 | Sonnet, briefed by Opus |
 | sonnet/20 | done | 2026-11-04 16:36:44 | 2026-11-04 17:16:12 | Sonnet, briefed by Opus |
 | sonnet/21 | done | 2026-11-04 17:32:18 | 2026-11-04 17:36:04 | Sonnet, briefed by Opus |
-| sonnet/22 | pending |  |  | Sonnet, briefed by Opus |
+| sonnet/22 | running | 2026-11-04 17:36:20 |  | Sonnet, briefed by Opus |
 | sonnet/24 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/25 | pending |  |  | Sonnet, briefed by Opus |
 | codex/25 | done | 2026-11-04 15:23:11 | 2026-11-04 15:35:47 | Codex (exploratory) |
@@ -52,7 +52,7 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 17:36:04, status **running**. Jo
 | local/10 | done | 2026-11-04 16:53:04 | 2026-11-04 17:01:21 | local models |
 | deepseek/10 | done | 2026-11-04 17:32:18 | 2026-11-04 17:34:33 | DeepSeek (volume) |
 | deepseek/11 | done | 2026-11-04 17:34:49 | 2026-11-04 17:35:44 | DeepSeek (volume) |
-| deepseek/12 | running | 2026-11-04 17:35:59 | 2026-11-04 16:54:25 | DeepSeek (volume) |
+| deepseek/12 | done | 2026-11-04 17:35:59 | 2026-11-04 17:37:05 | DeepSeek (volume) |
 | deepseek/13 | pending |  | 2026-11-04 16:54:25 | retry requested |
 | deepseek/14 | pending |  | 2026-11-04 16:54:25 | retry requested |
 | deepseek/15 | pending |  | 2026-11-04 16:54:25 | retry requested |
@@ -69,11 +69,18 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 17:36:04, status **running**. Jo
 
 ## Now running
 
-**deepseek/12** (since 2026-11-04 17:35:59), latest log lines:
+**sonnet/22** (since 2026-11-04 17:36:20), latest log lines:
 ```
-===== 2026-11-04 17:35:59 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 12 --gen
-== LP2:20.jpg/2-23.jpg/1 - 3.jpg/2-6.jpg/1  (693 symbols)
-17:36:01 [model] deepseek (proposer) calling...
+brief from claude-supervisor (2000 chars):
+  | 1. **Ciphertext autokey, short primer.** Use {"kind":"autokey","source":"ciphertext"} with a 1–3 symbol primer, and try all of sub, add and beaufort, each with map identity and map reverse. Reason
+  | 2. **Plaintext autokey with Liber Primus primers.** Use {"kind":"autokey","source":"plaintext"} with these words: DIVINITY, CIRCUMFERENCE, INSTAR, PARABLE, KOAN, EMERGE, WISDOM, PRIMES, TOTIENT. T
+  | 3. **Totient stream with a skipped F.** Use sequence prime_totients with combine sub, skip [0] and skip_mode "resolve" (the page 56 solution used this style). Set offset_range [0,2000], with scale
+  | 4. **Scaled sequences.** Use primes, fibonacci, triangular, squares, pi_digits and e_digits with scale in {2,3,5,7,28} and add in {0,1,2}. Cover offset_range [0,500] under sub, add and beaufort. R
+  | 5. **Reversed text before the key.** Set reverse_text true, then apply directions 1 and 3. Reason: Liber Primus pages are sometimes read backwards, and any key stream anchored at the end would be 
+  | 6. **Transposition plus key.** Undo a columnar transposition with widths 2–8, using identity order and reversed order. Follow it with a prime_totients or primes sequence over offset_range [0,200].
+  | 7. **Two-symbol skip sets.** Try skip [0,10] (F and I) and skip [2] (TH) in resolve mode, with the totient and primes streams. Reason: literal
+17:36:40 [model] claude-sonnet (proposer) calling...
+17:36:50 [model] claude-sonnet (proposer) ok 9.6s, tokens in/out 4135/1272, reply 2659 chars
 ```
 
 ## Results so far
@@ -170,16 +177,18 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 17:36:04, status **running**. Jo
   - LP2:17.jpg, 18.jpg, 19.jpg - 0.jpg-2.jpg: 30581 attempts, 61 hypotheses, **0 final pass(es)**
 - **deepseek/11** (done)
   - LP2:20.jpg/1 - 3.jpg/1: 36628 attempts, 67 hypotheses, **0 final pass(es)**
+- **deepseek/12** (done)
+  - LP2:20.jpg/2-23.jpg/1 - 3.jpg/2-6.jpg/1: 48478 attempts, 84 hypotheses, **0 final pass(es)**
 
 ## Model usage
 
-- deepseek: 14 call(s) in the last 5h (cap none), spent $0.0251
+- deepseek: 20 call(s) in the last 5h (cap none), spent $0.0386
 - qwen-local: 88 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 88 call(s) in the last 5h (cap none), spent $0.0000
 - granite: 4 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 191 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-sonnet: 191 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-supervisor: 191 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-opus: 193 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-sonnet: 193 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-supervisor: 193 call(s) in the last 5h (cap 550), spent $0.0000
 - codex: 85 call(s) in the last 5h (cap 850), spent $0.0000
 - dry: 4 call(s) in the last 5h (cap none), spent $0.0000
 
@@ -193,11 +202,6 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 17:36:04, status **running**. Jo
 
 ## Events
 
-- 2026-11-04 17:08:27 codex/10: running 15 min | 17:08:08 [model] codex (proposer) ok 26.7s, tokens in/out 20100/1155, reply 3048 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-04 17:12:07 sonnet/20: running 35 min | 17:06:24 [model] claude-sonnet (proposer) ok 17.5s, tokens in/out 7253/1160, reply 2439 chars
-- 2026-11-04 17:13:27 codex/10: running 20 min | 17:11:29 [model] codex (proposer) ok 37.0s, tokens in/out 20175/1223, reply 3232 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-04 17:16:12 sonnet/20: done (exit 0, 39 min)
-- 2026-11-04 17:16:28 published: 43 file(s) to branch results
 - 2026-11-04 17:16:28 codex/10: done (exit 0, 23 min)
 - 2026-11-04 17:16:37 published: 43 file(s) to branch results
 - 2026-11-04 17:16:37 stopping: STOP file
@@ -218,3 +222,8 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 17:36:04, status **running**. Jo
 - 2026-11-04 17:35:59 deepseek/12: start (uses api:https://api.deepseek.com)
 - 2026-11-04 17:35:59 2 running: sonnet/21, deepseek/12
 - 2026-11-04 17:36:04 sonnet/21: done (exit 0, 4 min)
+- 2026-11-04 17:36:20 published: 46 file(s) to branch results
+- 2026-11-04 17:36:20 sonnet/22: start (uses claude-plan)
+- 2026-11-04 17:36:20 2 running: deepseek/12, sonnet/22
+- 2026-11-04 17:36:20 sonnet/24 waiting: claude-plan in use by sonnet/22
+- 2026-11-04 17:37:05 deepseek/12: done (exit 0, 1 min)
