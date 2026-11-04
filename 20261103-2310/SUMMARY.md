@@ -1,6 +1,6 @@
 # Overnight run 20261103-2310
 
-Started 2026-11-03 23:10:06, updated 2026-11-04 00:22:10, status **running**. Jobs: pending 34, running 2, done 26
+Started 2026-11-03 23:10:06, updated 2026-11-04 00:22:25, status **running**. Jobs: pending 34, running 1, done 27
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -46,7 +46,7 @@ Started 2026-11-03 23:10:06, updated 2026-11-04 00:22:10, status **running**. Jo
 | local/13 | done | 2026-11-03 23:56:19 | 2026-11-04 00:02:06 | local models |
 | local/22 | done | 2026-11-04 00:02:22 | 2026-11-04 00:10:07 | local models |
 | local/12 | done | 2026-11-04 00:10:31 | 2026-11-04 00:15:17 | local models |
-| local/24 | running | 2026-11-04 00:15:33 |  | local models |
+| local/24 | done | 2026-11-04 00:15:33 | 2026-11-04 00:22:25 | local models |
 | local/11 | pending |  |  | local models |
 | local/25 | pending |  |  | local models |
 | local/10 | pending |  |  | local models |
@@ -74,19 +74,6 @@ Started 2026-11-03 23:10:06, updated 2026-11-04 00:22:10, status **running**. Jo
 ===== 2026-11-04 00:22:05 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 16 --gen
 == LP2:15.jpg/2- - 32.jpg/2-39.jpg  (1894 symbols)
 00:22:06 [model] claude-supervisor (supervisor) calling...
-```
-**local/24** (since 2026-11-04 00:15:33), latest log lines:
-```
-round 5 [gemma-local] proposals=8 valid=7 attempts=38 passes=0 near=0 invalid=4
-00:20:33 [model] qwen-local (proposer) calling...
-00:20:52 [model] qwen-local (proposer) ok 19.2s, tokens in/out 3567/536, reply 1816 chars
-00:20:52 [model] gemma-local (proposer) calling...
-00:21:08 [model] gemma-local (proposer) ok 16.0s, tokens in/out 3735/447, reply 1376 chars
-round 6 [qwen-local] proposals=8 valid=8 attempts=130 passes=0 near=0 invalid=1
-round 6 [gemma-local] proposals=8 valid=7 attempts=44 passes=0 near=0 invalid=5
-stopped: rounds done; final passes: 0
-report: reports\overnight\20261103-2310\local_24\report.md
-model spend (reports/model_spend.sqlite): deepseek=$0.0000, qwen-local=$0.0000, gemma-local=$0.0000, granite=$0.0000, claude-opus=$0.0000, claude-sonnet=$0.0000, claude-supervisor=$0.0000, codex=$0.00
 ```
 
 ## Results so far
@@ -145,7 +132,7 @@ model spend (reports/model_spend.sqlite): deepseek=$0.0000, qwen-local=$0.0000, 
   - LP2:57.jpg-66.jpg/1: 103 attempts, 79 hypotheses, **0 final pass(es)**
 - **local/12** (done)
   - LP2:20.jpg/2-23.jpg/1 - 3.jpg/2-6.jpg/1: 330 attempts, 87 hypotheses, **0 final pass(es)**
-- **local/24** (running)
+- **local/24** (done)
   - LP2:51.jpg/2-53.jpg - 68.jpg/2-70.jpg: 174 attempts, 83 hypotheses, **0 final pass(es)**
 
 ## Model usage
@@ -171,8 +158,6 @@ model spend (reports/model_spend.sqlite): deepseek=$0.0000, qwen-local=$0.0000, 
 
 ## Events
 
-- 2026-11-04 00:10:51 codex/17: start (uses codex-plan)
-- 2026-11-04 00:10:51 3 running: sonnet/13, local/12, codex/17
 - 2026-11-04 00:12:16 sonnet/13: done (exit 0, 12 min)
 - 2026-11-04 00:12:32 published: 25 file(s) to branch results
 - 2026-11-04 00:12:32 sonnet/14: start (uses claude-plan)
@@ -196,3 +181,5 @@ model spend (reports/model_spend.sqlite): deepseek=$0.0000, qwen-local=$0.0000, 
 - 2026-11-04 00:22:05 sonnet/16: start (uses claude-plan)
 - 2026-11-04 00:22:05 3 running: codex/17, local/24, sonnet/16
 - 2026-11-04 00:22:10 codex/17: done (exit 0, 11 min)
+- 2026-11-04 00:22:25 published: 29 file(s) to branch results
+- 2026-11-04 00:22:25 local/24: done (exit 0, 7 min)
