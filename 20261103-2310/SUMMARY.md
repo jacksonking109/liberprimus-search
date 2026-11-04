@@ -1,6 +1,6 @@
 # Overnight run 20261103-2310
 
-Started 2026-11-03 23:10:06, updated 2026-11-04 01:39:31, status **running**. Jobs: pending 7, running 1, done 39, blocked 15
+Started 2026-11-03 23:10:06, updated 2026-11-04 01:46:36, status **running**. Jobs: pending 7, done 40, blocked 15
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -13,7 +13,7 @@ Started 2026-11-03 23:10:06, updated 2026-11-04 01:39:31, status **running**. Jo
 | sonnet/15 | done | 2026-11-04 00:21:44 | 2026-11-04 00:21:49 | Sonnet, briefed by Opus |
 | sonnet/16 | done | 2026-11-04 00:22:05 | 2026-11-04 01:26:25 | Sonnet, briefed by Opus |
 | sonnet/17 | done | 2026-11-04 01:26:49 | 2026-11-04 01:29:50 | Sonnet, briefed by Opus |
-| sonnet/18 | running | 2026-11-04 01:30:05 |  | Sonnet, briefed by Opus |
+| sonnet/18 | done | 2026-11-04 01:30:05 | 2026-11-04 01:46:36 | Sonnet, briefed by Opus |
 | sonnet/19 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/20 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/21 | pending |  |  | Sonnet, briefed by Opus |
@@ -67,22 +67,6 @@ Started 2026-11-03 23:10:06, updated 2026-11-04 01:39:31, status **running**. Jo
 | deepseek/25 | blocked |  | 2026-11-04 00:39:21 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
 | sup1/25 | pending |  |  | added by supervisor. Section 25 has near misses at margin -0.23 to -0.29, an order of magnitude closer than any other se |
 
-## Now running
-
-**sonnet/18** (since 2026-11-04 01:30:05), latest log lines:
-```
-01:30:51 [model] claude-sonnet (proposer) ok 8.8s, tokens in/out 4764/879, reply 1964 chars
-round 2 [claude-sonnet] proposals=8 valid=4 attempts=1027 passes=0 near=0 invalid=8
-01:30:51 [model] claude-sonnet (proposer) calling...
-01:31:01 [model] claude-sonnet (proposer) ok 9.9s, tokens in/out 5379/899, reply 2042 chars
-round 3 [claude-sonnet] proposals=8 valid=8 attempts=9534 passes=0 near=0 invalid=8
-01:35:35 [model] claude-sonnet (proposer) calling...
-01:35:45 [model] claude-sonnet (proposer) ok 10.2s, tokens in/out 5999/807, reply 1773 chars
-round 4 [claude-sonnet] proposals=8 valid=8 attempts=16047 passes=0 near=0 invalid=8
-01:38:12 [model] claude-sonnet (proposer) calling...
-01:38:31 [model] claude-sonnet (proposer) ok 18.9s, tokens in/out 6612/1520, reply 1933 chars
-```
-
 ## Results so far
 
 - **tier-claude** (done)
@@ -105,6 +89,8 @@ round 4 [claude-sonnet] proposals=8 valid=8 attempts=16047 passes=0 near=0 inval
   - LP2:15.jpg/2- - 32.jpg/2-39.jpg: 60000 attempts, 42 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **sonnet/17** (done)
   - LP2:- - 40.jpg-43.jpg: 5025 attempts, 25 hypotheses, **0 final pass(es)**
+- **sonnet/18** (done)
+  - LP2:- - 44.jpg-49.jpg: 35094 attempts, 39 hypotheses, **0 final pass(es)**
 - **codex/25** (done)
   - LP2:54.jpg-55.jpg - 71.jpg-72.jpg: 29964 attempts, 47 hypotheses, **0 final pass(es)**
 - **codex/24** (done)
@@ -170,9 +156,9 @@ round 4 [claude-sonnet] proposals=8 valid=8 attempts=16047 passes=0 near=0 inval
 
 - qwen-local: 122 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 122 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 159 call(s) in the last 5h (cap 120), spent $0.0000, paused until 03:38 (local cap, raise max_calls_per_window to allow more)
-- claude-sonnet: 159 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-supervisor: 159 call(s) in the last 5h (cap 200), spent $0.0000
+- claude-opus: 142 call(s) in the last 5h (cap 120), spent $0.0000, paused until 03:39 (local cap, raise max_calls_per_window to allow more)
+- claude-sonnet: 142 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-supervisor: 142 call(s) in the last 5h (cap 200), spent $0.0000
 - codex: 122 call(s) in the last 5h (cap 750), spent $0.0000
 
 ## Supervisor notes
@@ -188,14 +174,10 @@ round 4 [claude-sonnet] proposals=8 valid=8 attempts=16047 passes=0 near=0 inval
 - 2026-11-04 00:48:49: 00:48 check: run healthy, no failures and no FINAL leads. codex/16 finished (32k attempts on the 1894-rune section); its best near misses are about -2.36 using pi_digits at adjacent offsets 109/110, which is noise. Action needed from the owner: at 00:39 the runner blocked 15 deepseek jobs (deepseek/10 to deepseek/25). The deepseek prices are 0 in config/models.toml, so its USD cap cannot work. Fill in price_in_per_mtok and price_out_per_mtok to unblock them. The other pending codex and sonnet jobs still cover those sections, so I did not add replacement jobs. Section 25 (-0.23) is still the only lead worth following, and the sup1 job covers it. sonnet/16 is still running and sonnet/17 is waiting for claude-plan.
 - 2026-11-04 01:11:19: 01:11 check: run healthy, no failures and no FINAL leads. codex/14 finished with 44k attempts on the 1729-rune section 8..31. Its only near miss is -2.38 (primes*2 @402), which is noise. sonnet/16 is still running at 45 min, and sonnet/17 is waiting for claude-plan. Section 25 (-0.23) is still the only lead, and the sup1 job covers it. The near misses around -0.3 on sections of 120-330 runes still look like a scoring baseline, not real keys. The deepseek jobs stay blocked until its prices are set in config/models.toml. No jobs added.
 - 2026-11-04 01:26:49: 01:26 check: run healthy, no failures and no FINAL leads. sonnet/16 finished after 64 min and 60k attempts on the 1894-rune section 15..39. Its best near misses are -2.36 to -2.37 using pi_digits @109/110 and @1055/1056, the same adjacent-offset pattern codex/16 found, so it is noise. codex/13 finished in 4 min with nothing new on section 6..24, and codex/12 is running. Section 25 (-0.23) is still the only lead and the sup1 job covers it, though it may be the same ~300-rune scoring baseline. deepseek stays blocked until its prices are set in config/models.toml. No jobs added.
+- 2026-11-04 01:39:56: 01:39 check: run healthy, no failures and no FINAL leads. codex/12, codex/11, sonnet/17 and codex/10 finished. codex/12 and sonnet/12 found nothing better than about -2.4 on section 20..6 (693 runes), and those hits are noise at adjacent pi_digits offsets 293/294. sonnet/17 ran only 3 min (5k attempts) on section 40..43 (1021 runes), but codex/17 already covered it with 34k attempts and found nothing. sonnet/18 is running. Section 25 (-0.23) is still the only lead and the sup1 job covers it. It may be the same scoring baseline seen on other ~300-rune sections. deepseek stays blocked until its prices are set in config/models.toml. No jobs added.
 
 ## Events
 
-- 2026-11-04 01:20:50 codex/12: running 5 min | 01:20:18 [model] codex (proposer) ok 27.0s, tokens in/out 17465/384, reply 1491 chars
-- 2026-11-04 01:22:20 sonnet/16: running 60 min | 01:15:35 [model] claude-sonnet (proposer) ok 13.1s, tokens in/out 7432/1680, reply 1982 chars
-- 2026-11-04 01:25:50 codex/12: running 10 min | 01:23:55 [model] codex (proposer) ok 24.7s, tokens in/out 18687/576, reply 1689 chars
-- 2026-11-04 01:26:25 sonnet/16: done (exit 0, 64 min)
-- 2026-11-04 01:26:41 published: 36 file(s) to branch results
 - 2026-11-04 01:26:49 supervisor: note: 01:26 check: run healthy, no failures and no FINAL leads. sonnet/16 finished after 64 min and 60k attempts on the 1894-rune section 15..39. Its best near misses are -2.36 to -2.37 using pi_digits @109/110 and @1055/1056, the same adjacent-offset pattern codex/16 found, so it is noise. codex/13 fi...
 - 2026-11-04 01:26:49 sonnet/17: start (uses claude-plan)
 - 2026-11-04 01:26:49 2 running: codex/12, sonnet/17
@@ -216,3 +198,8 @@ round 4 [claude-sonnet] proposals=8 valid=8 attempts=16047 passes=0 near=0 inval
 - 2026-11-04 01:35:06 sonnet/18: running 5 min | 01:31:01 [model] claude-sonnet (proposer) ok 9.9s, tokens in/out 5379/899, reply 2042 chars
 - 2026-11-04 01:36:46 codex/10: running 5 min | 01:36:28 [model] codex (proposer) ok 15.4s, tokens in/out 18834/531, reply 1711 chars
 - 2026-11-04 01:39:31 codex/10: done (exit 0, 8 min)
+- 2026-11-04 01:39:47 published: 40 file(s) to branch results
+- 2026-11-04 01:39:56 supervisor: note: 01:39 check: run healthy, no failures and no FINAL leads. codex/12, codex/11, sonnet/17 and codex/10 finished. codex/12 and sonnet/12 found nothing better than about -2.4 on section 20..6 (693 runes), and those hits are noise at adjacent pi_digits offsets 293/294. sonnet/17 ran only 3 min (5k att...
+- 2026-11-04 01:40:11 sonnet/18: running 10 min | 01:38:31 [model] claude-sonnet (proposer) ok 18.9s, tokens in/out 6612/1520, reply 1933 chars
+- 2026-11-04 01:45:11 sonnet/18: running 15 min | 01:41:36 [model] claude-sonnet (proposer) ok 17.9s, tokens in/out 7275/1618, reply 2123 chars
+- 2026-11-04 01:46:36 sonnet/18: done (exit 0, 17 min)
