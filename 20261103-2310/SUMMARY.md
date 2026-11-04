@@ -1,6 +1,6 @@
 # Overnight run 20261103-2310
 
-Started 2026-11-03 23:10:06, updated 2026-11-04 02:11:47, status **running**. Jobs: pending 4, done 43, blocked 15
+Started 2026-11-03 23:10:06, updated 2026-11-04 02:13:57, status **running**. Jobs: pending 3, done 44, blocked 15
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -17,7 +17,7 @@ Started 2026-11-03 23:10:06, updated 2026-11-04 02:11:47, status **running**. Jo
 | sonnet/19 | done | 2026-11-04 01:46:52 | 2026-11-04 01:49:37 | Sonnet, briefed by Opus |
 | sonnet/20 | done | 2026-11-04 01:50:01 | 2026-11-04 02:08:26 | Sonnet, briefed by Opus |
 | sonnet/21 | done | 2026-11-04 02:08:52 | 2026-11-04 02:11:47 | Sonnet, briefed by Opus |
-| sonnet/22 | pending |  |  | Sonnet, briefed by Opus |
+| sonnet/22 | done | 2026-11-04 02:12:02 | 2026-11-04 02:13:57 | Sonnet, briefed by Opus |
 | sonnet/24 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/25 | pending |  |  | Sonnet, briefed by Opus |
 | codex/25 | done | 2026-11-03 23:10:06 | 2026-11-03 23:15:43 | Codex (exploratory) |
@@ -97,6 +97,8 @@ Started 2026-11-03 23:10:06, updated 2026-11-04 02:11:47, status **running**. Jo
   - LP2:50.jpg/2-56.jpg/1: 44091 attempts, 48 hypotheses, **0 final pass(es)**
 - **sonnet/21** (done)
   - LP2:56.jpg/2: 31565 attempts, 39 hypotheses, **0 final pass(es)**
+- **sonnet/22** (done)
+  - LP2:57.jpg-66.jpg/1: 6592 attempts, 45 hypotheses, **0 final pass(es)**
 - **codex/25** (done)
   - LP2:54.jpg-55.jpg - 71.jpg-72.jpg: 29964 attempts, 47 hypotheses, **0 final pass(es)**
 - **codex/24** (done)
@@ -162,9 +164,9 @@ Started 2026-11-03 23:10:06, updated 2026-11-04 02:11:47, status **running**. Jo
 
 - qwen-local: 122 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 122 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 165 call(s) in the last 5h (cap 120), spent $0.0000, paused until 04:18 (local cap, raise max_calls_per_window to allow more)
-- claude-sonnet: 165 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-supervisor: 165 call(s) in the last 5h (cap 200), spent $0.0000
+- claude-opus: 172 call(s) in the last 5h (cap 120), spent $0.0000, paused until 04:19 (local cap, raise max_calls_per_window to allow more)
+- claude-sonnet: 172 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-supervisor: 172 call(s) in the last 5h (cap 200), spent $0.0000
 - codex: 122 call(s) in the last 5h (cap 750), spent $0.0000
 
 ## Supervisor notes
@@ -186,10 +188,6 @@ Started 2026-11-03 23:10:06, updated 2026-11-04 02:11:47, status **running**. Jo
 
 ## Events
 
-- 2026-11-04 01:35:06 sonnet/18: running 5 min | 01:31:01 [model] claude-sonnet (proposer) ok 9.9s, tokens in/out 5379/899, reply 2042 chars
-- 2026-11-04 01:36:46 codex/10: running 5 min | 01:36:28 [model] codex (proposer) ok 15.4s, tokens in/out 18834/531, reply 1711 chars
-- 2026-11-04 01:39:31 codex/10: done (exit 0, 8 min)
-- 2026-11-04 01:39:47 published: 40 file(s) to branch results
 - 2026-11-04 01:39:56 supervisor: note: 01:39 check: run healthy, no failures and no FINAL leads. codex/12, codex/11, sonnet/17 and codex/10 finished. codex/12 and sonnet/12 found nothing better than about -2.4 on section 20..6 (693 runes), and those hits are noise at adjacent pi_digits offsets 293/294. sonnet/17 ran only 3 min (5k att...
 - 2026-11-04 01:40:11 sonnet/18: running 10 min | 01:38:31 [model] claude-sonnet (proposer) ok 18.9s, tokens in/out 6612/1520, reply 1933 chars
 - 2026-11-04 01:45:11 sonnet/18: running 15 min | 01:41:36 [model] claude-sonnet (proposer) ok 17.9s, tokens in/out 7275/1618, reply 2123 chars
@@ -211,3 +209,7 @@ Started 2026-11-03 23:10:06, updated 2026-11-04 02:11:47, status **running**. Jo
 - 2026-11-04 02:08:52 sonnet/21: start (uses claude-plan)
 - 2026-11-04 02:08:52 sonnet/22 waiting: claude-plan in use by sonnet/21
 - 2026-11-04 02:11:47 sonnet/21: done (exit 0, 3 min)
+- 2026-11-04 02:12:02 published: 44 file(s) to branch results
+- 2026-11-04 02:12:02 sonnet/22: start (uses claude-plan)
+- 2026-11-04 02:12:02 sonnet/24 waiting: claude-plan in use by sonnet/22
+- 2026-11-04 02:13:57 sonnet/22: done (exit 0, 2 min)
