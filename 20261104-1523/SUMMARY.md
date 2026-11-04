@@ -1,6 +1,6 @@
 # Overnight run 20261104-1523
 
-Started 2026-11-04 15:23:11, updated 2026-11-04 17:37:05, status **running**. Jobs: pending 15, running 1, done 46
+Started 2026-11-04 15:23:11, updated 2026-11-04 17:39:01, status **running**. Jobs: pending 14, running 1, done 47
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -53,7 +53,7 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 17:37:05, status **running**. Jo
 | deepseek/10 | done | 2026-11-04 17:32:18 | 2026-11-04 17:34:33 | DeepSeek (volume) |
 | deepseek/11 | done | 2026-11-04 17:34:49 | 2026-11-04 17:35:44 | DeepSeek (volume) |
 | deepseek/12 | done | 2026-11-04 17:35:59 | 2026-11-04 17:37:05 | DeepSeek (volume) |
-| deepseek/13 | pending |  | 2026-11-04 16:54:25 | retry requested |
+| deepseek/13 | done | 2026-11-04 17:37:21 | 2026-11-04 17:39:01 | DeepSeek (volume) |
 | deepseek/14 | pending |  | 2026-11-04 16:54:25 | retry requested |
 | deepseek/15 | pending |  | 2026-11-04 16:54:25 | retry requested |
 | deepseek/16 | pending |  | 2026-11-04 16:54:25 | retry requested |
@@ -71,9 +71,6 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 17:37:05, status **running**. Jo
 
 **sonnet/22** (since 2026-11-04 17:36:20), latest log lines:
 ```
-brief from claude-supervisor (2000 chars):
-  | 1. **Ciphertext autokey, short primer.** Use {"kind":"autokey","source":"ciphertext"} with a 1–3 symbol primer, and try all of sub, add and beaufort, each with map identity and map reverse. Reason
-  | 2. **Plaintext autokey with Liber Primus primers.** Use {"kind":"autokey","source":"plaintext"} with these words: DIVINITY, CIRCUMFERENCE, INSTAR, PARABLE, KOAN, EMERGE, WISDOM, PRIMES, TOTIENT. T
   | 3. **Totient stream with a skipped F.** Use sequence prime_totients with combine sub, skip [0] and skip_mode "resolve" (the page 56 solution used this style). Set offset_range [0,2000], with scale
   | 4. **Scaled sequences.** Use primes, fibonacci, triangular, squares, pi_digits and e_digits with scale in {2,3,5,7,28} and add in {0,1,2}. Cover offset_range [0,500] under sub, add and beaufort. R
   | 5. **Reversed text before the key.** Set reverse_text true, then apply directions 1 and 3. Reason: Liber Primus pages are sometimes read backwards, and any key stream anchored at the end would be 
@@ -81,6 +78,9 @@ brief from claude-supervisor (2000 chars):
   | 7. **Two-symbol skip sets.** Try skip [0,10] (F and I) and skip [2] (TH) in resolve mode, with the totient and primes streams. Reason: literal
 17:36:40 [model] claude-sonnet (proposer) calling...
 17:36:50 [model] claude-sonnet (proposer) ok 9.6s, tokens in/out 4135/1272, reply 2659 chars
+round 1 [claude-sonnet] proposals=12 valid=9 attempts=1222 passes=0 near=0 invalid=3
+17:38:33 [model] claude-sonnet (proposer) calling...
+17:38:42 [model] claude-sonnet (proposer) ok 8.5s, tokens in/out 5036/1224, reply 2665 chars
 ```
 
 ## Results so far
@@ -179,10 +179,12 @@ brief from claude-supervisor (2000 chars):
   - LP2:20.jpg/1 - 3.jpg/1: 36628 attempts, 67 hypotheses, **0 final pass(es)**
 - **deepseek/12** (done)
   - LP2:20.jpg/2-23.jpg/1 - 3.jpg/2-6.jpg/1: 48478 attempts, 84 hypotheses, **0 final pass(es)**
+- **deepseek/13** (done)
+  - LP2:6.jpg/2-7.jpg - 23.jpg/2-24.jpg: 24432 attempts, 53 hypotheses, **0 final pass(es)**
 
 ## Model usage
 
-- deepseek: 20 call(s) in the last 5h (cap none), spent $0.0386
+- deepseek: 26 call(s) in the last 5h (cap none), spent $0.0505
 - qwen-local: 88 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 88 call(s) in the last 5h (cap none), spent $0.0000
 - granite: 4 call(s) in the last 5h (cap none), spent $0.0000
@@ -202,10 +204,6 @@ brief from claude-supervisor (2000 chars):
 
 ## Events
 
-- 2026-11-04 17:16:28 codex/10: done (exit 0, 23 min)
-- 2026-11-04 17:16:37 published: 43 file(s) to branch results
-- 2026-11-04 17:16:37 stopping: STOP file
-- 2026-11-04 17:16:53 published: 43 file(s) to branch results
 - 2026-11-04 17:32:18 resumed
 - 2026-11-04 17:32:18 failed and blocked jobs reset to pending (--retry-failed)
 - 2026-11-04 17:32:18 sonnet/21: start (uses claude-plan)
@@ -227,3 +225,7 @@ brief from claude-supervisor (2000 chars):
 - 2026-11-04 17:36:20 2 running: deepseek/12, sonnet/22
 - 2026-11-04 17:36:20 sonnet/24 waiting: claude-plan in use by sonnet/22
 - 2026-11-04 17:37:05 deepseek/12: done (exit 0, 1 min)
+- 2026-11-04 17:37:21 published: 47 file(s) to branch results
+- 2026-11-04 17:37:21 deepseek/13: start (uses api:https://api.deepseek.com)
+- 2026-11-04 17:37:21 2 running: sonnet/22, deepseek/13
+- 2026-11-04 17:39:01 deepseek/13: done (exit 0, 2 min)
