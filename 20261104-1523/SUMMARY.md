@@ -1,6 +1,6 @@
 # Overnight run 20261104-1523
 
-Started 2026-11-04 15:23:11, updated 2026-11-04 17:40:47, status **running**. Jobs: pending 12, running 1, done 49
+Started 2026-11-04 15:23:11, updated 2026-11-04 17:42:58, status **running**. Jobs: pending 11, running 1, done 50
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -56,7 +56,7 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 17:40:47, status **running**. Jo
 | deepseek/13 | done | 2026-11-04 17:37:21 | 2026-11-04 17:39:01 | DeepSeek (volume) |
 | deepseek/14 | done | 2026-11-04 17:39:16 | 2026-11-04 17:40:26 | DeepSeek (volume) |
 | deepseek/15 | done | 2026-11-04 17:40:42 | 2026-11-04 17:40:47 | DeepSeek (volume) |
-| deepseek/16 | pending |  | 2026-11-04 16:54:25 | retry requested |
+| deepseek/16 | done | 2026-11-04 17:41:03 | 2026-11-04 17:42:58 | DeepSeek (volume) |
 | deepseek/17 | pending |  | 2026-11-04 16:54:25 | retry requested |
 | deepseek/18 | pending |  | 2026-11-04 16:54:25 | retry requested |
 | deepseek/19 | pending |  | 2026-11-04 16:54:25 | retry requested |
@@ -185,16 +185,18 @@ round 2 [claude-sonnet] proposals=12 valid=9 attempts=1986 passes=0 near=0 inval
   - LP2:8.jpg-14.jpg - 25.jpg-31.jpg: 22725 attempts, 44 hypotheses, **0 final pass(es)**
 - **deepseek/15** (done)
   - skip LP2:15.jpg/1 - 32.jpg/1: only 9 symbols (minimum 20, --min-length); too short to judge
+- **deepseek/16** (done)
+  - LP2:15.jpg/2- - 32.jpg/2-39.jpg: 28578 attempts, 67 hypotheses, **0 final pass(es)**
 
 ## Model usage
 
-- deepseek: 32 call(s) in the last 5h (cap none), spent $0.0643
+- deepseek: 38 call(s) in the last 5h (cap none), spent $0.0768
 - qwen-local: 88 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 88 call(s) in the last 5h (cap none), spent $0.0000
 - granite: 4 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 194 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-sonnet: 194 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-supervisor: 194 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-opus: 193 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-sonnet: 193 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-supervisor: 193 call(s) in the last 5h (cap 550), spent $0.0000
 - codex: 85 call(s) in the last 5h (cap 850), spent $0.0000
 - dry: 4 call(s) in the last 5h (cap none), spent $0.0000
 
@@ -208,11 +210,6 @@ round 2 [claude-sonnet] proposals=12 valid=9 attempts=1986 passes=0 near=0 inval
 
 ## Events
 
-- 2026-11-04 17:34:49 published: 44 file(s) to branch results
-- 2026-11-04 17:34:49 deepseek/11: start (uses api:https://api.deepseek.com)
-- 2026-11-04 17:34:49 2 running: sonnet/21, deepseek/11
-- 2026-11-04 17:35:44 deepseek/11: done (exit 0, 1 min)
-- 2026-11-04 17:35:59 published: 45 file(s) to branch results
 - 2026-11-04 17:35:59 deepseek/12: start (uses api:https://api.deepseek.com)
 - 2026-11-04 17:35:59 2 running: sonnet/21, deepseek/12
 - 2026-11-04 17:36:04 sonnet/21: done (exit 0, 4 min)
@@ -233,3 +230,8 @@ round 2 [claude-sonnet] proposals=12 valid=9 attempts=1986 passes=0 near=0 inval
 - 2026-11-04 17:40:42 deepseek/15: start (uses api:https://api.deepseek.com)
 - 2026-11-04 17:40:42 2 running: sonnet/22, deepseek/15
 - 2026-11-04 17:40:47 deepseek/15: done (exit 0, 0 min)
+- 2026-11-04 17:41:03 published: 49 file(s) to branch results
+- 2026-11-04 17:41:03 deepseek/16: start (uses api:https://api.deepseek.com)
+- 2026-11-04 17:41:03 2 running: sonnet/22, deepseek/16
+- 2026-11-04 17:41:23 sonnet/22: running 5 min | 17:39:33 [model] claude-sonnet (proposer) ok 9.2s, tokens in/out 5875/1336, reply 2890 chars
+- 2026-11-04 17:42:58 deepseek/16: done (exit 0, 2 min)
