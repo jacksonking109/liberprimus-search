@@ -1,6 +1,6 @@
 # Overnight run 20261104-0949
 
-Started 2026-11-04 09:49:00, updated 2026-11-04 11:54:10, status **running**. Jobs: pending 17, running 2, done 42, blocked 15
+Started 2026-11-04 09:49:00, updated 2026-11-04 11:56:21, status **running**. Jobs: pending 17, running 1, done 43, blocked 15
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -17,7 +17,7 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 11:54:10, status **running**. Jo
 | sonnet/19 | done | 2026-11-04 11:27:10 | 2026-11-04 11:29:30 | Sonnet, briefed by Opus |
 | sonnet/20 | done | 2026-11-04 11:29:45 | 2026-11-04 11:38:07 | Sonnet, briefed by Opus |
 | sonnet/21 | done | 2026-11-04 11:38:39 | 2026-11-04 11:40:49 | Sonnet, briefed by Opus |
-| sonnet/22 | running | 2026-11-04 11:51:20 |  | Sonnet, briefed by Opus |
+| sonnet/22 | done | 2026-11-04 11:51:20 | 2026-11-04 11:56:21 | Sonnet, briefed by Opus |
 | sonnet/24 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/25 | pending |  |  | Sonnet, briefed by Opus |
 | codex/25 | done | 2026-11-04 09:49:00 | 2026-11-04 09:56:14 | Codex (exploratory) |
@@ -83,31 +83,18 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 11:54:10, status **running**. Jo
 
 ## Now running
 
-**sonnet/22** (since 2026-11-04 11:51:20), latest log lines:
-```
-11:52:00 [model] claude-sonnet (proposer) ok 20.5s, tokens in/out 4116/1468, reply 2062 chars
-round 1 [claude-sonnet] proposals=8 valid=5 attempts=517 passes=0 near=0 invalid=3
-11:52:10 [model] claude-sonnet (proposer) calling...
-11:52:23 [model] claude-sonnet (proposer) ok 13.7s, tokens in/out 4752/1763, reply 1944 chars
-round 2 [claude-sonnet] proposals=8 valid=3 attempts=520 passes=0 near=0 invalid=8
-11:52:23 [model] claude-sonnet (proposer) calling...
-11:52:35 [model] claude-sonnet (proposer) ok 11.8s, tokens in/out 5351/1408, reply 1915 chars
-round 3 [claude-sonnet] proposals=8 valid=4 attempts=1040 passes=0 near=0 invalid=12
-11:52:35 [model] claude-sonnet (proposer) calling...
-11:52:58 [model] claude-sonnet (proposer) ok 22.9s, tokens in/out 5805/1539, reply 2067 chars
-```
 **codex/10** (since 2026-11-04 11:51:20), latest log lines:
 ```
-  | 5. Columnar transposition before the stream. The length 729 = 27x27 = 9x81, so try columnar orders of width 9 and 27 (identity order [0..8], reversed order, and simple shifts). Combine each with c
-  | 6. reverse_text true combined with directions 1-3. Reading the 0.jpg-2.jpg pages backwards may be the intended order.
-  | Do not repeat: periodic "repeat" streams with English words (DIVINITY, CIRCUMFERENCE, FIRFUMFERENFE, etc.), constant Caesar
-11:51:41 [model] codex (proposer) calling...
-11:52:03 [model] codex (proposer) ok 22.4s, tokens in/out 17653/900, reply 3212 chars
-round 1 [codex] proposals=16 valid=15 attempts=12021 passes=0 near=0 invalid=1
-11:53:33 [model] codex (proposer) calling...
 11:53:54 [model] codex (proposer) ok 21.5s, tokens in/out 19026/860, reply 3034 chars
 round 2 [codex] proposals=16 valid=16 attempts=26043 passes=0 near=0 invalid=1
 11:54:00 [model] codex (proposer) calling...
+11:54:24 [model] codex (proposer) ok 23.7s, tokens in/out 19293/947, reply 3052 chars
+round 3 [codex] proposals=16 valid=16 attempts=38066 passes=0 near=0 invalid=1
+11:54:30 [model] codex (proposer) calling...
+11:54:50 [model] codex (proposer) ok 20.5s, tokens in/out 20151/802, reply 2964 chars
+round 4 [codex] proposals=16 valid=16 attempts=48076 passes=0 near=0 invalid=1
+11:54:55 [model] codex (proposer) calling...
+11:55:16 [model] codex (proposer) ok 20.9s, tokens in/out 20178/819, reply 2944 chars
 ```
 
 ## Results so far
@@ -140,6 +127,8 @@ round 2 [codex] proposals=16 valid=16 attempts=26043 passes=0 near=0 invalid=1
   - LP2:50.jpg/2-56.jpg/1: 12757 attempts, 39 hypotheses, **0 final pass(es)**
 - **sonnet/21** (done)
   - LP2:56.jpg/2: 6575 attempts, 16 hypotheses, **0 final pass(es)**, stopped: stop_file
+- **sonnet/22** (done)
+  - LP2:57.jpg-66.jpg/1: 14163 attempts, 36 hypotheses, **0 final pass(es)**
 - **codex/25** (done)
   - LP2:54.jpg-55.jpg - 71.jpg-72.jpg: 30269 attempts, 47 hypotheses, **0 final pass(es)**
 - **codex/24** (done)
@@ -203,10 +192,10 @@ round 2 [codex] proposals=16 valid=16 attempts=26043 passes=0 near=0 invalid=1
 
 - qwen-local: 84 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 84 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 136 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-sonnet: 136 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-supervisor: 136 call(s) in the last 5h (cap 550), spent $0.0000
-- codex: 77 call(s) in the last 5h (cap 750), spent $0.0000
+- claude-opus: 138 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-sonnet: 138 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-supervisor: 138 call(s) in the last 5h (cap 550), spent $0.0000
+- codex: 80 call(s) in the last 5h (cap 750), spent $0.0000
 
 ## Supervisor notes
 
@@ -233,8 +222,6 @@ Prefer the longer sections (1000+ runes). On short ones (91 and 121 runes) noise
 
 ## Events
 
-- 2026-11-04 11:36:17 codex/12: start (uses codex-plan)
-- 2026-11-04 11:36:17 2 running: sonnet/20, codex/12
 - 2026-11-04 11:38:07 sonnet/20: done (exit 0, 8 min)
 - 2026-11-04 11:38:22 published: 40 file(s) to branch results
 - 2026-11-04 11:38:39 supervisor: note: 11:38 check: the run is healthy. sonnet/19, sonnet/20, codex/14 and codex/13 have finished, and codex/12 is running. There are still 0 final passes across about 37 finished jobs. The near misses are all at noise level. On section 13, codex hit e_digits sub @1553-1554 with skip [27], and section 1...
@@ -258,3 +245,5 @@ Prefer the longer sections (1000+ runes). On short ones (91 and 121 runes) noise
 - 2026-11-04 11:51:20 sonnet/24 waiting: claude-plan in use by sonnet/22
 - 2026-11-04 11:51:35 supervisor: note: 11:51 check: the run resumed at 11:51 after a STOP file at 11:40. sonnet/22, codex/11 and codex/10 are running. sonnet/21 and codex/12 finished with 0 final passes, and every near miss is still at noise level. There are still 0 final passes across about 40 finished jobs. The deepseek jobs are sti...
 - 2026-11-04 11:54:10 codex/11: done (exit 0, 3 min)
+- 2026-11-04 11:54:26 published: 43 file(s) to branch results
+- 2026-11-04 11:56:21 sonnet/22: done (exit 0, 5 min)
