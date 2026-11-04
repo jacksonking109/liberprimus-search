@@ -1,6 +1,6 @@
 # Overnight run 20261104-1523
 
-Started 2026-11-04 15:23:11, updated 2026-11-04 17:16:37, status **stopped**. Jobs: pending 5, done 42, blocked 15
+Started 2026-11-04 15:23:11, updated 2026-11-04 17:34:33, status **running**. Jobs: pending 18, running 1, done 43
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -16,7 +16,7 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 17:16:37, status **stopped**. Jo
 | sonnet/18 | done | 2026-11-04 16:21:57 | 2026-11-04 16:33:03 | Sonnet, briefed by Opus |
 | sonnet/19 | done | 2026-11-04 16:33:19 | 2026-11-04 16:36:29 | Sonnet, briefed by Opus |
 | sonnet/20 | done | 2026-11-04 16:36:44 | 2026-11-04 17:16:12 | Sonnet, briefed by Opus |
-| sonnet/21 | pending |  |  | Sonnet, briefed by Opus |
+| sonnet/21 | running | 2026-11-04 17:32:18 |  | Sonnet, briefed by Opus |
 | sonnet/22 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/24 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/25 | pending |  |  | Sonnet, briefed by Opus |
@@ -50,22 +50,38 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 17:16:37, status **stopped**. Jo
 | local/11 | done | 2026-11-04 16:41:06 | 2026-11-04 16:46:17 | local models |
 | local/25 | done | 2026-11-04 16:46:32 | 2026-11-04 16:52:48 | local models |
 | local/10 | done | 2026-11-04 16:53:04 | 2026-11-04 17:01:21 | local models |
-| deepseek/10 | blocked |  | 2026-11-04 16:54:25 | model deepseek: environment variable sk-150ada4ce1e34d7eaf2eeb8b37ed10ae is not set |
-| deepseek/11 | blocked |  | 2026-11-04 16:54:25 | model deepseek: environment variable sk-150ada4ce1e34d7eaf2eeb8b37ed10ae is not set |
-| deepseek/12 | blocked |  | 2026-11-04 16:54:25 | model deepseek: environment variable sk-150ada4ce1e34d7eaf2eeb8b37ed10ae is not set |
-| deepseek/13 | blocked |  | 2026-11-04 16:54:25 | model deepseek: environment variable sk-150ada4ce1e34d7eaf2eeb8b37ed10ae is not set |
-| deepseek/14 | blocked |  | 2026-11-04 16:54:25 | model deepseek: environment variable sk-150ada4ce1e34d7eaf2eeb8b37ed10ae is not set |
-| deepseek/15 | blocked |  | 2026-11-04 16:54:25 | model deepseek: environment variable sk-150ada4ce1e34d7eaf2eeb8b37ed10ae is not set |
-| deepseek/16 | blocked |  | 2026-11-04 16:54:25 | model deepseek: environment variable sk-150ada4ce1e34d7eaf2eeb8b37ed10ae is not set |
-| deepseek/17 | blocked |  | 2026-11-04 16:54:25 | model deepseek: environment variable sk-150ada4ce1e34d7eaf2eeb8b37ed10ae is not set |
-| deepseek/18 | blocked |  | 2026-11-04 16:54:25 | model deepseek: environment variable sk-150ada4ce1e34d7eaf2eeb8b37ed10ae is not set |
-| deepseek/19 | blocked |  | 2026-11-04 16:54:25 | model deepseek: environment variable sk-150ada4ce1e34d7eaf2eeb8b37ed10ae is not set |
-| deepseek/20 | blocked |  | 2026-11-04 16:54:25 | model deepseek: environment variable sk-150ada4ce1e34d7eaf2eeb8b37ed10ae is not set |
-| deepseek/21 | blocked |  | 2026-11-04 16:54:25 | model deepseek: environment variable sk-150ada4ce1e34d7eaf2eeb8b37ed10ae is not set |
-| deepseek/22 | blocked |  | 2026-11-04 16:54:25 | model deepseek: environment variable sk-150ada4ce1e34d7eaf2eeb8b37ed10ae is not set |
-| deepseek/24 | blocked |  | 2026-11-04 16:54:25 | model deepseek: environment variable sk-150ada4ce1e34d7eaf2eeb8b37ed10ae is not set |
-| deepseek/25 | blocked |  | 2026-11-04 16:54:25 | model deepseek: environment variable sk-150ada4ce1e34d7eaf2eeb8b37ed10ae is not set |
+| deepseek/10 | done | 2026-11-04 17:32:18 | 2026-11-04 17:34:33 | DeepSeek (volume) |
+| deepseek/11 | pending |  | 2026-11-04 16:54:25 | retry requested |
+| deepseek/12 | pending |  | 2026-11-04 16:54:25 | retry requested |
+| deepseek/13 | pending |  | 2026-11-04 16:54:25 | retry requested |
+| deepseek/14 | pending |  | 2026-11-04 16:54:25 | retry requested |
+| deepseek/15 | pending |  | 2026-11-04 16:54:25 | retry requested |
+| deepseek/16 | pending |  | 2026-11-04 16:54:25 | retry requested |
+| deepseek/17 | pending |  | 2026-11-04 16:54:25 | retry requested |
+| deepseek/18 | pending |  | 2026-11-04 16:54:25 | retry requested |
+| deepseek/19 | pending |  | 2026-11-04 16:54:25 | retry requested |
+| deepseek/20 | pending |  | 2026-11-04 16:54:25 | retry requested |
+| deepseek/21 | pending |  | 2026-11-04 16:54:25 | retry requested |
+| deepseek/22 | pending |  | 2026-11-04 16:54:25 | retry requested |
+| deepseek/24 | pending |  | 2026-11-04 16:54:25 | retry requested |
+| deepseek/25 | pending |  | 2026-11-04 16:54:25 | retry requested |
 | sup1/13 | pending |  |  | added by supervisor. sonnet/13 made only 22 attempts from 10 hypotheses on the 333-rune section 13, so its proposals exp |
+
+## Now running
+
+**sonnet/21** (since 2026-11-04 17:32:18), latest log lines:
+```
+17:32:46 [model] claude-sonnet (proposer) ok 8.5s, tokens in/out 3572/1282, reply 2691 chars
+round 1 [claude-sonnet] proposals=12 valid=6 attempts=1012 passes=0 near=0 invalid=6
+17:32:59 [model] claude-sonnet (proposer) calling...
+17:33:13 [model] claude-sonnet (proposer) ok 13.4s, tokens in/out 4676/2014, reply 3035 chars
+round 2 [claude-sonnet] proposals=12 valid=3 attempts=1015 passes=0 near=0 invalid=15
+17:33:13 [model] claude-sonnet (proposer) calling...
+17:33:28 [model] claude-sonnet (proposer) ok 14.8s, tokens in/out 5182/2042, reply 2632 chars
+round 3 [claude-sonnet] proposals=12 valid=12 attempts=13574 passes=0 near=0 invalid=15
+17:34:02 [model] claude-sonnet (proposer) calling...
+17:34:16 [model] claude-sonnet (proposer) ok 14.0s, tokens in/out 6219/1998, reply 3131 chars
+```
 
 ## Results so far
 
@@ -155,15 +171,20 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 17:16:37, status **stopped**. Jo
   - LP2:54.jpg-55.jpg - 71.jpg-72.jpg: 1590 attempts, 71 hypotheses, **0 final pass(es)**
 - **local/10** (done)
   - LP2:17.jpg, 18.jpg, 19.jpg - 0.jpg-2.jpg: 1648 attempts, 78 hypotheses, **0 final pass(es)**
+- **deepseek/10** (done)
+  - LP2:17.jpg, 18.jpg, 19.jpg - 0.jpg-2.jpg: 30581 attempts, 61 hypotheses, **0 final pass(es)**
 
 ## Model usage
 
-- qwen-local: 84 call(s) in the last 5h (cap none), spent $0.0000
-- gemma-local: 84 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 177 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-sonnet: 177 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-supervisor: 177 call(s) in the last 5h (cap 550), spent $0.0000
-- codex: 81 call(s) in the last 5h (cap 750), spent $0.0000
+- deepseek: 8 call(s) in the last 5h (cap none), spent $0.0123
+- qwen-local: 88 call(s) in the last 5h (cap none), spent $0.0000
+- gemma-local: 88 call(s) in the last 5h (cap none), spent $0.0000
+- granite: 4 call(s) in the last 5h (cap none), spent $0.0000
+- claude-opus: 190 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-sonnet: 190 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-supervisor: 190 call(s) in the last 5h (cap 550), spent $0.0000
+- codex: 85 call(s) in the last 5h (cap 850), spent $0.0000
+- dry: 4 call(s) in the last 5h (cap none), spent $0.0000
 
 ## Supervisor notes
 
@@ -171,18 +192,10 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 17:16:37, status **stopped**. Jo
 - 2026-11-04 16:25:32: 16:25 check: still no final passes in any section. 4 jobs are running (codex/16, codex/14, sonnet/18, and codex/14's next round), and the codex queue is working down toward codex/13. codex/13 should give a fuller second pass on the 333-rune section LP2:6.jpg/2-7.jpg - 23.jpg/2-24.jpg, where sonnet/13 made only 22 attempts, so I added no jobs yet. codex/14 is testing 1729 = 7*13*19 columnar transpositions and autokey variants on the 1729-rune section; check its results. Sections with only claude-sonnet coverage so far are 10, 11 and 12 (729, 119 and 693 runes).
 - 2026-11-04 17:02:02: 17:01 check: there are still no final passes in any section. The 15 deepseek jobs (deepseek/10 to deepseek/25) are blocked. The config puts what looks like a literal API key (sk-150a...) where the environment variable name should go. Move the key into an environment variable, put that variable's name in the models config, and revoke the key if this config is shared or published. The results branch is being published to, so check it doesn't contain the key. codex/10 is running and is the first non-sonnet, non-local pass on section 10 (729 runes). claude-sonnet has not yet run sections 20 to 25 (sonnet/21 is queued). I queued one claude-sonnet re-run of section 13, because sonnet/13 made only 22 attempts.
 - 2026-11-04 17:02:02: brief for sup1 (claude-sonnet): Section LP2:6.jpg/2-7.jpg - 23.jpg/2-24.jpg (333 runes). An earlier claude-sonnet job made only 22 attempts here because its proposals were too narrow, often a single fixed key. This time each hypothesis should expand to many keys: give parameter ranges, sweep offsets over 0-28, and try both directions (add and subtract mod 29). codex/13 (28k attempts) and local/13 have also found no final pass. Try families like these: (1) Shift streams from sequences: primes, phi(prime) = p-1 (the method behind the known solved Liber Primus page), primes minus 1 with a skip on the F rune (literal Fs left uncounted), Fibonacci and Lucas mod 29, squares, triangular numbers, and the digits of pi and e. (2) Vigenere with candidate keywords from Cicada/Liber Primus vocabulary (DIVINITY, CIRCUMFERENCE, FIRFUMFERENFE, INSTAR, PARABLE, WISDOM, KOAN, PRIMES, TOTIENT, CONSUMPTION), and also their Atbash forms. (3) Plaintext and ciphertext autokey seeded with a short primer, sweeping primer lengths 1-6. (4) Running key from solved Liber Primus pages, at several start offsets. (5) Atbash combined with a shift (reverse the Gematria Primus index, then add k). (6) Light transposition before substitution: reversal, the even/odd rune split, and columnar with widths 3, 9, 37 and 111 (333 = 9*37). Avoid wasting proposals on plain Caesar or plain Atbash alone, which earlier runs covered. Prefer programs whose key space is at least in the hundreds.
+- 2026-11-04 17:32:33: 17:32 check: the run resumed after the STOP file at 17:16, and there are still no final passes in any section. --retry-failed put the 15 blocked deepseek jobs back to pending, and deepseek/10 has started. If the models config still has the literal key (sk-150a...) where the environment variable name should go, these jobs will block again. Fix the config and revoke the key if the config or the results branch is shared. sonnet/21 is running, and the sup1 re-run of section 13 (333 runes) should follow. I added no jobs, to let the queue drain first.
 
 ## Events
 
-- 2026-11-04 16:53:25 codex/10: start (uses codex-plan)
-- 2026-11-04 16:53:25 4 running: sonnet/20, codex/11, local/10, codex/10
-- 2026-11-04 16:54:00 codex/11: running 5 min | 16:53:38 [model] codex (proposer) ok 27.9s, tokens in/out 19055/1232, reply 3374 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-04 16:54:10 codex/11: done (exit 0, 5 min)
-- 2026-11-04 16:54:25 published: 40 file(s) to branch results
-- 2026-11-04 16:54:25 blocked 15 jobs (deepseek/10 ... deepseek/25): model deepseek: environment variable sk-150ada4ce1e34d7eaf2eeb8b37ed10ae is not set
-- 2026-11-04 16:54:25 sonnet/21 waiting: claude-plan in use by sonnet/20
-- 2026-11-04 16:56:50 sonnet/20: running 20 min | 16:49:32 [model] claude-sonnet (proposer) ok 15.2s, tokens in/out 5948/1829, reply 2707 chars
-- 2026-11-04 16:58:06 local/10: running 5 min | 16:56:14 [model] gemma-local (proposer) ok 16.2s, tokens in/out 3458/477, reply 1486 chars
 - 2026-11-04 16:58:26 codex/10: running 5 min | 16:54:12 [model] codex (proposer) ok 25.5s, tokens in/out 17656/1087, reply 3344 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-04 17:01:21 local/10: done (exit 0, 8 min)
 - 2026-11-04 17:01:36 published: 41 file(s) to branch results
@@ -199,3 +212,12 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 17:16:37, status **stopped**. Jo
 - 2026-11-04 17:16:28 codex/10: done (exit 0, 23 min)
 - 2026-11-04 17:16:37 published: 43 file(s) to branch results
 - 2026-11-04 17:16:37 stopping: STOP file
+- 2026-11-04 17:16:53 published: 43 file(s) to branch results
+- 2026-11-04 17:32:18 resumed
+- 2026-11-04 17:32:18 failed and blocked jobs reset to pending (--retry-failed)
+- 2026-11-04 17:32:18 sonnet/21: start (uses claude-plan)
+- 2026-11-04 17:32:18 deepseek/10: start (uses api:https://api.deepseek.com)
+- 2026-11-04 17:32:18 2 running: sonnet/21, deepseek/10
+- 2026-11-04 17:32:18 sonnet/22 waiting: claude-plan in use by sonnet/21
+- 2026-11-04 17:32:33 supervisor: note: 17:32 check: the run resumed after the STOP file at 17:16, and there are still no final passes in any section. --retry-failed put the 15 blocked deepseek jobs back to pending, and deepseek/10 has started. If the models config still has the literal key (sk-150a...) where the environment variable n...
+- 2026-11-04 17:34:33 deepseek/10: done (exit 0, 2 min)
