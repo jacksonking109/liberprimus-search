@@ -1,6 +1,6 @@
 # Overnight run 20261103-2310
 
-Started 2026-11-03 23:10:06, updated 2026-11-04 01:31:30, status **running**. Jobs: pending 8, running 1, done 38, blocked 15
+Started 2026-11-03 23:10:06, updated 2026-11-04 01:39:31, status **running**. Jobs: pending 7, running 1, done 39, blocked 15
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -34,7 +34,7 @@ Started 2026-11-03 23:10:06, updated 2026-11-04 01:31:30, status **running**. Jo
 | codex/13 | done | 2026-11-04 01:11:19 | 2026-11-04 01:15:34 | Codex (exploratory) |
 | codex/12 | done | 2026-11-04 01:15:50 | 2026-11-04 01:27:29 | Codex (exploratory) |
 | codex/11 | done | 2026-11-04 01:27:45 | 2026-11-04 01:31:30 | Codex (exploratory) |
-| codex/10 | pending |  |  | Codex (exploratory) |
+| codex/10 | done | 2026-11-04 01:31:46 | 2026-11-04 01:39:31 | Codex (exploratory) |
 | local/17 | done | 2026-11-03 23:10:06 | 2026-11-03 23:14:52 | local models |
 | local/18 | done | 2026-11-03 23:15:08 | 2026-11-03 23:21:43 | local models |
 | local/16 | done | 2026-11-03 23:21:59 | 2026-11-03 23:32:05 | local models |
@@ -71,16 +71,16 @@ Started 2026-11-03 23:10:06, updated 2026-11-04 01:31:30, status **running**. Jo
 
 **sonnet/18** (since 2026-11-04 01:30:05), latest log lines:
 ```
-  | 6. Repeat streams using LP-derived words: FIRFUMFERENFE (the known misspelling key), YAHEOOPYJ, CICADA, WELCOME, and repeat keys of lengths 13, 29 and 31 made from numeric primes mod 29. Use sub a
-  | 7. Sequences triangular, squares
-01:30:24 [model] claude-sonnet (proposer) calling...
-01:30:32 [model] claude-sonnet (proposer) ok 7.9s, tokens in/out 4099/914, reply 2078 chars
-round 1 [claude-sonnet] proposals=8 valid=4 attempts=516 passes=0 near=0 invalid=4
-01:30:42 [model] claude-sonnet (proposer) calling...
 01:30:51 [model] claude-sonnet (proposer) ok 8.8s, tokens in/out 4764/879, reply 1964 chars
 round 2 [claude-sonnet] proposals=8 valid=4 attempts=1027 passes=0 near=0 invalid=8
 01:30:51 [model] claude-sonnet (proposer) calling...
 01:31:01 [model] claude-sonnet (proposer) ok 9.9s, tokens in/out 5379/899, reply 2042 chars
+round 3 [claude-sonnet] proposals=8 valid=8 attempts=9534 passes=0 near=0 invalid=8
+01:35:35 [model] claude-sonnet (proposer) calling...
+01:35:45 [model] claude-sonnet (proposer) ok 10.2s, tokens in/out 5999/807, reply 1773 chars
+round 4 [claude-sonnet] proposals=8 valid=8 attempts=16047 passes=0 near=0 invalid=8
+01:38:12 [model] claude-sonnet (proposer) calling...
+01:38:31 [model] claude-sonnet (proposer) ok 18.9s, tokens in/out 6612/1520, reply 1933 chars
 ```
 
 ## Results so far
@@ -133,6 +133,8 @@ round 2 [claude-sonnet] proposals=8 valid=4 attempts=1027 passes=0 near=0 invali
   - LP2:20.jpg/2-23.jpg/1 - 3.jpg/2-6.jpg/1: 34409 attempts, 48 hypotheses, **0 final pass(es)**
 - **codex/11** (done)
   - LP2:20.jpg/1 - 3.jpg/1: 31830 attempts, 47 hypotheses, **0 final pass(es)**
+- **codex/10** (done)
+  - LP2:17.jpg, 18.jpg, 19.jpg - 0.jpg-2.jpg: 34281 attempts, 46 hypotheses, **0 final pass(es)**
 - **local/17** (done)
   - LP2:- - 40.jpg-43.jpg: 190 attempts, 81 hypotheses, **0 final pass(es)**
 - **local/18** (done)
@@ -168,10 +170,10 @@ round 2 [claude-sonnet] proposals=8 valid=4 attempts=1027 passes=0 near=0 invali
 
 - qwen-local: 122 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 122 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 171 call(s) in the last 5h (cap 120), spent $0.0000, paused until 03:38 (local cap, raise max_calls_per_window to allow more)
-- claude-sonnet: 171 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-supervisor: 171 call(s) in the last 5h (cap 200), spent $0.0000
-- codex: 116 call(s) in the last 5h (cap 750), spent $0.0000
+- claude-opus: 159 call(s) in the last 5h (cap 120), spent $0.0000, paused until 03:38 (local cap, raise max_calls_per_window to allow more)
+- claude-sonnet: 159 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-supervisor: 159 call(s) in the last 5h (cap 200), spent $0.0000
+- codex: 122 call(s) in the last 5h (cap 750), spent $0.0000
 
 ## Supervisor notes
 
@@ -189,12 +191,6 @@ round 2 [claude-sonnet] proposals=8 valid=4 attempts=1027 passes=0 near=0 invali
 
 ## Events
 
-- 2026-11-04 01:12:19 sonnet/16: running 50 min | 00:57:59 [model] claude-sonnet (proposer) ok 10.4s, tokens in/out 6844/1397, reply 2068 chars
-- 2026-11-04 01:15:34 codex/13: done (exit 0, 4 min)
-- 2026-11-04 01:15:50 published: 35 file(s) to branch results
-- 2026-11-04 01:15:50 codex/12: start (uses codex-plan)
-- 2026-11-04 01:15:50 2 running: sonnet/16, codex/12
-- 2026-11-04 01:17:20 sonnet/16: running 55 min | 01:15:35 [model] claude-sonnet (proposer) ok 13.1s, tokens in/out 7432/1680, reply 1982 chars
 - 2026-11-04 01:20:50 codex/12: running 5 min | 01:20:18 [model] codex (proposer) ok 27.0s, tokens in/out 17465/384, reply 1491 chars
 - 2026-11-04 01:22:20 sonnet/16: running 60 min | 01:15:35 [model] claude-sonnet (proposer) ok 13.1s, tokens in/out 7432/1680, reply 1982 chars
 - 2026-11-04 01:25:50 codex/12: running 10 min | 01:23:55 [model] codex (proposer) ok 24.7s, tokens in/out 18687/576, reply 1689 chars
@@ -214,3 +210,9 @@ round 2 [claude-sonnet] proposals=8 valid=4 attempts=1027 passes=0 near=0 invali
 - 2026-11-04 01:30:05 2 running: codex/11, sonnet/18
 - 2026-11-04 01:30:05 sonnet/19 waiting: claude-plan in use by sonnet/18
 - 2026-11-04 01:31:30 codex/11: done (exit 0, 4 min)
+- 2026-11-04 01:31:46 published: 39 file(s) to branch results
+- 2026-11-04 01:31:46 codex/10: start (uses codex-plan)
+- 2026-11-04 01:31:46 2 running: sonnet/18, codex/10
+- 2026-11-04 01:35:06 sonnet/18: running 5 min | 01:31:01 [model] claude-sonnet (proposer) ok 9.9s, tokens in/out 5379/899, reply 2042 chars
+- 2026-11-04 01:36:46 codex/10: running 5 min | 01:36:28 [model] codex (proposer) ok 15.4s, tokens in/out 18834/531, reply 1711 chars
+- 2026-11-04 01:39:31 codex/10: done (exit 0, 8 min)
