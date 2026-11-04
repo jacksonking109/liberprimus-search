@@ -1,7 +1,11 @@
 """Unattended queue runner: `lpswarm overnight`.
 
-Runs a list of jobs (tier tests, swarms, baselines) one after another, each as a
-subprocess with its own log, and keeps a SUMMARY.md up to date. Safe to leave alone:
+Runs a list of jobs (tier tests, swarms, baselines), each as a subprocess with its own
+log, and keeps a SUMMARY.md up to date. Jobs that use different backends (the Claude
+plan, the Codex plan, one GPU's Ollama server, an API; see router.backend_key) run at
+the same time, up to `max_parallel`; jobs that share one wait their turn, in queue
+order. The main window shows every running job's log lines as they appear, prefixed
+with the job id. Safe to leave alone:
 
 - a crashing job fails that job, not the run;
 - state is saved after every step; re-running the command resumes (finished jobs
@@ -53,6 +57,7 @@ class OvernightConfig:
     results_branch: str = "results"
     until: str | None = None            # "HH:MM" local time
     max_added_jobs: int = 5
+    max_parallel: int = 2               # jobs at once (only ones on different backends)
     manifest: str = "data/lp/manifest.json"
     alphabet: str = "data/alphabet/gematria_primus.json"
     jobs: list[dict] = field(default_factory=list)
@@ -75,11 +80,16 @@ def load_config(path: str | Path) -> OvernightConfig:
         seen.add(j["id"])
         if not isinstance(j.get("args", []), list):
             raise ValueError(f"{path}: job {j['id']}: args must be a list of strings")
+        if "lane" in j and not isinstance(j["lane"], str):
+            raise ValueError(f"{path}: job {j['id']}: lane must be a string")
     known = {k for k in OvernightConfig.__dataclass_fields__ if k != "jobs"}
     bad = set(sec) - known
     if bad:
         raise ValueError(f"{path}: unknown [overnight] keys {sorted(bad)}")
-    return OvernightConfig(**sec, jobs=jobs)
+    cfg = OvernightConfig(**sec, jobs=jobs)
+    if int(cfg.max_parallel) < 1:
+        raise ValueError(f"{path}: max_parallel must be >= 1")
+    return cfg
 
 
 # ------------------------------------------------------------------ manifest
@@ -128,16 +138,33 @@ def expand_jobs(cfg: OvernightConfig) -> list[dict]:
             man = _arg_value(args, "--manifest") or cfg.manifest
             for idx in manifest_sections(man, sections):
                 out.append(_job(f"{j['id']}/{idx}", j["kind"], _set_arg(args, "--sections", str(idx)),
-                                "config", j.get("note", "")))
+                                "config", j.get("note", ""), j.get("lane")))
         else:
-            out.append(_job(j["id"], j["kind"], args, "config", j.get("note", "")))
+            out.append(_job(j["id"], j["kind"], args, "config", j.get("note", ""), j.get("lane")))
     return out
 
 
-def _job(jid: str, kind: str, args: list[str], added_by: str, note: str = "") -> dict:
-    return {"id": jid, "kind": kind, "args": args, "status": "pending", "added_by": added_by,
-            "note": note, "retries": 0, "started": None, "ended": None, "returncode": None,
-            "reason": None}
+def _job(jid: str, kind: str, args: list[str], added_by: str, note: str = "",
+         lane: str | None = None) -> dict:
+    j = {"id": jid, "kind": kind, "args": args, "status": "pending", "added_by": added_by,
+         "note": note, "retries": 0, "started": None, "ended": None, "returncode": None,
+         "reason": None}
+    if lane:
+        j["lane"] = lane
+    return j
+
+
+@dataclass
+class _Running:
+    job: dict
+    proc: subprocess.Popen
+    logf: object
+    log_path: Path
+    t_start: float
+    last_beat: float
+    offset: int = 0          # bytes of job.log already echoed to the console
+    partial: str = ""
+    killed: str | None = None
 
 
 # ---------------------------------------------------------------- the runner
@@ -184,7 +211,7 @@ class Overnight:
     def __init__(self, cfg: OvernightConfig, run_dir: str | Path, *, publish: bool | None = None,
                  router=None, stop_file: str | Path = "STOP", poll_s: float = 5.0,
                  python: str | None = None, progress: bool = True, retry_failed: bool = False,
-                 heartbeat_s: float = 300.0):
+                 heartbeat_s: float = 300.0, echo_jobs: bool = True, echo_max_lines: int = 20):
         self.cfg = cfg
         self.dir = Path(run_dir)
         self.dir.mkdir(parents=True, exist_ok=True)
@@ -197,6 +224,12 @@ class Overnight:
         self.progress = progress
         self.until = _until_epoch(cfg.until)
         self.heartbeat_s = heartbeat_s
+        self.echo_jobs = echo_jobs
+        self.echo_max_lines = echo_max_lines
+        self.max_parallel = max(1, int(cfg.max_parallel))
+        self.running: dict[str, _Running] = {}
+        self._last_wait = ""
+        self._specs_cache: tuple[float, dict] | None = None
         self.state = self._load_state()
         self.last_tick = 0.0
         if retry_failed:
@@ -265,6 +298,35 @@ class Overnight:
                 names += [x.strip() for x in v.split(",") if x.strip()]
         return [n for n in names if n != "baseline" and not n.startswith("random_program")]
 
+    def _specs(self) -> dict:
+        try:
+            mtime = Path(self.cfg.models).stat().st_mtime
+        except OSError:
+            return {}
+        if self._specs_cache is None or self._specs_cache[0] != mtime:
+            try:
+                from lpswarm.router.base import load_model_specs
+                self._specs_cache = (mtime, {s.name: s for s in load_model_specs(self.cfg.models)})
+            except Exception:  # noqa: BLE001 - preflight reports a broken config
+                self._specs_cache = (mtime, {})
+        return self._specs_cache[1]
+
+    def job_resources(self, job: dict) -> set[str]:
+        """What a job occupies while it runs: the backend of each model it uses (a plan
+        quota, a GPU's Ollama server, an API), plus its `lane` if set. Jobs without
+        models (baselines, random-only tests) take "cpu". Jobs sharing anything run one
+        after another."""
+        from lpswarm.router.router import backend_key
+        specs = self._specs()
+        res = set()
+        for n in self.job_models(job):
+            res.add(backend_key(specs[n]) if n in specs else f"model:{n}")
+        if not res:
+            res.add("cpu")
+        if job.get("lane"):
+            res.add(f"lane:{job['lane']}")
+        return res
+
     # ---------------------------------------------------------------- checks
     def preflight(self, job: dict) -> str | None:
         """Reason to refuse the job, or None. Also restarts Ollama if it is down."""
@@ -317,19 +379,29 @@ class Overnight:
         with KeepAwake():
             self.save()
             self.write_summary()
-            while True:
-                reason = self.should_stop()
-                if reason:
-                    self.log(f"stopping: {reason}")
-                    break
-                job = next((j for j in self.state["jobs"] if j["status"] in ("pending", "interrupted")),
-                           None)
-                if job is None:
-                    self.log("queue empty")
-                    break
-                self.run_job(job)
-                if job["status"] != "blocked":   # refused jobs did nothing; no report or check-in
-                    self.after_job(job)
+            try:
+                while True:
+                    reason = self.should_stop()
+                    if reason:
+                        self.log(f"stopping: {reason}")
+                        for r in list(self.running.values()):
+                            self.kill(r, reason)
+                        self.poll_jobs(wait=True)
+                        break
+                    self.start_ready_jobs()
+                    if not self.running:
+                        if not any(j["status"] in ("pending", "interrupted") for j in self.state["jobs"]):
+                            self.log("queue empty")
+                            break
+                        continue   # every startable job was refused; look again
+                    time.sleep(self.poll_s)
+                    self.poll_jobs()
+                    self.maybe_tick()
+            finally:
+                for r in list(self.running.values()):   # crash or Ctrl+C: leave nothing behind
+                    self.kill(r, "runner exiting")
+                if self.running:
+                    self.poll_jobs(wait=True)
             self.state["status"] = "finished" if not any(
                 j["status"] in ("pending", "interrupted") for j in self.state["jobs"]) else "stopped"
             self.save()
@@ -337,57 +409,162 @@ class Overnight:
             self.publish()
         return self.state
 
-    def run_job(self, job: dict) -> None:
+    def start_ready_jobs(self) -> None:
+        """Start queued jobs, in order, whose backends are free, up to max_parallel."""
+        busy: dict[str, str] = {}
+        for r in self.running.values():
+            for res in self.job_resources(r.job):
+                busy[res] = r.job["id"]
+        waiting = ""
+        for job in self.state["jobs"]:
+            if len(self.running) >= self.max_parallel:
+                break
+            if job["status"] not in ("pending", "interrupted"):
+                continue
+            res = self.job_resources(job)
+            clash = sorted(res & busy.keys())
+            if clash:
+                if not waiting:
+                    waiting = (f"{job['id']} waiting: {clash[0]} in use by {busy[clash[0]]}")
+                continue
+            started = self.start_job(job)
+            if started is not None:
+                for x in res:
+                    busy[x] = job["id"]
+                if len(self.running) > 1:
+                    self.log(f"{len(self.running)} running: {', '.join(self.running)}")
+            elif job["status"] != "blocked":
+                after = job["status"]
+                self.log(f"{job['id']}: {after}")
+        if waiting and waiting != self._last_wait:
+            self.log(waiting)
+        self._last_wait = waiting
+
+    def start_job(self, job: dict) -> _Running | None:
         refuse = self.preflight(job)
         if refuse:
             job.update(status="blocked", reason=refuse, ended=_now())
             self.log(f"{job['id']}: blocked: {refuse}")
             self.save()
-            return
+            return None
         d = self.job_dir(job)
         d.mkdir(parents=True, exist_ok=True)
         cmd = self.job_command(job)
-        job.update(status="running", started=job["started"] or _now(), reason=None)
-        self.save()
-        self.write_summary()
-        self.log(f"{job['id']}: start")
         kw: dict = {"creationflags": subprocess.CREATE_NEW_PROCESS_GROUP} if os.name == "nt" \
             else {"start_new_session": True}
-        env = dict(os.environ, LPSWARM_LOG_CALLS="1", PYTHONUNBUFFERED="1",
+        env = dict(os.environ, LPSWARM_LOG_CALLS="1", PYTHONUNBUFFERED="1", PYTHONIOENCODING="utf-8",
                    LPSWARM_TRANSCRIPT=str(d / "transcript.jsonl"))
-        t_start = time.monotonic()
-        last_beat = t_start
-        with (d / "job.log").open("a", encoding="utf-8") as logf:
-            logf.write(f"\n===== {_now()} {' '.join(cmd)}\n")
-            logf.flush()
+        log_path = d / "job.log"
+        logf = log_path.open("a", encoding="utf-8")
+        logf.write(f"\n===== {_now()} {' '.join(cmd)}\n")
+        logf.flush()
+        offset = log_path.stat().st_size
+        try:
             proc = subprocess.Popen(cmd, stdout=logf, stderr=subprocess.STDOUT, env=env, **kw)
-            killed = None
-            while proc.poll() is None:
-                time.sleep(self.poll_s)
-                if time.monotonic() - last_beat >= self.heartbeat_s:
-                    last_beat = time.monotonic()
-                    mins = (last_beat - t_start) / 60
-                    tail = _log_tail(d / "job.log", 1)
-                    self.log(f"{job['id']}: running {mins:.0f} min | {tail[-1] if tail else 'no output yet'}")
-                    self.save()
-                    self.write_summary()
-                reason = self.should_stop()
-                if reason or job.get("kill_requested"):
-                    killed = reason or job.pop("kill_requested")
-                    from lpswarm.router.cli_adapters import _kill_tree
-                    _kill_tree(proc)
-                    proc.wait(timeout=60)
-                    break
-                self.maybe_tick()
-        job["returncode"] = proc.returncode
-        job["ended"] = _now()
-        if killed:
-            job["status"] = "skipped" if killed == "skip" else "interrupted"
-            job["reason"] = killed
-        else:
-            job["status"] = "done" if proc.returncode == 0 else "failed"
-        self.log(f"{job['id']}: {job['status']} (exit {proc.returncode})")
+        except OSError as exc:
+            logf.close()
+            job.update(status="failed", reason=f"could not start: {exc}", ended=_now())
+            self.save()
+            return None
+        job.update(status="running", started=job["started"] or _now(), reason=None)
+        lanes = ", ".join(sorted(self.job_resources(job)))
+        self.log(f"{job['id']}: start (uses {lanes})")
+        now = time.monotonic()
+        r = _Running(job, proc, logf, log_path, now, now, offset=offset)
+        self.running[job["id"]] = r
         self.save()
+        self.write_summary()
+        return r
+
+    def kill(self, r: _Running, reason: str) -> None:
+        if r.killed is None:
+            r.killed = reason
+            from lpswarm.router.cli_adapters import _kill_tree
+            try:
+                _kill_tree(r.proc)
+            except Exception:  # noqa: BLE001
+                pass
+
+    def poll_jobs(self, wait: bool = False) -> None:
+        """Echo new log lines, print heartbeats, honour kill requests, finish exited jobs."""
+        for jid, r in list(self.running.items()):
+            if r.killed is None and r.job.get("kill_requested"):
+                self.kill(r, r.job.pop("kill_requested"))
+            if wait:
+                try:
+                    r.proc.wait(timeout=60)
+                except subprocess.TimeoutExpired:
+                    pass
+            self.echo_log(r)
+            done = r.proc.poll() is not None
+            if not done and time.monotonic() - r.last_beat >= self.heartbeat_s:
+                r.last_beat = time.monotonic()
+                mins = (r.last_beat - r.t_start) / 60
+                tail = _log_tail(r.log_path, 1)
+                self.log(f"{jid}: running {mins:.0f} min | {tail[-1] if tail else 'no output yet'}")
+                self.save()
+                self.write_summary()
+            if done:
+                self.finish_job(r)
+
+    def echo_log(self, r: _Running) -> None:
+        """Print a running job's new log lines to the console, prefixed with its id."""
+        if not (self.progress and self.echo_jobs):
+            return
+        try:
+            with open(r.log_path, "rb") as f:
+                f.seek(r.offset)
+                data = f.read()
+        except OSError:
+            return
+        if not data:
+            return
+        r.offset += len(data)
+        text = r.partial + data.decode("utf-8", errors="replace")
+        lines = text.split("\n")
+        r.partial = lines.pop()          # an unfinished last line waits for the next poll
+        lines = [x.rstrip() for x in lines if x.strip() and "UserWarning" not in x
+                 and not x.lstrip().startswith("return cls(")]
+        extra = len(lines) - self.echo_max_lines
+        if extra > 0:
+            lines = lines[:self.echo_max_lines // 2] + [f"... (+{extra} more lines in job.log)"] \
+                + lines[-(self.echo_max_lines // 2):]
+        for x in lines:
+            _echo(f"[{r.job['id']}] {x[:240]}")
+
+    def finish_job(self, r: _Running) -> None:
+        job = r.job
+        self.running.pop(job["id"], None)
+        try:
+            r.logf.close()
+        except OSError:
+            pass
+        if r.partial.strip() and self.progress and self.echo_jobs:
+            _echo(f"[{job['id']}] {r.partial.rstrip()[:240]}")
+        job["returncode"] = r.proc.returncode
+        job["ended"] = _now()
+        if r.killed:
+            job["status"] = "skipped" if r.killed == "skip" else "interrupted"
+            job["reason"] = r.killed
+        else:
+            job["status"] = "done" if r.proc.returncode == 0 else "failed"
+        mins = (time.monotonic() - r.t_start) / 60
+        self.log(f"{job['id']}: {job['status']} (exit {r.proc.returncode}, {mins:.0f} min)")
+        self.save()
+        if job["status"] in ("done", "failed", "skipped") or (r.killed == "skip"):
+            self.after_job(job)
+        else:
+            self.write_summary()
+
+    def run_job(self, job: dict) -> None:
+        """Run one job to the end (used by tests and as the serial path)."""
+        r = self.start_job(job)
+        while r is not None and job["id"] in self.running:
+            time.sleep(self.poll_s)
+            reason = self.should_stop()
+            if reason:
+                self.kill(r, reason)
+            self.poll_jobs(wait=bool(reason))
 
     def after_job(self, job: dict) -> None:
         self.write_summary()
@@ -429,9 +606,8 @@ class Overnight:
                 spent = self.router.spent(n)
             except Exception:  # noqa: BLE001
                 continue
-            pause = ""
-            if st["paused_until"]:
-                pause = f", paused until {time.strftime('%H:%M', time.localtime(st['paused_until']))}"
+            from lpswarm.router.limits import pause_text
+            pause = pause_text(st, "%H:%M")
             if st["calls"] or spent or pause:
                 lines.append(f"- {n}: {st['calls']} call(s) in the last {st['window_hours']:g}h "
                              f"(cap {st['cap'] or 'none'}), spent ${spent:.4f}{pause}")
@@ -668,6 +844,14 @@ def publish_results(run_dir: Path, branch: str = "results", repo: str | Path = "
     _git(["commit", "-q", "-m", f"results: {run_dir.name} {_now()}"], wt)
     _git(["push", "-q", "-u", "origin", branch], wt)
     return f"{copied} file(s) to branch {branch}"
+
+
+def _echo(line: str) -> None:
+    try:
+        print(line, flush=True)
+    except UnicodeEncodeError:   # a console that cannot show rune glyphs
+        enc = getattr(sys.stdout, "encoding", None) or "ascii"
+        print(line.encode(enc, errors="replace").decode(enc, errors="replace"), flush=True)
 
 
 def _log_tail(path: Path, n: int) -> list[str]:

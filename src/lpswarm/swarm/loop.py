@@ -10,6 +10,7 @@ target closes the run.
 from __future__ import annotations
 
 import time
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Sequence
@@ -20,7 +21,7 @@ from lpswarm.oracle import FullOracle
 from lpswarm.programs import SpecError, compile_spec, describe, expand, spec_hash
 from lpswarm.router.adapters import AdapterError
 from lpswarm.router.limits import RateLimited
-from lpswarm.router.router import BudgetExceeded
+from lpswarm.router.router import BudgetExceeded, backend_key
 from lpswarm.swarm.generators import Feedback, GenContext, summarise_tried
 
 
@@ -33,6 +34,9 @@ class SwarmConfig:
     stop_file: str | None = "STOP"
     stop_on_pass: bool = True
     wait_on_rate_limit: bool = True       # pause until a usage limit resets (else stop)
+    # Call generators on different backends (GPU / plan / API, see backend_key) at the
+    # same time; results are still processed one generator at a time, in order.
+    parallel: bool = True
 
     def __post_init__(self) -> None:
         if self.rounds < 1 or self.per_round < 1:
@@ -98,29 +102,35 @@ def run_swarm(target: Target, ledger: Ledger, oracle: FullOracle, generators: Se
         rounds_run = rnd
         limited: dict[str, float] = {}
         proposed_this_round = 0
+        stopped = _pre_check(stop_path, time_left, budget_left)
+        if stopped:
+            break
+        # Every generator sees the ledger as it was at the start of the round.
+        tried_now = summarise_tried(ledger.tried(tid))
+        ctxs = {}
         for gen in generators:
-            if stop_path is not None and stop_path.exists():
-                stopped = "stop_file"
-                break
-            if time_left() is not None and time_left() <= 0:
-                stopped = "timeout"
-                break
-            if budget_left() is not None and budget_left() <= 0:
-                stopped = "max_attempts"
+            k = min(int(getattr(gen, "per_round", None) or cfg.per_round), 32)
+            ctxs[gen.model] = GenContext(shown_label, alpha, target.ciphertext, rnd, k,
+                                         history[gen.model], errors[gen.model], tried_now,
+                                         alphabet_values, task_id=target.label)
+        fetched = _fetch_proposals(generators, ctxs, cfg.parallel, rnd, progress)
+        for gen in generators:
+            stopped = _pre_check(stop_path, time_left, budget_left)
+            if stopped:
                 break
             gs = stats[gen.model]
-            k = min(int(getattr(gen, "per_round", None) or cfg.per_round), 32)
-            ctx = GenContext(shown_label, alpha, target.ciphertext, rnd, k,
-                             history[gen.model], errors[gen.model],
-                             summarise_tried(ledger.tried(tid)), alphabet_values,
-                             task_id=target.label)
+            ctx = ctxs[gen.model]
+            k = ctx.k
             try:
-                raws = gen.propose(ctx)
+                raws, gen_errors = fetched[gen.model]
+                if isinstance(raws, BaseException):
+                    raise raws
                 proposed_this_round += 1
             except RateLimited as exc:
                 limited[gen.model] = exc.resume_at
                 if progress:
-                    print(f"  [{gen.model}] {exc}", flush=True)
+                    rest = "; the other generators carry on" if len(generators) > 1 else ""
+                    print(f"  [{gen.model}] {exc}{rest}", flush=True)
                 continue
             except BudgetExceeded as exc:
                 stopped = f"budget: {exc}"
@@ -139,7 +149,7 @@ def run_swarm(target: Target, ledger: Ledger, oracle: FullOracle, generators: Se
                 if progress:
                     print(f"  [{gen.model}] generator error: {type(exc).__name__}: {exc}")
                 continue
-            for e in getattr(gen, "last_errors", []) or []:
+            for e in gen_errors:
                 errors[gen.model].append(e)
             compiled, seen = [], set()
             for rp in raws:
@@ -233,6 +243,60 @@ def run_swarm(target: Target, ledger: Ledger, oracle: FullOracle, generators: Se
             idle_rounds = 0
     final = final_check(ledger, oracle, tid)
     return SwarmResult(tid, rounds_run, stopped, stats, final, time.monotonic() - t0)
+
+
+def _pre_check(stop_path, time_left, budget_left) -> str | None:
+    if stop_path is not None and stop_path.exists():
+        return "stop_file"
+    if time_left() is not None and time_left() <= 0:
+        return "timeout"
+    if budget_left() is not None and budget_left() <= 0:
+        return "max_attempts"
+    return None
+
+
+def generator_backend(gen) -> str:
+    """The backend a generator's calls queue on (see router.backend_key); generators
+    without a router (tests, scripted fakes) each get their own."""
+    router, name = getattr(gen, "router", None), getattr(gen, "model", None)
+    try:
+        return backend_key(router.spec(name))
+    except Exception:  # noqa: BLE001
+        return f"generator:{name}"
+
+
+def _fetch_proposals(generators, ctxs: dict, parallel: bool, rnd: int,
+                     progress: bool) -> dict[str, tuple]:
+    """Call every generator once; {model: (proposals or the exception, extra errors)}.
+
+    Generators on different backends are called at the same time (one worker thread
+    per backend); generators sharing a backend are called one after another. Nothing
+    here touches the target ledger: processing happens afterwards, in order."""
+    groups: dict[str, list] = {}
+    for gen in generators:
+        groups.setdefault(generator_backend(gen) if parallel else "serial", []).append(gen)
+    out: dict[str, tuple] = {}
+
+    def work(gens):
+        for gen in gens:
+            try:
+                raws = gen.propose(ctxs[gen.model])
+                out[gen.model] = (raws, list(getattr(gen, "last_errors", []) or []))
+            except Exception as exc:  # noqa: BLE001 - re-raised per generator by the caller
+                out[gen.model] = (exc, [])
+
+    if len(groups) <= 1:
+        for gens in groups.values():
+            work(gens)
+        return out
+    if progress:
+        print(f"round {rnd}: calling " + " | ".join(", ".join(g.model for g in gens)
+                                                     for gens in groups.values())
+              + " (in parallel)", flush=True)
+    with ThreadPoolExecutor(max_workers=len(groups), thread_name_prefix="gen") as pool:
+        for f in [pool.submit(work, gens) for gens in groups.values()]:
+            f.result()
+    return out
 
 
 def _wait_until(resume_at: float, stop_path, time_left, progress: bool) -> str | None:

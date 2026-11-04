@@ -82,7 +82,8 @@ replies = ['{"proposals": [{"spec": {"stream": {"kind": "sequence", "name": "pri
 # Usage limits: the harness counts its own calls per rolling window and pauses at
 # max_calls_per_window; when the CLI reports a usage limit it pauses until the reset
 # (or a 30 min cool-down if no time is given). Your other use of the plan (chat, IDE)
-# shares the same real limit, so keep the cap modest. Check status: lpswarm doctor
+# shares the same real limit. The cap is checked live, so raising it takes effect on the
+# next call. Check status: lpswarm doctor (it shows the whole group's calls)
 #
 # All Claude models share ONE plan quota: quota_group makes their calls count together
 # and a usage limit hit by any of them pauses all.
@@ -91,7 +92,7 @@ replies = ['{"proposals": [{"spec": {"stream": {"kind": "sequence", "name": "pri
 # model = "opus"
 # roles = ["proposer"]
 # quota_group = "claude-plan"
-# max_calls_per_window = 40
+# max_calls_per_window = 120
 # window_hours = 5
 #
 # [models.claude-sonnet]
@@ -99,7 +100,7 @@ replies = ['{"proposals": [{"spec": {"stream": {"kind": "sequence", "name": "pri
 # model = "sonnet"
 # roles = ["proposer"]
 # quota_group = "claude-plan"
-# max_calls_per_window = 40
+# max_calls_per_window = 120
 # window_hours = 5
 #
 # Supervisor for `lpswarm overnight` (answers with menu actions only; tools stay off).
@@ -108,7 +109,7 @@ replies = ['{"proposals": [{"spec": {"stream": {"kind": "sequence", "name": "pri
 # model = "opus"
 # roles = ["supervisor"]
 # quota_group = "claude-plan"
-# max_calls_per_window = 40
+# max_calls_per_window = 120
 # window_hours = 5
 #
 # Codex on your ChatGPT plan: the explorer.
@@ -117,7 +118,7 @@ replies = ['{"proposals": [{"spec": {"stream": {"kind": "sequence", "name": "pri
 # model = "default"                # or a model name accepted by `codex -m`
 # roles = ["proposer"]
 # quota_group = "codex-plan"
-# max_calls_per_window = 30
+# max_calls_per_window = 90
 # window_hours = 5
 # style = "exploratory"
 # per_round = 8

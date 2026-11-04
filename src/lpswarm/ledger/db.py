@@ -71,7 +71,10 @@ class Ledger:
         self.path = str(path)
         if self.path != ":memory:":
             Path(self.path).parent.mkdir(parents=True, exist_ok=True)
-        self.conn = sqlite3.connect(self.path)
+        # timeout: several overnight jobs may write the shared spend ledger at once.
+        # check_same_thread=False: the router calls models from worker threads and
+        # serialises its ledger use with a lock.
+        self.conn = sqlite3.connect(self.path, timeout=30, check_same_thread=False)
         self.conn.row_factory = sqlite3.Row
         schema = resources.files("lpswarm.ledger").joinpath("schema.sql").read_text(encoding="utf-8")
         self._migrate()
@@ -274,13 +277,16 @@ class Ledger:
                           (model, hit_at, resume_at, source, int(parsed), (message or "")[:500]))
         self.conn.commit()
 
-    def active_limit(self, model, now: float) -> float | None:
+    def active_limit(self, model, now: float, include_window: bool = False) -> float | None:
         """Latest resume time for a model (or any of a list of models sharing a quota)
-        if it is still in the future."""
+        if it is still in the future. Pauses from the local call cap (source 'window')
+        are recorded for history but ignored unless include_window: the router works
+        them out live from the call count, so raising the cap takes effect at once."""
         models = [model] if isinstance(model, str) else list(model)
         q = ",".join("?" * len(models))
-        row = self.conn.execute(f"SELECT MAX(resume_at) FROM rate_limit_event WHERE model IN ({q})",
-                                models).fetchone()
+        extra = "" if include_window else " AND source != 'window'"
+        row = self.conn.execute(f"SELECT MAX(resume_at) FROM rate_limit_event WHERE model IN ({q})"
+                                + extra, models).fetchone()
         return float(row[0]) if row and row[0] is not None and row[0] > now else None
 
     def calls_since(self, model, since_epoch: float) -> list[float]:

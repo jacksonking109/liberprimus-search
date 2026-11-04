@@ -207,25 +207,25 @@ if ((Test-Path $ModelsToml) -and -not $Force) {
     }
     $claudeBlock = @(
         "[models.claude-opus]", 'provider = "claude_code"', 'model = "opus"', 'roles = ["proposer"]',
-        'quota_group = "claude-plan"', "max_calls_per_window = 40", "window_hours = 5", "timeout = 600", "",
+        'quota_group = "claude-plan"', "max_calls_per_window = 120", "window_hours = 5", "timeout = 600", "",
         "[models.claude-sonnet]", 'provider = "claude_code"', 'model = "sonnet"', 'roles = ["proposer"]',
-        'quota_group = "claude-plan"', "max_calls_per_window = 40", "window_hours = 5", "timeout = 600", "",
+        'quota_group = "claude-plan"', "max_calls_per_window = 120", "window_hours = 5", "timeout = 600", "",
         "[models.claude-supervisor]", 'provider = "claude_code"', 'model = "opus"', 'roles = ["supervisor"]',
-        'quota_group = "claude-plan"', "max_calls_per_window = 40", "window_hours = 5", "timeout = 600", "")
+        'quota_group = "claude-plan"', "max_calls_per_window = 120", "window_hours = 5", "timeout = 600", "")
     if (Get-Command claude -ErrorAction SilentlyContinue) {
         $lines += @("# Claude Code on your plan (tools off, temp folder, API keys ignored). One shared quota.")
         $lines += $claudeBlock
-        Write-Step "OK" "found Claude Code; added claude-opus, claude-sonnet, claude-supervisor (shared 40 calls / 5h)"
+        Write-Step "OK" "found Claude Code; added claude-opus, claude-sonnet, claude-supervisor (shared 120 calls / 5h)"
     } else {
         $lines += @("# Claude Code not found when this file was generated. Install it, sign in, then uncomment:")
         $lines += ($claudeBlock | ForEach-Object { if ($_) { "# $_" } else { "" } })
     }
     $codexBlock = @("[models.codex]", 'provider = "codex"', 'model = "default"', 'roles = ["proposer"]',
-        'quota_group = "codex-plan"', "max_calls_per_window = 30", "window_hours = 5",
+        'quota_group = "codex-plan"', "max_calls_per_window = 90", "window_hours = 5",
         'style = "exploratory"', "per_round = 8", "timeout = 600", "")
     if (Get-Command codex -ErrorAction SilentlyContinue) {
         $lines += @("# Codex on your ChatGPT plan: the explorer.") + $codexBlock
-        Write-Step "OK" "found Codex; added model codex (30 calls / 5h)"
+        Write-Step "OK" "found Codex; added model codex (90 calls / 5h)"
     } else {
         $lines += @("# Codex not found when this file was generated. Install it, run: codex login, then uncomment:")
         $lines += ($codexBlock | ForEach-Object { if ($_) { "# $_" } else { "" } })

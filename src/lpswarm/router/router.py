@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import os
+import threading
 import time
 import warnings
 from dataclasses import dataclass
@@ -25,6 +26,23 @@ class BudgetExceeded(RuntimeError):
 
 
 SUBSCRIPTION_PROVIDERS = ("claude_code", "codex")
+
+
+def backend_key(spec: ModelSpec) -> str:
+    """What a model's calls queue on: one Ollama server (one GPU), one plan quota, one API
+    endpoint. Calls on different backends can run at the same time; calls on the same
+    backend are made one after another (two local models on one GPU would swap or run
+    out of memory; one plan quota is counted call by call)."""
+    x = spec.extra
+    if spec.provider == "ollama":
+        return f"ollama:{(spec.endpoint or 'http://localhost:11434').rstrip('/')}"
+    if x.get("quota_group"):
+        return str(x["quota_group"])
+    if spec.provider in SUBSCRIPTION_PROVIDERS:
+        return spec.provider
+    if spec.provider == "openai_compatible":
+        return f"api:{(spec.endpoint or '').rstrip('/')}"
+    return f"{spec.provider}:{spec.name}"
 
 
 def _accepts(fn, name: str) -> bool:
@@ -88,6 +106,9 @@ class Router:
         self.global_max_usd = global_max_usd
         self.retries = retries
         self._models: dict[str, _Entry] = {}
+        # Models may be called from several threads (one per backend, see backend_key);
+        # budget/limit checks and ledger writes are serialised here.
+        self._lock = threading.RLock()
         if ledger is None and (global_max_usd is not None or any(s.max_usd is not None for s in specs)):
             raise ValueError("USD caps need a ledger to count spending; pass ledger=...")
         if ledger is None and any(s.extra.get("max_calls_per_window") for s in specs):
@@ -142,34 +163,56 @@ class Router:
             return [name]
         return [n for n, e in self._models.items() if e.spec.extra.get("quota_group") == group]
 
+    def quota_label(self, name: str) -> str:
+        return str(self.spec(name).extra.get("quota_group") or name)
+
     def window_status(self, name: str, now: float | None = None) -> dict:
         """Calls in the current rolling window (summed over the quota group), the cap,
-        and any active pause (a limit hit by any group member pauses them all)."""
+        and any active pause (a limit hit by any group member pauses them all).
+
+        `pause_kind` is 'reply' (the CLI reported a usage limit; recorded, holds until
+        its reset) or 'window' (the local call cap is full; worked out live from the
+        call count and the current cap, so raising the cap ends it at once)."""
         now = time.time() if now is None else now
         spec = self.spec(name)
         hours = float(spec.extra.get("window_hours", 5))
         cap = spec.extra.get("max_calls_per_window")
         members = self.quota_members(name)
         calls = self.ledger.calls_since(members, now - hours * 3600) if self.ledger is not None else []
-        paused = self.ledger.active_limit(members, now) if self.ledger is not None else None
+        reply = self.ledger.active_limit(members, now) if self.ledger is not None else None
+        window = None
+        if cap and int(cap) > 0 and len(calls) >= int(cap):
+            # the call that must age out for the count to drop below the cap
+            window = calls[len(calls) - int(cap)] + hours * 3600 + 5
+        paused, kind = None, None
+        if reply is not None or window is not None:
+            paused = max(t for t in (reply, window) if t is not None)
+            kind = "reply" if reply is not None and reply >= (window or 0) else "window"
         return {"window_hours": hours, "calls": len(calls), "cap": cap, "paused_until": paused,
-                "oldest_call": calls[0] if calls else None, "group": members}
+                "pause_kind": kind, "oldest_call": calls[0] if calls else None, "group": members,
+                "quota": self.quota_label(name)}
 
     def _check_limits(self, name: str) -> None:
-        """Raise RateLimited if a recorded limit is active or the local window cap is full."""
+        """Raise RateLimited if a CLI-reported limit is active or the local window cap is full."""
         if self.ledger is None:
             return
         now = time.time()
-        until = self.ledger.active_limit(self.quota_members(name), now)
-        if until is not None:
-            raise RateLimited(name, until, "usage limit active for this plan")
         st = self.window_status(name, now)
-        cap = st["cap"]
-        if cap and st["calls"] >= int(cap):
-            resume = st["oldest_call"] + st["window_hours"] * 3600 + 5
-            self.ledger.add_rate_limit_event(name, now, resume, "window", False,
-                                             f"{st['calls']} calls in {st['window_hours']}h (cap {cap})")
-            raise RateLimited(name, resume, f"local cap of {cap} calls per {st['window_hours']:g}h")
+        if st["pause_kind"] == "reply":
+            raise RateLimited(name, st["paused_until"],
+                              f"usage limit reported by the CLI for {st['quota']}")
+        if st["pause_kind"] == "window":
+            resume, cap = st["paused_until"], st["cap"]
+            # history only (doctor / SUMMARY); one row per pause, not one per check
+            last = self.ledger.active_limit(st["group"], now, include_window=True)
+            if last is None or last < resume - 1:
+                self.ledger.add_rate_limit_event(name, now, resume, "window", False,
+                                                 f"{st['calls']} calls in {st['window_hours']:g}h "
+                                                 f"(cap {cap})")
+            raise RateLimited(name, resume,
+                              f"local cap {st['calls']}/{cap} calls per {st['window_hours']:g}h "
+                              f"for {st['quota']}; raise max_calls_per_window in the models "
+                              "config to allow more")
 
     def complete(self, name: str, messages: Sequence[dict], role: Role | str,
                  task_id: str | None = None, temperature: float = 0.7,
@@ -210,7 +253,7 @@ class Router:
                "task": task_id, "seconds": round(time.monotonic() - t0, 2),
                "messages": list(messages), "reply": reply, "error": error}
         try:
-            with open(path, "a", encoding="utf-8") as f:
+            with self._lock, open(path, "a", encoding="utf-8") as f:
                 f.write(json.dumps(rec, ensure_ascii=False) + "\n")
         except OSError:
             pass
@@ -225,8 +268,10 @@ class Router:
             raise ValueError(f"unknown model {name!r}")
         if Role(role) not in entry.spec.roles:
             raise ValueError(f"model {name} is not configured for role {Role(role).value}")
-        self._check_budget(name)
-        self._check_limits(name)
+        with self._lock:
+            self._check_budget(name)
+            self._check_limits(name)
+        self._log_call(f"[model] {name} ({Role(role).value}) calling...")
         last: AdapterError | None = None
         c: Completion | None = None
         for attempt in range(self.retries + 1):
@@ -242,8 +287,9 @@ class Router:
                 if getattr(exc, "rate_limited", False):
                     now = time.time()
                     if self.ledger is not None:
-                        self.ledger.add_rate_limit_event(name, now, exc.resume_at, "reply",
-                                                         getattr(exc, "parsed", False), str(exc))
+                        with self._lock:
+                            self.ledger.add_rate_limit_event(name, now, exc.resume_at, "reply",
+                                                             getattr(exc, "parsed", False), str(exc))
                     raise RateLimited(name, exc.resume_at,
                                       "usage limit reported by the CLI"
                                       + ("" if getattr(exc, "parsed", False)
@@ -255,11 +301,12 @@ class Router:
         if c is None:
             raise AdapterError(f"{name}: {last}", getattr(last, "transient", False))
         if self.ledger is not None:
-            self.ledger.add_budget_event(entry.spec.provider, name, c.tokens_in, c.tokens_out,
-                                         c.usd, task_id)
-            self.ledger.commit()
+            with self._lock:
+                self.ledger.add_budget_event(entry.spec.provider, name, c.tokens_in, c.tokens_out,
+                                             c.usd, task_id)
+                self.ledger.commit()
         return c
 
 
 __all__ = ["AdapterError", "BudgetExceeded", "Completion", "RateLimited", "Router",
-           "SUBSCRIPTION_PROVIDERS", "ScriptedAdapter", "make_adapter"]
+           "SUBSCRIPTION_PROVIDERS", "ScriptedAdapter", "backend_key", "make_adapter"]

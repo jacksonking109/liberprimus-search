@@ -52,6 +52,16 @@ class RateLimited(RuntimeError):
         super().__init__(f"{model} is paused until {when} ({reason})")
 
 
+def pause_text(status: dict, fmt: str = "%Y-%m-%d %H:%M") -> str:
+    """', paused until <time> (<why>)' for a Router.window_status() dict, or ''."""
+    until = status.get("paused_until")
+    if not until:
+        return ""
+    why = ("local cap, raise max_calls_per_window to allow more" if status.get("pause_kind") == "window"
+           else "usage limit reported by the CLI")
+    return f", paused until {time.strftime(fmt, time.localtime(until))} ({why})"
+
+
 def looks_like_limit(text: str) -> bool:
     return bool(text) and bool(_LIMIT_RE.search(text))
 

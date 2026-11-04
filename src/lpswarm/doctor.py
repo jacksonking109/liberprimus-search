@@ -113,15 +113,17 @@ def run_checks(models_config: str | None = None, ping: bool = False,
                     continue
                 from lpswarm.ledger import Ledger
                 from lpswarm.router import Router
+                from lpswarm.router.limits import pause_text
+                group = s.extra.get("quota_group")
+                members = [m for m in specs if m.name == s.name
+                           or (group and m.extra.get("quota_group") == group)]
                 with Ledger(lpath) as led:
-                    st = Router([s], ledger=led).window_status(s.name)
-                when = ""
-                if st["paused_until"]:
-                    from datetime import datetime
-                    when = f"; PAUSED until {datetime.fromtimestamp(st['paused_until']):%Y-%m-%d %H:%M}"
+                    st = Router(members, ledger=led).window_status(s.name)
+                when = pause_text(st).replace(", paused", "; PAUSED")
+                share = f" (group {group}: {', '.join(st['group'])})" if group else ""
                 out.append(Check(WARN if st["paused_until"] else OK, f"usage {s.name}",
                                  f"{st['calls']} call(s) in the last {st['window_hours']:g}h "
-                                 f"(cap {cap or 'none'}) in {lpath}{when}"))
+                                 f"(cap {cap or 'none'}){share} in {lpath}{when}"))
         elif s.provider == "command":
             cmd = list(s.extra.get("command") or [])
             exe = shutil.which(cmd[0]) if cmd else None

@@ -243,7 +243,7 @@ def cmd_swarm(args) -> int:
     oracle = FullOracle(alphabet, _oracle_cfg(args, conf))
     sc = _apply(SwarmConfig, conf.get("swarm", {}), {
         "rounds": args.rounds, "per_round": args.per_round, "max_attempts": args.max_attempts,
-        "timeout_s": args.timeout})
+        "timeout_s": args.timeout, "parallel": False if args.serial else None})
     with Ledger(args.ledger) as led:
         # Model calls are counted in one shared spend ledger (also used by tiertest and
         # doctor), so per-model USD caps and call-per-window caps hold across all runs.
@@ -264,6 +264,8 @@ def cmd_swarm(args) -> int:
         entries: list[dict] = []
         cmdline = "lpswarm " + " ".join(sys.argv[1:])
 
+        from lpswarm.router.limits import pause_text
+
         def usage_lines() -> list[str]:
             if not router:
                 return []
@@ -274,8 +276,7 @@ def cmd_swarm(args) -> int:
                 if st["cap"] or st["paused_until"]:
                     out.append(f"- {n}: {st['calls']} call(s) in the last {st['window_hours']:g}h "
                                f"(cap {st['cap'] or 'none'})"
-                               + (f", paused until {time.strftime('%Y-%m-%d %H:%M', time.localtime(st['paused_until']))}"
-                                  if st["paused_until"] else ""))
+                               + pause_text(st))
             return out + [""]
         for ct, label, page_range, synthetic, _, breaks in targets:
             if len(ct) < max(8, oracle.min_length):
@@ -350,6 +351,8 @@ def cmd_overnight(args) -> int:
     cfg = load_config(args.config)
     if args.until:
         cfg.until = args.until
+    if args.serial:
+        cfg.max_parallel = 1
     base = Path("reports") / "overnight"
     run_dir = Path(args.run_dir) if args.run_dir else None
     if run_dir is None and not args.new:
@@ -369,7 +372,7 @@ def cmd_overnight(args) -> int:
     elif cfg.supervisor:
         raise SystemExit(f"supervisor {cfg.supervisor} configured but {cfg.models} not found")
     run = Overnight(cfg, run_dir, publish=False if args.no_publish else None, router=router,
-                    retry_failed=args.retry_failed)
+                    retry_failed=args.retry_failed, echo_jobs=not args.quiet_jobs)
     try:
         st = run.run()
     finally:
@@ -521,6 +524,9 @@ def build_parser() -> argparse.ArgumentParser:
                    help="where model calls, spend and usage-limit pauses are logged (shared by "
                         "swarm, tiertest and doctor)")
     p.add_argument("--timeout", type=float, help="seconds per target")
+    p.add_argument("--serial", action="store_true",
+                   help="call generators one at a time (default: generators on different "
+                        "backends, e.g. Codex and a local GPU, are called at the same time)")
     p.add_argument("--top", type=int, default=5)
     p.add_argument("--quiet", action="store_true")
     p.set_defaults(func=cmd_swarm)
@@ -568,6 +574,10 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--no-publish", action="store_true", help="do not push results to GitHub")
     p.add_argument("--retry-failed", action="store_true",
                    help="when resuming, run failed and blocked jobs again")
+    p.add_argument("--serial", action="store_true",
+                   help="one job at a time (default: up to max_parallel jobs on different backends)")
+    p.add_argument("--quiet-jobs", action="store_true",
+                   help="do not echo running jobs' log lines; only start/finish and heartbeats")
     p.set_defaults(func=cmd_overnight)
 
     for name, fn in (("ruled-out", cmd_ruled_out), ("leads", cmd_leads)):

@@ -13,6 +13,11 @@
       powershell -ExecutionPolicy Bypass -File scripts\overnight.ps1 -Until 08:30
       powershell -ExecutionPolicy Bypass -File scripts\overnight.ps1 -New -NoPublish
       powershell -ExecutionPolicy Bypass -File scripts\overnight.ps1 -RetryFailed
+      powershell -ExecutionPolicy Bypass -File scripts\overnight.ps1 -Serial -QuietJobs
+
+  Jobs on different backends (Claude plan, Codex plan, each GPU) run side by side;
+  -Serial runs one at a time. The window shows each running job's log lines, prefixed
+  with the job id; -QuietJobs shows only starts, finishes and 5-minute heartbeats.
 #>
 [CmdletBinding()]
 param(
@@ -20,7 +25,9 @@ param(
     [switch]$New,
     [switch]$NoPublish,
     [switch]$NoOllama,
-    [switch]$RetryFailed
+    [switch]$RetryFailed,
+    [switch]$Serial,
+    [switch]$QuietJobs
 )
 
 $ErrorActionPreference = "Continue"
@@ -49,5 +56,7 @@ if ($Until) { $argsList += @("--until", $Until) }
 if ($New) { $argsList += "--new" }
 if ($NoPublish) { $argsList += "--no-publish" }
 if ($RetryFailed) { $argsList += "--retry-failed" }
+if ($Serial) { $argsList += "--serial" }
+if ($QuietJobs) { $argsList += "--quiet-jobs" }
 & $Lpswarm @argsList
 exit $LASTEXITCODE

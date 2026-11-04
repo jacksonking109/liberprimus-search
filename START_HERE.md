@@ -126,7 +126,7 @@ If a model name is missing from your config (for example gemma didn't download),
 .\.venv\Scripts\lpswarm.exe tiertest --models config\models.toml --arms claude-opus,claude-sonnet --lengths 80,160 --cases 3 --out reports\tier-claude
 ```
 
-It counts its own calls (40 per 5 hours by default) and pauses at that cap or when Claude
+It counts its own calls (120 per 5 hours by default) and pauses at that cap or when Claude
 reports a usage limit, then carries on after the reset. No deadline, so let it wait.
 
 **C. Real Liber Primus sections (after A looks sane):**
@@ -175,6 +175,11 @@ powershell -ExecutionPolicy Bypass -File scripts\overnight.ps1
 - The queue is `config\overnight.toml` (created by setup). Default: (1) tier test with Claude Code
   Opus + Sonnet, (2) every unsolved section with Codex (explorer) + DeepSeek (brute force), one
   sub-job per section. Edit the file to change jobs.
+- **Side by side:** jobs on different backends run at the same time (up to `max_parallel = 2`):
+  the Claude tier test and a Codex/local swarm run together, while two jobs on the same GPU or
+  the same plan wait their turn. Inside a swarm round, Codex and the local models are also asked
+  at the same time (qwen and gemma still take turns on the 5060 Ti). `-Serial` runs one job at a
+  time.
 - **Results:** `reports\overnight\<run>\SUMMARY.md` on the desktop, and on GitHub: branch
   **`results`** of this repo (open it in the GitHub app; only report `.md`/`.csv` files are
   pushed, never ledgers, logs or config). Uses your normal git login on the PC.
@@ -182,9 +187,12 @@ powershell -ExecutionPolicy Bypass -File scripts\overnight.ps1
   each job. It can only pick from a menu: write you a note, add a swarm job on chosen sections
   (max 5 per run, max 8 rounds), skip or retry a job, restart Ollama, or stop the run. Its notes
   appear in SUMMARY.md.
-- **Usage limits:** Opus, Sonnet and the supervisor share one Claude quota (40 calls / 5 h by
-  default); Codex has its own (30 / 5 h). At a cap or a usage-limit message the affected models
-  pause until the reset and the run keeps going with whatever else it can do.
+- **Usage limits:** Opus, Sonnet and the supervisor share one Claude quota (120 calls / 5 h by
+  default); Codex has its own (90 / 5 h). At a cap or a usage-limit message the affected models
+  pause until the reset and the run keeps going with whatever else it can do. The message says
+  which kind it is: `local cap 120/120` is lpswarm's own counter (raise `max_calls_per_window`
+  in `config\models.toml` and restart; it takes effect at once), while `usage limit reported by
+  the CLI` is the real plan limit.
 - **Money:** DeepSeek jobs are refused unless its prices are filled in (so `max_usd` can protect
   you) and `DEEPSEEK_API_KEY` is set. Set the key in the same PowerShell window first, or as a
   user environment variable:
@@ -196,10 +204,12 @@ powershell -ExecutionPolicy Bypass -File scripts\overnight.ps1
   (Open a new PowerShell window afterwards so it is picked up.)
 - **Crashes and reboots:** a failing job doesn't stop the queue. If the PC restarts, run the same
   command again: it resumes the unfinished run (finished jobs and sections are skipped).
-- **Watching it:** the main window prints a heartbeat every 5 minutes (job, minutes running,
-  latest progress line) and the supervisor's notes and actions. Each job's `job.log` has
-  round-by-round progress and one line per model call (model, seconds, tokens, or the error or
-  usage pause). Follow the running job's log from a second window:
+- **Watching it:** the main window shows every running job's log as it happens, each line
+  prefixed with the job id, e.g. `[sup1/12] 22:41:05 [model] codex (proposer) calling...`, then
+  `... ok 74.2s, tokens ...`, round results, pauses and errors. Also a heartbeat every 5 minutes
+  per job, which job is waiting for which backend, and the supervisor's notes and actions.
+  `-QuietJobs` keeps only starts, finishes and heartbeats. Each job's `job.log` has the same
+  lines. To follow one job from a second window:
 
 ```powershell
 Get-ChildItem reports\overnight -Recurse -Filter job.log | Sort-Object LastWriteTime | Select-Object -Last 1 | Get-Content -Tail 30 -Wait
