@@ -1,6 +1,6 @@
 # Overnight run 20261104-1523
 
-Started 2026-11-04 15:23:11, updated 2026-11-04 17:35:44, status **running**. Jobs: pending 17, running 1, done 44
+Started 2026-11-04 15:23:11, updated 2026-11-04 17:36:04, status **running**. Jobs: pending 16, running 1, done 45
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -16,7 +16,7 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 17:35:44, status **running**. Jo
 | sonnet/18 | done | 2026-11-04 16:21:57 | 2026-11-04 16:33:03 | Sonnet, briefed by Opus |
 | sonnet/19 | done | 2026-11-04 16:33:19 | 2026-11-04 16:36:29 | Sonnet, briefed by Opus |
 | sonnet/20 | done | 2026-11-04 16:36:44 | 2026-11-04 17:16:12 | Sonnet, briefed by Opus |
-| sonnet/21 | running | 2026-11-04 17:32:18 |  | Sonnet, briefed by Opus |
+| sonnet/21 | done | 2026-11-04 17:32:18 | 2026-11-04 17:36:04 | Sonnet, briefed by Opus |
 | sonnet/22 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/24 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/25 | pending |  |  | Sonnet, briefed by Opus |
@@ -52,7 +52,7 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 17:35:44, status **running**. Jo
 | local/10 | done | 2026-11-04 16:53:04 | 2026-11-04 17:01:21 | local models |
 | deepseek/10 | done | 2026-11-04 17:32:18 | 2026-11-04 17:34:33 | DeepSeek (volume) |
 | deepseek/11 | done | 2026-11-04 17:34:49 | 2026-11-04 17:35:44 | DeepSeek (volume) |
-| deepseek/12 | pending |  | 2026-11-04 16:54:25 | retry requested |
+| deepseek/12 | running | 2026-11-04 17:35:59 | 2026-11-04 16:54:25 | DeepSeek (volume) |
 | deepseek/13 | pending |  | 2026-11-04 16:54:25 | retry requested |
 | deepseek/14 | pending |  | 2026-11-04 16:54:25 | retry requested |
 | deepseek/15 | pending |  | 2026-11-04 16:54:25 | retry requested |
@@ -69,18 +69,11 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 17:35:44, status **running**. Jo
 
 ## Now running
 
-**sonnet/21** (since 2026-11-04 17:32:18), latest log lines:
+**deepseek/12** (since 2026-11-04 17:35:59), latest log lines:
 ```
-17:33:28 [model] claude-sonnet (proposer) ok 14.8s, tokens in/out 5182/2042, reply 2632 chars
-round 3 [claude-sonnet] proposals=12 valid=12 attempts=13574 passes=0 near=0 invalid=15
-17:34:02 [model] claude-sonnet (proposer) calling...
-17:34:16 [model] claude-sonnet (proposer) ok 14.0s, tokens in/out 6219/1998, reply 3131 chars
-round 4 [claude-sonnet] proposals=12 valid=12 attempts=24178 passes=0 near=0 invalid=15
-17:34:47 [model] claude-sonnet (proposer) calling...
-17:35:02 [model] claude-sonnet (proposer) ok 15.4s, tokens in/out 7211/2107, reply 2715 chars
-round 5 [claude-sonnet] proposals=12 valid=12 attempts=33270 passes=0 near=0 invalid=15
-17:35:14 [model] claude-sonnet (proposer) calling...
-17:35:25 [model] claude-sonnet (proposer) ok 11.2s, tokens in/out 7591/1566, reply 2704 chars
+===== 2026-11-04 17:35:59 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 12 --gen
+== LP2:20.jpg/2-23.jpg/1 - 3.jpg/2-6.jpg/1  (693 symbols)
+17:36:01 [model] deepseek (proposer) calling...
 ```
 
 ## Results so far
@@ -111,6 +104,8 @@ round 5 [claude-sonnet] proposals=12 valid=12 attempts=33270 passes=0 near=0 inv
   - LP2:33.jpg - 50.jpg/1: 26596 attempts, 55 hypotheses, **0 final pass(es)** (caution: short section (91 runes): many keys give plausible-looking text this short; treat any lead with extra caution)
 - **sonnet/20** (done)
   - LP2:50.jpg/2-56.jpg/1: 29488 attempts, 59 hypotheses, **0 final pass(es)**, stopped: stop_file
+- **sonnet/21** (done)
+  - LP2:56.jpg/2: 42296 attempts, 57 hypotheses, **0 final pass(es)**
 - **codex/25** (done)
   - LP2:54.jpg-55.jpg - 71.jpg-72.jpg: 60000 attempts, 57 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **codex/24** (done)
@@ -198,10 +193,6 @@ round 5 [claude-sonnet] proposals=12 valid=12 attempts=33270 passes=0 near=0 inv
 
 ## Events
 
-- 2026-11-04 17:02:02 supervisor: added sup1: swarm on 1 section(s) with claude-sonnet; brief: Section LP2:6.jpg/2-7.jpg - 23.jpg/2-24.jpg (333 runes). An earlier claude-sonnet job made only 22 attempts here because its proposals were too narrow, often a single fixed key. This time each hypothe...
-- 2026-11-04 17:02:07 sonnet/20: running 25 min | 16:57:14 [model] claude-sonnet (proposer) ok 12.0s, tokens in/out 6807/1581, reply 2425 chars
-- 2026-11-04 17:03:27 codex/10: running 10 min | 17:00:03 [model] codex (proposer) ok 23.1s, tokens in/out 19011/947, reply 3063 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-04 17:07:07 sonnet/20: running 30 min | 17:06:24 [model] claude-sonnet (proposer) ok 17.5s, tokens in/out 7253/1160, reply 2439 chars
 - 2026-11-04 17:08:27 codex/10: running 15 min | 17:08:08 [model] codex (proposer) ok 26.7s, tokens in/out 20100/1155, reply 3048 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-04 17:12:07 sonnet/20: running 35 min | 17:06:24 [model] claude-sonnet (proposer) ok 17.5s, tokens in/out 7253/1160, reply 2439 chars
 - 2026-11-04 17:13:27 codex/10: running 20 min | 17:11:29 [model] codex (proposer) ok 37.0s, tokens in/out 20175/1223, reply 3232 chars, model not reported (pin one with model = "..." in the models config)
@@ -223,3 +214,7 @@ round 5 [claude-sonnet] proposals=12 valid=12 attempts=33270 passes=0 near=0 inv
 - 2026-11-04 17:34:49 deepseek/11: start (uses api:https://api.deepseek.com)
 - 2026-11-04 17:34:49 2 running: sonnet/21, deepseek/11
 - 2026-11-04 17:35:44 deepseek/11: done (exit 0, 1 min)
+- 2026-11-04 17:35:59 published: 45 file(s) to branch results
+- 2026-11-04 17:35:59 deepseek/12: start (uses api:https://api.deepseek.com)
+- 2026-11-04 17:35:59 2 running: sonnet/21, deepseek/12
+- 2026-11-04 17:36:04 sonnet/21: done (exit 0, 4 min)
