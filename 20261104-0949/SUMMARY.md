@@ -1,6 +1,6 @@
 # Overnight run 20261104-0949
 
-Started 2026-11-04 09:49:00, updated 2026-11-04 12:02:22, status **running**. Jobs: pending 16, done 45, blocked 15
+Started 2026-11-04 09:49:00, updated 2026-11-04 12:05:27, status **running**. Jobs: pending 15, done 46, blocked 15
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -19,7 +19,7 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 12:02:22, status **running**. Jo
 | sonnet/21 | done | 2026-11-04 11:38:39 | 2026-11-04 11:40:49 | Sonnet, briefed by Opus |
 | sonnet/22 | done | 2026-11-04 11:51:20 | 2026-11-04 11:56:21 | Sonnet, briefed by Opus |
 | sonnet/24 | done | 2026-11-04 11:56:36 | 2026-11-04 12:02:22 | Sonnet, briefed by Opus |
-| sonnet/25 | pending |  |  | Sonnet, briefed by Opus |
+| sonnet/25 | done | 2026-11-04 12:02:52 | 2026-11-04 12:05:27 | Sonnet, briefed by Opus |
 | codex/25 | done | 2026-11-04 09:49:00 | 2026-11-04 09:56:14 | Codex (exploratory) |
 | codex/24 | done | 2026-11-04 09:56:29 | 2026-11-04 10:02:45 | Codex (exploratory) |
 | codex/22 | done | 2026-11-04 10:03:06 | 2026-11-04 10:21:04 | Codex (exploratory) |
@@ -115,6 +115,8 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 12:02:22, status **running**. Jo
   - LP2:57.jpg-66.jpg/1: 14163 attempts, 36 hypotheses, **0 final pass(es)**
 - **sonnet/24** (done)
   - LP2:51.jpg/2-53.jpg - 68.jpg/2-70.jpg: 32246 attempts, 40 hypotheses, **0 final pass(es)**
+- **sonnet/25** (done)
+  - LP2:54.jpg-55.jpg - 71.jpg-72.jpg: 8411 attempts, 41 hypotheses, **0 final pass(es)**
 - **codex/25** (done)
   - LP2:54.jpg-55.jpg - 71.jpg-72.jpg: 30269 attempts, 47 hypotheses, **0 final pass(es)**
 - **codex/24** (done)
@@ -180,9 +182,9 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 12:02:22, status **running**. Jo
 
 - qwen-local: 84 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 84 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 145 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-sonnet: 145 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-supervisor: 145 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-opus: 153 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-sonnet: 153 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-supervisor: 153 call(s) in the last 5h (cap 550), spent $0.0000
 - codex: 81 call(s) in the last 5h (cap 750), spent $0.0000
 
 ## Supervisor notes
@@ -207,14 +209,10 @@ Try these instead:
 
 Prefer the longer sections (1000+ runes). On short ones (91 and 121 runes) noise looks convincing, so don't chase near misses there. Keep each proposal distinct from the others and well-formed, because invalid proposals waste rounds.
 - 2026-11-04 11:51:35: 11:51 check: the run resumed at 11:51 after a STOP file at 11:40. sonnet/22, codex/11 and codex/10 are running. sonnet/21 and codex/12 finished with 0 final passes, and every near miss is still at noise level. There are still 0 final passes across about 40 finished jobs. The deepseek jobs are still blocked until the price fields in config/models.toml are filled in. sup1 (claude-opus, different cipher families) is queued, so I added no new jobs.
+- 2026-11-04 12:02:52: 12:02 check: the run is healthy. codex/11, sonnet/22, codex/10 and sonnet/24 have finished, and sonnet/25 is next on claude-plan. There are still 0 final passes across about 44 finished jobs. sonnet/24 made 32k attempts on the 534-rune section and found no near miss, and no new near misses have appeared since 11:51. The deepseek jobs are still blocked until the price fields in config/models.toml are filled in. The sup1 claude-opus job, which tries other cipher families, is still queued. I added no jobs, so I can see what sup1 finds before using more of tonight's job budget (1 of 5 used).
 
 ## Events
 
-- 2026-11-04 11:40:49 sonnet/21: done (exit 0, 2 min)
-- 2026-11-04 11:40:53 published: 42 file(s) to branch results
-- 2026-11-04 11:40:53 stopping: STOP file
-- 2026-11-04 11:40:56 published: 42 file(s) to branch results
-- 2026-11-04 11:51:20 resumed
 - 2026-11-04 11:51:20 resume: auto_brief/lane updated from the config for jobs not yet started
 - 2026-11-04 11:51:20 sonnet/22: start (uses claude-plan)
 - 2026-11-04 11:51:20 codex/11: start (uses codex-plan)
@@ -235,3 +233,8 @@ Prefer the longer sections (1000+ runes). On short ones (91 and 121 runes) noise
 - 2026-11-04 11:57:12 published: 45 file(s) to branch results
 - 2026-11-04 12:01:37 sonnet/24: running 5 min | 12:01:30 [model] claude-sonnet (proposer) calling...
 - 2026-11-04 12:02:22 sonnet/24: done (exit 0, 6 min)
+- 2026-11-04 12:02:38 published: 46 file(s) to branch results
+- 2026-11-04 12:02:52 supervisor: note: 12:02 check: the run is healthy. codex/11, sonnet/22, codex/10 and sonnet/24 have finished, and sonnet/25 is next on claude-plan. There are still 0 final passes across about 44 finished jobs. sonnet/24 made 32k attempts on the 534-rune section and found no near miss, and no new near misses have a...
+- 2026-11-04 12:02:52 sonnet/25: start (uses claude-plan)
+- 2026-11-04 12:02:52 sup1/10 waiting: claude-plan in use by sonnet/25
+- 2026-11-04 12:05:27 sonnet/25: done (exit 0, 3 min)
