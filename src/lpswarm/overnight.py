@@ -1001,6 +1001,9 @@ def _add_job(run: Overnight, a: dict) -> str:
 
 
 # ---------------------------------------------------------------- publishing
+_SECRET_RE = re.compile(r"\b(?:sk|pk|rk|key|tok|ghp|gho|xox[a-z])[-_][A-Za-z0-9_-]{16,}\b")
+
+
 def _git(args: list[str], cwd: str | Path) -> subprocess.CompletedProcess:
     r = subprocess.run(["git", *args], cwd=str(cwd), capture_output=True, text=True,
                        encoding="utf-8", errors="replace", timeout=300)
@@ -1040,7 +1043,9 @@ def publish_results(run_dir: Path, branch: str = "results", repo: str | Path = "
         rel = src.relative_to(run_dir)
         target = dest / rel
         target.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(src, target)
+        # Last line of defence: nothing that looks like an API key is ever published.
+        text = _SECRET_RE.sub("[redacted]", src.read_text(encoding="utf-8", errors="replace"))
+        target.write_text(text, encoding="utf-8")
         copied += 1
     _git(["add", "-A", "."], wt)
     if subprocess.run(["git", "diff", "--cached", "--quiet"], cwd=wt).returncode == 0:

@@ -644,3 +644,39 @@ def test_shared_context_peer_ledgers_and_strategy(tmp_path):
     assert cmd[cmd.index("--peer-ledger") + 1].endswith("a_9" + os.sep + "ledger.sqlite")
     assert cmd[cmd.index("--strategy-file") + 1].endswith("strategy.txt")
     assert "--peer-ledger" not in run.job_command(j3)
+
+
+def test_pasted_key_is_refused_without_echo_and_never_published(tmp_path):
+    import pytest
+    from lpswarm.overnight import publish_results
+    from lpswarm.router import load_model_specs
+    fake = "sk-" + "a1b2c3d4" * 4
+    f = tmp_path / "m.toml"
+    f.write_text(f'[models.ds]\nprovider = "openai_compatible"\nendpoint = "https://x.invalid"\n'
+                 f'model = "m"\napi_key_env = "{fake}"\n', encoding="utf-8")
+    with pytest.raises(ValueError) as ei:
+        load_model_specs(f)
+    assert fake not in str(ei.value) and "NAME of an environment variable" in str(ei.value)
+    f.write_text(f'[models.ds]\nprovider = "openai_compatible"\nendpoint = "https://x.invalid"\n'
+                 f'model = "m"\napi_key_env = "DEEPSEEK-API-KEY"\n', encoding="utf-8")
+    with pytest.raises(ValueError):
+        load_model_specs(f)
+    # publishing redacts anything key-shaped, even if one reached a summary
+    import subprocess
+    repo = tmp_path / "repo"
+    subprocess.run(["git", "init", "-q", str(repo)], check=True)
+    for k, v in (("user.email", "t@t"), ("user.name", "t")):
+        subprocess.run(["git", "-C", str(repo), "config", k, v], check=True)
+    (repo / "README").write_text("x", encoding="utf-8")
+    subprocess.run(["git", "-C", str(repo), "add", "README"], check=True)
+    subprocess.run(["git", "-C", str(repo), "commit", "-q", "-m", "init"], check=True)
+    run = tmp_path / "run1"
+    run.mkdir()
+    (run / "SUMMARY.md").write_text(f"blocked: environment variable {fake} is not set\n", encoding="utf-8")
+    try:
+        publish_results(run, "results", repo=repo, worktree=tmp_path / "wt")
+    except RuntimeError:
+        pass   # no remote to push to; the commit is what we check
+    out = subprocess.run(["git", "-C", str(tmp_path / "wt"), "show", "HEAD:run1/SUMMARY.md"],
+                         capture_output=True, text=True).stdout
+    assert fake not in out and "[redacted]" in out

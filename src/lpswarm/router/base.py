@@ -16,6 +16,8 @@ Design:
 """
 from __future__ import annotations
 
+import re
+
 import tomllib
 from dataclasses import dataclass, field
 from enum import Enum
@@ -72,6 +74,12 @@ def load_model_specs(path: str | Path) -> list[ModelSpec]:
         if "api_key" in d or "key" in d:
             raise ValueError(f"model {name}: put the NAME of an environment variable in "
                              "api_key_env; never put a key in the config file")
+        aek = d.get("api_key_env")
+        if aek is not None and not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", str(aek)):
+            # Never echo the value: it may be a pasted key.
+            raise ValueError(f"model {name}: api_key_env must be the NAME of an environment "
+                             "variable (letters, digits and underscores, e.g. DEEPSEEK_API_KEY). "
+                             "If you pasted a key there, remove it and revoke that key")
         for req in ("provider", "model"):
             if req not in d:
                 raise ValueError(f"model {name}: missing {req!r}")
