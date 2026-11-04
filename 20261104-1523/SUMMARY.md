@@ -1,6 +1,6 @@
 # Overnight run 20261104-1523
 
-Started 2026-11-04 15:23:11, updated 2026-11-04 16:33:03, status **running**. Jobs: pending 28, running 3, done 30
+Started 2026-11-04 15:23:11, updated 2026-11-04 16:36:29, status **running**. Jobs: pending 27, running 3, done 31
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -14,7 +14,7 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 16:33:03, status **running**. Jo
 | sonnet/16 | done | 2026-11-04 16:02:31 | 2026-11-04 16:13:39 | Sonnet, briefed by Opus |
 | sonnet/17 | done | 2026-11-04 16:13:54 | 2026-11-04 16:21:41 | Sonnet, briefed by Opus |
 | sonnet/18 | done | 2026-11-04 16:21:57 | 2026-11-04 16:33:03 | Sonnet, briefed by Opus |
-| sonnet/19 | pending |  |  | Sonnet, briefed by Opus |
+| sonnet/19 | done | 2026-11-04 16:33:19 | 2026-11-04 16:36:29 | Sonnet, briefed by Opus |
 | sonnet/20 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/21 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/22 | pending |  |  | Sonnet, briefed by Opus |
@@ -70,8 +70,6 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 16:33:03, status **running**. Jo
 
 **codex/16** (since 2026-11-04 16:12:44), latest log lines:
 ```
-  | 6. Digit streams. Use e_digits and pi_digits with scale 1, 2 and 3 and offset_range [0,1999]. Try both skip [0] and no skip.
-  | 7. Transposition plus stream (low priority). Undo columnar transposition with widths 2 to 8 in identity order, then apply prime_totients sub with skip [0] resolve. A transposition does not change 
 16:13:11 [model] codex (proposer) calling...
 16:13:42 [model] codex (proposer) ok 31.2s, tokens in/out 18196/1161, reply 3420 chars, model not reported (pin one with model = "..." in the models config)
 round 1 [codex] proposals=16 valid=16 attempts=16052 passes=0 near=0 invalid=0
@@ -80,27 +78,34 @@ round 1 [codex] proposals=16 valid=16 attempts=16052 passes=0 near=0 invalid=0
 round 2 [codex] proposals=16 valid=16 attempts=30132 passes=0 near=0 invalid=0
 16:28:20 [model] codex (proposer) calling...
 16:28:51 [model] codex (proposer) ok 31.3s, tokens in/out 19844/1348, reply 3196 chars, model not reported (pin one with model = "..." in the models config)
+round 3 [codex] proposals=16 valid=16 attempts=40200 passes=0 near=0 invalid=0
+16:36:09 [model] codex (proposer) calling...
 ```
 **codex/14** (since 2026-11-04 16:20:36), latest log lines:
 ```
-16:25:05 [model] codex (proposer) calling...
-16:25:44 [model] codex (proposer) ok 39.0s, tokens in/out 18997/1391, reply 4489 chars, model not reported (pin one with model = "..." in the models config)
-round 2 [codex] proposals=16 valid=16 attempts=4997 passes=0 near=0 invalid=2
-16:27:15 [model] codex (proposer) calling...
 16:27:39 [model] codex (proposer) ok 24.9s, tokens in/out 19812/1066, reply 3257 chars, model not reported (pin one with model = "..." in the models config)
 round 3 [codex] proposals=16 valid=16 attempts=13621 passes=0 near=0 invalid=2
 16:30:39 [model] codex (proposer) calling...
 16:31:03 [model] codex (proposer) ok 23.9s, tokens in/out 20220/995, reply 3310 chars, model not reported (pin one with model = "..." in the models config)
 round 4 [codex] proposals=16 valid=16 attempts=17991 passes=0 near=0 invalid=2
 16:32:37 [model] codex (proposer) calling...
+16:33:14 [model] codex (proposer) ok 36.9s, tokens in/out 19817/1277, reply 3240 chars, model not reported (pin one with model = "..." in the models config)
+round 5 [codex] proposals=16 valid=16 attempts=22046 passes=0 near=0 invalid=2
+16:35:25 [model] codex (proposer) calling...
+16:35:50 [model] codex (proposer) ok 24.7s, tokens in/out 20339/1013, reply 3170 chars, model not reported (pin one with model = "..." in the models config)
 ```
 **local/24** (since 2026-11-04 16:32:33), latest log lines:
 ```
-===== 2026-11-04 16:32:33 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 24 --gen
-== LP2:51.jpg/2-53.jpg - 68.jpg/2-70.jpg  (534 symbols)
-16:32:35 [model] qwen-local (proposer) calling...
-16:32:56 [model] qwen-local (proposer) ok 20.9s, tokens in/out 2419/658, reply 2385 chars
-16:32:56 [model] gemma-local (proposer) calling...
+round 1 [gemma-local] proposals=8 valid=6 attempts=506 passes=0 near=0 invalid=2
+16:34:42 [model] qwen-local (proposer) calling...
+16:35:04 [model] qwen-local (proposer) ok 21.9s, tokens in/out 2838/682, reply 2385 chars
+16:35:04 [model] gemma-local (proposer) calling...
+16:35:20 [model] gemma-local (proposer) ok 16.0s, tokens in/out 2979/478, reply 1410 chars
+round 2 [qwen-local] proposals=8 valid=5 attempts=13 passes=0 near=0 invalid=3
+round 2 [gemma-local] proposals=8 valid=7 attempts=1113 passes=0 near=0 invalid=3
+16:36:00 [model] qwen-local (proposer) calling...
+16:36:24 [model] qwen-local (proposer) ok 23.5s, tokens in/out 3332/732, reply 2556 chars
+16:36:24 [model] gemma-local (proposer) calling...
 ```
 
 ## Results so far
@@ -127,6 +132,8 @@ round 4 [codex] proposals=16 valid=16 attempts=17991 passes=0 near=0 invalid=2
   - LP2:- - 40.jpg-43.jpg: 22446 attempts, 58 hypotheses, **0 final pass(es)**
 - **sonnet/18** (done)
   - LP2:- - 44.jpg-49.jpg: 20515 attempts, 57 hypotheses, **0 final pass(es)**
+- **sonnet/19** (done)
+  - LP2:33.jpg - 50.jpg/1: 26596 attempts, 55 hypotheses, **0 final pass(es)** (caution: short section (91 runes): many keys give plausible-looking text this short; treat any lead with extra caution)
 - **codex/25** (done)
   - LP2:54.jpg-55.jpg - 71.jpg-72.jpg: 60000 attempts, 57 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **codex/24** (done)
@@ -170,12 +177,12 @@ round 4 [codex] proposals=16 valid=16 attempts=17991 passes=0 near=0 invalid=2
 
 ## Model usage
 
-- qwen-local: 61 call(s) in the last 5h (cap none), spent $0.0000
-- gemma-local: 60 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 210 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-sonnet: 210 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-supervisor: 210 call(s) in the last 5h (cap 550), spent $0.0000
-- codex: 70 call(s) in the last 5h (cap 750), spent $0.0000
+- qwen-local: 63 call(s) in the last 5h (cap none), spent $0.0000
+- gemma-local: 62 call(s) in the last 5h (cap none), spent $0.0000
+- claude-opus: 214 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-sonnet: 214 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-supervisor: 214 call(s) in the last 5h (cap 550), spent $0.0000
+- codex: 69 call(s) in the last 5h (cap 750), spent $0.0000
 
 ## Supervisor notes
 
@@ -184,11 +191,6 @@ round 4 [codex] proposals=16 valid=16 attempts=17991 passes=0 near=0 invalid=2
 
 ## Events
 
-- 2026-11-04 16:21:41 sonnet/17: done (exit 0, 8 min)
-- 2026-11-04 16:21:57 published: 28 file(s) to branch results
-- 2026-11-04 16:21:57 sonnet/18: start (uses claude-plan)
-- 2026-11-04 16:21:57 4 running: codex/16, local/22, codex/14, sonnet/18
-- 2026-11-04 16:22:47 codex/16: running 10 min | 16:13:42 [model] codex (proposer) ok 31.2s, tokens in/out 18196/1161, reply 3420 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-04 16:24:02 local/22: running 5 min | 16:23:42 [model] qwen-local (proposer) calling...
 - 2026-11-04 16:25:07 local/22: done (exit 0, 6 min)
 - 2026-11-04 16:25:23 published: 29 file(s) to branch results
@@ -209,3 +211,8 @@ round 4 [codex] proposals=16 valid=16 attempts=17991 passes=0 near=0 invalid=2
 - 2026-11-04 16:32:33 sonnet/19 waiting: claude-plan in use by sonnet/18
 - 2026-11-04 16:32:48 codex/16: running 20 min | 16:28:51 [model] codex (proposer) ok 31.3s, tokens in/out 19844/1348, reply 3196 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-04 16:33:03 sonnet/18: done (exit 0, 11 min)
+- 2026-11-04 16:33:19 published: 31 file(s) to branch results
+- 2026-11-04 16:33:19 sonnet/19: start (uses claude-plan)
+- 2026-11-04 16:33:19 4 running: codex/16, codex/14, local/24, sonnet/19
+- 2026-11-04 16:35:39 codex/14: running 15 min | 16:35:25 [model] codex (proposer) calling...
+- 2026-11-04 16:36:29 sonnet/19: done (exit 0, 3 min)
