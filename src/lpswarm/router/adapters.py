@@ -93,8 +93,11 @@ def ollama_tags(endpoint: str, timeout: float = 5.0) -> list[str]:
 
 class OllamaAdapter:
     def __init__(self, model: str, endpoint: str = "http://localhost:11434", timeout: float = 300,
-                 json_mode: bool = False, options: dict | None = None):
+                 json_mode: bool = False, options: dict | None = None, think: bool | None = None):
         self.model, self.endpoint, self.timeout = model, endpoint.rstrip("/"), timeout
+        # Thinking models (e.g. Qwen3) spend output tokens on hidden reasoning; think=False
+        # asks Ollama to skip it. None leaves the model's default (sent only when configured).
+        self.think = think
         # Ollama's default context window can silently cut long prompts (long sections
         # plus history); ask for a larger one unless the config sets num_ctx.
         self.json_mode, self.options = json_mode, {"num_ctx": 16384, **(options or {})}
@@ -103,6 +106,8 @@ class OllamaAdapter:
                  max_tokens: int = 2048, schema: dict | None = None) -> Completion:
         body = {"model": self.model, "messages": list(messages), "stream": False,
                 "options": {"temperature": temperature, "num_predict": max_tokens, **self.options}}
+        if self.think is not None:
+            body["think"] = bool(self.think)
         if schema is not None:
             body["format"] = schema       # structured output: reply must match the JSON schema
         elif self.json_mode:

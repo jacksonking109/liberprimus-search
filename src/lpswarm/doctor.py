@@ -151,7 +151,13 @@ def run_checks(models_config: str | None = None, ping: bool = False,
                 c = router.complete(s.name, [{"role": "user", "content":
                                               'Reply with the JSON {"ok": true} and nothing else.'}],
                                     role=role, max_tokens=20, temperature=0.0)
-                out.append(Check(OK, f"ping {s.name}", f"{c.latency_s:.1f}s, reply: {c.text[:40]!r}"))
+                if not c.text.strip():
+                    out.append(Check(WARN, f"ping {s.name}",
+                                     f"{c.latency_s:.1f}s but the reply was empty: a thinking model may "
+                                     "have used its whole budget on hidden reasoning; add think = false "
+                                     "to this model in the models config"))
+                else:
+                    out.append(Check(OK, f"ping {s.name}", f"{c.latency_s:.1f}s, reply: {c.text[:40]!r}"))
             except Exception as exc:  # noqa: BLE001
                 out.append(Check(FAIL, f"ping {s.name}", str(exc)[:200]))
     return out

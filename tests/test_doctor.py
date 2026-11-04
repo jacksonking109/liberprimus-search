@@ -103,3 +103,11 @@ def test_doctor_ping_scripted(tmp_path):
     assert checks["ping dry"].status == OK
     import sqlite3
     assert sqlite3.connect(spend).execute("SELECT COUNT(*) FROM budget_event").fetchone()[0] == 1
+
+
+def test_doctor_ping_empty_reply_is_a_warning(tmp_path):
+    p = tmp_path / "empty.toml"
+    p.write_text('[models.thinker]\nprovider = "scripted"\nmodel = "t"\nroles = ["proposer"]\n'
+                 'replies = [""]\n', encoding="utf-8")
+    checks = _by_name(run_checks(str(p), ping=True, ledgers=[str(tmp_path / "s.sqlite")]))
+    assert checks["ping thinker"].status == WARN and "think = false" in checks["ping thinker"].detail

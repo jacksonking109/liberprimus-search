@@ -23,6 +23,8 @@
 #   json_mode   ask the server for JSON output (Ollama `format: json`, OpenAI
 #               `response_format: json_object`)
 #   timeout     seconds per call
+#   think       Ollama only: false turns off hidden reasoning for thinking models (Qwen3);
+#               leave it out for models that don't think
 
 [models.deepseek]
 provider = "openai_compatible"
@@ -46,6 +48,7 @@ roles = ["proposer"]
 json_mode = true
 timeout = 600
 options = { num_ctx = 16384 }      # context window; default 16384 if omitted
+think = false                      # Qwen3 is a thinking model: skip hidden reasoning
 
 [models.gemma-local]
 provider = "ollama"

@@ -579,3 +579,14 @@ def test_executor_uses_variant_nulls_for_resolved_specs(oracle):
     from lpswarm.executor import final_check
     rows = final_check(led, oracle, led.targets()[0]["id"])
     assert rows and rows[0]["null_variant"] == "skipdp:25"
+
+
+def test_ollama_think_flag_only_when_configured(stub):
+    OllamaAdapter("qwen", stub).complete([{"role": "user", "content": "q"}])
+    assert "think" not in _Stub.seen[-1][2]
+    OllamaAdapter("qwen", stub, think=False).complete([{"role": "user", "content": "q"}])
+    assert _Stub.seen[-1][2]["think"] is False
+    from lpswarm.router import make_adapter
+    ad = make_adapter(ModelSpec("q", "ollama", "qwen3:14b", (Role.PROPOSER,), endpoint=stub,
+                                extra={"think": False}))
+    assert ad.think is False

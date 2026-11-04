@@ -39,7 +39,8 @@ def make_adapter(spec: ModelSpec):
     if spec.provider == "ollama":
         return OllamaAdapter(spec.model, spec.endpoint or "http://localhost:11434",
                              timeout=float(x.get("timeout", 300)), json_mode=bool(x.get("json_mode")),
-                             options=x.get("options"))
+                             options=x.get("options"),
+                             think=bool(x["think"]) if "think" in x else None)
     if spec.provider == "openai_compatible":
         if not spec.endpoint:
             raise ValueError(f"model {spec.name}: openai_compatible needs an endpoint")
