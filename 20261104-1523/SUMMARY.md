@@ -1,6 +1,6 @@
 # Overnight run 20261104-1523
 
-Started 2026-11-04 15:23:11, updated 2026-11-04 17:53:22, status **stopped**. Jobs: pending 6, done 55, interrupted 1
+Started 2026-11-04 15:23:11, updated 2026-11-04 18:38:55, status **running**. Jobs: pending 5, running 1, done 56
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -17,7 +17,7 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 17:53:22, status **stopped**. Jo
 | sonnet/19 | done | 2026-11-04 16:33:19 | 2026-11-04 16:36:29 | Sonnet, briefed by Opus |
 | sonnet/20 | done | 2026-11-04 16:36:44 | 2026-11-04 17:16:12 | Sonnet, briefed by Opus |
 | sonnet/21 | done | 2026-11-04 17:32:18 | 2026-11-04 17:36:04 | Sonnet, briefed by Opus |
-| sonnet/22 | interrupted | 2026-11-04 17:36:20 | 2026-11-04 17:53:22 | STOP file |
+| sonnet/22 | running | 2026-11-04 17:36:20 | 2026-11-04 17:53:22 | Sonnet, briefed by Opus |
 | sonnet/24 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/25 | pending |  |  | Sonnet, briefed by Opus |
 | codex/25 | done | 2026-11-04 15:23:11 | 2026-11-04 15:35:47 | Codex (exploratory) |
@@ -62,10 +62,26 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 17:53:22, status **stopped**. Jo
 | deepseek/19 | done | 2026-11-04 17:50:15 | 2026-11-04 17:51:00 | DeepSeek (volume) |
 | deepseek/20 | done | 2026-11-04 17:51:15 | 2026-11-04 17:52:16 | DeepSeek (volume) |
 | deepseek/21 | done | 2026-11-04 17:52:31 | 2026-11-04 17:53:06 | DeepSeek (volume) |
-| deepseek/22 | pending |  | 2026-11-04 16:54:25 | retry requested |
+| deepseek/22 | done | 2026-11-04 17:54:46 | 2026-11-04 18:38:55 | DeepSeek (volume) |
 | deepseek/24 | pending |  | 2026-11-04 16:54:25 | retry requested |
 | deepseek/25 | pending |  | 2026-11-04 16:54:25 | retry requested |
 | sup1/13 | pending |  |  | added by supervisor. sonnet/13 made only 22 attempts from 10 hypotheses on the 333-rune section 13, so its proposals exp |
+
+## Now running
+
+**sonnet/22** (since 2026-11-04 17:36:20), latest log lines:
+```
+17:55:34 [model] claude-sonnet (proposer) ok 9.2s, tokens in/out 7838/1296, reply 2723 chars
+round 2 [claude-sonnet] proposals=12 valid=12 attempts=3400 passes=0 near=0 invalid=6
+18:05:20 [model] claude-sonnet (proposer) calling...
+18:05:31 [model] claude-sonnet (proposer) ok 11.0s, tokens in/out 8461/1381, reply 2929 chars
+round 3 [claude-sonnet] proposals=12 valid=12 attempts=8193 passes=0 near=0 invalid=6
+18:19:44 [model] claude-sonnet (proposer) calling...
+18:19:56 [model] claude-sonnet (proposer) ok 12.8s, tokens in/out 9109/1745, reply 3319 chars
+round 4 [claude-sonnet] proposals=12 valid=12 attempts=14270 passes=0 near=0 invalid=6
+18:36:04 [model] claude-sonnet (proposer) calling...
+18:36:16 [model] claude-sonnet (proposer) ok 11.7s, tokens in/out 9621/1325, reply 2784 chars
+```
 
 ## Results so far
 
@@ -97,7 +113,7 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 17:53:22, status **stopped**. Jo
   - LP2:50.jpg/2-56.jpg/1: 29488 attempts, 59 hypotheses, **0 final pass(es)**, stopped: stop_file
 - **sonnet/21** (done)
   - LP2:56.jpg/2: 42296 attempts, 57 hypotheses, **0 final pass(es)**
-- **sonnet/22** (interrupted)
+- **sonnet/22** (running)
   - LP2:57.jpg-66.jpg/1: 11514 attempts, 37 hypotheses, **0 final pass(es)**, stopped: stop_file
 - **codex/25** (done)
   - LP2:54.jpg-55.jpg - 71.jpg-72.jpg: 60000 attempts, 57 hypotheses, **0 final pass(es)**, stopped: max_attempts
@@ -183,18 +199,24 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 17:53:22, status **stopped**. Jo
   - LP2:50.jpg/2-56.jpg/1: 22328 attempts, 51 hypotheses, **0 final pass(es)**
 - **deepseek/21** (done)
   - LP2:56.jpg/2: 3898 attempts, 70 hypotheses, **0 final pass(es)**
+- **deepseek/22** (done)
+  - LP2:57.jpg-66.jpg/1: 30674 attempts, 70 hypotheses, **0 final pass(es)**
 
 ## Model usage
 
-- deepseek: 68 call(s) in the last 5h (cap none), spent $0.1380
+- deepseek: 74 call(s) in the last 5h (cap none), spent $0.1545
 - qwen-local: 88 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 88 call(s) in the last 5h (cap none), spent $0.0000
 - granite: 4 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 190 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-sonnet: 190 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-supervisor: 190 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-opus: 167 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-sonnet: 167 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-supervisor: 167 call(s) in the last 5h (cap 550), spent $0.0000
 - codex: 85 call(s) in the last 5h (cap 850), spent $0.0000
 - dry: 4 call(s) in the last 5h (cap none), spent $0.0000
+
+## Current strategy note (read by every lane each round)
+
+No final passes after about 20-60k attempts per section from sonnet, codex and deepseek. Treat these as low-yield everywhere: plain Caesar, plain Atbash, Atbash+shift, single-keyword Vigenere with common Cicada words, and plain prime or p-1 streams starting at offset 0. Favour next: (1) p-1 (totient) streams with an interrupter skip on F runes, plus a sweep of the stream start index (not just the shift). (2) Running keys taken from the other LP2 sections, or the section read backwards. (3) Columnar or route transposition keyed to the section length's factors (1729=7*13*19, 333=9*37, 693=7*9*11, 729=27*27) before substitution. (4) Ciphertext autokey with primers of 1-6. (5) Two-stage programs, such as Atbash then a sequence stream, or Fibonacci/Lucas mod 29 with a skip rule. Each hypothesis
 
 ## Supervisor notes
 
@@ -203,31 +225,33 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 17:53:22, status **stopped**. Jo
 - 2026-11-04 17:02:02: 17:01 check: there are still no final passes in any section. The 15 deepseek jobs (deepseek/10 to deepseek/25) are blocked. The config puts what looks like a literal API key (sk-150a...) where the environment variable name should go. Move the key into an environment variable, put that variable's name in the models config, and revoke the key if this config is shared or published. The results branch is being published to, so check it doesn't contain the key. codex/10 is running and is the first non-sonnet, non-local pass on section 10 (729 runes). claude-sonnet has not yet run sections 20 to 25 (sonnet/21 is queued). I queued one claude-sonnet re-run of section 13, because sonnet/13 made only 22 attempts.
 - 2026-11-04 17:02:02: brief for sup1 (claude-sonnet): Section LP2:6.jpg/2-7.jpg - 23.jpg/2-24.jpg (333 runes). An earlier claude-sonnet job made only 22 attempts here because its proposals were too narrow, often a single fixed key. This time each hypothesis should expand to many keys: give parameter ranges, sweep offsets over 0-28, and try both directions (add and subtract mod 29). codex/13 (28k attempts) and local/13 have also found no final pass. Try families like these: (1) Shift streams from sequences: primes, phi(prime) = p-1 (the method behind the known solved Liber Primus page), primes minus 1 with a skip on the F rune (literal Fs left uncounted), Fibonacci and Lucas mod 29, squares, triangular numbers, and the digits of pi and e. (2) Vigenere with candidate keywords from Cicada/Liber Primus vocabulary (DIVINITY, CIRCUMFERENCE, FIRFUMFERENFE, INSTAR, PARABLE, WISDOM, KOAN, PRIMES, TOTIENT, CONSUMPTION), and also their Atbash forms. (3) Plaintext and ciphertext autokey seeded with a short primer, sweeping primer lengths 1-6. (4) Running key from solved Liber Primus pages, at several start offsets. (5) Atbash combined with a shift (reverse the Gematria Primus index, then add k). (6) Light transposition before substitution: reversal, the even/odd rune split, and columnar with widths 3, 9, 37 and 111 (333 = 9*37). Avoid wasting proposals on plain Caesar or plain Atbash alone, which earlier runs covered. Prefer programs whose key space is at least in the hundreds.
 - 2026-11-04 17:32:33: 17:32 check: the run resumed after the STOP file at 17:16, and there are still no final passes in any section. --retry-failed put the 15 blocked deepseek jobs back to pending, and deepseek/10 has started. If the models config still has the literal key (sk-150a...) where the environment variable name should go, these jobs will block again. Fix the config and revoke the key if the config or the results branch is shared. sonnet/21 is running, and the sup1 re-run of section 13 (333 runes) should follow. I added no jobs, to let the queue drain first.
+- 2026-11-04 17:55:03: strategy note set: No final passes after about 20-60k attempts per section from sonnet, codex and deepseek. Treat these as low-yield everywhere: plain Caesar, plain Atbash, Atbash+shift, single-keyword Vigenere with common Cicada words, and plain prime or p-1 streams starting at offset 0. Favour next: (1) p-1 (totient) streams with an interrupter skip on F runes, plus a sweep of the stream start index (not just the shift). (2) Running keys taken from the other LP2 sections, or the section read backwards. (3) Columnar or route transposition keyed to the section length's factors (1729=7*13*19, 333=9*37, 693=7*9*11, 729=27*27) before substitution. (4) Ciphertext autokey with primers of 1-6. (5) Two-stage programs, such as Atbash then a sequence stream, or Fibonacci/Lucas mod 29 with a skip rule. Each hypothesis
+- 2026-11-04 17:55:03: 17:55 check: there are still 0 final passes across all sections. The deepseek jobs now complete (deepseek/10-21 done), so they are no longer blocked. If the literal key is still in the config, still revoke it as noted earlier. Sections 24 and 25 (534 and 308 runes) have only codex and local coverage; I assume the queued sonnet and deepseek jobs will cover them. I updated the strategy note to steer lanes away from directions that look exhausted, and added no jobs.
 
 ## Events
 
-- 2026-11-04 17:43:13 published: 50 file(s) to branch results
-- 2026-11-04 17:43:13 deepseek/17: start (uses api:https://api.deepseek.com)
-- 2026-11-04 17:43:13 2 running: sonnet/22, deepseek/17
-- 2026-11-04 17:46:23 sonnet/22: running 10 min | 17:39:33 [model] claude-sonnet (proposer) ok 9.2s, tokens in/out 5875/1336, reply 2890 chars
-- 2026-11-04 17:46:28 deepseek/17: done (exit 0, 3 min)
-- 2026-11-04 17:46:44 published: 51 file(s) to branch results
-- 2026-11-04 17:46:44 deepseek/18: start (uses api:https://api.deepseek.com)
-- 2026-11-04 17:46:44 2 running: sonnet/22, deepseek/18
-- 2026-11-04 17:49:59 deepseek/18: done (exit 0, 3 min)
-- 2026-11-04 17:50:15 published: 52 file(s) to branch results
-- 2026-11-04 17:50:15 deepseek/19: start (uses api:https://api.deepseek.com)
-- 2026-11-04 17:50:15 2 running: sonnet/22, deepseek/19
-- 2026-11-04 17:51:00 deepseek/19: done (exit 0, 1 min)
-- 2026-11-04 17:51:15 published: 53 file(s) to branch results
-- 2026-11-04 17:51:15 deepseek/20: start (uses api:https://api.deepseek.com)
-- 2026-11-04 17:51:16 2 running: sonnet/22, deepseek/20
-- 2026-11-04 17:51:26 sonnet/22: running 15 min | 17:49:19 [model] claude-sonnet (proposer) ok 16.8s, tokens in/out 6789/1204, reply 2685 chars
-- 2026-11-04 17:52:16 deepseek/20: done (exit 0, 1 min)
-- 2026-11-04 17:52:31 published: 54 file(s) to branch results
-- 2026-11-04 17:52:31 deepseek/21: start (uses api:https://api.deepseek.com)
-- 2026-11-04 17:52:31 2 running: sonnet/22, deepseek/21
-- 2026-11-04 17:53:06 deepseek/21: done (exit 0, 1 min)
-- 2026-11-04 17:53:22 published: 55 file(s) to branch results
-- 2026-11-04 17:53:22 stopping: STOP file
-- 2026-11-04 17:53:22 sonnet/22: interrupted (exit 0, 17 min)
+- 2026-11-04 17:54:46 resumed
+- 2026-11-04 17:54:46 failed and blocked jobs reset to pending (--retry-failed)
+- 2026-11-04 17:54:46 sonnet/22: start (uses claude-plan)
+- 2026-11-04 17:54:46 deepseek/22: start (uses api:https://api.deepseek.com)
+- 2026-11-04 17:54:46 2 running: sonnet/22, deepseek/22
+- 2026-11-04 17:54:46 sonnet/24 waiting: claude-plan in use by sonnet/22
+- 2026-11-04 17:55:03 supervisor: strategy note set (800 chars): No final passes after about 20-60k attempts per section from sonnet, codex and deepseek. Treat these as low-yield everywhere: plain Caesar, plain Atbash, Atbash+shift, single-keyword Vigenere with com
+- 2026-11-04 17:55:03 supervisor: note: 17:55 check: there are still 0 final passes across all sections. The deepseek jobs now complete (deepseek/10-21 done), so they are no longer blocked. If the literal key is still in the config, still revoke it as noted earlier. Sections 24 and 25 (534 and 308 runes) have only codex and local cover...
+- 2026-11-04 17:59:49 sonnet/22: running 5 min | 17:55:34 [model] claude-sonnet (proposer) ok 9.2s, tokens in/out 7838/1296, reply 2723 chars
+- 2026-11-04 17:59:49 deepseek/22: running 5 min | 17:55:18 [model] deepseek (proposer) ok 4.6s, tokens in/out 4226/842, reply 2833 chars
+- 2026-11-04 18:04:49 sonnet/22: running 10 min | 17:55:34 [model] claude-sonnet (proposer) ok 9.2s, tokens in/out 7838/1296, reply 2723 chars
+- 2026-11-04 18:04:49 deepseek/22: running 10 min | 18:03:15 [model] deepseek (proposer) ok 4.7s, tokens in/out 5390/1095, reply 3202 chars
+- 2026-11-04 18:09:49 sonnet/22: running 15 min | 18:05:31 [model] claude-sonnet (proposer) ok 11.0s, tokens in/out 8461/1381, reply 2929 chars
+- 2026-11-04 18:09:49 deepseek/22: running 15 min | 18:03:15 [model] deepseek (proposer) ok 4.7s, tokens in/out 5390/1095, reply 3202 chars
+- 2026-11-04 18:14:49 sonnet/22: running 20 min | 18:05:31 [model] claude-sonnet (proposer) ok 11.0s, tokens in/out 8461/1381, reply 2929 chars
+- 2026-11-04 18:14:49 deepseek/22: running 20 min | 18:03:15 [model] deepseek (proposer) ok 4.7s, tokens in/out 5390/1095, reply 3202 chars
+- 2026-11-04 18:19:49 sonnet/22: running 25 min | 18:19:44 [model] claude-sonnet (proposer) calling...
+- 2026-11-04 18:19:49 deepseek/22: running 25 min | 18:18:04 [model] deepseek (proposer) ok 12.7s, tokens in/out 5740/1179, reply 3399 chars
+- 2026-11-04 18:24:49 sonnet/22: running 30 min | 18:19:56 [model] claude-sonnet (proposer) ok 12.8s, tokens in/out 9109/1745, reply 3319 chars
+- 2026-11-04 18:24:49 deepseek/22: running 30 min | 18:18:04 [model] deepseek (proposer) ok 12.7s, tokens in/out 5740/1179, reply 3399 chars
+- 2026-11-04 18:29:49 sonnet/22: running 35 min | 18:19:56 [model] claude-sonnet (proposer) ok 12.8s, tokens in/out 9109/1745, reply 3319 chars
+- 2026-11-04 18:29:49 deepseek/22: running 35 min | 18:18:04 [model] deepseek (proposer) ok 12.7s, tokens in/out 5740/1179, reply 3399 chars
+- 2026-11-04 18:34:49 sonnet/22: running 40 min | 18:19:56 [model] claude-sonnet (proposer) ok 12.8s, tokens in/out 9109/1745, reply 3319 chars
+- 2026-11-04 18:34:50 deepseek/22: running 40 min | 18:18:04 [model] deepseek (proposer) ok 12.7s, tokens in/out 5740/1179, reply 3399 chars
+- 2026-11-04 18:38:55 deepseek/22: done (exit 0, 44 min)
