@@ -1,6 +1,6 @@
 # Overnight run 20261103-2030
 
-Started 2026-11-03 20:30:23, updated 2026-11-03 22:39:52, status **running**. Jobs: pending 8, running 1, done 7, blocked 15
+Started 2026-11-03 20:30:23, updated 2026-11-03 22:44:58, status **running**. Jobs: pending 8, done 8, blocked 15
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -26,7 +26,7 @@ Started 2026-11-03 20:30:23, updated 2026-11-03 22:39:52, status **running**. Jo
 | sup1/13 | done | 2026-11-03 22:26:38 | 2026-11-03 22:31:13 | added by supervisor. The DeepSeek-based unsolved jobs are blocked by the zero-price config. This covers the same section |
 | sup1/14 | done | 2026-11-03 22:31:29 | 2026-11-03 22:33:04 | added by supervisor. The DeepSeek-based unsolved jobs are blocked by the zero-price config. This covers the same section |
 | sup1/15 | done | 2026-11-03 22:33:43 | 2026-11-03 22:35:46 | added by supervisor. The DeepSeek-based unsolved jobs are blocked by the zero-price config. This covers the same section |
-| sup1/16 | running | 2026-11-03 22:36:02 |  | added by supervisor. The DeepSeek-based unsolved jobs are blocked by the zero-price config. This covers the same section |
+| sup1/16 | done | 2026-11-03 22:36:02 | 2026-11-03 22:44:58 | added by supervisor. The DeepSeek-based unsolved jobs are blocked by the zero-price config. This covers the same section |
 | sup1/17 | pending |  |  | added by supervisor. The DeepSeek-based unsolved jobs are blocked by the zero-price config. This covers the same section |
 | sup1/18 | pending |  |  | added by supervisor. The DeepSeek-based unsolved jobs are blocked by the zero-price config. This covers the same section |
 | sup1/19 | pending |  |  | added by supervisor. The DeepSeek-based unsolved jobs are blocked by the zero-price config. This covers the same section |
@@ -35,22 +35,6 @@ Started 2026-11-03 20:30:23, updated 2026-11-03 22:39:52, status **running**. Jo
 | sup1/22 | pending |  |  | added by supervisor. The DeepSeek-based unsolved jobs are blocked by the zero-price config. This covers the same section |
 | sup1/24 | pending |  |  | added by supervisor. The DeepSeek-based unsolved jobs are blocked by the zero-price config. This covers the same section |
 | sup1/25 | pending |  |  | added by supervisor. The DeepSeek-based unsolved jobs are blocked by the zero-price config. This covers the same section |
-
-## Now running
-
-**sup1/16** (since 2026-11-03 22:36:02), latest log lines:
-```
-round 1 [codex] proposals=8 valid=8 attempts=6878 passes=0 near=0 invalid=0
-round 1 [qwen-local] proposals=4 valid=4 attempts=4 passes=0 near=0 invalid=0
-round 1 [gemma-local] proposals=4 valid=3 attempts=3 passes=0 near=0 invalid=1
-round 2: calling codex | qwen-local, gemma-local (in parallel)
-22:37:34 [model] codex (proposer) calling...
-22:37:34 [model] qwen-local (proposer) calling...
-22:37:47 [model] codex (proposer) ok 13.0s, tokens in/out 17603/469, reply 1664 chars
-22:37:51 [model] qwen-local (proposer) ok 16.5s, tokens in/out 2769/363, reply 1329 chars
-22:37:51 [model] gemma-local (proposer) calling...
-22:38:03 [model] gemma-local (proposer) ok 12.2s, tokens in/out 2874/254, reply 807 chars
-```
 
 ## Results so far
 
@@ -70,16 +54,18 @@ round 2: calling codex | qwen-local, gemma-local (in parallel)
   - LP2:8.jpg-14.jpg - 25.jpg-31.jpg: 2347 attempts, 4 hypotheses, **0 final pass(es)**, stopped: stop_file
 - **sup1/15** (done)
   - LP2:15.jpg/1 - 32.jpg/1: 12380 attempts, 62 hypotheses, **0 final pass(es)**
+- **sup1/16** (done)
+  - LP2:15.jpg/2- - 32.jpg/2-39.jpg: 19149 attempts, 58 hypotheses, **0 final pass(es)**
 
 ## Model usage
 
-- qwen-local: 25 call(s) in the last 5h (cap none), spent $0.0000
-- gemma-local: 25 call(s) in the last 5h (cap none), spent $0.0000
+- qwen-local: 27 call(s) in the last 5h (cap none), spent $0.0000
+- gemma-local: 27 call(s) in the last 5h (cap none), spent $0.0000
 - granite: 2 call(s) in the last 5h (cap none), spent $0.0000
 - claude-opus: 63 call(s) in the last 5h (cap 120), spent $0.0000
 - claude-sonnet: 63 call(s) in the last 5h (cap 120), spent $0.0000
 - claude-supervisor: 63 call(s) in the last 5h (cap 200), spent $0.0000
-- codex: 24 call(s) in the last 5h (cap 100), spent $0.0000
+- codex: 26 call(s) in the last 5h (cap 100), spent $0.0000
 - dry: 2 call(s) in the last 5h (cap none), spent $0.0000
 
 ## Supervisor notes
@@ -91,10 +77,6 @@ round 2: calling codex | qwen-local, gemma-local (in parallel)
 
 ## Events
 
-- 2026-11-03 22:26:37 published: 8 file(s) to branch results
-- 2026-11-03 22:26:38 sup1/13: start (uses codex-plan, ollama:http://127.0.0.1:11434)
-- 2026-11-03 22:26:38 2 running: tier-claude, sup1/13
-- 2026-11-03 22:28:53 tier-claude: running 20 min | 22:08:50 [model] claude-sonnet (proposer) paused: claude-sonnet is paused until 2026-11-04 01:27 (local cap 40/40 calls per 5h for claude-plan; raise max_calls_per_window in the models config to allow
 - 2026-11-03 22:31:13 sup1/13: done (exit 0, 5 min)
 - 2026-11-03 22:31:28 published: 9 file(s) to branch results
 - 2026-11-03 22:31:28 supervisor unavailable: claude-supervisor is paused until 2026-11-04 01:27 (local cap 40/40 calls per 5h for claude-plan; raise max_calls_per_window in the models config to allow more)
@@ -116,3 +98,7 @@ round 2: calling codex | qwen-local, gemma-local (in parallel)
 - 2026-11-03 22:36:02 2 running: tier-claude, sup1/16
 - 2026-11-03 22:38:47 tier-claude: running 5 min | 22:38:46 [model] claude-sonnet (proposer) calling...
 - 2026-11-03 22:39:52 tier-claude: done (exit 0, 6 min)
+- 2026-11-03 22:40:08 published: 11 file(s) to branch results
+- 2026-11-03 22:40:08 sup1/17 waiting: codex-plan in use by sup1/16
+- 2026-11-03 22:41:03 sup1/16: running 5 min | 22:40:42 [model] codex (proposer) ok 31.1s, tokens in/out 18114/471, reply 1620 chars
+- 2026-11-03 22:44:58 sup1/16: done (exit 0, 9 min)
