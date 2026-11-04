@@ -43,6 +43,7 @@ class GenContext:
     alphabet_values: list[int] | None = None
     task_id: str = ""      # internal (cost attribution); never shown to the model
     style: str = ""        # per-model role hint: "exploratory" | "volume" | ""
+    brief: str = ""        # direction written by the run supervisor for this job (optional)
 
     def stats(self) -> dict:
         c = self.ciphertext
@@ -169,6 +170,8 @@ STYLE_HINTS = {
 }
 
 
+MAX_BRIEF_CHARS = 2000
+
 SYSTEM_PROMPT = ("You are a cryptanalysis assistant proposing hypotheses for an unsolved "
                  "historical-style cipher. Be concrete and diverse; do not repeat proposals that "
                  "already failed. Reply with JSON only.")
@@ -203,6 +206,10 @@ def build_prompt(ctx: GenContext, max_symbols: int = 300) -> list[dict]:
         lines += [f"  - {e}" for e in ctx.errors[-10:]]
     if ctx.style in STYLE_HINTS:
         lines.append(STYLE_HINTS[ctx.style])
+    if ctx.brief:
+        lines.append("Direction from the run supervisor, who has read the results so far "
+                     "(use it to choose what to try; the reply format and the rules above still "
+                     "apply):\n" + ctx.brief[:MAX_BRIEF_CHARS])
     lines.append(
         f'Round {ctx.round}. Propose {ctx.k} NEW, diverse hypotheses as JSON: '
         '{"proposals": [{"spec": {...}, "why": "one short sentence"}, ...]}')

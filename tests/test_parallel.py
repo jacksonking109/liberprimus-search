@@ -309,3 +309,58 @@ def test_short_sections_skipped_or_flagged(tmp_path):
     assert "short section (91 runes)" in so
     rep = (out / "report.md").read_text(encoding="utf-8")
     assert "91 (short)" in rep and "Caution: short section" in rep
+
+
+def test_per_model_cap_inside_group(tmp_path):
+    led = Ledger(tmp_path / "s.sqlite")
+    specs = [ModelSpec("opus", "scripted", "x", (Role.PROPOSER,),
+                       extra={"quota_group": "g", "max_calls_per_window": 10,
+                              "model_max_calls_per_window": 2}),
+             ModelSpec("sonnet", "scripted", "x", (Role.PROPOSER,),
+                       extra={"quota_group": "g", "max_calls_per_window": 10})]
+    r = Router(specs, ledger=led, adapters={s.name: ScriptedAdapter(s.name, ["ok"]) for s in specs})
+    r.complete("opus", [], role="proposer")
+    r.complete("opus", [], role="proposer")
+    try:
+        r.complete("opus", [], role="proposer")
+        raise AssertionError("opus share should be full")
+    except RateLimited as exc:
+        assert "for opus alone" in str(exc)
+    for _ in range(8):                     # sonnet uses the rest of the group total
+        r.complete("sonnet", [], role="proposer")
+    try:
+        r.complete("sonnet", [], role="proposer")
+        raise AssertionError("group total should be full")
+    except RateLimited as exc:
+        assert "10/10" in str(exc) and "for g" in str(exc)
+
+
+def test_supervisor_brief_reaches_the_prompt(tmp_path):
+    from lpswarm.alphabet import Alphabet
+    from lpswarm.overnight import apply_supervisor_reply
+    from lpswarm.swarm.generators import GenContext, build_prompt
+    import json as _json
+    import numpy as np
+    led = Ledger(tmp_path / "spend.sqlite")
+    specs = [ModelSpec("sup", "scripted", "sup", (Role.SUPERVISOR,)),
+             ModelSpec("claude-sonnet", "scripted", "s", (Role.PROPOSER,))]
+    router = Router(specs, ledger=led, adapters={s.name: ScriptedAdapter(s.name, ["{}"]) for s in specs})
+    cfg = OvernightConfig(models=str(tmp_path / "none.toml"), spend_ledger=str(tmp_path / "s.sqlite"),
+                          publish=False, manifest=str(ROOT / "data" / "lp" / "manifest.json"),
+                          alphabet=str(ROOT / "data" / "alphabet" / "gematria_primus.json"),
+                          jobs=[{"id": "x", "kind": "validate"}], supervisor="sup")
+    run = Overnight(cfg, tmp_path / "run", router=router, stop_file=tmp_path / "STOP", progress=False)
+    reply = _json.dumps({"actions": [{"type": "add_job", "sections": [16], "generators": ["claude-sonnet"],
+                                      "rounds": 2, "per_round": 4, "reason": "test",
+                                      "brief": "Try totient-prime streams with offsets 0-28."}]})
+    msgs = apply_supervisor_reply(run, reply)
+    assert "brief: Try totient" in msgs[0]
+    job = run.state["jobs"][-1]
+    assert job["brief"].startswith("Try totient")
+    cmd = run.job_command(job)
+    assert "--brief-file" in cmd
+    assert (run.job_dir(job) / "brief.txt").read_text(encoding="utf-8").startswith("Try totient")
+    assert any("brief for sup1" in n for n in run.state["notes"])
+    a = Alphabet.latin26()
+    ctx = GenContext("t", a, np.arange(20) % 26, 1, 4, brief="Try totient-prime streams.")
+    assert "Direction from the run supervisor" in build_prompt(ctx)[1]["content"]

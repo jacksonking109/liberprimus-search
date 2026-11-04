@@ -121,6 +121,8 @@ def run_checks(models_config: str | None = None, ping: bool = False,
                     st = Router(members, ledger=led).window_status(s.name)
                 when = pause_text(st).replace(", paused", "; PAUSED")
                 share = f" (group {group}: {', '.join(st['group'])})" if group else ""
+                if st.get("model_cap"):
+                    share += f"; this model {st['model_calls']}/{st['model_cap']}"
                 out.append(Check(WARN if st["paused_until"] else OK, f"usage {s.name}",
                                  f"{st['calls']} call(s) in the last {st['window_hours']:g}h "
                                  f"(cap {cap or 'none'}){share} in {lpath}{when}"))

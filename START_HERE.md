@@ -126,7 +126,7 @@ If a model name is missing from your config (for example gemma didn't download),
 .\.venv\Scripts\lpswarm.exe tiertest --models config\models.toml --arms claude-opus,claude-sonnet --lengths 80,160 --cases 3 --out reports\tier-claude
 ```
 
-It counts its own calls (120 per 5 hours by default) and pauses at that cap or when Claude
+It counts its own calls (200 per 5 hours shared by the Claude models, Opus at most 60, by default) and pauses at that cap or when Claude
 reports a usage limit, then carries on after the reset. No deadline, so let it wait.
 
 **C. Real Liber Primus sections (after A looks sane):**
@@ -186,9 +186,13 @@ powershell -ExecutionPolicy Bypass -File scripts\overnight.ps1
 - **Supervisor:** `claude-supervisor` (Claude Code Opus, tools off) checks in every 60 min and after
   each job. It can only pick from a menu: write you a note, add a swarm job on chosen sections
   (max 5 per run, max 8 rounds), skip or retry a job, restart Ollama, or stop the run. Its notes
-  appear in SUMMARY.md.
-- **Usage limits:** Opus, Sonnet and the supervisor share one Claude quota (120 calls / 5 h by
-  default); Codex has its own (90 / 5 h). At a cap or a usage-limit message the affected models
+  appear in SUMMARY.md. When it adds a job it can **delegate** to a cheaper model (e.g.
+  `claude-sonnet`) with a written brief: what to try on those sections, based on the per-section
+  results so far. The brief goes into every generator's prompt for that job and is copied into
+  SUMMARY's supervisor notes, so you can see what Opus told Sonnet.
+- **Usage limits:** Opus, Sonnet and the supervisor share one Claude quota (200 calls / 5 h by
+  default, `max_calls_per_window`), with per-model shares (`model_max_calls_per_window`): Opus
+  60, supervisor 30, Sonnet the rest. Codex has its own (90 / 5 h). At a cap or a usage-limit message the affected models
   pause until the reset and the run keeps going with whatever else it can do. The message says
   which kind it is: `local cap 120/120` is lpswarm's own counter (raise `max_calls_per_window`
   in `config\models.toml` and restart; it takes effect at once), while `usage limit reported by

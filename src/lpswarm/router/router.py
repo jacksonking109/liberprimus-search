@@ -137,7 +137,7 @@ class Router:
             pass
         return r
 
-    LIVE_KEYS = ("max_calls_per_window", "window_hours", "quota_group")
+    LIVE_KEYS = ("max_calls_per_window", "model_max_calls_per_window", "window_hours", "quota_group")
 
     def refresh_limits(self) -> bool:
         """Re-read the plan-cap settings (LIVE_KEYS) from the models config if the file
@@ -229,19 +229,32 @@ class Router:
         hours = float(spec.extra.get("window_hours", 5))
         cap = spec.extra.get("max_calls_per_window")
         members = self.quota_members(name)
-        calls = self.ledger.calls_since(members, now - hours * 3600) if self.ledger is not None else []
+        since = now - hours * 3600
+        calls = self.ledger.calls_since(members, since) if self.ledger is not None else []
         reply = self.ledger.active_limit(members, now) if self.ledger is not None else None
-        window = None
-        if cap and int(cap) > 0 and len(calls) >= int(cap):
+        # Optional cap on this model alone, inside the group's total (e.g. Opus 60 of 200).
+        mcap = spec.extra.get("model_max_calls_per_window")
+        own = (self.ledger.calls_since(name, since) if self.ledger is not None and len(members) > 1
+               else calls) if mcap else []
+        window, limiter = None, None
+
+        def _resume(times, c):
             # the call that must age out for the count to drop below the cap
-            window = calls[len(calls) - int(cap)] + hours * 3600 + 5
+            return times[len(times) - int(c)] + hours * 3600 + 5
+        if cap and int(cap) > 0 and len(calls) >= int(cap):
+            window, limiter = _resume(calls, cap), "group"
+        if mcap and int(mcap) > 0 and len(own) >= int(mcap):
+            t = _resume(own, mcap)
+            if window is None or t > window:
+                window, limiter = t, "model"
         paused, kind = None, None
         if reply is not None or window is not None:
             paused = max(t for t in (reply, window) if t is not None)
             kind = "reply" if reply is not None and reply >= (window or 0) else "window"
         return {"window_hours": hours, "calls": len(calls), "cap": cap, "paused_until": paused,
                 "pause_kind": kind, "oldest_call": calls[0] if calls else None, "group": members,
-                "quota": self.quota_label(name)}
+                "quota": self.quota_label(name), "model_calls": len(own) if mcap else None,
+                "model_cap": mcap, "limiter": limiter}
 
     def _check_limits(self, name: str) -> None:
         """Raise RateLimited if a CLI-reported limit is active or the local window cap is full."""
@@ -260,6 +273,11 @@ class Router:
                 self.ledger.add_rate_limit_event(name, now, resume, "window", False,
                                                  f"{st['calls']} calls in {st['window_hours']:g}h "
                                                  f"(cap {cap})")
+            if st["limiter"] == "model":
+                raise RateLimited(name, resume,
+                                  f"local cap {st['model_calls']}/{st['model_cap']} calls per "
+                                  f"{st['window_hours']:g}h for {name} alone; raise "
+                                  "model_max_calls_per_window in the models config to allow more")
             raise RateLimited(name, resume,
                               f"local cap {st['calls']}/{cap} calls per {st['window_hours']:g}h "
                               f"for {st['quota']}; raise max_calls_per_window in the models "

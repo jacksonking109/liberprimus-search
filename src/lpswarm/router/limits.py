@@ -57,8 +57,12 @@ def pause_text(status: dict, fmt: str = "%Y-%m-%d %H:%M") -> str:
     until = status.get("paused_until")
     if not until:
         return ""
-    why = ("local cap, raise max_calls_per_window to allow more" if status.get("pause_kind") == "window"
-           else "usage limit reported by the CLI")
+    if status.get("pause_kind") != "window":
+        why = "usage limit reported by the CLI"
+    elif status.get("limiter") == "model":
+        why = "local per-model cap, raise model_max_calls_per_window to allow more"
+    else:
+        why = "local cap, raise max_calls_per_window to allow more"
     return f", paused until {time.strftime(fmt, time.localtime(until))} ({why})"
 
 

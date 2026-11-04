@@ -86,22 +86,27 @@ replies = ['{"proposals": [{"spec": {"stream": {"kind": "sequence", "name": "pri
 # next call. Check status: lpswarm doctor (it shows the whole group's calls)
 #
 # All Claude models share ONE plan quota: quota_group makes their calls count together
-# and a usage limit hit by any of them pauses all.
+# and a usage limit hit by any of them pauses all. max_calls_per_window is the shared
+# total (set the same on every member); model_max_calls_per_window caps one model's share
+# of it. Below: Opus (heavier on the plan) 60, the supervisor 30, Sonnet the rest. The
+# supervisor (Opus) can delegate swarm jobs to Sonnet with a written brief.
 # [models.claude-opus]
 # provider = "claude_code"
 # model = "opus"
 # roles = ["proposer"]
 # quota_group = "claude-plan"
-# max_calls_per_window = 120
+# max_calls_per_window = 200
+# model_max_calls_per_window = 60
 # window_hours = 5
 #
 # [models.claude-sonnet]
 # provider = "claude_code"
-# model = "sonnet"
+# model = "sonnet"                  # Claude Code's alias for the current Sonnet
 # roles = ["proposer"]
 # quota_group = "claude-plan"
-# max_calls_per_window = 120
+# max_calls_per_window = 200
 # window_hours = 5
+# style = "exploratory"
 #
 # Supervisor for `lpswarm overnight` (answers with menu actions only; tools stay off).
 # [models.claude-supervisor]
@@ -109,7 +114,8 @@ replies = ['{"proposals": [{"spec": {"stream": {"kind": "sequence", "name": "pri
 # model = "opus"
 # roles = ["supervisor"]
 # quota_group = "claude-plan"
-# max_calls_per_window = 120
+# max_calls_per_window = 200
+# model_max_calls_per_window = 30
 # window_hours = 5
 #
 # Codex on your ChatGPT plan: the explorer.

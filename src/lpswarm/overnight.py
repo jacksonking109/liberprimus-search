@@ -282,6 +282,10 @@ class Overnight:
         elif job["kind"] in ("swarm", "baseline"):
             args = _set_arg(args, "--report-dir", str(d))
             args = _set_arg(args, "--ledger", str(d / "ledger.sqlite"))
+            if job["kind"] == "swarm" and job.get("brief"):
+                d.mkdir(parents=True, exist_ok=True)
+                (d / "brief.txt").write_text(job["brief"], encoding="utf-8")
+                args = _set_arg(args, "--brief-file", str(d / "brief.txt"))
             if job["kind"] == "swarm":
                 if Path(models).is_file() and "--models" not in args:
                     args += ["--models", models]
@@ -715,14 +719,23 @@ SUPERVISOR_MENU = """You are supervising an unattended cryptanalysis run while i
 Code runs the jobs; you can only answer with JSON choosing actions from this menu:
   {"type": "note", "text": "..."}                     a short note for the owner's summary
   {"type": "add_job", "sections": "unsolved" | [section indexes], "generators": [model names],
-   "rounds": 1-8, "per_round": 1-8, "reason": "..."}   queue a swarm job (limited per night)
+   "rounds": 1-8, "per_round": 1-8, "reason": "...",
+   "brief": "..."}                                     queue a swarm job (limited per night)
   {"type": "skip_job", "id": "..."}                    skip a pending or running job
   {"type": "retry_job", "id": "..."}                   retry a failed/interrupted job (once)
   {"type": "restart_ollama", "reason": "..."}          restart the local model servers
   {"type": "stop", "reason": "..."}                    end the run early
 Reply exactly: {"actions": [...]} . Prefer few actions; an empty list is fine.
 Do not add jobs that repeat ones already queued. A FINAL lead is a strong candidate that the
-owner should read; don't stop the run because of one."""
+owner should read; don't stop the run because of one.
+
+Delegating: you are the planner; the proposer models do the volume work. To hand work to a
+model (e.g. claude-sonnet), add_job with it in "generators" and a "brief" (up to 2000
+characters) that every generator in that job reads before proposing. A good brief is
+concrete: which cipher-program ideas to try on these sections and why (stream kinds,
+sequences, offsets, skip rules, transpositions), what the digest shows was already tried or
+came close, and what to avoid. The proposers reply in a fixed JSON language that code checks;
+the brief only steers their choices. Keep each job to the sections the brief is about."""
 
 
 def supervisor_prompt(run: Overnight) -> list[dict]:
@@ -734,8 +747,37 @@ def supervisor_prompt(run: Overnight) -> list[dict]:
         gens = run.router.names(Role.PROPOSER)
     extra = (f"Configured proposer models: {', '.join(gens) or 'none'}. Jobs added so far tonight: "
              f"{run.state['added_jobs']} of {run.cfg.max_added_jobs}. Time now: {_now()}.")
+    digest = section_digest(run)
     return [{"role": "system", "content": SUPERVISOR_MENU},
-            {"role": "user", "content": extra + "\n\nCurrent summary:\n" + summary[-9000:]}]
+            {"role": "user", "content": extra + "\n\nCurrent summary:\n" + summary[-9000:]
+             + ("\n\nPer-section results so far (best leads, for writing briefs):\n" + digest
+                if digest else "")}]
+
+
+def section_digest(run: Overnight, per_section: int = 4, limit_chars: int = 6000) -> str:
+    """Best leads per finished swarm section (verdict, margin, key, who proposed it), so
+    the supervisor can write briefs that build on what came close."""
+    rows: dict[str, list[str]] = {}
+    for j in run.state["jobs"]:
+        if j["kind"] != "swarm" or j["status"] not in ("done", "interrupted", "skipped"):
+            continue
+        rp = run.job_dir(j) / "report.json"
+        if not rp.is_file():
+            continue
+        try:
+            rep = json.loads(rp.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        for t in rep.get("targets", []):
+            key = f"{t['label']} ({t['symbols']} runes)"
+            lst = rows.setdefault(key, [])
+            lst.append(f"  job {j['id']}: {t['attempts']} attempts, {t['hypotheses']} hypotheses, "
+                       f"{t['final_passes']} final")
+            for ld in t.get("leads", [])[:per_section]:
+                lst.append(f"    {'FINAL ' if ld['final'] else ''}{ld['verdict']} margin "
+                           f"{ld['margin']:+.2f} by {ld['by']}: {str(ld['key'])[:140]}")
+    text = "\n".join(f"{k}\n" + "\n".join(v) for k, v in rows.items())
+    return text[-limit_chars:]
 
 
 def apply_supervisor_reply(run: Overnight, reply: str) -> list[str]:
@@ -808,15 +850,22 @@ def _add_job(run: Overnight, a: dict) -> str:
         return "add_job refused: no sections"
     if run.state["added_jobs"] >= run.cfg.max_added_jobs:
         return "add_job refused: nightly limit reached"
+    from lpswarm.swarm.generators import MAX_BRIEF_CHARS
+    brief = str(a.get("brief") or "").strip()[:MAX_BRIEF_CHARS]
     n = run.state["added_jobs"] + 1
     base = f"sup{n}"
     for idx in sections:
         args = ["--manifest", run.cfg.manifest, "--alphabet", run.cfg.alphabet, "--sections", str(idx),
                 "--generators", ",".join(gens), "--rounds", str(rounds), "--per-round", str(per_round)]
-        run.state["jobs"].append(_job(f"{base}/{idx}", "swarm", args, "supervisor",
-                                      str(a.get("reason", ""))[:200]))
+        job = _job(f"{base}/{idx}", "swarm", args, "supervisor", str(a.get("reason", ""))[:200])
+        if brief:
+            job["brief"] = brief
+        run.state["jobs"].append(job)
     run.state["added_jobs"] = n
-    return f"added {base}: swarm on {len(sections)} section(s) with {','.join(gens)}"
+    if brief:
+        run.state["notes"].append(f"{_now()}: brief for {base} ({','.join(gens)}): {brief}")
+    return (f"added {base}: swarm on {len(sections)} section(s) with {','.join(gens)}"
+            + (f"; brief: {brief[:200]}" + ("..." if len(brief) > 200 else "") if brief else ""))
 
 
 # ---------------------------------------------------------------- publishing
