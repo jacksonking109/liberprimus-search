@@ -1,6 +1,6 @@
 # Overnight run 20261103-2310
 
-Started 2026-11-03 23:10:06, updated 2026-11-04 02:24:52, status **running**. Jobs: pending 3, done 47, blocked 15
+Started 2026-11-03 23:10:06, updated 2026-11-04 02:29:13, status **running**. Jobs: pending 2, done 48, blocked 15
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -66,7 +66,7 @@ Started 2026-11-03 23:10:06, updated 2026-11-04 02:24:52, status **running**. Jo
 | deepseek/24 | blocked |  | 2026-11-04 00:39:21 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
 | deepseek/25 | blocked |  | 2026-11-04 00:39:21 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
 | sup1/25 | done | 2026-11-04 02:20:07 | 2026-11-04 02:24:52 | added by supervisor. Section 25 has near misses at margin -0.23 to -0.29, an order of magnitude closer than any other se |
-| sup2/14 | pending |  |  | added by supervisor. Largest sections have thin sonnet coverage (5k-11k attempts vs 30-60k elsewhere); fill gap with del |
+| sup2/14 | done | 2026-11-04 02:25:08 | 2026-11-04 02:29:13 | added by supervisor. Largest sections have thin sonnet coverage (5k-11k attempts vs 30-60k elsewhere); fill gap with del |
 | sup2/17 | pending |  |  | added by supervisor. Largest sections have thin sonnet coverage (5k-11k attempts vs 30-60k elsewhere); fill gap with del |
 | sup2/22 | pending |  |  | added by supervisor. Largest sections have thin sonnet coverage (5k-11k attempts vs 30-60k elsewhere); fill gap with del |
 
@@ -168,14 +168,16 @@ Started 2026-11-03 23:10:06, updated 2026-11-04 02:24:52, status **running**. Jo
   - LP2:17.jpg, 18.jpg, 19.jpg - 0.jpg-2.jpg: 249 attempts, 90 hypotheses, **0 final pass(es)**
 - **sup1/25** (done)
   - LP2:54.jpg-55.jpg - 71.jpg-72.jpg: 5713 attempts, 73 hypotheses, **0 final pass(es)**
+- **sup2/14** (done)
+  - LP2:8.jpg-14.jpg - 25.jpg-31.jpg: 4419 attempts, 19 hypotheses, **0 final pass(es)**
 
 ## Model usage
 
 - qwen-local: 122 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 122 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 193 call(s) in the last 5h (cap 120), spent $0.0000, paused until 04:25 (local cap, raise max_calls_per_window to allow more)
-- claude-sonnet: 193 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-supervisor: 193 call(s) in the last 5h (cap 200), spent $0.0000
+- claude-opus: 197 call(s) in the last 5h (cap 120), spent $0.0000, paused until 04:28 (local cap, raise max_calls_per_window to allow more)
+- claude-sonnet: 197 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-supervisor: 197 call(s) in the last 5h (cap 200), spent $0.0000
 - codex: 128 call(s) in the last 5h (cap 750), spent $0.0000
 
 ## Supervisor notes
@@ -209,10 +211,6 @@ Spread attempts across all three sections; do not spend everything on one. On se
 
 ## Events
 
-- 2026-11-04 02:05:01 sonnet/20: running 15 min | 02:04:39 [model] claude-sonnet (proposer) ok 14.6s, tokens in/out 6954/921, reply 2054 chars
-- 2026-11-04 02:08:26 sonnet/20: done (exit 0, 18 min)
-- 2026-11-04 02:08:42 published: 43 file(s) to branch results
-- 2026-11-04 02:08:52 supervisor: note: 02:08 check: run healthy, no failures and no FINAL leads. sonnet/20 finished on section 50..56/1 (1468 runes) after 18 min and 44k attempts with no near misses. codex/20 had already found nothing there. sonnet/21 should start next. Section 25 (-0.23) is still the only lead and the sup1 job covers...
 - 2026-11-04 02:08:52 sonnet/21: start (uses claude-plan)
 - 2026-11-04 02:08:52 sonnet/22 waiting: claude-plan in use by sonnet/21
 - 2026-11-04 02:11:47 sonnet/21: done (exit 0, 3 min)
@@ -234,3 +232,7 @@ Spread attempts across all three sections; do not spend everything on one. On se
 - 2026-11-04 02:20:07 sup1/25: start (uses claude-plan, codex-plan)
 - 2026-11-04 02:20:07 sup2/14 waiting: claude-plan in use by sup1/25
 - 2026-11-04 02:24:52 sup1/25: done (exit 0, 5 min)
+- 2026-11-04 02:25:08 published: 48 file(s) to branch results
+- 2026-11-04 02:25:08 sup2/14: start (uses claude-plan)
+- 2026-11-04 02:25:08 sup2/17 waiting: claude-plan in use by sup2/14
+- 2026-11-04 02:29:13 sup2/14: done (exit 0, 4 min)
