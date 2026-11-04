@@ -1,6 +1,6 @@
 # Overnight run 20261104-1523
 
-Started 2026-11-04 15:23:11, updated 2026-11-04 16:54:10, status **running**. Jobs: pending 19, running 3, done 39
+Started 2026-11-04 15:23:11, updated 2026-11-04 17:01:21, status **running**. Jobs: pending 4, running 2, done 40, blocked 15
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -49,30 +49,27 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 16:54:10, status **running**. Jo
 | local/24 | done | 2026-11-04 16:32:33 | 2026-11-04 16:40:50 | local models |
 | local/11 | done | 2026-11-04 16:41:06 | 2026-11-04 16:46:17 | local models |
 | local/25 | done | 2026-11-04 16:46:32 | 2026-11-04 16:52:48 | local models |
-| local/10 | running | 2026-11-04 16:53:04 |  | local models |
-| deepseek/10 | pending |  |  | DeepSeek (volume) |
-| deepseek/11 | pending |  |  | DeepSeek (volume) |
-| deepseek/12 | pending |  |  | DeepSeek (volume) |
-| deepseek/13 | pending |  |  | DeepSeek (volume) |
-| deepseek/14 | pending |  |  | DeepSeek (volume) |
-| deepseek/15 | pending |  |  | DeepSeek (volume) |
-| deepseek/16 | pending |  |  | DeepSeek (volume) |
-| deepseek/17 | pending |  |  | DeepSeek (volume) |
-| deepseek/18 | pending |  |  | DeepSeek (volume) |
-| deepseek/19 | pending |  |  | DeepSeek (volume) |
-| deepseek/20 | pending |  |  | DeepSeek (volume) |
-| deepseek/21 | pending |  |  | DeepSeek (volume) |
-| deepseek/22 | pending |  |  | DeepSeek (volume) |
-| deepseek/24 | pending |  |  | DeepSeek (volume) |
-| deepseek/25 | pending |  |  | DeepSeek (volume) |
+| local/10 | done | 2026-11-04 16:53:04 | 2026-11-04 17:01:21 | local models |
+| deepseek/10 | blocked |  | 2026-11-04 16:54:25 | model deepseek: environment variable sk-150ada4ce1e34d7eaf2eeb8b37ed10ae is not set |
+| deepseek/11 | blocked |  | 2026-11-04 16:54:25 | model deepseek: environment variable sk-150ada4ce1e34d7eaf2eeb8b37ed10ae is not set |
+| deepseek/12 | blocked |  | 2026-11-04 16:54:25 | model deepseek: environment variable sk-150ada4ce1e34d7eaf2eeb8b37ed10ae is not set |
+| deepseek/13 | blocked |  | 2026-11-04 16:54:25 | model deepseek: environment variable sk-150ada4ce1e34d7eaf2eeb8b37ed10ae is not set |
+| deepseek/14 | blocked |  | 2026-11-04 16:54:25 | model deepseek: environment variable sk-150ada4ce1e34d7eaf2eeb8b37ed10ae is not set |
+| deepseek/15 | blocked |  | 2026-11-04 16:54:25 | model deepseek: environment variable sk-150ada4ce1e34d7eaf2eeb8b37ed10ae is not set |
+| deepseek/16 | blocked |  | 2026-11-04 16:54:25 | model deepseek: environment variable sk-150ada4ce1e34d7eaf2eeb8b37ed10ae is not set |
+| deepseek/17 | blocked |  | 2026-11-04 16:54:25 | model deepseek: environment variable sk-150ada4ce1e34d7eaf2eeb8b37ed10ae is not set |
+| deepseek/18 | blocked |  | 2026-11-04 16:54:25 | model deepseek: environment variable sk-150ada4ce1e34d7eaf2eeb8b37ed10ae is not set |
+| deepseek/19 | blocked |  | 2026-11-04 16:54:25 | model deepseek: environment variable sk-150ada4ce1e34d7eaf2eeb8b37ed10ae is not set |
+| deepseek/20 | blocked |  | 2026-11-04 16:54:25 | model deepseek: environment variable sk-150ada4ce1e34d7eaf2eeb8b37ed10ae is not set |
+| deepseek/21 | blocked |  | 2026-11-04 16:54:25 | model deepseek: environment variable sk-150ada4ce1e34d7eaf2eeb8b37ed10ae is not set |
+| deepseek/22 | blocked |  | 2026-11-04 16:54:25 | model deepseek: environment variable sk-150ada4ce1e34d7eaf2eeb8b37ed10ae is not set |
+| deepseek/24 | blocked |  | 2026-11-04 16:54:25 | model deepseek: environment variable sk-150ada4ce1e34d7eaf2eeb8b37ed10ae is not set |
+| deepseek/25 | blocked |  | 2026-11-04 16:54:25 | model deepseek: environment variable sk-150ada4ce1e34d7eaf2eeb8b37ed10ae is not set |
 
 ## Now running
 
 **sonnet/20** (since 2026-11-04 16:36:44), latest log lines:
 ```
-  | - Plain repeat-word Vigenère with common LP keywords and no skips (largely covered across the 60k attempts).
-  | - Constant shifts or atbas
-16:37:05 [model] claude-sonnet (proposer) calling...
 16:37:14 [model] claude-sonnet (proposer) ok 9.4s, tokens in/out 4141/1246, reply 2850 chars
 round 1 [claude-sonnet] proposals=12 valid=7 attempts=7 passes=0 near=0 invalid=5
 16:37:24 [model] claude-sonnet (proposer) calling...
@@ -80,28 +77,22 @@ round 1 [claude-sonnet] proposals=12 valid=7 attempts=7 passes=0 near=0 invalid=
 round 2 [claude-sonnet] proposals=12 valid=12 attempts=12054 passes=0 near=0 invalid=5
 16:49:17 [model] claude-sonnet (proposer) calling...
 16:49:32 [model] claude-sonnet (proposer) ok 15.2s, tokens in/out 5948/1829, reply 2707 chars
+round 3 [claude-sonnet] proposals=12 valid=12 attempts=18159 passes=0 near=0 invalid=5
+16:57:02 [model] claude-sonnet (proposer) calling...
+16:57:14 [model] claude-sonnet (proposer) ok 12.0s, tokens in/out 6807/1581, reply 2425 chars
 ```
 **codex/10** (since 2026-11-04 16:53:25), latest log lines:
 ```
-  | - constant or Atbash shifts alone,
-  | - short repeat words (Vigenère, Beaufort) without transposition,
-  | - primes or prime_totients with sub at default offset and no skip.
-  | 1. Ciphertext autokey. Use {"kind":"autokey","source":"ciphertext","primer":[k]} with k from 0 to 28. Try all of sub, add and beaufort, each with map identity and with map reverse. Reason: chainin
   | 2. Plaintext autokey. Use primers [k] and [k1,k2] from small values, and the words "DIVINITY", "CIRCUMFERENCE", "INSTAR", "PARABLE", "WISDOM" and "KOAN". Use sub and beaufort. Each of these also w
   | 3. Totient stream with F skipped (the LP solved-page pattern). Use sequence prime_totients with skip [0] (F), skip_mode "resolve". Set offset_range [0,1500] and try sub, add and beaufort. Also run
   | 4. Other sequences with skip_mode "resolve" on F. Use pi_digits, e_digits, fibonacci, squares and triangular with offset_range [0,2000] and combine sub or beaufort. Also try scale values 2, 3, 28 
   | 5. Transposition, then a simple stream. Use columnar orders of width 2–9; 729 = 27² = 9·81, so prioritise width 9 and 27-friendly widths. Use identity order, reversed order, and the first rows of 
   | 6. Repeat word plus reverse map plus F skip. Use the words "FIRFUMFERENFE", "CICADA", "PRIMES" and "LIBERPRIMUS" with skip [0] resolve. Use offs
 16:53:46 [model] codex (proposer) calling...
-```
-**local/10** (since 2026-11-04 16:53:04), latest log lines:
-```
-===== 2026-11-04 16:53:04 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 10 --gen
-== LP2:17.jpg, 18.jpg, 19.jpg - 0.jpg-2.jpg  (729 symbols)
-16:53:06 [model] qwen-local (proposer) calling...
-16:53:28 [model] qwen-local (proposer) ok 22.4s, tokens in/out 2408/718, reply 2658 chars
-16:53:28 [model] gemma-local (proposer) calling...
-16:53:43 [model] gemma-local (proposer) ok 15.1s, tokens in/out 2465/464, reply 1337 chars
+16:54:12 [model] codex (proposer) ok 25.5s, tokens in/out 17656/1087, reply 3344 chars, model not reported (pin one with model = "..." in the models config)
+round 1 [codex] proposals=16 valid=16 attempts=5061 passes=0 near=0 invalid=0
+16:59:40 [model] codex (proposer) calling...
+17:00:03 [model] codex (proposer) ok 23.1s, tokens in/out 19011/947, reply 3063 chars, model not reported (pin one with model = "..." in the models config)
 ```
 
 ## Results so far
@@ -186,15 +177,17 @@ round 2 [claude-sonnet] proposals=12 valid=12 attempts=12054 passes=0 near=0 inv
   - LP2:20.jpg/1 - 3.jpg/1: 1943 attempts, 77 hypotheses, **0 final pass(es)**
 - **local/25** (done)
   - LP2:54.jpg-55.jpg - 71.jpg-72.jpg: 1590 attempts, 71 hypotheses, **0 final pass(es)**
+- **local/10** (done)
+  - LP2:17.jpg, 18.jpg, 19.jpg - 0.jpg-2.jpg: 1648 attempts, 78 hypotheses, **0 final pass(es)**
 
 ## Model usage
 
-- qwen-local: 79 call(s) in the last 5h (cap none), spent $0.0000
-- gemma-local: 79 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 208 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-sonnet: 208 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-supervisor: 208 call(s) in the last 5h (cap 550), spent $0.0000
-- codex: 79 call(s) in the last 5h (cap 750), spent $0.0000
+- qwen-local: 84 call(s) in the last 5h (cap none), spent $0.0000
+- gemma-local: 84 call(s) in the last 5h (cap none), spent $0.0000
+- claude-opus: 201 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-sonnet: 201 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-supervisor: 201 call(s) in the last 5h (cap 550), spent $0.0000
+- codex: 77 call(s) in the last 5h (cap 750), spent $0.0000
 
 ## Supervisor notes
 
@@ -203,13 +196,6 @@ round 2 [claude-sonnet] proposals=12 valid=12 attempts=12054 passes=0 near=0 inv
 
 ## Events
 
-- 2026-11-04 16:46:32 local/25: start (uses ollama:http://127.0.0.1:11434)
-- 2026-11-04 16:46:32 4 running: codex/16, sonnet/20, codex/12, local/25
-- 2026-11-04 16:46:32 sonnet/21 waiting: claude-plan in use by sonnet/20
-- 2026-11-04 16:46:47 sonnet/20: running 10 min | 16:37:37 [model] claude-sonnet (proposer) ok 13.1s, tokens in/out 5007/1808, reply 2618 chars
-- 2026-11-04 16:47:42 codex/12: running 5 min | 16:47:30 [model] codex (proposer) ok 27.3s, tokens in/out 19805/1128, reply 3033 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-04 16:47:53 codex/16: running 35 min | 16:44:26 [model] codex (proposer) ok 36.6s, tokens in/out 19687/1263, reply 3139 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-04 16:48:43 codex/16: done (exit 0, 36 min)
 - 2026-11-04 16:48:58 published: 37 file(s) to branch results
 - 2026-11-04 16:48:58 codex/11: start (uses codex-plan)
 - 2026-11-04 16:48:58 4 running: sonnet/20, codex/12, local/25, codex/11
@@ -228,3 +214,10 @@ round 2 [claude-sonnet] proposals=12 valid=12 attempts=12054 passes=0 near=0 inv
 - 2026-11-04 16:53:25 4 running: sonnet/20, codex/11, local/10, codex/10
 - 2026-11-04 16:54:00 codex/11: running 5 min | 16:53:38 [model] codex (proposer) ok 27.9s, tokens in/out 19055/1232, reply 3374 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-04 16:54:10 codex/11: done (exit 0, 5 min)
+- 2026-11-04 16:54:25 published: 40 file(s) to branch results
+- 2026-11-04 16:54:25 blocked 15 jobs (deepseek/10 ... deepseek/25): model deepseek: environment variable sk-150ada4ce1e34d7eaf2eeb8b37ed10ae is not set
+- 2026-11-04 16:54:25 sonnet/21 waiting: claude-plan in use by sonnet/20
+- 2026-11-04 16:56:50 sonnet/20: running 20 min | 16:49:32 [model] claude-sonnet (proposer) ok 15.2s, tokens in/out 5948/1829, reply 2707 chars
+- 2026-11-04 16:58:06 local/10: running 5 min | 16:56:14 [model] gemma-local (proposer) ok 16.2s, tokens in/out 3458/477, reply 1486 chars
+- 2026-11-04 16:58:26 codex/10: running 5 min | 16:54:12 [model] codex (proposer) ok 25.5s, tokens in/out 17656/1087, reply 3344 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-04 17:01:21 local/10: done (exit 0, 8 min)
