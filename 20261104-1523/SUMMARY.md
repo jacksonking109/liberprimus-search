@@ -1,6 +1,6 @@
 # Overnight run 20261104-1523
 
-Started 2026-11-04 15:23:11, updated 2026-11-04 16:36:29, status **running**. Jobs: pending 27, running 3, done 31
+Started 2026-11-04 15:23:11, updated 2026-11-04 16:37:24, status **running**. Jobs: pending 26, running 3, done 32
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -15,7 +15,7 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 16:36:29, status **running**. Jo
 | sonnet/17 | done | 2026-11-04 16:13:54 | 2026-11-04 16:21:41 | Sonnet, briefed by Opus |
 | sonnet/18 | done | 2026-11-04 16:21:57 | 2026-11-04 16:33:03 | Sonnet, briefed by Opus |
 | sonnet/19 | done | 2026-11-04 16:33:19 | 2026-11-04 16:36:29 | Sonnet, briefed by Opus |
-| sonnet/20 | pending |  |  | Sonnet, briefed by Opus |
+| sonnet/20 | running | 2026-11-04 16:36:44 |  | Sonnet, briefed by Opus |
 | sonnet/21 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/22 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/24 | pending |  |  | Sonnet, briefed by Opus |
@@ -30,7 +30,7 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 16:36:29, status **running**. Jo
 | codex/17 | done | 2026-11-04 16:00:20 | 2026-11-04 16:20:00 | Codex (exploratory) |
 | codex/16 | running | 2026-11-04 16:12:44 |  | Codex (exploratory) |
 | codex/15 | done | 2026-11-04 16:20:16 | 2026-11-04 16:20:21 | Codex (exploratory) |
-| codex/14 | running | 2026-11-04 16:20:36 |  | Codex (exploratory) |
+| codex/14 | done | 2026-11-04 16:20:36 | 2026-11-04 16:37:24 | Codex (exploratory) |
 | codex/13 | pending |  |  | Codex (exploratory) |
 | codex/12 | pending |  |  | Codex (exploratory) |
 | codex/11 | pending |  |  | Codex (exploratory) |
@@ -68,9 +68,21 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 16:36:29, status **running**. Jo
 
 ## Now running
 
+**sonnet/20** (since 2026-11-04 16:36:44), latest log lines:
+```
+  | 4. Ciphertext autokey with reverse_text true. Repeat direction 1 with the text read backwards, in case the key ran end to start.
+  | 5. Columnar transposition before autokey. Try columnar orders of width 2–7, using identity and reversed orders, combined with the best-scoring direction-1 variant. The aim is to check whether doub
+  | 6. Other sequences with skip [0] resolve. Try pi_digits, e_digits, fibonacci and squares, each with offset_range [0,2000], combine sub and beaufort, and scale 1 and -1.
+  | Do NOT repeat:
+  | - Plain repeat-word Vigenère with common LP keywords and no skips (largely covered across the 60k attempts).
+  | - Constant shifts or atbas
+16:37:05 [model] claude-sonnet (proposer) calling...
+16:37:14 [model] claude-sonnet (proposer) ok 9.4s, tokens in/out 4141/1246, reply 2850 chars
+round 1 [claude-sonnet] proposals=12 valid=7 attempts=7 passes=0 near=0 invalid=5
+16:37:24 [model] claude-sonnet (proposer) calling...
+```
 **codex/16** (since 2026-11-04 16:12:44), latest log lines:
 ```
-16:13:11 [model] codex (proposer) calling...
 16:13:42 [model] codex (proposer) ok 31.2s, tokens in/out 18196/1161, reply 3420 chars, model not reported (pin one with model = "..." in the models config)
 round 1 [codex] proposals=16 valid=16 attempts=16052 passes=0 near=0 invalid=0
 16:22:51 [model] codex (proposer) calling...
@@ -80,32 +92,20 @@ round 2 [codex] proposals=16 valid=16 attempts=30132 passes=0 near=0 invalid=0
 16:28:51 [model] codex (proposer) ok 31.3s, tokens in/out 19844/1348, reply 3196 chars, model not reported (pin one with model = "..." in the models config)
 round 3 [codex] proposals=16 valid=16 attempts=40200 passes=0 near=0 invalid=0
 16:36:09 [model] codex (proposer) calling...
-```
-**codex/14** (since 2026-11-04 16:20:36), latest log lines:
-```
-16:27:39 [model] codex (proposer) ok 24.9s, tokens in/out 19812/1066, reply 3257 chars, model not reported (pin one with model = "..." in the models config)
-round 3 [codex] proposals=16 valid=16 attempts=13621 passes=0 near=0 invalid=2
-16:30:39 [model] codex (proposer) calling...
-16:31:03 [model] codex (proposer) ok 23.9s, tokens in/out 20220/995, reply 3310 chars, model not reported (pin one with model = "..." in the models config)
-round 4 [codex] proposals=16 valid=16 attempts=17991 passes=0 near=0 invalid=2
-16:32:37 [model] codex (proposer) calling...
-16:33:14 [model] codex (proposer) ok 36.9s, tokens in/out 19817/1277, reply 3240 chars, model not reported (pin one with model = "..." in the models config)
-round 5 [codex] proposals=16 valid=16 attempts=22046 passes=0 near=0 invalid=2
-16:35:25 [model] codex (proposer) calling...
-16:35:50 [model] codex (proposer) ok 24.7s, tokens in/out 20339/1013, reply 3170 chars, model not reported (pin one with model = "..." in the models config)
+16:36:43 [model] codex (proposer) ok 34.1s, tokens in/out 20197/1140, reply 3094 chars, model not reported (pin one with model = "..." in the models config)
 ```
 **local/24** (since 2026-11-04 16:32:33), latest log lines:
 ```
-round 1 [gemma-local] proposals=8 valid=6 attempts=506 passes=0 near=0 invalid=2
-16:34:42 [model] qwen-local (proposer) calling...
-16:35:04 [model] qwen-local (proposer) ok 21.9s, tokens in/out 2838/682, reply 2385 chars
-16:35:04 [model] gemma-local (proposer) calling...
 16:35:20 [model] gemma-local (proposer) ok 16.0s, tokens in/out 2979/478, reply 1410 chars
 round 2 [qwen-local] proposals=8 valid=5 attempts=13 passes=0 near=0 invalid=3
 round 2 [gemma-local] proposals=8 valid=7 attempts=1113 passes=0 near=0 invalid=3
 16:36:00 [model] qwen-local (proposer) calling...
 16:36:24 [model] qwen-local (proposer) ok 23.5s, tokens in/out 3332/732, reply 2556 chars
 16:36:24 [model] gemma-local (proposer) calling...
+16:36:41 [model] gemma-local (proposer) ok 16.7s, tokens in/out 3393/517, reply 1521 chars
+round 3 [qwen-local] proposals=8 valid=7 attempts=261 passes=0 near=0 invalid=4
+round 3 [gemma-local] proposals=8 valid=7 attempts=2123 passes=0 near=0 invalid=4
+16:37:21 [model] qwen-local (proposer) calling...
 ```
 
 ## Results so far
@@ -152,6 +152,8 @@ round 2 [gemma-local] proposals=8 valid=7 attempts=1113 passes=0 near=0 invalid=
   - LP2:- - 40.jpg-43.jpg: 40153 attempts, 93 hypotheses, **0 final pass(es)**
 - **codex/15** (done)
   - skip LP2:15.jpg/1 - 32.jpg/1: only 9 symbols (minimum 20, --min-length); too short to judge
+- **codex/14** (done)
+  - LP2:8.jpg-14.jpg - 25.jpg-31.jpg: 26385 attempts, 90 hypotheses, **0 final pass(es)**
 - **local/17** (done)
   - LP2:- - 40.jpg-43.jpg: 2063 attempts, 70 hypotheses, **0 final pass(es)**
 - **local/18** (done)
@@ -178,10 +180,10 @@ round 2 [gemma-local] proposals=8 valid=7 attempts=1113 passes=0 near=0 invalid=
 ## Model usage
 
 - qwen-local: 63 call(s) in the last 5h (cap none), spent $0.0000
-- gemma-local: 62 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 214 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-sonnet: 214 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-supervisor: 214 call(s) in the last 5h (cap 550), spent $0.0000
+- gemma-local: 63 call(s) in the last 5h (cap none), spent $0.0000
+- claude-opus: 216 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-sonnet: 216 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-supervisor: 216 call(s) in the last 5h (cap 550), spent $0.0000
 - codex: 69 call(s) in the last 5h (cap 750), spent $0.0000
 
 ## Supervisor notes
@@ -191,10 +193,6 @@ round 2 [gemma-local] proposals=8 valid=7 attempts=1113 passes=0 near=0 invalid=
 
 ## Events
 
-- 2026-11-04 16:24:02 local/22: running 5 min | 16:23:42 [model] qwen-local (proposer) calling...
-- 2026-11-04 16:25:07 local/22: done (exit 0, 6 min)
-- 2026-11-04 16:25:23 published: 29 file(s) to branch results
-- 2026-11-04 16:25:32 supervisor: note: 16:25 check: still no final passes in any section. 4 jobs are running (codex/16, codex/14, sonnet/18, and codex/14's next round), and the codex queue is working down toward codex/13. codex/13 should give a fuller second pass on the 333-rune section LP2:6.jpg/2-7.jpg - 23.jpg/2-24.jpg, where sonne...
 - 2026-11-04 16:25:32 local/12: start (uses ollama:http://127.0.0.1:11434)
 - 2026-11-04 16:25:32 4 running: codex/16, codex/14, sonnet/18, local/12
 - 2026-11-04 16:25:32 sonnet/19 waiting: claude-plan in use by sonnet/18
@@ -216,3 +214,7 @@ round 2 [gemma-local] proposals=8 valid=7 attempts=1113 passes=0 near=0 invalid=
 - 2026-11-04 16:33:19 4 running: codex/16, codex/14, local/24, sonnet/19
 - 2026-11-04 16:35:39 codex/14: running 15 min | 16:35:25 [model] codex (proposer) calling...
 - 2026-11-04 16:36:29 sonnet/19: done (exit 0, 3 min)
+- 2026-11-04 16:36:44 published: 32 file(s) to branch results
+- 2026-11-04 16:36:44 sonnet/20: start (uses claude-plan)
+- 2026-11-04 16:36:44 4 running: codex/16, codex/14, local/24, sonnet/20
+- 2026-11-04 16:37:24 codex/14: done (exit 0, 17 min)
