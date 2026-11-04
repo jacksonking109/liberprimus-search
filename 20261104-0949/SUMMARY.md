@@ -1,6 +1,6 @@
 # Overnight run 20261104-0949
 
-Started 2026-11-04 09:49:00, updated 2026-11-04 11:13:26, status **running**. Jobs: pending 28, running 1, done 32
+Started 2026-11-04 09:49:00, updated 2026-11-04 11:20:52, status **running**. Jobs: pending 12, running 1, done 33, blocked 15
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -13,7 +13,7 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 11:13:26, status **running**. Jo
 | sonnet/15 | done | 2026-11-04 10:47:49 | 2026-11-04 10:47:54 | Sonnet, briefed by Opus |
 | sonnet/16 | done | 2026-11-04 10:48:09 | 2026-11-04 11:04:59 | Sonnet, briefed by Opus |
 | sonnet/17 | done | 2026-11-04 11:05:18 | 2026-11-04 11:13:04 | Sonnet, briefed by Opus |
-| sonnet/18 | pending |  |  | Sonnet, briefed by Opus |
+| sonnet/18 | running | 2026-11-04 11:13:42 |  | Sonnet, briefed by Opus |
 | sonnet/19 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/20 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/21 | pending |  |  | Sonnet, briefed by Opus |
@@ -28,7 +28,7 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 11:13:26, status **running**. Jo
 | codex/19 | done | 2026-11-04 10:39:26 | 2026-11-04 10:43:17 | Codex (exploratory) |
 | codex/18 | done | 2026-11-04 10:43:33 | 2026-11-04 10:54:10 | Codex (exploratory) |
 | codex/17 | done | 2026-11-04 10:54:26 | 2026-11-04 11:05:15 | Codex (exploratory) |
-| codex/16 | running | 2026-11-04 11:05:18 |  | Codex (exploratory) |
+| codex/16 | done | 2026-11-04 11:05:18 | 2026-11-04 11:20:52 | Codex (exploratory) |
 | codex/15 | pending |  |  | Codex (exploratory) |
 | codex/14 | pending |  |  | Codex (exploratory) |
 | codex/13 | pending |  |  | Codex (exploratory) |
@@ -50,36 +50,36 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 11:13:26, status **running**. Jo
 | local/11 | done | 2026-11-04 10:58:43 | 2026-11-04 11:02:44 | local models |
 | local/25 | done | 2026-11-04 11:02:59 | 2026-11-04 11:07:23 | local models |
 | local/10 | done | 2026-11-04 11:07:39 | 2026-11-04 11:13:26 | local models |
-| deepseek/10 | pending |  |  | DeepSeek (volume) |
-| deepseek/11 | pending |  |  | DeepSeek (volume) |
-| deepseek/12 | pending |  |  | DeepSeek (volume) |
-| deepseek/13 | pending |  |  | DeepSeek (volume) |
-| deepseek/14 | pending |  |  | DeepSeek (volume) |
-| deepseek/15 | pending |  |  | DeepSeek (volume) |
-| deepseek/16 | pending |  |  | DeepSeek (volume) |
-| deepseek/17 | pending |  |  | DeepSeek (volume) |
-| deepseek/18 | pending |  |  | DeepSeek (volume) |
-| deepseek/19 | pending |  |  | DeepSeek (volume) |
-| deepseek/20 | pending |  |  | DeepSeek (volume) |
-| deepseek/21 | pending |  |  | DeepSeek (volume) |
-| deepseek/22 | pending |  |  | DeepSeek (volume) |
-| deepseek/24 | pending |  |  | DeepSeek (volume) |
-| deepseek/25 | pending |  |  | DeepSeek (volume) |
+| deepseek/10 | blocked |  | 2026-11-04 11:13:42 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
+| deepseek/11 | blocked |  | 2026-11-04 11:13:42 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
+| deepseek/12 | blocked |  | 2026-11-04 11:13:42 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
+| deepseek/13 | blocked |  | 2026-11-04 11:13:42 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
+| deepseek/14 | blocked |  | 2026-11-04 11:13:42 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
+| deepseek/15 | blocked |  | 2026-11-04 11:13:42 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
+| deepseek/16 | blocked |  | 2026-11-04 11:13:42 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
+| deepseek/17 | blocked |  | 2026-11-04 11:13:42 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
+| deepseek/18 | blocked |  | 2026-11-04 11:13:42 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
+| deepseek/19 | blocked |  | 2026-11-04 11:13:42 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
+| deepseek/20 | blocked |  | 2026-11-04 11:13:42 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
+| deepseek/21 | blocked |  | 2026-11-04 11:13:42 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
+| deepseek/22 | blocked |  | 2026-11-04 11:13:42 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
+| deepseek/24 | blocked |  | 2026-11-04 11:13:42 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
+| deepseek/25 | blocked |  | 2026-11-04 11:13:42 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
 
 ## Now running
 
-**codex/16** (since 2026-11-04 11:05:18), latest log lines:
+**sonnet/18** (since 2026-11-04 11:13:42), latest log lines:
 ```
-11:08:26 [model] codex (proposer) ok 20.6s, tokens in/out 18049/433, reply 1590 chars
-round 2 [codex] proposals=8 valid=8 attempts=6633 passes=0 near=0 invalid=0
-11:08:29 [model] codex (proposer) calling...
-11:08:49 [model] codex (proposer) ok 20.5s, tokens in/out 18424/462, reply 1691 chars
-round 3 [codex] proposals=8 valid=8 attempts=8686 passes=0 near=0 invalid=0
-11:08:51 [model] codex (proposer) calling...
-11:09:08 [model] codex (proposer) ok 17.0s, tokens in/out 18805/495, reply 1668 chars
-round 4 [codex] proposals=8 valid=8 attempts=14707 passes=0 near=0 invalid=0
-11:12:22 [model] codex (proposer) calling...
-11:12:35 [model] codex (proposer) ok 12.8s, tokens in/out 19158/450, reply 1594 chars
+11:14:09 [model] claude-sonnet (proposer) ok 7.4s, tokens in/out 4142/851, reply 1904 chars
+round 1 [claude-sonnet] proposals=8 valid=5 attempts=5 passes=0 near=0 invalid=3
+11:14:25 [model] claude-sonnet (proposer) calling...
+11:14:32 [model] claude-sonnet (proposer) ok 7.4s, tokens in/out 4715/969, reply 2124 chars
+round 2 [claude-sonnet] proposals=8 valid=8 attempts=5526 passes=0 near=0 invalid=3
+11:18:07 [model] claude-sonnet (proposer) calling...
+11:18:22 [model] claude-sonnet (proposer) ok 15.2s, tokens in/out 5322/909, reply 2025 chars
+round 3 [claude-sonnet] proposals=8 valid=8 attempts=10075 passes=0 near=0 invalid=3
+11:19:46 [model] claude-sonnet (proposer) calling...
+11:19:55 [model] claude-sonnet (proposer) ok 9.5s, tokens in/out 5915/878, reply 1992 chars
 ```
 
 ## Results so far
@@ -120,6 +120,8 @@ round 4 [codex] proposals=8 valid=8 attempts=14707 passes=0 near=0 invalid=0
   - LP2:- - 44.jpg-49.jpg: 28364 attempts, 48 hypotheses, **0 final pass(es)**
 - **codex/17** (done)
   - LP2:- - 40.jpg-43.jpg: 30353 attempts, 48 hypotheses, **0 final pass(es)**
+- **codex/16** (done)
+  - LP2:15.jpg/2- - 32.jpg/2-39.jpg: 24778 attempts, 48 hypotheses, **0 final pass(es)**
 - **local/17** (done)
   - LP2:- - 40.jpg-43.jpg: 298 attempts, 82 hypotheses, **0 final pass(es)**
 - **local/18** (done)
@@ -155,10 +157,10 @@ round 4 [codex] proposals=8 valid=8 attempts=14707 passes=0 near=0 invalid=0
 
 - qwen-local: 84 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 84 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 101 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-sonnet: 101 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-supervisor: 101 call(s) in the last 5h (cap 550), spent $0.0000
-- codex: 53 call(s) in the last 5h (cap 750), spent $0.0000
+- claude-opus: 106 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-sonnet: 106 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-supervisor: 106 call(s) in the last 5h (cap 550), spent $0.0000
+- codex: 54 call(s) in the last 5h (cap 750), spent $0.0000
 
 ## Supervisor notes
 
@@ -172,15 +174,6 @@ round 4 [codex] proposals=8 valid=8 attempts=14707 passes=0 near=0 invalid=0
 
 ## Events
 
-- 2026-11-04 11:02:59 3 running: sonnet/16, codex/17, local/25
-- 2026-11-04 11:02:59 sonnet/17 waiting: claude-plan in use by sonnet/16
-- 2026-11-04 11:03:14 sonnet/16: running 15 min | 11:02:31 [model] claude-sonnet (proposer) ok 10.6s, tokens in/out 7183/878, reply 1960 chars
-- 2026-11-04 11:04:29 codex/17: running 10 min | 11:01:23 [model] codex (proposer) ok 22.4s, tokens in/out 19173/541, reply 1679 chars
-- 2026-11-04 11:04:59 sonnet/16: done (exit 0, 17 min)
-- 2026-11-04 11:05:15 published: 30 file(s) to branch results
-- 2026-11-04 11:05:15 codex/17: done (exit 0, 11 min)
-- 2026-11-04 11:05:18 published: 31 file(s) to branch results
-- 2026-11-04 11:05:18 sonnet/17: start (uses claude-plan)
 - 2026-11-04 11:05:18 2 running: local/25, sonnet/17
 - 2026-11-04 11:05:18 codex/16: start (uses codex-plan)
 - 2026-11-04 11:05:18 3 running: local/25, sonnet/17, codex/16
@@ -197,3 +190,12 @@ round 4 [codex] proposals=8 valid=8 attempts=14707 passes=0 near=0 invalid=0
 - 2026-11-04 11:13:20 published: 33 file(s) to branch results
 - 2026-11-04 11:13:26 supervisor: note: 11:13 check: the run is healthy. sonnet/16, sonnet/17, codex/17 and local/25 have finished. codex/16 and local/10 are running, and sonnet/18 is next. There are still 0 final passes across about 30 finished jobs. sonnet/17 and codex/17 together made about 48k attempts on the 40-43 section, and nei...
 - 2026-11-04 11:13:26 local/10: done (exit 0, 6 min)
+- 2026-11-04 11:13:42 published: 34 file(s) to branch results
+- 2026-11-04 11:13:42 sonnet/18: start (uses claude-plan)
+- 2026-11-04 11:13:42 2 running: codex/16, sonnet/18
+- 2026-11-04 11:13:42 blocked 15 jobs (deepseek/10 ... deepseek/25): model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_per_mtok
+- 2026-11-04 11:13:42 sonnet/19 waiting: claude-plan in use by sonnet/18
+- 2026-11-04 11:15:22 codex/16: running 10 min | 11:14:58 [model] codex (proposer) ok 15.0s, tokens in/out 19356/461, reply 1703 chars
+- 2026-11-04 11:18:42 sonnet/18: running 5 min | 11:18:22 [model] claude-sonnet (proposer) ok 15.2s, tokens in/out 5322/909, reply 2025 chars
+- 2026-11-04 11:20:22 codex/16: running 15 min | 11:14:58 [model] codex (proposer) ok 15.0s, tokens in/out 19356/461, reply 1703 chars
+- 2026-11-04 11:20:52 codex/16: done (exit 0, 16 min)
