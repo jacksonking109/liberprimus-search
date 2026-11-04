@@ -1,6 +1,6 @@
 # Overnight run 20261104-1523
 
-Started 2026-11-04 15:23:11, updated 2026-11-04 17:16:28, status **running**. Jobs: pending 5, done 42, blocked 15
+Started 2026-11-04 15:23:11, updated 2026-11-04 17:16:37, status **stopped**. Jobs: pending 5, done 42, blocked 15
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -174,8 +174,6 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 17:16:28, status **running**. Jo
 
 ## Events
 
-- 2026-11-04 16:53:09 codex/12: done (exit 0, 10 min)
-- 2026-11-04 16:53:25 published: 39 file(s) to branch results
 - 2026-11-04 16:53:25 codex/10: start (uses codex-plan)
 - 2026-11-04 16:53:25 4 running: sonnet/20, codex/11, local/10, codex/10
 - 2026-11-04 16:54:00 codex/11: running 5 min | 16:53:38 [model] codex (proposer) ok 27.9s, tokens in/out 19055/1232, reply 3374 chars, model not reported (pin one with model = "..." in the models config)
@@ -199,3 +197,5 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 17:16:28, status **running**. Jo
 - 2026-11-04 17:16:12 sonnet/20: done (exit 0, 39 min)
 - 2026-11-04 17:16:28 published: 43 file(s) to branch results
 - 2026-11-04 17:16:28 codex/10: done (exit 0, 23 min)
+- 2026-11-04 17:16:37 published: 43 file(s) to branch results
+- 2026-11-04 17:16:37 stopping: STOP file
