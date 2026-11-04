@@ -1,6 +1,6 @@
 # Overnight run 20261104-1523
 
-Started 2026-11-04 15:23:11, updated 2026-11-04 17:16:12, status **running**. Jobs: pending 5, running 1, done 41, blocked 15
+Started 2026-11-04 15:23:11, updated 2026-11-04 17:16:28, status **running**. Jobs: pending 5, done 42, blocked 15
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -34,7 +34,7 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 17:16:12, status **running**. Jo
 | codex/13 | done | 2026-11-04 16:37:40 | 2026-11-04 16:42:26 | Codex (exploratory) |
 | codex/12 | done | 2026-11-04 16:42:41 | 2026-11-04 16:53:09 | Codex (exploratory) |
 | codex/11 | done | 2026-11-04 16:48:58 | 2026-11-04 16:54:10 | Codex (exploratory) |
-| codex/10 | running | 2026-11-04 16:53:25 |  | Codex (exploratory) |
+| codex/10 | done | 2026-11-04 16:53:25 | 2026-11-04 17:16:28 | Codex (exploratory) |
 | local/17 | done | 2026-11-04 15:23:11 | 2026-11-04 15:31:35 | local models |
 | local/18 | done | 2026-11-04 15:31:51 | 2026-11-04 15:41:46 | local models |
 | local/16 | done | 2026-11-04 15:42:01 | 2026-11-04 15:47:33 | local models |
@@ -66,22 +66,6 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 17:16:12, status **running**. Jo
 | deepseek/24 | blocked |  | 2026-11-04 16:54:25 | model deepseek: environment variable sk-150ada4ce1e34d7eaf2eeb8b37ed10ae is not set |
 | deepseek/25 | blocked |  | 2026-11-04 16:54:25 | model deepseek: environment variable sk-150ada4ce1e34d7eaf2eeb8b37ed10ae is not set |
 | sup1/13 | pending |  |  | added by supervisor. sonnet/13 made only 22 attempts from 10 hypotheses on the 333-rune section 13, so its proposals exp |
-
-## Now running
-
-**codex/10** (since 2026-11-04 16:53:25), latest log lines:
-```
-round 4 [codex] proposals=16 valid=16 attempts=19698 passes=0 near=0 invalid=1
-17:10:52 [model] codex (proposer) calling...
-17:11:29 [model] codex (proposer) ok 37.0s, tokens in/out 20175/1223, reply 3232 chars, model not reported (pin one with model = "..." in the models config)
-round 5 [codex] proposals=16 valid=15 attempts=25238 passes=0 near=0 invalid=2
-17:14:55 [model] codex (proposer) calling...
-17:15:20 [model] codex (proposer) ok 25.1s, tokens in/out 20287/1052, reply 3058 chars, model not reported (pin one with model = "..." in the models config)
-round 6 [codex] proposals=16 valid=16 attempts=26991 passes=0 near=0 invalid=2
-stopped: stop_file; final passes: 0
-report: reports\overnight\20261104-1523\codex_10\report.md
-model spend (reports/model_spend.sqlite): deepseek=$0.0000, qwen-local=$0.0000, gemma-local=$0.0000, granite=$0.0000, claude-opus=$0.0000, claude-sonnet=$0.0000, claude-supervisor=$0.0000, codex=$0.00
-```
 
 ## Results so far
 
@@ -139,7 +123,7 @@ model spend (reports/model_spend.sqlite): deepseek=$0.0000, qwen-local=$0.0000, 
   - LP2:20.jpg/2-23.jpg/1 - 3.jpg/2-6.jpg/1: 56284 attempts, 90 hypotheses, **0 final pass(es)**
 - **codex/11** (done)
   - LP2:20.jpg/1 - 3.jpg/1: 25842 attempts, 91 hypotheses, **0 final pass(es)**
-- **codex/10** (running)
+- **codex/10** (done)
   - LP2:17.jpg, 18.jpg, 19.jpg - 0.jpg-2.jpg: 26991 attempts, 89 hypotheses, **0 final pass(es)**, stopped: stop_file
 - **local/17** (done)
   - LP2:- - 40.jpg-43.jpg: 2063 attempts, 70 hypotheses, **0 final pass(es)**
@@ -190,8 +174,6 @@ model spend (reports/model_spend.sqlite): deepseek=$0.0000, qwen-local=$0.0000, 
 
 ## Events
 
-- 2026-11-04 16:53:04 4 running: sonnet/20, codex/12, codex/11, local/10
-- 2026-11-04 16:53:04 sonnet/21 waiting: claude-plan in use by sonnet/20
 - 2026-11-04 16:53:09 codex/12: done (exit 0, 10 min)
 - 2026-11-04 16:53:25 published: 39 file(s) to branch results
 - 2026-11-04 16:53:25 codex/10: start (uses codex-plan)
@@ -215,3 +197,5 @@ model spend (reports/model_spend.sqlite): deepseek=$0.0000, qwen-local=$0.0000, 
 - 2026-11-04 17:12:07 sonnet/20: running 35 min | 17:06:24 [model] claude-sonnet (proposer) ok 17.5s, tokens in/out 7253/1160, reply 2439 chars
 - 2026-11-04 17:13:27 codex/10: running 20 min | 17:11:29 [model] codex (proposer) ok 37.0s, tokens in/out 20175/1223, reply 3232 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-04 17:16:12 sonnet/20: done (exit 0, 39 min)
+- 2026-11-04 17:16:28 published: 43 file(s) to branch results
+- 2026-11-04 17:16:28 codex/10: done (exit 0, 23 min)
