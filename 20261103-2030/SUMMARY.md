@@ -1,10 +1,10 @@
 # Overnight run 20261103-2030
 
-Started 2026-11-03 20:30:23, updated 2026-11-03 22:35:46, status **running**. Jobs: pending 9, running 1, done 6, blocked 15
+Started 2026-11-03 20:30:23, updated 2026-11-03 22:39:52, status **running**. Jobs: pending 8, running 1, done 7, blocked 15
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
-| tier-claude | running | 2026-11-03 20:30:23 | 2026-11-03 22:33:16 | Claude Code proposers vs the random control |
+| tier-claude | done | 2026-11-03 20:30:23 | 2026-11-03 22:39:52 | Claude Code proposers vs the random control |
 | unsolved/10 | blocked |  | 2026-11-03 22:08:49 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
 | unsolved/11 | blocked |  | 2026-11-03 22:08:49 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
 | unsolved/12 | blocked |  | 2026-11-03 22:08:49 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
@@ -26,7 +26,7 @@ Started 2026-11-03 20:30:23, updated 2026-11-03 22:35:46, status **running**. Jo
 | sup1/13 | done | 2026-11-03 22:26:38 | 2026-11-03 22:31:13 | added by supervisor. The DeepSeek-based unsolved jobs are blocked by the zero-price config. This covers the same section |
 | sup1/14 | done | 2026-11-03 22:31:29 | 2026-11-03 22:33:04 | added by supervisor. The DeepSeek-based unsolved jobs are blocked by the zero-price config. This covers the same section |
 | sup1/15 | done | 2026-11-03 22:33:43 | 2026-11-03 22:35:46 | added by supervisor. The DeepSeek-based unsolved jobs are blocked by the zero-price config. This covers the same section |
-| sup1/16 | pending |  |  | added by supervisor. The DeepSeek-based unsolved jobs are blocked by the zero-price config. This covers the same section |
+| sup1/16 | running | 2026-11-03 22:36:02 |  | added by supervisor. The DeepSeek-based unsolved jobs are blocked by the zero-price config. This covers the same section |
 | sup1/17 | pending |  |  | added by supervisor. The DeepSeek-based unsolved jobs are blocked by the zero-price config. This covers the same section |
 | sup1/18 | pending |  |  | added by supervisor. The DeepSeek-based unsolved jobs are blocked by the zero-price config. This covers the same section |
 | sup1/19 | pending |  |  | added by supervisor. The DeepSeek-based unsolved jobs are blocked by the zero-price config. This covers the same section |
@@ -38,26 +38,26 @@ Started 2026-11-03 20:30:23, updated 2026-11-03 22:35:46, status **running**. Jo
 
 ## Now running
 
-**tier-claude** (since 2026-11-03 20:30:23), latest log lines:
+**sup1/16** (since 2026-11-03 22:36:02), latest log lines:
 ```
-22:34:42 [model] claude-sonnet (proposer) ok 13.7s, tokens in/out 3919/1519, reply 1364 chars
-22:34:42 [model] claude-sonnet (proposer) calling...
-22:34:49 [model] claude-sonnet (proposer) ok 6.2s, tokens in/out 4311/706, reply 1521 chars
-[claude-sonnet] 2/6 L=80 recovered=0 attempts=3990 calls=5 usd=0.0000
-22:34:58 [model] claude-sonnet (proposer) calling...
-22:35:12 [model] claude-sonnet (proposer) ok 13.8s, tokens in/out 2397/1589, reply 1419 chars
-22:35:15 [model] claude-sonnet (proposer) calling...
-22:35:28 [model] claude-sonnet (proposer) ok 12.9s, tokens in/out 2854/1495, reply 1394 chars
-22:35:29 [model] claude-sonnet (proposer) calling...
-22:35:41 [model] claude-sonnet (proposer) ok 12.8s, tokens in/out 3368/1494, reply 1590 chars
+round 1 [codex] proposals=8 valid=8 attempts=6878 passes=0 near=0 invalid=0
+round 1 [qwen-local] proposals=4 valid=4 attempts=4 passes=0 near=0 invalid=0
+round 1 [gemma-local] proposals=4 valid=3 attempts=3 passes=0 near=0 invalid=1
+round 2: calling codex | qwen-local, gemma-local (in parallel)
+22:37:34 [model] codex (proposer) calling...
+22:37:34 [model] qwen-local (proposer) calling...
+22:37:47 [model] codex (proposer) ok 13.0s, tokens in/out 17603/469, reply 1664 chars
+22:37:51 [model] qwen-local (proposer) ok 16.5s, tokens in/out 2769/363, reply 1329 chars
+22:37:51 [model] gemma-local (proposer) calling...
+22:38:03 [model] gemma-local (proposer) ok 12.2s, tokens in/out 2874/254, reply 807 chars
 ```
 
 ## Results so far
 
-- **tier-claude** (running)
+- **tier-claude** (done)
   - random_program:40: recall 0.00 (0/6), 192 attempts, 0 model calls, $0.0000
   - claude-opus: recall 0.50 (3/6), 41822 attempts, 21 model calls, $0.0000
-  - claude-sonnet: recall 0.50 (1/2), 8180 attempts, 10 model calls, $0.0000
+  - claude-sonnet: recall 0.33 (2/6), 23101 attempts, 26 model calls, $0.0000
 - **sup1/10** (done)
   - LP2:17.jpg, 18.jpg, 19.jpg - 0.jpg-2.jpg: 18513 attempts, 61 hypotheses, **0 final pass(es)**
 - **sup1/11** (done)
@@ -73,13 +73,13 @@ Started 2026-11-03 20:30:23, updated 2026-11-03 22:35:46, status **running**. Jo
 
 ## Model usage
 
-- qwen-local: 23 call(s) in the last 5h (cap none), spent $0.0000
-- gemma-local: 23 call(s) in the last 5h (cap none), spent $0.0000
+- qwen-local: 25 call(s) in the last 5h (cap none), spent $0.0000
+- gemma-local: 25 call(s) in the last 5h (cap none), spent $0.0000
 - granite: 2 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 50 call(s) in the last 5h (cap 120), spent $0.0000
-- claude-sonnet: 50 call(s) in the last 5h (cap 120), spent $0.0000
-- claude-supervisor: 50 call(s) in the last 5h (cap 200), spent $0.0000
-- codex: 22 call(s) in the last 5h (cap 100), spent $0.0000
+- claude-opus: 63 call(s) in the last 5h (cap 120), spent $0.0000
+- claude-sonnet: 63 call(s) in the last 5h (cap 120), spent $0.0000
+- claude-supervisor: 63 call(s) in the last 5h (cap 200), spent $0.0000
+- codex: 24 call(s) in the last 5h (cap 100), spent $0.0000
 - dry: 2 call(s) in the last 5h (cap none), spent $0.0000
 
 ## Supervisor notes
@@ -91,11 +91,6 @@ Started 2026-11-03 20:30:23, updated 2026-11-03 22:35:46, status **running**. Jo
 
 ## Events
 
-- 2026-11-03 22:19:36 sup1/12: start (uses codex-plan, ollama:http://127.0.0.1:11434)
-- 2026-11-03 22:19:36 2 running: tier-claude, sup1/12
-- 2026-11-03 22:23:51 tier-claude: running 15 min | 22:08:50 [model] claude-sonnet (proposer) paused: claude-sonnet is paused until 2026-11-04 01:27 (local cap 40/40 calls per 5h for claude-plan; raise max_calls_per_window in the models config to allow
-- 2026-11-03 22:24:36 sup1/12: running 5 min | 22:24:11 [model] gemma-local (proposer) ok 14.5s, tokens in/out 3203/254, reply 812 chars
-- 2026-11-03 22:26:22 sup1/12: done (exit 0, 7 min)
 - 2026-11-03 22:26:37 published: 8 file(s) to branch results
 - 2026-11-03 22:26:38 sup1/13: start (uses codex-plan, ollama:http://127.0.0.1:11434)
 - 2026-11-03 22:26:38 2 running: tier-claude, sup1/13
@@ -116,3 +111,8 @@ Started 2026-11-03 20:30:23, updated 2026-11-03 22:35:46, status **running**. Jo
 - 2026-11-03 22:33:43 2 running: tier-claude, sup1/15
 - 2026-11-03 22:33:56 supervisor: note: 22:33: The run resumed after a STOP file at 22:33:16. That stop cut sup1/14 (section 14) short at 2,347 attempts and 4 hypotheses, so section 14 is only lightly covered. It is marked done, so I can't retry it; rerun it manually if you want full coverage. tier-claude restarted, but the shared clau...
 - 2026-11-03 22:35:46 sup1/15: done (exit 0, 2 min)
+- 2026-11-03 22:36:02 published: 11 file(s) to branch results
+- 2026-11-03 22:36:02 sup1/16: start (uses codex-plan, ollama:http://127.0.0.1:11434)
+- 2026-11-03 22:36:02 2 running: tier-claude, sup1/16
+- 2026-11-03 22:38:47 tier-claude: running 5 min | 22:38:46 [model] claude-sonnet (proposer) calling...
+- 2026-11-03 22:39:52 tier-claude: done (exit 0, 6 min)
