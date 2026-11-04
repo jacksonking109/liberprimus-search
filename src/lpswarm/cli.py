@@ -225,6 +225,32 @@ def cmd_baseline(args) -> int:
     return 0
 
 
+def _auto_brief(args, router, alphabet, ct, label, values) -> str:
+    """Ask the --auto-brief model for a brief on this target; '' if it is unavailable."""
+    import numpy as np
+    from lpswarm.router.adapters import AdapterError
+    from lpswarm.router.limits import RateLimited
+    from lpswarm.router.router import BudgetExceeded
+    from lpswarm.swarm.generators import MAX_BRIEF_CHARS, GenContext, build_brief_prompt
+    context = ""
+    if args.brief_context and Path(args.brief_context).is_file():
+        from lpswarm.textio import read_text
+        context = read_text(args.brief_context).strip()
+    ctx = GenContext(label, alphabet, np.asarray(ct), 0, 8, alphabet_values=values, task_id=label)
+    try:
+        c = router.complete(args.auto_brief, build_brief_prompt(ctx, context), role="supervisor",
+                            task_id=f"{label}#brief", temperature=0.4, max_tokens=1500)
+    except (RateLimited, BudgetExceeded, AdapterError, ValueError) as exc:
+        print(f"auto-brief skipped ({args.auto_brief}): {str(exc)[:200]}", flush=True)
+        return ""
+    text = c.text.strip()[:MAX_BRIEF_CHARS]
+    print(f"brief from {args.auto_brief} ({len(text)} chars):", flush=True)
+    for line in text.splitlines():
+        if line.strip():
+            print(f"  | {line[:200]}", flush=True)
+    return text
+
+
 def cmd_swarm(args) -> int:
     from lpswarm.executor import Target
     from lpswarm.ledger import Ledger
@@ -294,10 +320,14 @@ def cmd_swarm(args) -> int:
             if short_note(len(ct)):
                 print(f"note: {short_note(len(ct))}")
             print(f"\n== {label}  ({len(ct)} symbols)")
+            tgt_brief = brief
+            if args.auto_brief and router is not None:
+                tgt_brief = "\n\n".join(x for x in (_auto_brief(args, router, alphabet, ct, label,
+                                                                  values), brief) if x)
             res = run_swarm(Target(alphabet, ct, label, page_range=page_range, is_synthetic=synthetic,
                                    breaks=breaks),
                             led, oracle, gens, sc, ranker=ranker, alphabet_values=values,
-                            progress=not args.quiet, brief=brief)
+                            progress=not args.quiet, brief=tgt_brief)
             n_final = sum(1 for r in res.final if r["passed_final"])
             print(f"stopped: {res.stopped or 'rounds done'}; final passes: {n_final}")
             entries.append(target_entry(led, res.target_id, label, len(ct), stopped=res.stopped,
@@ -548,6 +578,11 @@ def build_parser() -> argparse.ArgumentParser:
                         "cannot be judged)")
     p.add_argument("--brief-file", help="text file with direction for the model generators "
                    "(written by the overnight supervisor when it delegates a job)")
+    p.add_argument("--auto-brief", metavar="MODEL",
+                   help="before each target, ask this supervisor-role model (e.g. "
+                        "claude-supervisor) to write a brief for the generators")
+    p.add_argument("--brief-context", help="text file with results so far on this target, shown "
+                   "to the --auto-brief model (written by the overnight runner)")
     p.add_argument("--serial", action="store_true",
                    help="call generators one at a time (default: generators on different "
                         "backends, e.g. Codex and a local GPU, are called at the same time)")

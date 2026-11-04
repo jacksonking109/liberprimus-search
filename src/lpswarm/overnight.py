@@ -41,6 +41,7 @@ from lpswarm.textio import read_text
 
 STATUSES = ("pending", "running", "done", "failed", "skipped", "interrupted", "blocked")
 KINDS = ("tiertest", "swarm", "baseline", "validate")
+ORDERS = ("forward", "reverse", "middle")
 MAX_ROUNDS_ADDED = 8
 MAX_PER_ROUND_ADDED = 8
 MIN_FORCED_TICK_S = 600   # after-job supervisor check-ins at least 10 minutes apart
@@ -57,7 +58,7 @@ class OvernightConfig:
     results_branch: str = "results"
     until: str | None = None            # "HH:MM" local time
     max_added_jobs: int = 5
-    max_parallel: int = 2               # jobs at once (only ones on different backends)
+    max_parallel: int = 3               # jobs at once (only ones on different backends)
     manifest: str = "data/lp/manifest.json"
     alphabet: str = "data/alphabet/gematria_primus.json"
     jobs: list[dict] = field(default_factory=list)
@@ -82,6 +83,10 @@ def load_config(path: str | Path) -> OvernightConfig:
             raise ValueError(f"{path}: job {j['id']}: args must be a list of strings")
         if "lane" in j and not isinstance(j["lane"], str):
             raise ValueError(f"{path}: job {j['id']}: lane must be a string")
+        if j.get("order", "forward") not in ORDERS:
+            raise ValueError(f"{path}: job {j['id']}: order must be one of {ORDERS}")
+        if "auto_brief" in j and not isinstance(j["auto_brief"], (bool, str)):
+            raise ValueError(f"{path}: job {j['id']}: auto_brief must be true or a model name")
     known = {k for k in OvernightConfig.__dataclass_fields__ if k != "jobs"}
     bad = set(sec) - known
     if bad:
@@ -136,12 +141,29 @@ def expand_jobs(cfg: OvernightConfig) -> list[dict]:
         sections = _arg_value(args, "--sections")
         if j["kind"] in ("swarm", "baseline") and sections and "--manifest" in args:
             man = _arg_value(args, "--manifest") or cfg.manifest
-            for idx in manifest_sections(man, sections):
-                out.append(_job(f"{j['id']}/{idx}", j["kind"], _set_arg(args, "--sections", str(idx)),
-                                "config", j.get("note", ""), j.get("lane")))
+            for idx in _ordered(manifest_sections(man, sections), j.get("order", "forward")):
+                job = _job(f"{j['id']}/{idx}", j["kind"], _set_arg(args, "--sections", str(idx)),
+                           "config", j.get("note", ""), j.get("lane"))
+                if j.get("auto_brief"):
+                    job["auto_brief"] = j["auto_brief"]
+                out.append(job)
         else:
             out.append(_job(j["id"], j["kind"], args, "config", j.get("note", ""), j.get("lane")))
     return out
+
+
+def _ordered(items: list[int], order: str) -> list[int]:
+    """Section order for a lane, so parallel lanes start on different sections."""
+    if order == "reverse":
+        return list(reversed(items))
+    if order == "middle":       # middle outwards: m, m+1, m-1, m+2, ...
+        m = len(items) // 2
+        out = []
+        for k in range(len(items)):
+            i = m + (k + 1) // 2 if k % 2 else m - k // 2
+            out.append(items[i])
+        return out
+    return list(items)
 
 
 def _job(jid: str, kind: str, args: list[str], added_by: str, note: str = "",
@@ -286,6 +308,16 @@ class Overnight:
                 d.mkdir(parents=True, exist_ok=True)
                 (d / "brief.txt").write_text(job["brief"], encoding="utf-8")
                 args = _set_arg(args, "--brief-file", str(d / "brief.txt"))
+            if job["kind"] == "swarm" and job.get("auto_brief"):
+                ab = job["auto_brief"]
+                model = ab if isinstance(ab, str) else (self.cfg.supervisor or "")
+                if model:
+                    d.mkdir(parents=True, exist_ok=True)
+                    sec = _arg_value(job["args"], "--sections")
+                    ctx = section_digest(self, section=sec) or "(nothing tried on this section yet)"
+                    (d / "brief_context.txt").write_text(ctx, encoding="utf-8")
+                    args = _set_arg(args, "--auto-brief", model)
+                    args = _set_arg(args, "--brief-context", str(d / "brief_context.txt"))
             if job["kind"] == "swarm":
                 if Path(models).is_file() and "--models" not in args:
                     args += ["--models", models]
@@ -754,12 +786,16 @@ def supervisor_prompt(run: Overnight) -> list[dict]:
                 if digest else "")}]
 
 
-def section_digest(run: Overnight, per_section: int = 4, limit_chars: int = 6000) -> str:
-    """Best leads per finished swarm section (verdict, margin, key, who proposed it), so
-    the supervisor can write briefs that build on what came close."""
+def section_digest(run: Overnight, per_section: int = 4, limit_chars: int = 6000,
+                   section: str | None = None) -> str:
+    """Best leads per swarm section from finished or running jobs (verdict, margin, key, who
+    proposed it), so the supervisor can write briefs that build on what came close.
+    `section` limits it to jobs on that one section."""
     rows: dict[str, list[str]] = {}
     for j in run.state["jobs"]:
-        if j["kind"] != "swarm" or j["status"] not in ("done", "interrupted", "skipped"):
+        if j["kind"] != "swarm" or j["status"] not in ("done", "interrupted", "skipped", "running"):
+            continue
+        if section is not None and _arg_value(j["args"], "--sections") != str(section):
             continue
         rp = run.job_dir(j) / "report.json"
         if not rp.is_file():

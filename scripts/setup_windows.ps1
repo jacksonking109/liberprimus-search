@@ -208,18 +208,18 @@ if ((Test-Path $ModelsToml) -and -not $Force) {
     $claudeBlock = @(
         "# max_calls_per_window = the shared Claude total; model_max_calls_per_window = one model's share.",
         "[models.claude-opus]", 'provider = "claude_code"', 'model = "opus"', 'roles = ["proposer"]',
-        'quota_group = "claude-plan"', "max_calls_per_window = 200", "model_max_calls_per_window = 60",
+        'quota_group = "claude-plan"', "max_calls_per_window = 250", "model_max_calls_per_window = 60",
         "window_hours = 5", "timeout = 600", "",
         "[models.claude-sonnet]", 'provider = "claude_code"', 'model = "sonnet"', 'roles = ["proposer"]',
-        'quota_group = "claude-plan"', "max_calls_per_window = 200", "window_hours = 5", "timeout = 600",
+        'quota_group = "claude-plan"', "max_calls_per_window = 250", "window_hours = 5", "timeout = 600",
         'style = "exploratory"', "",
         "[models.claude-supervisor]", 'provider = "claude_code"', 'model = "opus"', 'roles = ["supervisor"]',
-        'quota_group = "claude-plan"', "max_calls_per_window = 200", "model_max_calls_per_window = 30",
+        'quota_group = "claude-plan"', "max_calls_per_window = 250", "model_max_calls_per_window = 100",
         "window_hours = 5", "timeout = 600", "")
     if (Get-Command claude -ErrorAction SilentlyContinue) {
         $lines += @("# Claude Code on your plan (tools off, temp folder, API keys ignored). One shared quota.")
         $lines += $claudeBlock
-        Write-Step "OK" "found Claude Code; added claude-opus, claude-sonnet, claude-supervisor (shared 200 calls / 5h; Opus 60, supervisor 30, Sonnet the rest)"
+        Write-Step "OK" "found Claude Code; added claude-opus, claude-sonnet, claude-supervisor (shared 250 calls / 5h; Opus 60, supervisor/briefs 100, Sonnet the rest)"
     } else {
         $lines += @("# Claude Code not found when this file was generated. Install it, sign in, then uncomment:")
         $lines += ($claudeBlock | ForEach-Object { if ($_) { "# $_" } else { "" } })

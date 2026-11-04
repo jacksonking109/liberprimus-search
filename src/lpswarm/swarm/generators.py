@@ -217,6 +217,30 @@ def build_prompt(ctx: GenContext, max_symbols: int = 300) -> list[dict]:
             {"role": "user", "content": "\n".join(lines)}]
 
 
+BRIEF_SYSTEM = ("You are the lead cryptanalyst planning work on an unsolved cipher section. "
+                "Another model will propose cipher programs from your brief; deterministic code "
+                "tests every proposal against a null-calibrated English detector. Write a short, "
+                "concrete brief in plain text (no JSON), at most 1800 characters.")
+
+
+def build_brief_prompt(ctx: GenContext, results_so_far: str = "") -> list[dict]:
+    """Prompt for the supervisor model to write a brief for one target (auto-brief)."""
+    base = build_prompt(ctx)[1]["content"]
+    # Reuse the proposer's view (language, examples, ciphertext, statistics), minus the
+    # final instruction line, then ask for a plan instead of proposals.
+    body = base.rsplit("\nRound ", 1)[0]
+    ask = ("Write the brief for the proposer: 4-8 numbered directions, each naming concrete "
+           "program choices in the language above (stream kind and sequence, combine mode, "
+           "offsets or ranges, skip rules, transpositions) and the reason (a statistic of this "
+           "text, or a near miss below). Say what NOT to repeat. Prefer ideas that differ from "
+           "what was already tried.")
+    if results_so_far:
+        body += "\n\nResults so far on this section across the run (best leads; margin < 0 means " \
+                "below the pass threshold):\n" + results_so_far
+    return [{"role": "system", "content": BRIEF_SYSTEM},
+            {"role": "user", "content": body + "\n\n" + ask}]
+
+
 _FENCE = re.compile(r"```(?:json)?\s*(.*?)```", re.S)
 
 

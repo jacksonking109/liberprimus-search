@@ -126,7 +126,7 @@ If a model name is missing from your config (for example gemma didn't download),
 .\.venv\Scripts\lpswarm.exe tiertest --models config\models.toml --arms claude-opus,claude-sonnet --lengths 80,160 --cases 3 --out reports\tier-claude
 ```
 
-It counts its own calls (200 per 5 hours shared by the Claude models, Opus at most 60, by default) and pauses at that cap or when Claude
+It counts its own calls (250 per 5 hours shared by the Claude models, Opus proposer at most 60, by default) and pauses at that cap or when Claude
 reports a usage limit, then carries on after the reset. No deadline, so let it wait.
 
 **C. Real Liber Primus sections (after A looks sane):**
@@ -173,8 +173,10 @@ powershell -ExecutionPolicy Bypass -File scripts\overnight.ps1
 ```
 
 - The queue is `config\overnight.toml` (created by setup). Default: (1) tier test with Claude Code
-  Opus + Sonnet, (2) every unsolved section with Codex (explorer) + DeepSeek (brute force), one
-  sub-job per section. Edit the file to change jobs.
+  Opus + Sonnet; then the unsolved sections (20+ runes) in three lanes that run side by side,
+  each starting on a different section: (2) **Sonnet**, with a brief Opus writes for each section
+  from what's been tried there, (3) **Codex**, (4) **qwen/gemma** on the 5060 Ti; (5) DeepSeek,
+  refused until it's set up. One sub-job per section. Edit the file to change jobs.
 - **Side by side:** jobs on different backends run at the same time (up to `max_parallel = 2`):
   the Claude tier test and a Codex/local swarm run together, while two jobs on the same GPU or
   the same plan wait their turn. Inside a swarm round, Codex and the local models are also asked
@@ -190,9 +192,9 @@ powershell -ExecutionPolicy Bypass -File scripts\overnight.ps1
   `claude-sonnet`) with a written brief: what to try on those sections, based on the per-section
   results so far. The brief goes into every generator's prompt for that job and is copied into
   SUMMARY's supervisor notes, so you can see what Opus told Sonnet.
-- **Usage limits:** Opus, Sonnet and the supervisor share one Claude quota (200 calls / 5 h by
+- **Usage limits:** Opus, Sonnet and the supervisor share one Claude quota (250 calls / 5 h by
   default, `max_calls_per_window`), with per-model shares (`model_max_calls_per_window`): Opus
-  60, supervisor 30, Sonnet the rest. Codex has its own (90 / 5 h). At a cap or a usage-limit message the affected models
+  60, supervisor 100 (check-ins and briefs), Sonnet the rest. Codex has its own (90 / 5 h). At a cap or a usage-limit message the affected models
   pause until the reset and the run keeps going with whatever else it can do. The message says
   which kind it is: `local cap 120/120` is lpswarm's own counter (raise `max_calls_per_window`
   in `config\models.toml` and restart; it takes effect at once), while `usage limit reported by

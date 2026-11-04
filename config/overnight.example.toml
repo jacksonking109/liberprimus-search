@@ -11,7 +11,7 @@ tick_minutes = 60                             # supervisor check-ins (also after
 publish = true                                # push report files to the `results` branch
 results_branch = "results"
 max_added_jobs = 5                            # cap on jobs the supervisor may add per run
-max_parallel = 2                              # jobs at once; only jobs on different backends
+max_parallel = 3                              # jobs at once; only jobs on different backends
                                               # (Claude plan, Codex plan, each GPU, an API) run
                                               # side by side, others wait in queue order
 # until = "08:30"                             # optional stop time (HH:MM, local)
@@ -19,7 +19,7 @@ max_parallel = 2                              # jobs at once; only jobs on diffe
 # Each job can also set lane = "name": jobs with the same lane never run at the same time.
 #
 # 1. Tier test with Claude Code on your plan (paced by the claude-plan quota; pauses at limits).
-#    Runs alongside job 2, which uses the Codex plan / DeepSeek instead.
+#    The Sonnet lane below waits for it (same Claude quota); Codex and local run alongside.
 [[job]]
 id = "tier-claude"
 kind = "tiertest"
@@ -27,19 +27,48 @@ args = ["--arms", "random_program:40,claude-opus,claude-sonnet", "--lengths", "8
         "--cases", "3", "--word-breaks"]
 note = "Claude Code proposers vs the random control"
 
-# 2. Unsolved sections: Codex explores, DeepSeek brute-forces (one sub-job per section).
+# 2-4. Unsolved sections in three lanes that run side by side, each starting on a different
+# section (order = forward / reverse / middle). One sub-job per section; sections under 20
+# runes are skipped.
+#
+# Sonnet lane: before each section, the supervisor model (Opus) writes a brief from what
+# has been tried on that section so far (auto_brief), and Sonnet proposes from it.
 [[job]]
-id = "unsolved"
+id = "sonnet"
+kind = "swarm"
+auto_brief = true
+order = "forward"
+args = ["--manifest", "data/lp/manifest.json", "--alphabet", "data/alphabet/gematria_primus.json",
+        "--sections", "unsolved", "--generators", "claude-sonnet", "--rounds", "6",
+        "--per-round", "8", "--max-attempts", "60000"]
+note = "Sonnet, briefed by Opus"
+
+# Codex lane (its own plan quota).
+[[job]]
+id = "codex"
+kind = "swarm"
+order = "reverse"
+args = ["--manifest", "data/lp/manifest.json", "--alphabet", "data/alphabet/gematria_primus.json",
+        "--sections", "unsolved", "--generators", "codex", "--rounds", "6",
+        "--per-round", "8", "--max-attempts", "60000"]
+note = "Codex (exploratory)"
+
+# Local lane (5060 Ti; qwen and gemma take turns on the one GPU). Add "--ranker", "granite"
+# once the 2060 is in.
+[[job]]
+id = "local"
+kind = "swarm"
+order = "middle"
+args = ["--manifest", "data/lp/manifest.json", "--alphabet", "data/alphabet/gematria_primus.json",
+        "--sections", "unsolved", "--generators", "qwen-local,gemma-local", "--rounds", "6",
+        "--per-round", "8", "--max-attempts", "60000"]
+note = "local models"
+
+# 5. DeepSeek brute force: refused until its prices and DEEPSEEK_API_KEY are set.
+[[job]]
+id = "deepseek"
 kind = "swarm"
 args = ["--manifest", "data/lp/manifest.json", "--alphabet", "data/alphabet/gematria_primus.json",
-        "--sections", "unsolved", "--generators", "codex,deepseek", "--rounds", "6",
-        "--per-round", "8", "--max-attempts", "60000"]
-note = "Codex (exploratory) + DeepSeek (volume)"
-
-# Example: add local models when the GPUs are free.
-# [[job]]
-# id = "unsolved-local"
-# kind = "swarm"
-# args = ["--manifest", "data/lp/manifest.json", "--alphabet", "data/alphabet/gematria_primus.json",
-#         "--sections", "unsolved", "--generators", "qwen-local,gemma-local", "--rounds", "5",
-#         "--ranker", "granite"]
+        "--sections", "unsolved", "--generators", "deepseek", "--rounds", "6",
+        "--per-round", "16", "--max-attempts", "60000"]
+note = "DeepSeek (volume)"

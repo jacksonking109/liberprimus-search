@@ -364,3 +364,55 @@ def test_supervisor_brief_reaches_the_prompt(tmp_path):
     a = Alphabet.latin26()
     ctx = GenContext("t", a, np.arange(20) % 26, 1, 4, brief="Try totient-prime streams.")
     assert "Direction from the run supervisor" in build_prompt(ctx)[1]["content"]
+
+
+def test_lane_orders_and_auto_brief_job(tmp_path):
+    from lpswarm.overnight import _ordered, expand_jobs, load_config
+    assert _ordered([1, 2, 3, 4, 5], "reverse") == [5, 4, 3, 2, 1]
+    mid = _ordered([1, 2, 3, 4, 5], "middle")
+    assert mid[0] == 3 and sorted(mid) == [1, 2, 3, 4, 5]
+    cfg = load_config(ROOT / "config" / "overnight.example.toml")
+    cfg.manifest = str(ROOT / "data" / "lp" / "manifest.json")
+    jobs = expand_jobs(cfg)
+    firsts = {}
+    for j in jobs:
+        firsts.setdefault(j["id"].split("/")[0], j["id"])
+    assert len({firsts["sonnet"].split("/")[1], firsts["codex"].split("/")[1],
+                firsts["local"].split("/")[1]}) == 3          # lanes start on different sections
+    sj = next(j for j in jobs if j["id"].startswith("sonnet/"))
+    assert sj["auto_brief"] is True
+    cfg.supervisor = "claude-supervisor"
+    run = Overnight(cfg, tmp_path / "run", stop_file=tmp_path / "STOP", progress=False)
+    cmd = run.job_command(sj)
+    assert cmd[cmd.index("--auto-brief") + 1] == "claude-supervisor"
+    assert (run.job_dir(sj) / "brief_context.txt").is_file()
+
+
+def test_auto_brief_in_swarm_cli(tmp_path):
+    import json as _json
+    import subprocess as sp
+    models = tmp_path / "m.toml"
+    models.write_text(
+        '[models.sup]\nprovider = "scripted"\nmodel = "x"\nroles = ["supervisor"]\n'
+        'replies = ["1. Try prime streams, combine sub, offsets 0-5."]\n\n'
+        '[models.son]\nprovider = "scripted"\nmodel = "x"\nroles = ["proposer"]\n'
+        'replies = [\'{"proposals": [{"spec": {"stream": {"kind": "constant", "value": 3}}}]}\']\n',
+        encoding="utf-8")
+    ctx = tmp_path / "ctx.txt"
+    ctx.write_text("job codex/11: 40 attempts; near_miss margin -0.10 by codex: primes", encoding="utf-8")
+    tr = tmp_path / "t.jsonl"
+    r = sp.run([sys.executable, "-m", "lpswarm", "swarm", "--manifest", str(ROOT / "data/lp/manifest.json"),
+                "--alphabet", str(ROOT / "data/alphabet/gematria_primus.json"), "--sections", "11",
+                "--generators", "son", "--models", str(models), "--spend-ledger", str(tmp_path / "s.sqlite"),
+                "--rounds", "1", "--per-round", "1", "--null-samples", "100",
+                "--ledger", str(tmp_path / "l.sqlite"), "--report-dir", str(tmp_path / "r"),
+                "--auto-brief", "sup", "--brief-context", str(ctx)],
+               capture_output=True, text=True, encoding="utf-8", cwd=ROOT,
+               env={**__import__("os").environ, "LPSWARM_TRANSCRIPT": str(tr)})
+    assert r.returncode == 0, r.stderr[-800:]
+    assert "brief from sup" in r.stdout and "| 1. Try prime streams" in r.stdout
+    recs = [_json.loads(x) for x in tr.read_text(encoding="utf-8").splitlines()]
+    brief_call = next(x for x in recs if x["model"] == "sup")
+    assert "near_miss margin -0.10" in brief_call["messages"][1]["content"]
+    prop_call = next(x for x in recs if x["model"] == "son")
+    assert "Try prime streams" in prop_call["messages"][1]["content"]
