@@ -1,6 +1,6 @@
 # Overnight run 20261103-2030
 
-Started 2026-11-03 20:30:23, updated 2026-11-03 22:44:58, status **running**. Jobs: pending 8, done 8, blocked 15
+Started 2026-11-03 20:30:23, updated 2026-11-03 22:52:21, status **running**. Jobs: pending 7, done 9, blocked 15
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -27,7 +27,7 @@ Started 2026-11-03 20:30:23, updated 2026-11-03 22:44:58, status **running**. Jo
 | sup1/14 | done | 2026-11-03 22:31:29 | 2026-11-03 22:33:04 | added by supervisor. The DeepSeek-based unsolved jobs are blocked by the zero-price config. This covers the same section |
 | sup1/15 | done | 2026-11-03 22:33:43 | 2026-11-03 22:35:46 | added by supervisor. The DeepSeek-based unsolved jobs are blocked by the zero-price config. This covers the same section |
 | sup1/16 | done | 2026-11-03 22:36:02 | 2026-11-03 22:44:58 | added by supervisor. The DeepSeek-based unsolved jobs are blocked by the zero-price config. This covers the same section |
-| sup1/17 | pending |  |  | added by supervisor. The DeepSeek-based unsolved jobs are blocked by the zero-price config. This covers the same section |
+| sup1/17 | done | 2026-11-03 22:45:26 | 2026-11-03 22:52:21 | added by supervisor. The DeepSeek-based unsolved jobs are blocked by the zero-price config. This covers the same section |
 | sup1/18 | pending |  |  | added by supervisor. The DeepSeek-based unsolved jobs are blocked by the zero-price config. This covers the same section |
 | sup1/19 | pending |  |  | added by supervisor. The DeepSeek-based unsolved jobs are blocked by the zero-price config. This covers the same section |
 | sup1/20 | pending |  |  | added by supervisor. The DeepSeek-based unsolved jobs are blocked by the zero-price config. This covers the same section |
@@ -56,16 +56,18 @@ Started 2026-11-03 20:30:23, updated 2026-11-03 22:44:58, status **running**. Jo
   - LP2:15.jpg/1 - 32.jpg/1: 12380 attempts, 62 hypotheses, **0 final pass(es)**
 - **sup1/16** (done)
   - LP2:15.jpg/2- - 32.jpg/2-39.jpg: 19149 attempts, 58 hypotheses, **0 final pass(es)**
+- **sup1/17** (done)
+  - LP2:- - 40.jpg-43.jpg: 22165 attempts, 62 hypotheses, **0 final pass(es)**
 
 ## Model usage
 
-- qwen-local: 27 call(s) in the last 5h (cap none), spent $0.0000
-- gemma-local: 27 call(s) in the last 5h (cap none), spent $0.0000
+- qwen-local: 31 call(s) in the last 5h (cap none), spent $0.0000
+- gemma-local: 31 call(s) in the last 5h (cap none), spent $0.0000
 - granite: 2 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 63 call(s) in the last 5h (cap 120), spent $0.0000
-- claude-sonnet: 63 call(s) in the last 5h (cap 120), spent $0.0000
-- claude-supervisor: 63 call(s) in the last 5h (cap 200), spent $0.0000
-- codex: 26 call(s) in the last 5h (cap 100), spent $0.0000
+- claude-opus: 64 call(s) in the last 5h (cap 120), spent $0.0000
+- claude-sonnet: 64 call(s) in the last 5h (cap 120), spent $0.0000
+- claude-supervisor: 64 call(s) in the last 5h (cap 200), spent $0.0000
+- codex: 30 call(s) in the last 5h (cap 100), spent $0.0000
 - dry: 2 call(s) in the last 5h (cap none), spent $0.0000
 
 ## Supervisor notes
@@ -74,15 +76,10 @@ Started 2026-11-03 20:30:23, updated 2026-11-03 22:44:58, status **running**. Jo
 - 2026-11-03 20:33:29: unsolved/10 was blocked because deepseek has max_usd set but its prices in config/models.toml are 0. The other 14 pending unsolved jobs also use DeepSeek, so they will likely block the same way. I can't edit the config. To fix this, fill in price_in_per_mtok and price_out_per_mtok for deepseek, then rerun those sections. Meanwhile I queued one replacement job on the unsolved sections using Codex and the local models (no DeepSeek) so the night isn't wasted. tier-claude is still failed: tiertest needs an LM (a bigram table) for skip_mode resolve.
 - 2026-11-03 20:40:05: 20:39 resume with --retry-failed: tier-claude is running again and unsolved/10-19 are back to pending. If config/models.toml was not fixed (a bigram LM for tiertest skip_mode resolve, and real deepseek prices), these will fail or block the same way as before. sup1 (codex + local models) still covers sections 10-25 as a fallback. If the deepseek jobs now run, the overlap with sup1 is intentional because they use different generators. No new jobs added; 1 of 5 used.
 - 2026-11-03 22:33:56: 22:33: The run resumed after a STOP file at 22:33:16. That stop cut sup1/14 (section 14) short at 2,347 attempts and 4 hypotheses, so section 14 is only lightly covered. It is marked done, so I can't retry it; rerun it manually if you want full coverage. tier-claude restarted, but the shared claude-plan cap (40/40 per 5h) pauses both Claude arms until about 01:27. It will mostly idle until then, and claude-opus recall is 0.50 (3/6) so far. No final passes from sup1/10-14. The sup1 codex and local-model jobs keep running on sections 15-25. I added no jobs; 1 of 5 used.
+- 2026-11-03 22:45:26: 22:45: tier-claude finished OK at 22:39 (exit 0). Final recall: claude-opus 0.50 (3/6), claude-sonnet 0.33 (2/6), random control 0/6. sup1/10-16 found no final passes. sup1/17-25 are still pending and run one at a time on codex-plan. unsolved/22, 24 and 25 stay blocked until deepseek prices are filled in config/models.toml. No new jobs added; 1 of 5 used.
 
 ## Events
 
-- 2026-11-03 22:31:13 sup1/13: done (exit 0, 5 min)
-- 2026-11-03 22:31:28 published: 9 file(s) to branch results
-- 2026-11-03 22:31:28 supervisor unavailable: claude-supervisor is paused until 2026-11-04 01:27 (local cap 40/40 calls per 5h for claude-plan; raise max_calls_per_window in the models config to allow more)
-- 2026-11-03 22:31:29 sup1/14: start (uses codex-plan, ollama:http://127.0.0.1:11434)
-- 2026-11-03 22:31:29 2 running: tier-claude, sup1/14
-- 2026-11-03 22:33:04 sup1/14: done (exit 0, 2 min)
 - 2026-11-03 22:33:16 published: 10 file(s) to branch results
 - 2026-11-03 22:33:16 stopping: STOP file
 - 2026-11-03 22:33:16 tier-claude: interrupted (exit 1, 24 min)
@@ -102,3 +99,9 @@ Started 2026-11-03 20:30:23, updated 2026-11-03 22:44:58, status **running**. Jo
 - 2026-11-03 22:40:08 sup1/17 waiting: codex-plan in use by sup1/16
 - 2026-11-03 22:41:03 sup1/16: running 5 min | 22:40:42 [model] codex (proposer) ok 31.1s, tokens in/out 18114/471, reply 1620 chars
 - 2026-11-03 22:44:58 sup1/16: done (exit 0, 9 min)
+- 2026-11-03 22:45:13 published: 12 file(s) to branch results
+- 2026-11-03 22:45:26 supervisor: note: 22:45: tier-claude finished OK at 22:39 (exit 0). Final recall: claude-opus 0.50 (3/6), claude-sonnet 0.33 (2/6), random control 0/6. sup1/10-16 found no final passes. sup1/17-25 are still pending and run one at a time on codex-plan. unsolved/22, 24 and 25 stay blocked until deepseek prices are f...
+- 2026-11-03 22:45:26 sup1/17: start (uses codex-plan, ollama:http://127.0.0.1:11434)
+- 2026-11-03 22:45:26 sup1/18 waiting: codex-plan in use by sup1/17
+- 2026-11-03 22:50:26 sup1/17: running 5 min | 22:50:26 [model] gemma-local (proposer) calling...
+- 2026-11-03 22:52:21 sup1/17: done (exit 0, 7 min)
