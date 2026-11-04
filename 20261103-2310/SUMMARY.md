@@ -1,6 +1,6 @@
 # Overnight run 20261103-2310
 
-Started 2026-11-03 23:10:06, updated 2026-11-04 02:29:13, status **running**. Jobs: pending 2, done 48, blocked 15
+Started 2026-11-03 23:10:06, updated 2026-11-04 02:34:43, status **running**. Jobs: pending 1, done 49, blocked 15
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -67,7 +67,7 @@ Started 2026-11-03 23:10:06, updated 2026-11-04 02:29:13, status **running**. Jo
 | deepseek/25 | blocked |  | 2026-11-04 00:39:21 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
 | sup1/25 | done | 2026-11-04 02:20:07 | 2026-11-04 02:24:52 | added by supervisor. Section 25 has near misses at margin -0.23 to -0.29, an order of magnitude closer than any other se |
 | sup2/14 | done | 2026-11-04 02:25:08 | 2026-11-04 02:29:13 | added by supervisor. Largest sections have thin sonnet coverage (5k-11k attempts vs 30-60k elsewhere); fill gap with del |
-| sup2/17 | pending |  |  | added by supervisor. Largest sections have thin sonnet coverage (5k-11k attempts vs 30-60k elsewhere); fill gap with del |
+| sup2/17 | done | 2026-11-04 02:29:28 | 2026-11-04 02:34:43 | added by supervisor. Largest sections have thin sonnet coverage (5k-11k attempts vs 30-60k elsewhere); fill gap with del |
 | sup2/22 | pending |  |  | added by supervisor. Largest sections have thin sonnet coverage (5k-11k attempts vs 30-60k elsewhere); fill gap with del |
 
 ## Results so far
@@ -170,14 +170,16 @@ Started 2026-11-03 23:10:06, updated 2026-11-04 02:29:13, status **running**. Jo
   - LP2:54.jpg-55.jpg - 71.jpg-72.jpg: 5713 attempts, 73 hypotheses, **0 final pass(es)**
 - **sup2/14** (done)
   - LP2:8.jpg-14.jpg - 25.jpg-31.jpg: 4419 attempts, 19 hypotheses, **0 final pass(es)**
+- **sup2/17** (done)
+  - LP2:- - 40.jpg-43.jpg: 9019 attempts, 19 hypotheses, **0 final pass(es)**
 
 ## Model usage
 
 - qwen-local: 122 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 122 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 197 call(s) in the last 5h (cap 120), spent $0.0000, paused until 04:28 (local cap, raise max_calls_per_window to allow more)
-- claude-sonnet: 197 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-supervisor: 197 call(s) in the last 5h (cap 200), spent $0.0000
+- claude-opus: 201 call(s) in the last 5h (cap 120), spent $0.0000, paused until 04:34 (local cap, raise max_calls_per_window to allow more)
+- claude-sonnet: 201 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-supervisor: 201 call(s) in the last 5h (cap 200), spent $0.0000, paused until 03:34 (local cap, raise max_calls_per_window to allow more)
 - codex: 128 call(s) in the last 5h (cap 750), spent $0.0000
 
 ## Supervisor notes
@@ -211,11 +213,6 @@ Spread attempts across all three sections; do not spend everything on one. On se
 
 ## Events
 
-- 2026-11-04 02:08:52 sonnet/21: start (uses claude-plan)
-- 2026-11-04 02:08:52 sonnet/22 waiting: claude-plan in use by sonnet/21
-- 2026-11-04 02:11:47 sonnet/21: done (exit 0, 3 min)
-- 2026-11-04 02:12:02 published: 44 file(s) to branch results
-- 2026-11-04 02:12:02 sonnet/22: start (uses claude-plan)
 - 2026-11-04 02:12:02 sonnet/24 waiting: claude-plan in use by sonnet/22
 - 2026-11-04 02:13:57 sonnet/22: done (exit 0, 2 min)
 - 2026-11-04 02:14:13 published: 45 file(s) to branch results
@@ -236,3 +233,8 @@ Spread attempts across all three sections; do not spend everything on one. On se
 - 2026-11-04 02:25:08 sup2/14: start (uses claude-plan)
 - 2026-11-04 02:25:08 sup2/17 waiting: claude-plan in use by sup2/14
 - 2026-11-04 02:29:13 sup2/14: done (exit 0, 4 min)
+- 2026-11-04 02:29:28 published: 49 file(s) to branch results
+- 2026-11-04 02:29:28 sup2/17: start (uses claude-plan)
+- 2026-11-04 02:29:28 sup2/22 waiting: claude-plan in use by sup2/17
+- 2026-11-04 02:34:28 sup2/17: running 5 min | 02:32:07 [model] claude-sonnet (proposer) ok 18.4s, tokens in/out 5438/1193, reply 1635 chars
+- 2026-11-04 02:34:43 sup2/17: done (exit 0, 5 min)
