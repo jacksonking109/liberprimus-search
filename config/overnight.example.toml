@@ -11,9 +11,11 @@ tick_minutes = 60                             # supervisor check-ins (also after
 publish = true                                # push report files to the `results` branch
 results_branch = "results"
 max_added_jobs = 5                            # cap on jobs the supervisor may add per run
-max_parallel = 3                              # jobs at once; only jobs on different backends
+max_parallel = 4                              # jobs at once; only jobs on different backends
                                               # (Claude plan, Codex plan, each GPU, an API) run
                                               # side by side, others wait in queue order
+capacity = { "codex-plan" = 2 }               # jobs allowed on one backend at once (default 1):
+                                              # two Codex sections at a time
 # until = "08:30"                             # optional stop time (HH:MM, local)
 
 # Each job can also set lane = "name": jobs with the same lane never run at the same time.

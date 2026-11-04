@@ -258,9 +258,10 @@ powershell -ExecutionPolicy Bypass -File scripts\overnight.ps1
   each starting on a different section: (2) **Sonnet**, with a brief Opus writes for each section
   from what's been tried there, (3) **Codex**, (4) **qwen/gemma** on the 5060 Ti; (5) DeepSeek,
   refused until it's set up. One sub-job per section. Edit the file to change jobs.
-- **Side by side:** jobs on different backends run at the same time (up to `max_parallel = 2`):
-  the Claude tier test and a Codex/local swarm run together, while two jobs on the same GPU or
-  the same plan wait their turn. Inside a swarm round, Codex and the local models are also asked
+- **Side by side:** jobs on different backends run at the same time (up to `max_parallel = 4`):
+  the Claude, Codex and local lanes run together, while two jobs on the same GPU or the same
+  plan wait their turn, unless `capacity` allows more (the example lets two Codex sections run
+  at once: `capacity = { "codex-plan" = 2 }`). Inside a swarm round, Codex and the local models are also asked
   at the same time (qwen and gemma still take turns on the 5060 Ti). `-Serial` runs one job at a
   time.
 - **Results:** `reports\overnight\<run>\SUMMARY.md` on the desktop, and on GitHub: branch
@@ -278,8 +279,10 @@ powershell -ExecutionPolicy Bypass -File scripts\overnight.ps1
   60, supervisor 100 (check-ins and briefs), Sonnet the rest. Codex has its own (90 / 5 h). At a cap or a usage-limit message the affected models
   pause until the reset and the run keeps going with whatever else it can do. The message says
   which kind it is: `local cap 120/120` is lpswarm's own counter (raise `max_calls_per_window`
-  in `config\models.toml` and restart; it takes effect at once), while `usage limit reported by
-  the CLI` is the real plan limit.
+  in `config\models.toml`; it takes effect at once), while `usage limit reported by
+  the CLI` is the real plan limit. To use more of a plan that has headroom: raise the model's
+  `per_round` in `config\models.toml` (more proposals per call, no extra calls; picked up by
+  the next section) or its `capacity` in `config\overnight.toml` (more sections at once).
 - **Money:** DeepSeek jobs are refused unless its prices are filled in (so `max_usd` can protect
   you) and `DEEPSEEK_API_KEY` is set. Set the key in the same PowerShell window first, or as a
   user environment variable:

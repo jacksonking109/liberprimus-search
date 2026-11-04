@@ -477,3 +477,20 @@ def test_ranker_backend_is_its_own_resource(tmp_path):
     run = Overnight(cfg, tmp_path / "run", stop_file=tmp_path / "STOP", progress=False)
     assert run.job_resources(run.state["jobs"][0]) == {"ollama:http://127.0.0.1:11434",
                                                        "ollama:http://127.0.0.1:11435"}
+
+
+def test_capacity_lets_two_jobs_share_a_backend(tmp_path, capsys):
+    import pytest
+    from lpswarm.overnight import load_config
+    run = _night(tmp_path, ["a", "a", "a"], sleep_s=1.5)
+    run.cfg.capacity = {"scripted:a": 2}
+    st = run.run()
+    t = _times(st)
+    assert t["j1"][0] < t["j0"][1]                  # j0 and j1 overlapped
+    assert t["j2"][0] >= min(t["j0"][1], t["j1"][1])  # the third waited for a free slot
+    assert "scripted:a full (2/2" in capsys.readouterr().out
+    bad = tmp_path / "bad.toml"
+    bad.write_text('[overnight]\ncapacity = { "x" = 0 }\n[[job]]\nid = "a"\nkind = "validate"\n',
+                   encoding="utf-8")
+    with pytest.raises(ValueError):
+        load_config(bad)

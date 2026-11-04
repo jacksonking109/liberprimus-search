@@ -58,7 +58,10 @@ class OvernightConfig:
     results_branch: str = "results"
     until: str | None = None            # "HH:MM" local time
     max_added_jobs: int = 5
-    max_parallel: int = 3               # jobs at once (only ones on different backends)
+    max_parallel: int = 4               # jobs at once (only ones on different backends)
+    # How many jobs may use one backend at the same time (default 1), e.g.
+    # {"codex-plan": 2} runs two Codex section jobs side by side.
+    capacity: dict = field(default_factory=dict)
     manifest: str = "data/lp/manifest.json"
     alphabet: str = "data/alphabet/gematria_primus.json"
     jobs: list[dict] = field(default_factory=list)
@@ -94,6 +97,11 @@ def load_config(path: str | Path) -> OvernightConfig:
     cfg = OvernightConfig(**sec, jobs=jobs)
     if int(cfg.max_parallel) < 1:
         raise ValueError(f"{path}: max_parallel must be >= 1")
+    if not isinstance(cfg.capacity, dict):
+        raise ValueError(f"{path}: capacity must be a table, e.g. capacity = {{ \"codex-plan\" = 2 }}")
+    for k, v in cfg.capacity.items():
+        if not isinstance(v, int) or isinstance(v, bool) or v < 1:
+            raise ValueError(f"{path}: capacity for {k!r} must be a whole number >= 1")
     return cfg
 
 
@@ -447,11 +455,17 @@ class Overnight:
         return self.state
 
     def start_ready_jobs(self) -> None:
-        """Start queued jobs, in order, whose backends are free, up to max_parallel."""
-        busy: dict[str, str] = {}
+        """Start queued jobs, in order, whose backends have room, up to max_parallel."""
+        users: dict[str, list[str]] = {}          # resource -> running job ids
         for r in self.running.values():
             for res in self.job_resources(r.job):
-                busy[res] = r.job["id"]
+                users.setdefault(res, []).append(r.job["id"])
+
+        def cap(res: str) -> int:
+            c = self.cfg.capacity.get(res)
+            if c is None and res.startswith("lane:"):
+                c = self.cfg.capacity.get(res[5:])
+            return int(c or 1)
         waiting = ""
         blocked: dict[str, list[str]] = {}       # reason -> job ids (one console line each)
         self._blocked_sink = blocked
@@ -461,15 +475,19 @@ class Overnight:
             if job["status"] not in ("pending", "interrupted"):
                 continue
             res = self.job_resources(job)
-            clash = sorted(res & busy.keys())
-            if clash:
+            full = sorted(x for x in res if len(users.get(x, [])) >= cap(x))
+            if full:
                 if not waiting:
-                    waiting = (f"{job['id']} waiting: {clash[0]} in use by {busy[clash[0]]}")
+                    x = full[0]
+                    who = users[x]
+                    waiting = (f"{job['id']} waiting: {x} in use by {who[0]}" if cap(x) == 1 else
+                               f"{job['id']} waiting: {x} full ({len(who)}/{cap(x)}: "
+                               f"{', '.join(who)})")
                 continue
             started = self.start_job(job)
             if started is not None:
                 for x in res:
-                    busy[x] = job["id"]
+                    users.setdefault(x, []).append(job["id"])
                 if len(self.running) > 1:
                     self.log(f"{len(self.running)} running: {', '.join(self.running)}")
             elif job["status"] != "blocked":
