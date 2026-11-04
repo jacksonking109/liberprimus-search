@@ -1,6 +1,6 @@
 # Overnight run 20261104-0949
 
-Started 2026-11-04 09:49:00, updated 2026-11-04 12:31:39, status **running**. Jobs: pending 9, done 52, blocked 15
+Started 2026-11-04 09:49:00, updated 2026-11-04 12:45:25, status **running**. Jobs: pending 8, done 53, blocked 15
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -71,7 +71,7 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 12:31:39, status **running**. Jo
 | sup1/13 | done | 2026-11-04 12:13:24 | 2026-11-04 12:15:44 | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
 | sup1/14 | done | 2026-11-04 12:15:59 | 2026-11-04 12:31:10 | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
 | sup1/15 | done | 2026-11-04 12:31:34 | 2026-11-04 12:31:39 | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
-| sup1/16 | pending |  |  | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
+| sup1/16 | done | 2026-11-04 12:31:55 | 2026-11-04 12:45:25 | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
 | sup1/17 | pending |  |  | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
 | sup1/18 | pending |  |  | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
 | sup1/19 | pending |  |  | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
@@ -189,14 +189,16 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 12:31:39, status **running**. Jo
   - LP2:8.jpg-14.jpg - 25.jpg-31.jpg: 15222 attempts, 24 hypotheses, **0 final pass(es)**
 - **sup1/15** (done)
   - skip LP2:15.jpg/1 - 32.jpg/1: only 9 symbols (minimum 20, --min-length); too short to judge
+- **sup1/16** (done)
+  - LP2:15.jpg/2- - 32.jpg/2-39.jpg: 11271 attempts, 23 hypotheses, **0 final pass(es)**
 
 ## Model usage
 
 - qwen-local: 84 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 84 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 175 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-sonnet: 175 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-supervisor: 175 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-opus: 179 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-sonnet: 179 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-supervisor: 179 call(s) in the last 5h (cap 550), spent $0.0000
 - codex: 81 call(s) in the last 5h (cap 750), spent $0.0000
 
 ## Supervisor notes
@@ -227,12 +229,6 @@ Prefer the longer sections (1000+ runes). On short ones (91 and 121 runes) noise
 
 ## Events
 
-- 2026-11-04 12:07:59 published: 48 file(s) to branch results
-- 2026-11-04 12:07:59 sup1/11: start (uses claude-plan)
-- 2026-11-04 12:07:59 sup1/12 waiting: claude-plan in use by sup1/11
-- 2026-11-04 12:09:29 sup1/11: done (exit 0, 2 min)
-- 2026-11-04 12:09:44 published: 49 file(s) to branch results
-- 2026-11-04 12:09:44 sup1/12: start (uses claude-plan)
 - 2026-11-04 12:09:44 sup1/13 waiting: claude-plan in use by sup1/12
 - 2026-11-04 12:12:59 sup1/12: done (exit 0, 3 min)
 - 2026-11-04 12:13:15 published: 50 file(s) to branch results
@@ -252,3 +248,9 @@ Prefer the longer sections (1000+ runes). On short ones (91 and 121 runes) noise
 - 2026-11-04 12:31:34 sup1/15: start (uses claude-plan)
 - 2026-11-04 12:31:34 sup1/16 waiting: claude-plan in use by sup1/15
 - 2026-11-04 12:31:39 sup1/15: done (exit 0, 0 min)
+- 2026-11-04 12:31:55 published: 52 file(s) to branch results
+- 2026-11-04 12:31:55 sup1/16: start (uses claude-plan)
+- 2026-11-04 12:31:55 sup1/17 waiting: claude-plan in use by sup1/16
+- 2026-11-04 12:36:55 sup1/16: running 5 min | 12:35:26 [model] claude-opus (proposer) ok 8.3s, tokens in/out 4231/674, reply 1438 chars
+- 2026-11-04 12:41:55 sup1/16: running 10 min | 12:41:17 [model] claude-opus (proposer) ok 8.4s, tokens in/out 5245/735, reply 1565 chars
+- 2026-11-04 12:45:25 sup1/16: done (exit 0, 14 min)
