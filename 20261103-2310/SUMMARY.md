@@ -1,6 +1,6 @@
 # Overnight run 20261103-2310
 
-Started 2026-11-03 23:10:06, updated 2026-11-04 02:42:44, status **running**. Jobs: done 50, blocked 15
+Started 2026-11-03 23:10:06, updated 2026-11-04 02:43:00, status **finished**. Jobs: done 50, blocked 15
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -215,8 +215,6 @@ Spread attempts across all three sections; do not spend everything on one. On se
 
 ## Events
 
-- 2026-11-04 02:17:53 sonnet/24: done (exit 0, 4 min)
-- 2026-11-04 02:18:08 published: 46 file(s) to branch results
 - 2026-11-04 02:18:08 sonnet/25: start (uses claude-plan)
 - 2026-11-04 02:18:09 sup1/25 waiting: claude-plan in use by sonnet/25
 - 2026-11-04 02:19:34 sonnet/25: done (exit 0, 1 min)
@@ -240,3 +238,5 @@ Spread attempts across all three sections; do not spend everything on one. On se
 - 2026-11-04 02:34:59 sup2/22: start (uses claude-plan)
 - 2026-11-04 02:39:59 sup2/22: running 5 min | 02:39:04 [model] claude-sonnet (proposer) ok 11.6s, tokens in/out 5003/758, reply 1671 chars
 - 2026-11-04 02:42:44 sup2/22: done (exit 0, 8 min)
+- 2026-11-04 02:43:00 published: 51 file(s) to branch results
+- 2026-11-04 02:43:00 queue empty
