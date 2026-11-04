@@ -1,6 +1,6 @@
 # Overnight run 20261104-0949
 
-Started 2026-11-04 09:49:00, updated 2026-11-04 11:20:52, status **running**. Jobs: pending 12, running 1, done 33, blocked 15
+Started 2026-11-04 09:49:00, updated 2026-11-04 11:21:13, status **running**. Jobs: pending 11, running 1, done 34, blocked 15
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -29,7 +29,7 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 11:20:52, status **running**. Jo
 | codex/18 | done | 2026-11-04 10:43:33 | 2026-11-04 10:54:10 | Codex (exploratory) |
 | codex/17 | done | 2026-11-04 10:54:26 | 2026-11-04 11:05:15 | Codex (exploratory) |
 | codex/16 | done | 2026-11-04 11:05:18 | 2026-11-04 11:20:52 | Codex (exploratory) |
-| codex/15 | pending |  |  | Codex (exploratory) |
+| codex/15 | done | 2026-11-04 11:21:08 | 2026-11-04 11:21:13 | Codex (exploratory) |
 | codex/14 | pending |  |  | Codex (exploratory) |
 | codex/13 | pending |  |  | Codex (exploratory) |
 | codex/12 | pending |  |  | Codex (exploratory) |
@@ -70,8 +70,6 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 11:20:52, status **running**. Jo
 
 **sonnet/18** (since 2026-11-04 11:13:42), latest log lines:
 ```
-11:14:09 [model] claude-sonnet (proposer) ok 7.4s, tokens in/out 4142/851, reply 1904 chars
-round 1 [claude-sonnet] proposals=8 valid=5 attempts=5 passes=0 near=0 invalid=3
 11:14:25 [model] claude-sonnet (proposer) calling...
 11:14:32 [model] claude-sonnet (proposer) ok 7.4s, tokens in/out 4715/969, reply 2124 chars
 round 2 [claude-sonnet] proposals=8 valid=8 attempts=5526 passes=0 near=0 invalid=3
@@ -80,6 +78,8 @@ round 2 [claude-sonnet] proposals=8 valid=8 attempts=5526 passes=0 near=0 invali
 round 3 [claude-sonnet] proposals=8 valid=8 attempts=10075 passes=0 near=0 invalid=3
 11:19:46 [model] claude-sonnet (proposer) calling...
 11:19:55 [model] claude-sonnet (proposer) ok 9.5s, tokens in/out 5915/878, reply 1992 chars
+round 4 [claude-sonnet] proposals=8 valid=8 attempts=13111 passes=0 near=0 invalid=3
+11:21:10 [model] claude-sonnet (proposer) calling...
 ```
 
 ## Results so far
@@ -122,6 +122,8 @@ round 3 [claude-sonnet] proposals=8 valid=8 attempts=10075 passes=0 near=0 inval
   - LP2:- - 40.jpg-43.jpg: 30353 attempts, 48 hypotheses, **0 final pass(es)**
 - **codex/16** (done)
   - LP2:15.jpg/2- - 32.jpg/2-39.jpg: 24778 attempts, 48 hypotheses, **0 final pass(es)**
+- **codex/15** (done)
+  - skip LP2:15.jpg/1 - 32.jpg/1: only 9 symbols (minimum 20, --min-length); too short to judge
 - **local/17** (done)
   - LP2:- - 40.jpg-43.jpg: 298 attempts, 82 hypotheses, **0 final pass(es)**
 - **local/18** (done)
@@ -174,10 +176,6 @@ round 3 [claude-sonnet] proposals=8 valid=8 attempts=10075 passes=0 near=0 inval
 
 ## Events
 
-- 2026-11-04 11:05:18 2 running: local/25, sonnet/17
-- 2026-11-04 11:05:18 codex/16: start (uses codex-plan)
-- 2026-11-04 11:05:18 3 running: local/25, sonnet/17, codex/16
-- 2026-11-04 11:05:18 sonnet/18 waiting: claude-plan in use by sonnet/17
 - 2026-11-04 11:07:23 local/25: done (exit 0, 4 min)
 - 2026-11-04 11:07:39 published: 32 file(s) to branch results
 - 2026-11-04 11:07:39 local/10: start (uses ollama:http://127.0.0.1:11434)
@@ -199,3 +197,7 @@ round 3 [claude-sonnet] proposals=8 valid=8 attempts=10075 passes=0 near=0 inval
 - 2026-11-04 11:18:42 sonnet/18: running 5 min | 11:18:22 [model] claude-sonnet (proposer) ok 15.2s, tokens in/out 5322/909, reply 2025 chars
 - 2026-11-04 11:20:22 codex/16: running 15 min | 11:14:58 [model] codex (proposer) ok 15.0s, tokens in/out 19356/461, reply 1703 chars
 - 2026-11-04 11:20:52 codex/16: done (exit 0, 16 min)
+- 2026-11-04 11:21:08 published: 35 file(s) to branch results
+- 2026-11-04 11:21:08 codex/15: start (uses codex-plan)
+- 2026-11-04 11:21:08 2 running: sonnet/18, codex/15
+- 2026-11-04 11:21:13 codex/15: done (exit 0, 0 min)
