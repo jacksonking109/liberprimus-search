@@ -239,6 +239,13 @@ def test_openai_compatible_adapter(stub, monkeypatch):
     path, headers, body = _Stub.seen[-1]
     assert path == "/chat/completions" and headers["Authorization"] == "Bearer test-not-a-real-key"
     assert body["response_format"] == {"type": "json_object"}
+    assert "thinking" not in body
+    ad2 = OpenAICompatibleAdapter("deepseek-x", stub, "LPSWARM_TEST_KEY",
+                                  extra_body={"thinking": {"type": "disabled"}})
+    ad2.complete([{"role": "user", "content": "q"}])
+    assert _Stub.seen[-1][2]["thinking"] == {"type": "disabled"}
+    with pytest.raises(ValueError):
+        OpenAICompatibleAdapter("m", stub, "K", extra_body={"model": "other"})
     monkeypatch.delenv("LPSWARM_TEST_KEY")
     with pytest.raises(AdapterError, match="not set"):
         ad.complete([])

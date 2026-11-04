@@ -68,7 +68,8 @@ def make_adapter(spec: ModelSpec):
                                        timeout=float(x.get("timeout", 120)),
                                        price_in_per_mtok=float(x.get("price_in_per_mtok", 0.0)),
                                        price_out_per_mtok=float(x.get("price_out_per_mtok", 0.0)),
-                                       json_mode=bool(x.get("json_mode")))
+                                       json_mode=bool(x.get("json_mode")),
+                                       extra_body=x.get("extra_body"))
     if spec.provider == "scripted":
         # Offline dry runs: replies from the config (cycled) or from a JSON file of strings.
         replies = x.get("replies")

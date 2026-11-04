@@ -81,6 +81,9 @@ def load_model_specs(path: str | Path) -> list[ModelSpec]:
                 max_usd = float(max_usd)
             except (TypeError, ValueError):
                 raise ValueError(f"model {name}: max_usd must be a number") from None
+        if "extra_body" in d and not isinstance(d["extra_body"], dict):
+            raise ValueError(f"model {name}: extra_body must be a table, e.g. "
+                             'extra_body = { thinking = { type = "disabled" } }')
         for k in ("price_in_per_mtok", "price_out_per_mtok", "timeout"):
             if k in d and not isinstance(d[k], (int, float)):
                 raise ValueError(f"model {name}: {k} must be a number")

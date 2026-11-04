@@ -578,3 +578,18 @@ def test_near_miss_means_better_than_the_best_noise():
             return o.score(np.zeros(L, dtype=np.int16), attempt_count=N).verdict
     assert verdict(old) == "near_miss" and verdict(new) == "fail"
     assert new.chance_level(near, L, N) <= 1.5
+
+
+def test_extra_body_from_models_toml(tmp_path):
+    import pytest
+    from lpswarm.router import load_model_specs, make_adapter
+    f = tmp_path / "m.toml"
+    f.write_text('[models.ds]\nprovider = "openai_compatible"\nendpoint = "https://x.invalid"\n'
+                 'model = "m"\napi_key_env = "K"\nextra_body = { thinking = { type = "disabled" } }\n',
+                 encoding="utf-8")
+    ad = make_adapter(load_model_specs(f)[0])
+    assert ad.extra_body == {"thinking": {"type": "disabled"}}
+    f.write_text('[models.ds]\nprovider = "openai_compatible"\nendpoint = "https://x.invalid"\n'
+                 'model = "m"\nextra_body = "nope"\n', encoding="utf-8")
+    with pytest.raises(ValueError):
+        load_model_specs(f)

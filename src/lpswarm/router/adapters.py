@@ -122,8 +122,14 @@ class OllamaAdapter:
 class OpenAICompatibleAdapter:
     def __init__(self, model: str, endpoint: str, api_key_env: str | None, timeout: float = 120,
                  price_in_per_mtok: float = 0.0, price_out_per_mtok: float = 0.0,
-                 json_mode: bool = False):
+                 json_mode: bool = False, extra_body: dict | None = None):
         self.model, self.endpoint, self.timeout = model, endpoint.rstrip("/"), timeout
+        # Extra JSON fields sent with every request, e.g. DeepSeek's
+        # {"thinking": {"type": "disabled"}}. The core fields cannot be overridden.
+        bad = set(extra_body or {}) & {"model", "messages", "stream", "max_tokens", "temperature"}
+        if bad:
+            raise ValueError(f"extra_body cannot set {sorted(bad)}")
+        self.extra_body = dict(extra_body or {})
         self.api_key_env = api_key_env
         self.price_in, self.price_out = price_in_per_mtok, price_out_per_mtok
         self.json_mode = json_mode
@@ -142,6 +148,7 @@ class OpenAICompatibleAdapter:
                 "max_tokens": max_tokens, "stream": False}
         if self.json_mode or schema is not None:
             body["response_format"] = {"type": "json_object"}
+        body.update(self.extra_body)
         url = self.endpoint + ("/chat/completions" if not self.endpoint.endswith("/chat/completions")
                                else "")
         t0 = time.monotonic()

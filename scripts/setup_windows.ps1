@@ -182,6 +182,8 @@ if ((Test-Path $ModelsToml) -and -not $Force) {
         "timeout = 180",
         'style = "volume"',
         "per_round = 16",
+        '# DeepSeek thinks by default and bills the hidden reasoning as output tokens: turn it off.',
+        'extra_body = { thinking = { type = "disabled" } }',
         ""
     )
     if ($proposerTag) {

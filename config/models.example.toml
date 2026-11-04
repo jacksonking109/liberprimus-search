@@ -39,6 +39,9 @@ json_mode = true
 timeout = 180
 style = "volume"                   # brute-force style prompts (wide offset ranges)
 per_round = 16                     # proposals per round for this model
+# DeepSeek thinks by default and bills the hidden reasoning as output tokens: turn it off.
+# extra_body is sent as extra JSON fields with every request to this model.
+extra_body = { thinking = { type = "disabled" } }
 
 [models.qwen-local]
 provider = "ollama"
