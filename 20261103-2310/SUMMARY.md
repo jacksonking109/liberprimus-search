@@ -1,6 +1,6 @@
 # Overnight run 20261103-2310
 
-Started 2026-11-03 23:10:06, updated 2026-11-04 02:08:26, status **running**. Jobs: pending 5, done 42, blocked 15
+Started 2026-11-03 23:10:06, updated 2026-11-04 02:11:47, status **running**. Jobs: pending 4, done 43, blocked 15
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -16,7 +16,7 @@ Started 2026-11-03 23:10:06, updated 2026-11-04 02:08:26, status **running**. Jo
 | sonnet/18 | done | 2026-11-04 01:30:05 | 2026-11-04 01:46:36 | Sonnet, briefed by Opus |
 | sonnet/19 | done | 2026-11-04 01:46:52 | 2026-11-04 01:49:37 | Sonnet, briefed by Opus |
 | sonnet/20 | done | 2026-11-04 01:50:01 | 2026-11-04 02:08:26 | Sonnet, briefed by Opus |
-| sonnet/21 | pending |  |  | Sonnet, briefed by Opus |
+| sonnet/21 | done | 2026-11-04 02:08:52 | 2026-11-04 02:11:47 | Sonnet, briefed by Opus |
 | sonnet/22 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/24 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/25 | pending |  |  | Sonnet, briefed by Opus |
@@ -95,6 +95,8 @@ Started 2026-11-03 23:10:06, updated 2026-11-04 02:08:26, status **running**. Jo
   - LP2:33.jpg - 50.jpg/1: 26509 attempts, 23 hypotheses, **0 final pass(es)** (caution: short section (91 runes): many keys give plausible-looking text this short; treat any lead with extra caution)
 - **sonnet/20** (done)
   - LP2:50.jpg/2-56.jpg/1: 44091 attempts, 48 hypotheses, **0 final pass(es)**
+- **sonnet/21** (done)
+  - LP2:56.jpg/2: 31565 attempts, 39 hypotheses, **0 final pass(es)**
 - **codex/25** (done)
   - LP2:54.jpg-55.jpg - 71.jpg-72.jpg: 29964 attempts, 47 hypotheses, **0 final pass(es)**
 - **codex/24** (done)
@@ -160,9 +162,9 @@ Started 2026-11-03 23:10:06, updated 2026-11-04 02:08:26, status **running**. Jo
 
 - qwen-local: 122 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 122 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 157 call(s) in the last 5h (cap 120), spent $0.0000, paused until 04:15 (local cap, raise max_calls_per_window to allow more)
-- claude-sonnet: 157 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-supervisor: 157 call(s) in the last 5h (cap 200), spent $0.0000
+- claude-opus: 165 call(s) in the last 5h (cap 120), spent $0.0000, paused until 04:18 (local cap, raise max_calls_per_window to allow more)
+- claude-sonnet: 165 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-supervisor: 165 call(s) in the last 5h (cap 200), spent $0.0000
 - codex: 122 call(s) in the last 5h (cap 750), spent $0.0000
 
 ## Supervisor notes
@@ -180,14 +182,10 @@ Started 2026-11-03 23:10:06, updated 2026-11-04 02:08:26, status **running**. Jo
 - 2026-11-04 01:26:49: 01:26 check: run healthy, no failures and no FINAL leads. sonnet/16 finished after 64 min and 60k attempts on the 1894-rune section 15..39. Its best near misses are -2.36 to -2.37 using pi_digits @109/110 and @1055/1056, the same adjacent-offset pattern codex/16 found, so it is noise. codex/13 finished in 4 min with nothing new on section 6..24, and codex/12 is running. Section 25 (-0.23) is still the only lead and the sup1 job covers it, though it may be the same ~300-rune scoring baseline. deepseek stays blocked until its prices are set in config/models.toml. No jobs added.
 - 2026-11-04 01:39:56: 01:39 check: run healthy, no failures and no FINAL leads. codex/12, codex/11, sonnet/17 and codex/10 finished. codex/12 and sonnet/12 found nothing better than about -2.4 on section 20..6 (693 runes), and those hits are noise at adjacent pi_digits offsets 293/294. sonnet/17 ran only 3 min (5k attempts) on section 40..43 (1021 runes), but codex/17 already covered it with 34k attempts and found nothing. sonnet/18 is running. Section 25 (-0.23) is still the only lead and the sup1 job covers it. It may be the same scoring baseline seen on other ~300-rune sections. deepseek stays blocked until its prices are set in config/models.toml. No jobs added.
 - 2026-11-04 01:50:01: 01:49 check: run healthy, no failures and no FINAL leads. sonnet/18 finished on section 44..49 (1433 runes) with 35k attempts and no near misses. codex/18 had already covered that section and also found nothing. sonnet/19 ran 3 min (26k attempts) on the 91-rune section 33..50/1. Its best results were about -2.0, from beaufort with pi_digits at adjacent offsets 1338-1340. codex/19 got similar scores from primes at 1605-1607. These are short-section noise. sonnet/20 is starting. Section 25 (-0.23) is still the only lead and the sup1 job covers it. It may be the same ~300-rune scoring baseline. deepseek stays blocked until its prices are set in config/models.toml. No jobs added.
+- 2026-11-04 02:08:52: 02:08 check: run healthy, no failures and no FINAL leads. sonnet/20 finished on section 50..56/1 (1468 runes) after 18 min and 44k attempts with no near misses. codex/20 had already found nothing there. sonnet/21 should start next. Section 25 (-0.23) is still the only lead and the sup1 job covers it, though it may be the same scoring baseline seen on other ~300-rune sections. The sections without a sonnet pass yet (51..70, 57..66, 56.jpg/2, 54..72) should be covered by the pending sonnet jobs. deepseek stays blocked until its prices are set in config/models.toml. No jobs added.
 
 ## Events
 
-- 2026-11-04 01:30:05 sonnet/19 waiting: claude-plan in use by sonnet/18
-- 2026-11-04 01:31:30 codex/11: done (exit 0, 4 min)
-- 2026-11-04 01:31:46 published: 39 file(s) to branch results
-- 2026-11-04 01:31:46 codex/10: start (uses codex-plan)
-- 2026-11-04 01:31:46 2 running: sonnet/18, codex/10
 - 2026-11-04 01:35:06 sonnet/18: running 5 min | 01:31:01 [model] claude-sonnet (proposer) ok 9.9s, tokens in/out 5379/899, reply 2042 chars
 - 2026-11-04 01:36:46 codex/10: running 5 min | 01:36:28 [model] codex (proposer) ok 15.4s, tokens in/out 18834/531, reply 1711 chars
 - 2026-11-04 01:39:31 codex/10: done (exit 0, 8 min)
@@ -208,3 +206,8 @@ Started 2026-11-03 23:10:06, updated 2026-11-04 02:08:26, status **running**. Jo
 - 2026-11-04 02:00:01 sonnet/20: running 10 min | 01:57:24 [model] claude-sonnet (proposer) ok 7.3s, tokens in/out 5969/845, reply 1862 chars
 - 2026-11-04 02:05:01 sonnet/20: running 15 min | 02:04:39 [model] claude-sonnet (proposer) ok 14.6s, tokens in/out 6954/921, reply 2054 chars
 - 2026-11-04 02:08:26 sonnet/20: done (exit 0, 18 min)
+- 2026-11-04 02:08:42 published: 43 file(s) to branch results
+- 2026-11-04 02:08:52 supervisor: note: 02:08 check: run healthy, no failures and no FINAL leads. sonnet/20 finished on section 50..56/1 (1468 runes) after 18 min and 44k attempts with no near misses. codex/20 had already found nothing there. sonnet/21 should start next. Section 25 (-0.23) is still the only lead and the sup1 job covers...
+- 2026-11-04 02:08:52 sonnet/21: start (uses claude-plan)
+- 2026-11-04 02:08:52 sonnet/22 waiting: claude-plan in use by sonnet/21
+- 2026-11-04 02:11:47 sonnet/21: done (exit 0, 3 min)
