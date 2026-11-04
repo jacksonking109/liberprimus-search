@@ -15,3 +15,4 @@ claude-sonnet,51b8a3f474ce0583,program,80,1,206,2,0,0,0,pass_found,13.05,1,2457,
 claude-sonnet,3816107e36b2a62b,program,80,0,3045,,0,0,0,,90.07,5,17879,3941,0.0
 claude-sonnet,58faea5dcfe35cd2,program,80,0,2451,,0,0,0,,123.91,5,17466,8590,0.0
 claude-sonnet,d78d9a268b69a356,program,160,1,7,1,0,1,0,pass_found,33.2,1,2713,1441,0.0
+claude-sonnet,bc8b8091be0dc1a1,program,160,0,4096,,0,0,0,,125.75,5,19345,4392,0.0
