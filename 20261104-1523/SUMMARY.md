@@ -1,6 +1,6 @@
 # Overnight run 20261104-1523
 
-Started 2026-11-04 15:23:11, updated 2026-11-04 15:47:33, status **running**. Jobs: pending 49, running 3, done 9
+Started 2026-11-04 15:23:11, updated 2026-11-04 15:48:59, status **running**. Jobs: pending 48, running 3, done 10
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -22,7 +22,7 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 15:47:33, status **running**. Jo
 | sonnet/25 | pending |  |  | Sonnet, briefed by Opus |
 | codex/25 | done | 2026-11-04 15:23:11 | 2026-11-04 15:35:47 | Codex (exploratory) |
 | codex/24 | done | 2026-11-04 15:23:11 | 2026-11-04 15:40:48 | Codex (exploratory) |
-| codex/22 | running | 2026-11-04 15:36:02 |  | Codex (exploratory) |
+| codex/22 | done | 2026-11-04 15:36:02 | 2026-11-04 15:48:59 | Codex (exploratory) |
 | codex/21 | done | 2026-11-04 15:41:06 | 2026-11-04 15:47:02 | Codex (exploratory) |
 | codex/20 | running | 2026-11-04 15:47:18 |  | Codex (exploratory) |
 | codex/19 | pending |  |  | Codex (exploratory) |
@@ -38,7 +38,7 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 15:47:33, status **running**. Jo
 | local/17 | done | 2026-11-04 15:23:11 | 2026-11-04 15:31:35 | local models |
 | local/18 | done | 2026-11-04 15:31:51 | 2026-11-04 15:41:46 | local models |
 | local/16 | done | 2026-11-04 15:42:01 | 2026-11-04 15:47:33 | local models |
-| local/19 | pending |  |  | local models |
+| local/19 | running | 2026-11-04 15:47:48 |  | local models |
 | local/15 | pending |  |  | local models |
 | local/20 | pending |  |  | local models |
 | local/14 | pending |  |  | local models |
@@ -70,35 +70,42 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 15:47:33, status **running**. Jo
 
 **sonnet/12** (since 2026-11-04 15:44:52), latest log lines:
 ```
-15:45:29 [model] claude-sonnet (proposer) calling...
-15:45:42 [model] claude-sonnet (proposer) ok 12.7s, tokens in/out 5126/1058, reply 2311 chars
-round 2 [claude-sonnet] proposals=12 valid=3 attempts=7 passes=0 near=0 invalid=17
-15:45:42 [model] claude-sonnet (proposer) calling...
 15:45:54 [model] claude-sonnet (proposer) ok 11.8s, tokens in/out 5460/1202, reply 2525 chars
 round 3 [claude-sonnet] proposals=12 valid=12 attempts=16024 passes=0 near=0 invalid=17
 15:47:14 [model] claude-sonnet (proposer) calling...
 15:47:27 [model] claude-sonnet (proposer) ok 13.0s, tokens in/out 6340/1634, reply 2516 chars
 round 4 [claude-sonnet] proposals=12 valid=12 attempts=26128 passes=0 near=0 invalid=17
 15:47:32 [model] claude-sonnet (proposer) calling...
-```
-**codex/22** (since 2026-11-04 15:36:02), latest log lines:
-```
-15:42:55 [model] codex (proposer) ok 21.6s, tokens in/out 19527/857, reply 2916 chars, model not reported (pin one with model = "..." in the models config)
-round 3 [codex] proposals=16 valid=16 attempts=22129 passes=0 near=0 invalid=0
-15:43:00 [model] codex (proposer) calling...
-15:43:24 [model] codex (proposer) ok 24.1s, tokens in/out 19683/980, reply 2757 chars, model not reported (pin one with model = "..." in the models config)
-round 4 [codex] proposals=16 valid=16 attempts=28222 passes=0 near=0 invalid=0
-15:43:28 [model] codex (proposer) calling...
-15:43:57 [model] codex (proposer) ok 29.4s, tokens in/out 19200/917, reply 2885 chars, model not reported (pin one with model = "..." in the models config)
-round 5 [codex] proposals=16 valid=16 attempts=38178 passes=0 near=0 invalid=0
-15:46:12 [model] codex (proposer) calling...
-15:46:38 [model] codex (proposer) ok 25.4s, tokens in/out 19298/1081, reply 2972 chars, model not reported (pin one with model = "..." in the models config)
+15:47:47 [model] claude-sonnet (proposer) ok 15.6s, tokens in/out 7140/1161, reply 2489 chars
+round 5 [claude-sonnet] proposals=12 valid=12 attempts=40188 passes=0 near=0 invalid=17
+15:48:30 [model] claude-sonnet (proposer) calling...
+15:48:42 [model] claude-sonnet (proposer) ok 12.1s, tokens in/out 7639/1196, reply 2623 chars
 ```
 **codex/20** (since 2026-11-04 15:47:18), latest log lines:
 ```
-===== 2026-11-04 15:47:18 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 20 --gen
-== LP2:50.jpg/2-56.jpg/1  (1468 symbols)
-15:47:19 [model] claude-supervisor (supervisor) calling...
+  | Brief for LP2:50/2-56/1 (1468 runes, IC 0.995 so flat, doubles 11 vs 50.6 expected)
+  | Nothing has been tried on this section yet. The flat IC rules out monoalphabetic and short-period keys being visible directly. The strong doubles deficit means adjacent ciphertext runes are rarely
+  | 1. Prime-totient stream, modelled on the solved LP page. Use sequence prime_totients, combine sub, offset_range [0,2000], with skip [0] (F), first skip_mode "all", then "resolve". Repeat with comb
+  | 2. Autokey, which suits the doubles deficit. Use source "ciphertext" and source "plaintext", each with combine sub, add and beaufort. Primers: single runes 0..28 (one proposal per value, or batch 
+  | 3. Other sequences with offset_range [0,2000]: primes, fibonacci, pi_digits, e_digits, triangular, squares, naturals. Use combine sub and add, scale 1 and add 0 first. Then scale 28 (a negated str
+  | 4. Repeat-word keys whose period may be hidden by the flat IC: DIVINITY, CIRCUMFERENCE, FIRFUMFERENFE, PILGRIM, INSTAR, EMERGE, CICADA, PARABLE. Use combine sub and beaufort, map identity and reve
+  | 5. Reversal variants. Set reverse_text true together with the best stream families above (prime_totients sub, ciphertext autokey). The section may be written backwards like other LP pages.
+  | 6. Columnar transposition. Undo columnar with widths 2..8 using simple orders: identity, reversed, and alternating such as [1,0] or [2,0,1]. Combine each with constant streams 0..28 via sub. Then 
+15:47:39 [model] codex (proposer) calling...
+15:48:05 [model] codex (proposer) ok 25.9s, tokens in/out 18177/1043, reply 3363 chars, model not reported (pin one with model = "..." in the models config)
+```
+**local/19** (since 2026-11-04 15:47:48), latest log lines:
+```
+===== 2026-11-04 15:47:48 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 19 --gen
+note: short section (91 runes): many keys give plausible-looking text this short; treat any lead with extra caution
+== LP2:33.jpg - 50.jpg/1  (91 symbols)
+15:47:50 [model] qwen-local (proposer) calling...
+15:48:09 [model] qwen-local (proposer) ok 18.8s, tokens in/out 1613/608, reply 2259 chars
+15:48:09 [model] gemma-local (proposer) calling...
+15:48:24 [model] gemma-local (proposer) ok 15.4s, tokens in/out 1667/479, reply 1443 chars
+round 1 [qwen-local] proposals=8 valid=8 attempts=8 passes=0 near=0 invalid=0
+round 1 [gemma-local] proposals=8 valid=8 attempts=58 passes=0 near=0 invalid=0
+15:48:35 [model] qwen-local (proposer) calling...
 ```
 
 ## Results so far
@@ -115,6 +122,8 @@ round 5 [codex] proposals=16 valid=16 attempts=38178 passes=0 near=0 invalid=0
   - LP2:54.jpg-55.jpg - 71.jpg-72.jpg: 60000 attempts, 57 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **codex/24** (done)
   - LP2:51.jpg/2-53.jpg - 68.jpg/2-70.jpg: 58281 attempts, 88 hypotheses, **0 final pass(es)**
+- **codex/22** (done)
+  - LP2:57.jpg-66.jpg/1: 42190 attempts, 86 hypotheses, **0 final pass(es)**
 - **codex/21** (done)
   - LP2:56.jpg/2: 19586 attempts, 82 hypotheses, **0 final pass(es)**
 - **local/17** (done)
@@ -126,7 +135,7 @@ round 5 [codex] proposals=16 valid=16 attempts=38178 passes=0 near=0 invalid=0
 
 ## Model usage
 
-- qwen-local: 45 call(s) in the last 5h (cap none), spent $0.0000
+- qwen-local: 44 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 45 call(s) in the last 5h (cap none), spent $0.0000
 - claude-opus: 200 call(s) in the last 5h (cap 550), spent $0.0000
 - claude-sonnet: 200 call(s) in the last 5h (cap 550), spent $0.0000
@@ -135,11 +144,6 @@ round 5 [codex] proposals=16 valid=16 attempts=38178 passes=0 near=0 invalid=0
 
 ## Events
 
-- 2026-11-04 15:41:04 sonnet/10: done (exit 0, 4 min)
-- 2026-11-04 15:41:06 published: 9 file(s) to branch results
-- 2026-11-04 15:41:06 sonnet/11: start (uses claude-plan)
-- 2026-11-04 15:41:06 3 running: local/18, codex/22, sonnet/11
-- 2026-11-04 15:41:06 codex/21: start (uses codex-plan)
 - 2026-11-04 15:41:06 4 running: local/18, codex/22, sonnet/11, codex/21
 - 2026-11-04 15:41:06 sonnet/12 waiting: claude-plan in use by sonnet/11
 - 2026-11-04 15:41:46 local/18: done (exit 0, 10 min)
@@ -160,3 +164,8 @@ round 5 [codex] proposals=16 valid=16 attempts=38178 passes=0 near=0 invalid=0
 - 2026-11-04 15:47:18 4 running: codex/22, local/16, sonnet/12, codex/20
 - 2026-11-04 15:47:18 sonnet/13 waiting: claude-plan in use by sonnet/12
 - 2026-11-04 15:47:33 local/16: done (exit 0, 6 min)
+- 2026-11-04 15:47:48 published: 13 file(s) to branch results
+- 2026-11-04 15:47:48 local/19: start (uses ollama:http://127.0.0.1:11434)
+- 2026-11-04 15:47:48 4 running: codex/22, sonnet/12, codex/20, local/19
+- 2026-11-04 15:47:48 sonnet/13 waiting: claude-plan in use by sonnet/12
+- 2026-11-04 15:48:59 codex/22: done (exit 0, 13 min)
