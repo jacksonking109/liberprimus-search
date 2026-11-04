@@ -1,26 +1,26 @@
 # Overnight run 20261103-2030
 
-Started 2026-11-03 20:30:23, updated 2026-11-03 20:35:48, status **running**. Jobs: pending 20, failed 1, blocked 10
+Started 2026-11-03 20:30:23, updated 2026-11-03 22:15:29, status **running**. Jobs: pending 14, running 1, done 1, blocked 15
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
-| tier-claude | failed | 2026-11-03 20:30:23 | 2026-11-03 20:32:42 | Claude Code proposers vs the random control |
-| unsolved/10 | blocked |  | 2026-11-03 20:33:05 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
-| unsolved/11 | blocked |  | 2026-11-03 20:33:29 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
-| unsolved/12 | blocked |  | 2026-11-03 20:33:49 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
-| unsolved/13 | blocked |  | 2026-11-03 20:34:08 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
-| unsolved/14 | blocked |  | 2026-11-03 20:34:15 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
-| unsolved/15 | blocked |  | 2026-11-03 20:34:34 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
-| unsolved/16 | blocked |  | 2026-11-03 20:34:48 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
-| unsolved/17 | blocked |  | 2026-11-03 20:35:08 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
-| unsolved/18 | blocked |  | 2026-11-03 20:35:28 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
-| unsolved/19 | blocked |  | 2026-11-03 20:35:48 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
-| unsolved/20 | pending |  |  | Codex (exploratory) + DeepSeek (volume) |
-| unsolved/21 | pending |  |  | Codex (exploratory) + DeepSeek (volume) |
-| unsolved/22 | pending |  |  | Codex (exploratory) + DeepSeek (volume) |
-| unsolved/24 | pending |  |  | Codex (exploratory) + DeepSeek (volume) |
-| unsolved/25 | pending |  |  | Codex (exploratory) + DeepSeek (volume) |
-| sup1/10 | pending |  |  | added by supervisor. The DeepSeek-based unsolved jobs are blocked by the zero-price config. This covers the same section |
+| tier-claude | running | 2026-11-03 20:30:23 | 2026-11-03 20:32:42 | Claude Code proposers vs the random control |
+| unsolved/10 | blocked |  | 2026-11-03 22:08:49 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
+| unsolved/11 | blocked |  | 2026-11-03 22:08:49 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
+| unsolved/12 | blocked |  | 2026-11-03 22:08:49 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
+| unsolved/13 | blocked |  | 2026-11-03 22:08:49 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
+| unsolved/14 | blocked |  | 2026-11-03 22:08:49 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
+| unsolved/15 | blocked |  | 2026-11-03 22:08:49 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
+| unsolved/16 | blocked |  | 2026-11-03 22:08:49 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
+| unsolved/17 | blocked |  | 2026-11-03 22:08:49 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
+| unsolved/18 | blocked |  | 2026-11-03 22:08:49 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
+| unsolved/19 | blocked |  | 2026-11-03 22:08:49 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
+| unsolved/20 | blocked |  | 2026-11-03 22:08:49 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
+| unsolved/21 | blocked |  | 2026-11-03 22:08:49 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
+| unsolved/22 | blocked |  | 2026-11-03 22:08:49 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
+| unsolved/24 | blocked |  | 2026-11-03 22:08:49 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
+| unsolved/25 | blocked |  | 2026-11-03 22:08:49 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
+| sup1/10 | done | 2026-11-03 22:08:49 | 2026-11-03 22:15:29 | added by supervisor. The DeepSeek-based unsolved jobs are blocked by the zero-price config. This covers the same section |
 | sup1/11 | pending |  |  | added by supervisor. The DeepSeek-based unsolved jobs are blocked by the zero-price config. This covers the same section |
 | sup1/12 | pending |  |  | added by supervisor. The DeepSeek-based unsolved jobs are blocked by the zero-price config. This covers the same section |
 | sup1/13 | pending |  |  | added by supervisor. The DeepSeek-based unsolved jobs are blocked by the zero-price config. This covers the same section |
@@ -36,58 +36,67 @@ Started 2026-11-03 20:30:23, updated 2026-11-03 20:35:48, status **running**. Jo
 | sup1/24 | pending |  |  | added by supervisor. The DeepSeek-based unsolved jobs are blocked by the zero-price config. This covers the same section |
 | sup1/25 | pending |  |  | added by supervisor. The DeepSeek-based unsolved jobs are blocked by the zero-price config. This covers the same section |
 
+## Now running
+
+**tier-claude** (since 2026-11-03 20:30:23), latest log lines:
+```
+===== 2026-11-03 20:30:23 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm tiertest --arms random_program:40,claude-opus,claude-sonnet --lengths 80,160 --cases 3 --word-breaks --o
+lpswarm: error: skip_mode "resolve" needs a language model (lm=bigram table)
+===== 2026-11-03 20:39:54 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm tiertest --arms random_program:40,claude-opus,claude-sonnet --lengths 80,160 --cases 3 --word-breaks --o
+===== 2026-11-03 22:08:49 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm tiertest --arms random_program:40,claude-opus,claude-sonnet --lengths 80,160 --cases 3 --word-breaks --o
+resuming run 20261103T203025: 12 case(s) already done
+22:08:50 [model] claude-sonnet (proposer) paused: claude-sonnet is paused until 2026-11-04 01:27 (local cap 40/40 calls per 5h for claude-plan; raise max_calls_per_window in the models config to allow
+```
+
 ## Results so far
 
-- **tier-claude** (failed)
+- **tier-claude** (running)
   - random_program:40: recall 0.00 (0/6), 192 attempts, 0 model calls, $0.0000
-  - claude-opus: recall 0.50 (1/2), 11742 attempts, 6 model calls, $0.0000
-  - last log lines:
-    > 
-    > ===== 2026-11-03 20:30:23 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm tiertest --arms random_program:40,claude-opus,claude-sonnet --le
-    > C:\Users\ihazp\liberprimus-search\src\lpswarm\router\router.py:106: UserWarning: model deepseek: max_usd is set but prices are 0, so spend is recorded as $0 and
-    >   return cls(load_model_specs(path), ledger=ledger, **kw)
-    > lpswarm: error: skip_mode "resolve" needs a language model (lm=bigram table)
+  - claude-opus: recall 0.50 (3/6), 41822 attempts, 21 model calls, $0.0000
+- **sup1/10** (done)
+  - LP2:17.jpg, 18.jpg, 19.jpg - 0.jpg-2.jpg: 18513 attempts, 61 hypotheses, **0 final pass(es)**
 
 ## Model usage
 
-- qwen-local: 2 call(s) in the last 5h (cap none), spent $0.0000
-- gemma-local: 2 call(s) in the last 5h (cap none), spent $0.0000
+- qwen-local: 6 call(s) in the last 5h (cap none), spent $0.0000
+- gemma-local: 6 call(s) in the last 5h (cap none), spent $0.0000
 - granite: 2 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 21 call(s) in the last 5h (cap 40), spent $0.0000
-- claude-sonnet: 21 call(s) in the last 5h (cap 40), spent $0.0000
-- claude-supervisor: 21 call(s) in the last 5h (cap 40), spent $0.0000
-- codex: 1 call(s) in the last 5h (cap 30), spent $0.0000
+- claude-opus: 40 call(s) in the last 5h (cap 40), spent $0.0000, paused until 01:27 (local cap, raise max_calls_per_window to allow more)
+- claude-sonnet: 40 call(s) in the last 5h (cap 40), spent $0.0000, paused until 01:27 (local cap, raise max_calls_per_window to allow more)
+- claude-supervisor: 40 call(s) in the last 5h (cap 40), spent $0.0000, paused until 01:27 (local cap, raise max_calls_per_window to allow more)
+- codex: 5 call(s) in the last 5h (cap 30), spent $0.0000
 - dry: 2 call(s) in the last 5h (cap none), spent $0.0000
 
 ## Supervisor notes
 
 - 2026-11-03 20:33:05: tier-claude failed at 20:32 with exit 2, a config error: 'skip_mode "resolve" needs a language model (lm=bigram table)'. I did not retry it because it would fail the same way until the tiertest command sets an LM (e.g. a bigram table) or uses a different skip_mode. Partial result before the failure: claude-opus recall 0.50 (1/2) over 11742 attempts; random control 0/6. Also a router warning: deepseek has max_usd set but prices are 0, so spend shows as $0 and the cost cap will not limit it. The 15 unsolved jobs are still pending. If they also use skip_mode resolve they may fail the same way.
 - 2026-11-03 20:33:29: unsolved/10 was blocked because deepseek has max_usd set but its prices in config/models.toml are 0. The other 14 pending unsolved jobs also use DeepSeek, so they will likely block the same way. I can't edit the config. To fix this, fill in price_in_per_mtok and price_out_per_mtok for deepseek, then rerun those sections. Meanwhile I queued one replacement job on the unsolved sections using Codex and the local models (no DeepSeek) so the night isn't wasted. tier-claude is still failed: tiertest needs an LM (a bigram table) for skip_mode resolve.
+- 2026-11-03 20:40:05: 20:39 resume with --retry-failed: tier-claude is running again and unsolved/10-19 are back to pending. If config/models.toml was not fixed (a bigram LM for tiertest skip_mode resolve, and real deepseek prices), these will fail or block the same way as before. sup1 (codex + local models) still covers sections 10-25 as a fallback. If the deepseek jobs now run, the overlap with sup1 is intentional because they use different generators. No new jobs added; 1 of 5 used.
 
 ## Events
 
-- 2026-11-03 20:30:23 tier-claude: start
-- 2026-11-03 20:32:42 tier-claude: failed (exit 2)
-- 2026-11-03 20:32:59 published: 5 file(s) to branch results
-- 2026-11-03 20:33:05 supervisor: note added
-- 2026-11-03 20:33:05 unsolved/10: blocked: model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_per_mtok
-- 2026-11-03 20:33:20 published: 5 file(s) to branch results
-- 2026-11-03 20:33:29 supervisor: note added
-- 2026-11-03 20:33:29 supervisor: added sup1: swarm on 15 section(s) with codex,qwen-local,gemma-local
-- 2026-11-03 20:33:29 unsolved/11: blocked: model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_per_mtok
-- 2026-11-03 20:33:44 published: 5 file(s) to branch results
-- 2026-11-03 20:33:49 unsolved/12: blocked: model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_per_mtok
-- 2026-11-03 20:34:04 published: 5 file(s) to branch results
-- 2026-11-03 20:34:08 unsolved/13: blocked: model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_per_mtok
-- 2026-11-03 20:34:10 published: 5 file(s) to branch results
-- 2026-11-03 20:34:15 unsolved/14: blocked: model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_per_mtok
-- 2026-11-03 20:34:30 published: 5 file(s) to branch results
-- 2026-11-03 20:34:34 unsolved/15: blocked: model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_per_mtok
-- 2026-11-03 20:34:44 published: 5 file(s) to branch results
-- 2026-11-03 20:34:48 unsolved/16: blocked: model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_per_mtok
-- 2026-11-03 20:35:03 published: 5 file(s) to branch results
-- 2026-11-03 20:35:08 unsolved/17: blocked: model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_per_mtok
-- 2026-11-03 20:35:24 published: 5 file(s) to branch results
-- 2026-11-03 20:35:28 unsolved/18: blocked: model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_per_mtok
-- 2026-11-03 20:35:43 published: 5 file(s) to branch results
-- 2026-11-03 20:35:48 unsolved/19: blocked: model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_per_mtok
+- 2026-11-03 20:39:54 tier-claude: start
+- 2026-11-03 20:40:05 supervisor: note added
+- 2026-11-03 22:08:49 resumed
+- 2026-11-03 22:08:49 tier-claude: start (uses claude-plan)
+- 2026-11-03 22:08:49 unsolved/10: blocked: model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_per_mtok
+- 2026-11-03 22:08:49 unsolved/11: blocked: model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_per_mtok
+- 2026-11-03 22:08:49 unsolved/12: blocked: model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_per_mtok
+- 2026-11-03 22:08:49 unsolved/13: blocked: model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_per_mtok
+- 2026-11-03 22:08:49 unsolved/14: blocked: model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_per_mtok
+- 2026-11-03 22:08:49 unsolved/15: blocked: model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_per_mtok
+- 2026-11-03 22:08:49 unsolved/16: blocked: model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_per_mtok
+- 2026-11-03 22:08:49 unsolved/17: blocked: model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_per_mtok
+- 2026-11-03 22:08:49 unsolved/18: blocked: model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_per_mtok
+- 2026-11-03 22:08:49 unsolved/19: blocked: model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_per_mtok
+- 2026-11-03 22:08:49 unsolved/20: blocked: model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_per_mtok
+- 2026-11-03 22:08:49 unsolved/21: blocked: model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_per_mtok
+- 2026-11-03 22:08:49 unsolved/22: blocked: model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_per_mtok
+- 2026-11-03 22:08:49 unsolved/24: blocked: model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_per_mtok
+- 2026-11-03 22:08:49 unsolved/25: blocked: model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_per_mtok
+- 2026-11-03 22:08:49 sup1/10: start (uses codex-plan, ollama:http://127.0.0.1:11434)
+- 2026-11-03 22:08:49 2 running: tier-claude, sup1/10
+- 2026-11-03 22:08:54 supervisor unavailable: claude-supervisor is paused until 2026-11-04 01:27 (local cap 40/40 calls per 5h for claude-plan; raise max_calls_per_window in the models config to allow more)
+- 2026-11-03 22:13:49 tier-claude: running 5 min | 22:08:50 [model] claude-sonnet (proposer) paused: claude-sonnet is paused until 2026-11-04 01:27 (local cap 40/40 calls per 5h for claude-plan; raise max_calls_per_window in the models config to allow
+- 2026-11-03 22:13:49 sup1/10: running 5 min | 22:13:22 [model] gemma-local (proposer) ok 14.6s, tokens in/out 3294/253, reply 735 chars
+- 2026-11-03 22:15:29 sup1/10: done (exit 0, 7 min)
