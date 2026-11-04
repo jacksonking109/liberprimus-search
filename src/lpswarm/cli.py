@@ -190,8 +190,9 @@ def cmd_baseline(args) -> int:
     cmdline = "lpswarm " + " ".join(sys.argv[1:])
     with Ledger(args.ledger) as led:
         for ct, label, page_range, synthetic, demo_keys, breaks in targets:
-            if len(ct) < max(8, oracle.min_length):
-                print(f"skip {label}: only {len(ct)} symbols under alphabet {alphabet.name}")
+            if len(ct) < max(args.min_length, oracle.min_length):
+                print(f"skip {label}: only {len(ct)} symbols under alphabet {alphabet.name} "
+                      f"(minimum {max(args.min_length, oracle.min_length)}, --min-length)")
                 continue
             print(f"\n== {label}  ({len(ct)} symbols)")
             tgt = Target(alphabet, ct, label, page_range=page_range, is_synthetic=synthetic,
@@ -279,9 +280,13 @@ def cmd_swarm(args) -> int:
                                + pause_text(st))
             return out + [""]
         for ct, label, page_range, synthetic, _, breaks in targets:
-            if len(ct) < max(8, oracle.min_length):
-                print(f"skip {label}: only {len(ct)} symbols")
+            if len(ct) < max(args.min_length, oracle.min_length):
+                print(f"skip {label}: only {len(ct)} symbols (minimum "
+                      f"{max(args.min_length, oracle.min_length)}, --min-length); too short to judge")
                 continue
+            from lpswarm.reports import short_note
+            if short_note(len(ct)):
+                print(f"note: {short_note(len(ct))}")
             print(f"\n== {label}  ({len(ct)} symbols)")
             res = run_swarm(Target(alphabet, ct, label, page_range=page_range, is_synthetic=synthetic,
                                    breaks=breaks),
@@ -495,6 +500,9 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--columnar-max-width", type=int)
     p.add_argument("--max-attempts", type=int, help="new attempts per family")
     p.add_argument("--timeout", type=float, help="seconds per family")
+    p.add_argument("--min-length", type=int, default=20,
+                   help="skip targets shorter than this many symbols (default 20: shorter text "
+                        "cannot be judged)")
     p.add_argument("--top", type=int, default=10)
     p.add_argument("--quiet", action="store_true")
     p.set_defaults(func=cmd_baseline)
@@ -529,6 +537,9 @@ def build_parser() -> argparse.ArgumentParser:
                    help="where model calls, spend and usage-limit pauses are logged (shared by "
                         "swarm, tiertest and doctor)")
     p.add_argument("--timeout", type=float, help="seconds per target")
+    p.add_argument("--min-length", type=int, default=20,
+                   help="skip targets shorter than this many symbols (default 20: shorter text "
+                        "cannot be judged)")
     p.add_argument("--serial", action="store_true",
                    help="call generators one at a time (default: generators on different "
                         "backends, e.g. Codex and a local GPU, are called at the same time)")

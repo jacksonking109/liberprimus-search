@@ -13,13 +13,26 @@ def default_report_dir(command: str) -> Path:
     return Path("reports") / f"{command}-{time.strftime('%Y%m%d-%H%M%S')}"
 
 
+MIN_TARGET_SYMBOLS = 20     # shorter sections are skipped by swarm/baseline (--min-length)
+SHORT_TARGET_SYMBOLS = 100  # below this a lead says little: flagged in reports and SUMMARY
+
+
+def short_note(symbols: int) -> str:
+    """'' for a normal-length target, else a caution for reports."""
+    if symbols >= SHORT_TARGET_SYMBOLS:
+        return ""
+    return (f"short section ({symbols} runes): many keys give plausible-looking text this short; "
+            "treat any lead with extra caution")
+
+
 def target_entry(led: Ledger, target_id: str, label: str, symbols: int, *, stopped: str | None = None,
                  stats: dict | None = None, top: int = 10, elapsed_s: float | None = None) -> dict:
     leads = led.leads(target_id, include_near_miss=True, limit=top)
     finals = [r for r in leads if r.get("passed_final")]
     tried = led.tried(target_id)
     return {
-        "label": label, "symbols": symbols, "attempts": led.attempt_count(target_id),
+        "label": label, "symbols": symbols, "short": bool(short_note(symbols)),
+        "attempts": led.attempt_count(target_id),
         "hypotheses": len(tried), "final_passes": len(finals), "stopped": stopped,
         "elapsed_s": round(elapsed_s, 1) if elapsed_s is not None else None,
         "generators": stats or {},
@@ -46,10 +59,13 @@ def write_run_report(out_dir: str | Path, title: str, command: str, entries: lis
     lines += ["| target | symbols | attempts | hypotheses | final passes | stopped |",
               "| --- | ---: | ---: | ---: | ---: | --- |"]
     for e in entries:
-        lines.append(f"| {e['label']} | {e['symbols']} | {e['attempts']} | {e['hypotheses']} | "
+        sym = f"{e['symbols']} (short)" if short_note(e["symbols"]) else e["symbols"]
+        lines.append(f"| {e['label']} | {sym} | {e['attempts']} | {e['hypotheses']} | "
                      f"{e['final_passes']} | {e['stopped'] or ''} |")
     for e in entries:
         lines += ["", f"## {e['label']}", ""]
+        if short_note(e["symbols"]):
+            lines += [f"**Caution: {short_note(e['symbols'])}.**", ""]
         if e["generators"]:
             lines.append("| generator | proposals | invalid | attempts | passes | near misses | model errors |")
             lines.append("| --- | ---: | ---: | ---: | ---: | ---: | ---: |")

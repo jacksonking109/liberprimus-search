@@ -599,13 +599,20 @@ class Overnight:
                                f"{s['attempts']} attempts, {s['model_calls']} model calls, ${s['usd']:.4f}")
         elif (d / "report.json").is_file():
             rep = json.loads((d / "report.json").read_text(encoding="utf-8"))
+            from lpswarm.reports import short_note
             for t in rep.get("targets", []):
                 out.append(f"  - {t['label']}: {t['attempts']} attempts, {t['hypotheses']} hypotheses, "
                            f"**{t['final_passes']} final pass(es)**"
-                           + (f", stopped: {t['stopped']}" if t.get("stopped") else ""))
+                           + (f", stopped: {t['stopped']}" if t.get("stopped") else "")
+                           + (f" (caution: {short_note(t['symbols'])})" if short_note(t.get("symbols", 999))
+                              else ""))
                 for ld in t.get("leads", [])[:3]:
                     if ld["final"]:
                         out.append(f"    - FINAL by {ld['by']}: `{ld['key']}` -> `{ld['plaintext'][:70]}`")
+        if not out and job["status"] == "done" and job["kind"] in ("swarm", "baseline"):
+            skips = [x for x in _log_tail(d / "job.log", 20) if x.startswith("skip ")]
+            if skips:      # e.g. a section below --min-length: say why there is no result
+                out.append(f"  - {skips[-1]}")
         if job["status"] == "failed" and (d / "job.log").is_file():
             tail = (d / "job.log").read_text(encoding="utf-8", errors="replace").splitlines()[-12:]
             out.append("  - last log lines:")

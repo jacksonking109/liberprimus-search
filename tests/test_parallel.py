@@ -287,3 +287,25 @@ def test_job_env_mutes_the_prices_warning(tmp_path):
             "max_usd=1.0)], ledger=__import__('lpswarm.ledger',fromlist=['Ledger']).Ledger())")
     out = sp.run([sys.executable, "-c", code], env=seen["env"], capture_output=True, text=True)
     assert out.returncode == 0 and "prices are 0" not in out.stderr
+
+
+def test_short_sections_skipped_or_flagged(tmp_path):
+    import subprocess as sp
+    man = str(ROOT / "data" / "lp" / "manifest.json")
+    alpha = str(ROOT / "data" / "alphabet" / "gematria_primus.json")
+
+    def swarm(section):
+        out = tmp_path / f"s{section}"
+        r = sp.run([sys.executable, "-m", "lpswarm", "swarm", "--manifest", man, "--alphabet", alpha,
+                    "--sections", str(section), "--generators", "random_program", "--rounds", "1",
+                    "--per-round", "2", "--null-samples", "100", "--ledger", str(out / "l.sqlite"),
+                    "--report-dir", str(out)], capture_output=True, text=True, encoding="utf-8",
+                   cwd=ROOT)
+        assert r.returncode == 0, r.stderr[-500:]
+        return r.stdout, out
+    so, _ = swarm(15)                       # 9 runes: skipped
+    assert "skip" in so and "minimum 20" in so
+    so, out = swarm(19)                     # 91 runes: run, but flagged
+    assert "short section (91 runes)" in so
+    rep = (out / "report.md").read_text(encoding="utf-8")
+    assert "91 (short)" in rep and "Caution: short section" in rep
