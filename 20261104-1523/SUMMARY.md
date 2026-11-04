@@ -1,6 +1,6 @@
 # Overnight run 20261104-1523
 
-Started 2026-11-04 15:23:11, updated 2026-11-04 17:34:33, status **running**. Jobs: pending 18, running 1, done 43
+Started 2026-11-04 15:23:11, updated 2026-11-04 17:35:44, status **running**. Jobs: pending 17, running 1, done 44
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -51,7 +51,7 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 17:34:33, status **running**. Jo
 | local/25 | done | 2026-11-04 16:46:32 | 2026-11-04 16:52:48 | local models |
 | local/10 | done | 2026-11-04 16:53:04 | 2026-11-04 17:01:21 | local models |
 | deepseek/10 | done | 2026-11-04 17:32:18 | 2026-11-04 17:34:33 | DeepSeek (volume) |
-| deepseek/11 | pending |  | 2026-11-04 16:54:25 | retry requested |
+| deepseek/11 | done | 2026-11-04 17:34:49 | 2026-11-04 17:35:44 | DeepSeek (volume) |
 | deepseek/12 | pending |  | 2026-11-04 16:54:25 | retry requested |
 | deepseek/13 | pending |  | 2026-11-04 16:54:25 | retry requested |
 | deepseek/14 | pending |  | 2026-11-04 16:54:25 | retry requested |
@@ -71,16 +71,16 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 17:34:33, status **running**. Jo
 
 **sonnet/21** (since 2026-11-04 17:32:18), latest log lines:
 ```
-17:32:46 [model] claude-sonnet (proposer) ok 8.5s, tokens in/out 3572/1282, reply 2691 chars
-round 1 [claude-sonnet] proposals=12 valid=6 attempts=1012 passes=0 near=0 invalid=6
-17:32:59 [model] claude-sonnet (proposer) calling...
-17:33:13 [model] claude-sonnet (proposer) ok 13.4s, tokens in/out 4676/2014, reply 3035 chars
-round 2 [claude-sonnet] proposals=12 valid=3 attempts=1015 passes=0 near=0 invalid=15
-17:33:13 [model] claude-sonnet (proposer) calling...
 17:33:28 [model] claude-sonnet (proposer) ok 14.8s, tokens in/out 5182/2042, reply 2632 chars
 round 3 [claude-sonnet] proposals=12 valid=12 attempts=13574 passes=0 near=0 invalid=15
 17:34:02 [model] claude-sonnet (proposer) calling...
 17:34:16 [model] claude-sonnet (proposer) ok 14.0s, tokens in/out 6219/1998, reply 3131 chars
+round 4 [claude-sonnet] proposals=12 valid=12 attempts=24178 passes=0 near=0 invalid=15
+17:34:47 [model] claude-sonnet (proposer) calling...
+17:35:02 [model] claude-sonnet (proposer) ok 15.4s, tokens in/out 7211/2107, reply 2715 chars
+round 5 [claude-sonnet] proposals=12 valid=12 attempts=33270 passes=0 near=0 invalid=15
+17:35:14 [model] claude-sonnet (proposer) calling...
+17:35:25 [model] claude-sonnet (proposer) ok 11.2s, tokens in/out 7591/1566, reply 2704 chars
 ```
 
 ## Results so far
@@ -173,16 +173,18 @@ round 3 [claude-sonnet] proposals=12 valid=12 attempts=13574 passes=0 near=0 inv
   - LP2:17.jpg, 18.jpg, 19.jpg - 0.jpg-2.jpg: 1648 attempts, 78 hypotheses, **0 final pass(es)**
 - **deepseek/10** (done)
   - LP2:17.jpg, 18.jpg, 19.jpg - 0.jpg-2.jpg: 30581 attempts, 61 hypotheses, **0 final pass(es)**
+- **deepseek/11** (done)
+  - LP2:20.jpg/1 - 3.jpg/1: 36628 attempts, 67 hypotheses, **0 final pass(es)**
 
 ## Model usage
 
-- deepseek: 8 call(s) in the last 5h (cap none), spent $0.0123
+- deepseek: 14 call(s) in the last 5h (cap none), spent $0.0251
 - qwen-local: 88 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 88 call(s) in the last 5h (cap none), spent $0.0000
 - granite: 4 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 190 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-sonnet: 190 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-supervisor: 190 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-opus: 191 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-sonnet: 191 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-supervisor: 191 call(s) in the last 5h (cap 550), spent $0.0000
 - codex: 85 call(s) in the last 5h (cap 850), spent $0.0000
 - dry: 4 call(s) in the last 5h (cap none), spent $0.0000
 
@@ -196,10 +198,6 @@ round 3 [claude-sonnet] proposals=12 valid=12 attempts=13574 passes=0 near=0 inv
 
 ## Events
 
-- 2026-11-04 16:58:26 codex/10: running 5 min | 16:54:12 [model] codex (proposer) ok 25.5s, tokens in/out 17656/1087, reply 3344 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-04 17:01:21 local/10: done (exit 0, 8 min)
-- 2026-11-04 17:01:36 published: 41 file(s) to branch results
-- 2026-11-04 17:02:02 supervisor: note: 17:01 check: there are still no final passes in any section. The 15 deepseek jobs (deepseek/10 to deepseek/25) are blocked. The config puts what looks like a literal API key (sk-150a...) where the environment variable name should go. Move the key into an environment variable, put that variable's ...
 - 2026-11-04 17:02:02 supervisor: added sup1: swarm on 1 section(s) with claude-sonnet; brief: Section LP2:6.jpg/2-7.jpg - 23.jpg/2-24.jpg (333 runes). An earlier claude-sonnet job made only 22 attempts here because its proposals were too narrow, often a single fixed key. This time each hypothe...
 - 2026-11-04 17:02:07 sonnet/20: running 25 min | 16:57:14 [model] claude-sonnet (proposer) ok 12.0s, tokens in/out 6807/1581, reply 2425 chars
 - 2026-11-04 17:03:27 codex/10: running 10 min | 17:00:03 [model] codex (proposer) ok 23.1s, tokens in/out 19011/947, reply 3063 chars, model not reported (pin one with model = "..." in the models config)
@@ -221,3 +219,7 @@ round 3 [claude-sonnet] proposals=12 valid=12 attempts=13574 passes=0 near=0 inv
 - 2026-11-04 17:32:18 sonnet/22 waiting: claude-plan in use by sonnet/21
 - 2026-11-04 17:32:33 supervisor: note: 17:32 check: the run resumed after the STOP file at 17:16, and there are still no final passes in any section. --retry-failed put the 15 blocked deepseek jobs back to pending, and deepseek/10 has started. If the models config still has the literal key (sk-150a...) where the environment variable n...
 - 2026-11-04 17:34:33 deepseek/10: done (exit 0, 2 min)
+- 2026-11-04 17:34:49 published: 44 file(s) to branch results
+- 2026-11-04 17:34:49 deepseek/11: start (uses api:https://api.deepseek.com)
+- 2026-11-04 17:34:49 2 running: sonnet/21, deepseek/11
+- 2026-11-04 17:35:44 deepseek/11: done (exit 0, 1 min)
