@@ -494,3 +494,36 @@ def test_capacity_lets_two_jobs_share_a_backend(tmp_path, capsys):
                    encoding="utf-8")
     with pytest.raises(ValueError):
         load_config(bad)
+
+
+def test_resume_picks_up_auto_brief_for_unstarted_jobs(tmp_path):
+    from lpswarm.overnight import _job
+    jobs = [{"id": "codex", "kind": "validate"}]
+    cfg = OvernightConfig(models=str(tmp_path / "none.toml"), spend_ledger=str(tmp_path / "s.sqlite"),
+                          publish=False, jobs=jobs)
+    run = Overnight(cfg, tmp_path / "run", stop_file=tmp_path / "STOP", progress=False)
+    run.state["jobs"] = [_job("codex/25", "swarm", [], "config"), _job("codex/24", "swarm", [], "config")]
+    run.state["jobs"][0]["status"] = "done"
+    run.save()
+    cfg2 = OvernightConfig(models=str(tmp_path / "none.toml"), spend_ledger=str(tmp_path / "s.sqlite"),
+                           publish=False, jobs=[{"id": "codex", "kind": "swarm", "auto_brief": "codex"}])
+    again = Overnight(cfg2, tmp_path / "run", stop_file=tmp_path / "STOP", progress=False)
+    js = {j["id"]: j for j in again.state["jobs"]}
+    assert js["codex/24"]["auto_brief"] == "codex"      # not started: updated
+    assert "auto_brief" not in js["codex/25"]           # finished: left alone
+
+
+def test_auto_brief_by_a_proposer_model(tmp_path):
+    import subprocess as sp
+    models = tmp_path / "m.toml"
+    models.write_text(
+        '[models.cx]\nprovider = "scripted"\nmodel = "x"\nroles = ["proposer"]\n'
+        'replies = ["1. Try totient streams."]\n', encoding="utf-8")
+    r = sp.run([sys.executable, "-m", "lpswarm", "swarm", "--manifest", str(ROOT / "data/lp/manifest.json"),
+                "--alphabet", str(ROOT / "data/alphabet/gematria_primus.json"), "--sections", "11",
+                "--generators", "cx", "--models", str(models), "--spend-ledger", str(tmp_path / "s.sqlite"),
+                "--rounds", "1", "--per-round", "1", "--null-samples", "100",
+                "--ledger", str(tmp_path / "l.sqlite"), "--report-dir", str(tmp_path / "r"),
+                "--auto-brief", "cx"], capture_output=True, text=True, encoding="utf-8", cwd=ROOT)
+    assert r.returncode == 0, r.stderr[-800:]
+    assert "brief from cx" in r.stdout and "| 1. Try totient streams." in r.stdout

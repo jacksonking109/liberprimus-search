@@ -278,9 +278,35 @@ class Overnight:
                     j["status"] = "interrupted"
             st["status"] = "running"
             st.setdefault("events", []).append(f"{_now()} resumed")
+            self._refresh_job_options(st)
             return st
         return {"started": _now(), "status": "running", "jobs": expand_jobs(self.cfg),
                 "notes": [], "events": [f"{_now()} started"], "added_jobs": 0, "ticks": 0}
+
+    LIVE_JOB_KEYS = ("auto_brief", "lane")
+
+    def _refresh_job_options(self, st: dict) -> None:
+        """On resume, jobs that have not started take auto_brief / lane from the current
+        config, so those edits apply without starting a new run (args stay as they were)."""
+        by_id = {j["id"]: j for j in self.cfg.jobs}
+        changed = 0
+        for j in st["jobs"]:
+            if j.get("added_by") != "config" or j["status"] not in ("pending", "interrupted"):
+                continue
+            src = by_id.get(j["id"].split("/")[0])
+            if src is None:
+                continue
+            for k in self.LIVE_JOB_KEYS:
+                new = src.get(k)
+                if j.get(k) != new:
+                    changed += 1
+                    if new in (None, False, ""):
+                        j.pop(k, None)
+                    else:
+                        j[k] = new
+        if changed:
+            st["events"].append(f"{_now()} resume: auto_brief/lane updated from the config "
+                                f"for jobs not yet started")
 
     def save(self) -> None:
         self.state["updated"] = _now()

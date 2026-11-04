@@ -237,8 +237,12 @@ def _auto_brief(args, router, alphabet, ct, label, values) -> str:
         from lpswarm.textio import read_text
         context = read_text(args.brief_context).strip()
     ctx = GenContext(label, alphabet, np.asarray(ct), 0, 8, alphabet_values=values, task_id=label)
+    from lpswarm.router.base import Role
     try:
-        c = router.complete(args.auto_brief, build_brief_prompt(ctx, context), role="supervisor",
+        # A supervisor-role model (Opus) or any proposer (e.g. Codex briefing itself).
+        roles = router.spec(args.auto_brief).roles
+        role = "supervisor" if Role.SUPERVISOR in roles else "proposer"
+        c = router.complete(args.auto_brief, build_brief_prompt(ctx, context), role=role,
                             task_id=f"{label}#brief", temperature=0.4, max_tokens=1500)
     except (RateLimited, BudgetExceeded, AdapterError, ValueError) as exc:
         print(f"auto-brief skipped ({args.auto_brief}): {str(exc)[:200]}", flush=True)
