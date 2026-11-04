@@ -1,6 +1,6 @@
 # Overnight run 20261104-1523
 
-Started 2026-11-04 15:23:11, updated 2026-11-04 17:53:06, status **running**. Jobs: pending 6, running 1, done 55
+Started 2026-11-04 15:23:11, updated 2026-11-04 17:53:22, status **stopped**. Jobs: pending 6, done 55, interrupted 1
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -17,7 +17,7 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 17:53:06, status **running**. Jo
 | sonnet/19 | done | 2026-11-04 16:33:19 | 2026-11-04 16:36:29 | Sonnet, briefed by Opus |
 | sonnet/20 | done | 2026-11-04 16:36:44 | 2026-11-04 17:16:12 | Sonnet, briefed by Opus |
 | sonnet/21 | done | 2026-11-04 17:32:18 | 2026-11-04 17:36:04 | Sonnet, briefed by Opus |
-| sonnet/22 | running | 2026-11-04 17:36:20 |  | Sonnet, briefed by Opus |
+| sonnet/22 | interrupted | 2026-11-04 17:36:20 | 2026-11-04 17:53:22 | STOP file |
 | sonnet/24 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/25 | pending |  |  | Sonnet, briefed by Opus |
 | codex/25 | done | 2026-11-04 15:23:11 | 2026-11-04 15:35:47 | Codex (exploratory) |
@@ -67,22 +67,6 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 17:53:06, status **running**. Jo
 | deepseek/25 | pending |  | 2026-11-04 16:54:25 | retry requested |
 | sup1/13 | pending |  |  | added by supervisor. sonnet/13 made only 22 attempts from 10 hypotheses on the 333-rune section 13, so its proposals exp |
 
-## Now running
-
-**sonnet/22** (since 2026-11-04 17:36:20), latest log lines:
-```
-17:36:50 [model] claude-sonnet (proposer) ok 9.6s, tokens in/out 4135/1272, reply 2659 chars
-round 1 [claude-sonnet] proposals=12 valid=9 attempts=1222 passes=0 near=0 invalid=3
-17:38:33 [model] claude-sonnet (proposer) calling...
-17:38:42 [model] claude-sonnet (proposer) ok 8.5s, tokens in/out 5036/1224, reply 2665 chars
-round 2 [claude-sonnet] proposals=12 valid=9 attempts=1986 passes=0 near=0 invalid=6
-17:39:24 [model] claude-sonnet (proposer) calling...
-17:39:33 [model] claude-sonnet (proposer) ok 9.2s, tokens in/out 5875/1336, reply 2890 chars
-round 3 [claude-sonnet] proposals=12 valid=12 attempts=7683 passes=0 near=0 invalid=6
-17:49:02 [model] claude-sonnet (proposer) calling...
-17:49:19 [model] claude-sonnet (proposer) ok 16.8s, tokens in/out 6789/1204, reply 2685 chars
-```
-
 ## Results so far
 
 - **tier-claude** (done)
@@ -113,6 +97,8 @@ round 3 [claude-sonnet] proposals=12 valid=12 attempts=7683 passes=0 near=0 inva
   - LP2:50.jpg/2-56.jpg/1: 29488 attempts, 59 hypotheses, **0 final pass(es)**, stopped: stop_file
 - **sonnet/21** (done)
   - LP2:56.jpg/2: 42296 attempts, 57 hypotheses, **0 final pass(es)**
+- **sonnet/22** (interrupted)
+  - LP2:57.jpg-66.jpg/1: 11514 attempts, 37 hypotheses, **0 final pass(es)**, stopped: stop_file
 - **codex/25** (done)
   - LP2:54.jpg-55.jpg - 71.jpg-72.jpg: 60000 attempts, 57 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **codex/24** (done)
@@ -204,9 +190,9 @@ round 3 [claude-sonnet] proposals=12 valid=12 attempts=7683 passes=0 near=0 inva
 - qwen-local: 88 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 88 call(s) in the last 5h (cap none), spent $0.0000
 - granite: 4 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 191 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-sonnet: 191 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-supervisor: 191 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-opus: 190 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-sonnet: 190 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-supervisor: 190 call(s) in the last 5h (cap 550), spent $0.0000
 - codex: 85 call(s) in the last 5h (cap 850), spent $0.0000
 - dry: 4 call(s) in the last 5h (cap none), spent $0.0000
 
@@ -220,9 +206,6 @@ round 3 [claude-sonnet] proposals=12 valid=12 attempts=7683 passes=0 near=0 inva
 
 ## Events
 
-- 2026-11-04 17:41:03 2 running: sonnet/22, deepseek/16
-- 2026-11-04 17:41:23 sonnet/22: running 5 min | 17:39:33 [model] claude-sonnet (proposer) ok 9.2s, tokens in/out 5875/1336, reply 2890 chars
-- 2026-11-04 17:42:58 deepseek/16: done (exit 0, 2 min)
 - 2026-11-04 17:43:13 published: 50 file(s) to branch results
 - 2026-11-04 17:43:13 deepseek/17: start (uses api:https://api.deepseek.com)
 - 2026-11-04 17:43:13 2 running: sonnet/22, deepseek/17
@@ -245,3 +228,6 @@ round 3 [claude-sonnet] proposals=12 valid=12 attempts=7683 passes=0 near=0 inva
 - 2026-11-04 17:52:31 deepseek/21: start (uses api:https://api.deepseek.com)
 - 2026-11-04 17:52:31 2 running: sonnet/22, deepseek/21
 - 2026-11-04 17:53:06 deepseek/21: done (exit 0, 1 min)
+- 2026-11-04 17:53:22 published: 55 file(s) to branch results
+- 2026-11-04 17:53:22 stopping: STOP file
+- 2026-11-04 17:53:22 sonnet/22: interrupted (exit 0, 17 min)
