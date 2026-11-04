@@ -1,6 +1,6 @@
 # Overnight run 20261104-1523
 
-Started 2026-11-04 15:23:11, updated 2026-11-04 16:40:50, status **running**. Jobs: pending 25, running 3, done 33
+Started 2026-11-04 15:23:11, updated 2026-11-04 16:42:26, status **running**. Jobs: pending 24, running 3, done 34
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -31,7 +31,7 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 16:40:50, status **running**. Jo
 | codex/16 | running | 2026-11-04 16:12:44 |  | Codex (exploratory) |
 | codex/15 | done | 2026-11-04 16:20:16 | 2026-11-04 16:20:21 | Codex (exploratory) |
 | codex/14 | done | 2026-11-04 16:20:36 | 2026-11-04 16:37:24 | Codex (exploratory) |
-| codex/13 | running | 2026-11-04 16:37:40 |  | Codex (exploratory) |
+| codex/13 | done | 2026-11-04 16:37:40 | 2026-11-04 16:42:26 | Codex (exploratory) |
 | codex/12 | pending |  |  | Codex (exploratory) |
 | codex/11 | pending |  |  | Codex (exploratory) |
 | codex/10 | pending |  |  | Codex (exploratory) |
@@ -47,7 +47,7 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 16:40:50, status **running**. Jo
 | local/22 | done | 2026-11-04 16:19:00 | 2026-11-04 16:25:07 | local models |
 | local/12 | done | 2026-11-04 16:25:32 | 2026-11-04 16:32:17 | local models |
 | local/24 | done | 2026-11-04 16:32:33 | 2026-11-04 16:40:50 | local models |
-| local/11 | pending |  |  | local models |
+| local/11 | running | 2026-11-04 16:41:06 |  | local models |
 | local/25 | pending |  |  | local models |
 | local/10 | pending |  |  | local models |
 | deepseek/10 | pending |  |  | DeepSeek (volume) |
@@ -83,9 +83,6 @@ round 1 [claude-sonnet] proposals=12 valid=7 attempts=7 passes=0 near=0 invalid=
 ```
 **codex/16** (since 2026-11-04 16:12:44), latest log lines:
 ```
-16:13:42 [model] codex (proposer) ok 31.2s, tokens in/out 18196/1161, reply 3420 chars, model not reported (pin one with model = "..." in the models config)
-round 1 [codex] proposals=16 valid=16 attempts=16052 passes=0 near=0 invalid=0
-16:22:51 [model] codex (proposer) calling...
 16:23:17 [model] codex (proposer) ok 25.6s, tokens in/out 19070/1061, reply 3110 chars, model not reported (pin one with model = "..." in the models config)
 round 2 [codex] proposals=16 valid=16 attempts=30132 passes=0 near=0 invalid=0
 16:28:20 [model] codex (proposer) calling...
@@ -93,19 +90,22 @@ round 2 [codex] proposals=16 valid=16 attempts=30132 passes=0 near=0 invalid=0
 round 3 [codex] proposals=16 valid=16 attempts=40200 passes=0 near=0 invalid=0
 16:36:09 [model] codex (proposer) calling...
 16:36:43 [model] codex (proposer) ok 34.1s, tokens in/out 20197/1140, reply 3094 chars, model not reported (pin one with model = "..." in the models config)
+round 4 [codex] proposals=16 valid=16 attempts=50237 passes=0 near=0 invalid=0
+16:41:42 [model] codex (proposer) calling...
+16:42:07 [model] codex (proposer) ok 25.3s, tokens in/out 20264/1064, reply 2957 chars, model not reported (pin one with model = "..." in the models config)
 ```
-**codex/13** (since 2026-11-04 16:37:40), latest log lines:
+**local/11** (since 2026-11-04 16:41:06), latest log lines:
 ```
-16:38:00 [model] codex (proposer) calling...
-16:38:22 [model] codex (proposer) ok 21.8s, tokens in/out 18178/897, reply 2895 chars, model not reported (pin one with model = "..." in the models config)
-round 1 [codex] proposals=16 valid=16 attempts=8025 passes=0 near=0 invalid=0
-16:39:30 [model] codex (proposer) calling...
-16:40:03 [model] codex (proposer) ok 33.5s, tokens in/out 18304/1111, reply 3007 chars, model not reported (pin one with model = "..." in the models config)
-round 2 [codex] proposals=16 valid=16 attempts=14094 passes=0 near=0 invalid=0
-16:40:06 [model] codex (proposer) calling...
-16:40:29 [model] codex (proposer) ok 23.0s, tokens in/out 18923/967, reply 2935 chars, model not reported (pin one with model = "..." in the models config)
-round 3 [codex] proposals=16 valid=16 attempts=20120 passes=0 near=0 invalid=0
-16:40:48 [model] codex (proposer) calling...
+== LP2:20.jpg/1 - 3.jpg/1  (119 symbols)
+16:41:07 [model] qwen-local (proposer) calling...
+16:41:26 [model] qwen-local (proposer) ok 19.1s, tokens in/out 1725/604, reply 2057 chars
+16:41:26 [model] gemma-local (proposer) calling...
+16:41:42 [model] gemma-local (proposer) ok 15.9s, tokens in/out 1779/514, reply 1478 chars
+round 1 [qwen-local] proposals=8 valid=8 attempts=208 passes=0 near=0 invalid=0
+round 1 [gemma-local] proposals=8 valid=7 attempts=35 passes=0 near=0 invalid=1
+16:41:56 [model] qwen-local (proposer) calling...
+16:42:18 [model] qwen-local (proposer) ok 22.1s, tokens in/out 2178/723, reply 2582 chars
+16:42:18 [model] gemma-local (proposer) calling...
 ```
 
 ## Results so far
@@ -154,6 +154,8 @@ round 3 [codex] proposals=16 valid=16 attempts=20120 passes=0 near=0 invalid=0
   - skip LP2:15.jpg/1 - 32.jpg/1: only 9 symbols (minimum 20, --min-length); too short to judge
 - **codex/14** (done)
   - LP2:8.jpg-14.jpg - 25.jpg-31.jpg: 26385 attempts, 90 hypotheses, **0 final pass(es)**
+- **codex/13** (done)
+  - LP2:6.jpg/2-7.jpg - 23.jpg/2-24.jpg: 28225 attempts, 88 hypotheses, **0 final pass(es)**
 - **local/17** (done)
   - LP2:- - 40.jpg-43.jpg: 2063 attempts, 70 hypotheses, **0 final pass(es)**
 - **local/18** (done)
@@ -181,12 +183,12 @@ round 3 [codex] proposals=16 valid=16 attempts=20120 passes=0 near=0 invalid=0
 
 ## Model usage
 
-- qwen-local: 66 call(s) in the last 5h (cap none), spent $0.0000
-- gemma-local: 66 call(s) in the last 5h (cap none), spent $0.0000
+- qwen-local: 68 call(s) in the last 5h (cap none), spent $0.0000
+- gemma-local: 67 call(s) in the last 5h (cap none), spent $0.0000
 - claude-opus: 212 call(s) in the last 5h (cap 550), spent $0.0000
 - claude-sonnet: 212 call(s) in the last 5h (cap 550), spent $0.0000
 - claude-supervisor: 212 call(s) in the last 5h (cap 550), spent $0.0000
-- codex: 70 call(s) in the last 5h (cap 750), spent $0.0000
+- codex: 74 call(s) in the last 5h (cap 750), spent $0.0000
 
 ## Supervisor notes
 
@@ -195,12 +197,6 @@ round 3 [codex] proposals=16 valid=16 attempts=20120 passes=0 near=0 invalid=0
 
 ## Events
 
-- 2026-11-04 16:30:37 codex/14: running 10 min | 16:27:39 [model] codex (proposer) ok 24.9s, tokens in/out 19812/1066, reply 3257 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-04 16:31:57 sonnet/18: running 10 min | 16:29:38 [model] claude-sonnet (proposer) ok 23.2s, tokens in/out 7920/2162, reply 2736 chars
-- 2026-11-04 16:32:17 local/12: done (exit 0, 7 min)
-- 2026-11-04 16:32:33 published: 30 file(s) to branch results
-- 2026-11-04 16:32:33 local/24: start (uses ollama:http://127.0.0.1:11434)
-- 2026-11-04 16:32:33 4 running: codex/16, codex/14, sonnet/18, local/24
 - 2026-11-04 16:32:33 sonnet/19 waiting: claude-plan in use by sonnet/18
 - 2026-11-04 16:32:48 codex/16: running 20 min | 16:28:51 [model] codex (proposer) ok 31.3s, tokens in/out 19844/1348, reply 3196 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-04 16:33:03 sonnet/18: done (exit 0, 11 min)
@@ -220,3 +216,9 @@ round 3 [codex] proposals=16 valid=16 attempts=20120 passes=0 near=0 invalid=0
 - 2026-11-04 16:37:40 sonnet/21 waiting: claude-plan in use by sonnet/20
 - 2026-11-04 16:37:50 codex/16: running 25 min | 16:36:43 [model] codex (proposer) ok 34.1s, tokens in/out 20197/1140, reply 3094 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-04 16:40:50 local/24: done (exit 0, 8 min)
+- 2026-11-04 16:41:06 published: 34 file(s) to branch results
+- 2026-11-04 16:41:06 local/11: start (uses ollama:http://127.0.0.1:11434)
+- 2026-11-04 16:41:06 4 running: codex/16, sonnet/20, codex/13, local/11
+- 2026-11-04 16:41:06 sonnet/21 waiting: claude-plan in use by sonnet/20
+- 2026-11-04 16:41:46 sonnet/20: running 5 min | 16:37:37 [model] claude-sonnet (proposer) ok 13.1s, tokens in/out 5007/1808, reply 2618 chars
+- 2026-11-04 16:42:26 codex/13: done (exit 0, 5 min)
