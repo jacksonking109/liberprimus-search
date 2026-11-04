@@ -1,6 +1,6 @@
 # Overnight run 20261103-2030
 
-Started 2026-11-03 20:30:23, updated 2026-11-03 22:19:21, status **running**. Jobs: pending 13, running 1, done 2, blocked 15
+Started 2026-11-03 20:30:23, updated 2026-11-03 22:26:22, status **running**. Jobs: pending 12, running 1, done 3, blocked 15
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -22,7 +22,7 @@ Started 2026-11-03 20:30:23, updated 2026-11-03 22:19:21, status **running**. Jo
 | unsolved/25 | blocked |  | 2026-11-03 22:08:49 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
 | sup1/10 | done | 2026-11-03 22:08:49 | 2026-11-03 22:15:29 | added by supervisor. The DeepSeek-based unsolved jobs are blocked by the zero-price config. This covers the same section |
 | sup1/11 | done | 2026-11-03 22:15:45 | 2026-11-03 22:19:21 | added by supervisor. The DeepSeek-based unsolved jobs are blocked by the zero-price config. This covers the same section |
-| sup1/12 | pending |  |  | added by supervisor. The DeepSeek-based unsolved jobs are blocked by the zero-price config. This covers the same section |
+| sup1/12 | done | 2026-11-03 22:19:36 | 2026-11-03 22:26:22 | added by supervisor. The DeepSeek-based unsolved jobs are blocked by the zero-price config. This covers the same section |
 | sup1/13 | pending |  |  | added by supervisor. The DeepSeek-based unsolved jobs are blocked by the zero-price config. This covers the same section |
 | sup1/14 | pending |  |  | added by supervisor. The DeepSeek-based unsolved jobs are blocked by the zero-price config. This covers the same section |
 | sup1/15 | pending |  |  | added by supervisor. The DeepSeek-based unsolved jobs are blocked by the zero-price config. This covers the same section |
@@ -57,16 +57,18 @@ resuming run 20261103T203025: 12 case(s) already done
   - LP2:17.jpg, 18.jpg, 19.jpg - 0.jpg-2.jpg: 18513 attempts, 61 hypotheses, **0 final pass(es)**
 - **sup1/11** (done)
   - LP2:20.jpg/1 - 3.jpg/1: 26343 attempts, 62 hypotheses, **0 final pass(es)**
+- **sup1/12** (done)
+  - LP2:20.jpg/2-23.jpg/1 - 3.jpg/2-6.jpg/1: 18302 attempts, 61 hypotheses, **0 final pass(es)**
 
 ## Model usage
 
-- qwen-local: 10 call(s) in the last 5h (cap none), spent $0.0000
-- gemma-local: 10 call(s) in the last 5h (cap none), spent $0.0000
+- qwen-local: 14 call(s) in the last 5h (cap none), spent $0.0000
+- gemma-local: 14 call(s) in the last 5h (cap none), spent $0.0000
 - granite: 2 call(s) in the last 5h (cap none), spent $0.0000
 - claude-opus: 40 call(s) in the last 5h (cap 40), spent $0.0000, paused until 01:27 (local cap, raise max_calls_per_window to allow more)
 - claude-sonnet: 40 call(s) in the last 5h (cap 40), spent $0.0000, paused until 01:27 (local cap, raise max_calls_per_window to allow more)
 - claude-supervisor: 40 call(s) in the last 5h (cap 40), spent $0.0000, paused until 01:27 (local cap, raise max_calls_per_window to allow more)
-- codex: 9 call(s) in the last 5h (cap 30), spent $0.0000
+- codex: 13 call(s) in the last 5h (cap 30), spent $0.0000
 - dry: 2 call(s) in the last 5h (cap none), spent $0.0000
 
 ## Supervisor notes
@@ -77,13 +79,6 @@ resuming run 20261103T203025: 12 case(s) already done
 
 ## Events
 
-- 2026-11-03 22:08:49 unsolved/11: blocked: model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_per_mtok
-- 2026-11-03 22:08:49 unsolved/12: blocked: model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_per_mtok
-- 2026-11-03 22:08:49 unsolved/13: blocked: model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_per_mtok
-- 2026-11-03 22:08:49 unsolved/14: blocked: model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_per_mtok
-- 2026-11-03 22:08:49 unsolved/15: blocked: model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_per_mtok
-- 2026-11-03 22:08:49 unsolved/16: blocked: model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_per_mtok
-- 2026-11-03 22:08:49 unsolved/17: blocked: model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_per_mtok
 - 2026-11-03 22:08:49 unsolved/18: blocked: model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_per_mtok
 - 2026-11-03 22:08:49 unsolved/19: blocked: model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_per_mtok
 - 2026-11-03 22:08:49 unsolved/20: blocked: model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_per_mtok
@@ -102,3 +97,10 @@ resuming run 20261103T203025: 12 case(s) already done
 - 2026-11-03 22:15:45 2 running: tier-claude, sup1/11
 - 2026-11-03 22:18:50 tier-claude: running 10 min | 22:08:50 [model] claude-sonnet (proposer) paused: claude-sonnet is paused until 2026-11-04 01:27 (local cap 40/40 calls per 5h for claude-plan; raise max_calls_per_window in the models config to allow
 - 2026-11-03 22:19:21 sup1/11: done (exit 0, 4 min)
+- 2026-11-03 22:19:36 published: 7 file(s) to branch results
+- 2026-11-03 22:19:36 supervisor unavailable: claude-supervisor is paused until 2026-11-04 01:27 (local cap 40/40 calls per 5h for claude-plan; raise max_calls_per_window in the models config to allow more)
+- 2026-11-03 22:19:36 sup1/12: start (uses codex-plan, ollama:http://127.0.0.1:11434)
+- 2026-11-03 22:19:36 2 running: tier-claude, sup1/12
+- 2026-11-03 22:23:51 tier-claude: running 15 min | 22:08:50 [model] claude-sonnet (proposer) paused: claude-sonnet is paused until 2026-11-04 01:27 (local cap 40/40 calls per 5h for claude-plan; raise max_calls_per_window in the models config to allow
+- 2026-11-03 22:24:36 sup1/12: running 5 min | 22:24:11 [model] gemma-local (proposer) ok 14.5s, tokens in/out 3203/254, reply 812 chars
+- 2026-11-03 22:26:22 sup1/12: done (exit 0, 7 min)
