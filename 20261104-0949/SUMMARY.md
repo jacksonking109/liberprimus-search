@@ -1,6 +1,6 @@
 # Overnight run 20261104-0949
 
-Started 2026-11-04 09:49:00, updated 2026-11-04 11:40:34, status **running**. Jobs: pending 20, running 1, done 40, blocked 15
+Started 2026-11-04 09:49:00, updated 2026-11-04 11:40:49, status **running**. Jobs: pending 20, done 41, blocked 15
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -16,7 +16,7 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 11:40:34, status **running**. Jo
 | sonnet/18 | done | 2026-11-04 11:13:42 | 2026-11-04 11:26:43 | Sonnet, briefed by Opus |
 | sonnet/19 | done | 2026-11-04 11:27:10 | 2026-11-04 11:29:30 | Sonnet, briefed by Opus |
 | sonnet/20 | done | 2026-11-04 11:29:45 | 2026-11-04 11:38:07 | Sonnet, briefed by Opus |
-| sonnet/21 | running | 2026-11-04 11:38:39 |  | Sonnet, briefed by Opus |
+| sonnet/21 | done | 2026-11-04 11:38:39 | 2026-11-04 11:40:49 | Sonnet, briefed by Opus |
 | sonnet/22 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/24 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/25 | pending |  |  | Sonnet, briefed by Opus |
@@ -81,22 +81,6 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 11:40:34, status **running**. Jo
 | sup1/24 | pending |  |  | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
 | sup1/25 | pending |  |  | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
 
-## Now running
-
-**sonnet/21** (since 2026-11-04 11:38:39), latest log lines:
-```
-        near_miss by claude-sonnet    sub; sequence prime_totients*1+0 @403; skip [0] (resolve)  [chance 46: noise level (pure noise does this well that often)]
-        GUNUWYOECPTYOEREONGXSSMSNGYTJSIYWHSLRAELTHRSWIOSIOLAPALLJROCHAEEOEOPALESTJYJJOEDTHNGGRYEEYBYDNG
-        near_miss by claude-sonnet    sub; sequence prime_totients*1+0 @353; skip [0] (resolve)  [chance 53: noise level (pure noise does this well that often)]
-        DAUOELGEOAOGEOGSHEAPIHTTOTBGXATHININCYNGDFDCUHFGJIYFGTHEMIICEATHFOFDTNHOLLENGEACEACUJSJFAAEWO
-        near_miss by claude-sonnet    sub; sequence prime_totients*1+0 @862; skip [0] (resolve)  [chance 50: noise level (pure noise does this well that often)]
-        WREORRJMNGTHAJOTOFEARGIFEOAEBGFEFGTFEAAXPSFSOEXNGWSTCDOEEXXPGISEMOIOCEANGEMIDGHSIOAEBTHIOEOERYCICC
-        near_miss by claude-sonnet    beaufort; sequence prime_totients*1+0 @564; map reverse; skip [0] (resolve)  [chance 34: noise level (pure noise does this well that often)]
-        HIOAANWRCMBUPCRTHWAOAEHEAEAAGOEIOXWLTRHXGLUNGNAEPSGNGJGFOECRJLAECPEABULCLGSLENNGJCDHWRUSNGCICOEU
-report: reports\overnight\20261104-0949\sonnet_21\report.md
-model spend (reports/model_spend.sqlite): deepseek=$0.0000, qwen-local=$0.0000, gemma-local=$0.0000, granite=$0.0000, claude-opus=$0.0000, claude-sonnet=$0.0000, claude-supervisor=$0.0000, codex=$0.00
-```
-
 ## Results so far
 
 - **tier-claude** (done)
@@ -125,7 +109,7 @@ model spend (reports/model_spend.sqlite): deepseek=$0.0000, qwen-local=$0.0000, 
   - LP2:33.jpg - 50.jpg/1: 8899 attempts, 22 hypotheses, **0 final pass(es)** (caution: short section (91 runes): many keys give plausible-looking text this short; treat any lead with extra caution)
 - **sonnet/20** (done)
   - LP2:50.jpg/2-56.jpg/1: 12757 attempts, 39 hypotheses, **0 final pass(es)**
-- **sonnet/21** (running)
+- **sonnet/21** (done)
   - LP2:56.jpg/2: 6575 attempts, 16 hypotheses, **0 final pass(es)**, stopped: stop_file
 - **codex/25** (done)
   - LP2:54.jpg-55.jpg - 71.jpg-72.jpg: 30269 attempts, 47 hypotheses, **0 final pass(es)**
@@ -217,8 +201,6 @@ Prefer the longer sections (1000+ runes). On short ones (91 and 121 runes) noise
 
 ## Events
 
-- 2026-11-04 11:27:10 sonnet/19: start (uses claude-plan)
-- 2026-11-04 11:27:10 2 running: codex/14, sonnet/19
 - 2026-11-04 11:27:10 sonnet/20 waiting: claude-plan in use by sonnet/19
 - 2026-11-04 11:29:30 sonnet/19: done (exit 0, 2 min)
 - 2026-11-04 11:29:45 published: 37 file(s) to branch results
@@ -242,3 +224,5 @@ Prefer the longer sections (1000+ runes). On short ones (91 and 121 runes) noise
 - 2026-11-04 11:38:39 2 running: codex/12, sonnet/21
 - 2026-11-04 11:38:39 sonnet/22 waiting: claude-plan in use by sonnet/21
 - 2026-11-04 11:40:34 codex/12: done (exit 0, 4 min)
+- 2026-11-04 11:40:49 published: 42 file(s) to branch results
+- 2026-11-04 11:40:49 sonnet/21: done (exit 0, 2 min)
