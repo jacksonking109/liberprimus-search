@@ -1,6 +1,6 @@
 # Overnight run 20261103-2030
 
-Started 2026-11-03 20:30:23, updated 2026-11-03 20:34:48, status **running**. Jobs: pending 23, failed 1, blocked 7
+Started 2026-11-03 20:30:23, updated 2026-11-03 20:35:08, status **running**. Jobs: pending 22, failed 1, blocked 8
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -12,7 +12,7 @@ Started 2026-11-03 20:30:23, updated 2026-11-03 20:34:48, status **running**. Jo
 | unsolved/14 | blocked |  | 2026-11-03 20:34:15 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
 | unsolved/15 | blocked |  | 2026-11-03 20:34:34 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
 | unsolved/16 | blocked |  | 2026-11-03 20:34:48 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
-| unsolved/17 | pending |  |  | Codex (exploratory) + DeepSeek (volume) |
+| unsolved/17 | blocked |  | 2026-11-03 20:35:08 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
 | unsolved/18 | pending |  |  | Codex (exploratory) + DeepSeek (volume) |
 | unsolved/19 | pending |  |  | Codex (exploratory) + DeepSeek (volume) |
 | unsolved/20 | pending |  |  | Codex (exploratory) + DeepSeek (volume) |
@@ -53,9 +53,9 @@ Started 2026-11-03 20:30:23, updated 2026-11-03 20:34:48, status **running**. Jo
 - qwen-local: 2 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 2 call(s) in the last 5h (cap none), spent $0.0000
 - granite: 2 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 18 call(s) in the last 5h (cap 40), spent $0.0000
-- claude-sonnet: 18 call(s) in the last 5h (cap 40), spent $0.0000
-- claude-supervisor: 18 call(s) in the last 5h (cap 40), spent $0.0000
+- claude-opus: 19 call(s) in the last 5h (cap 40), spent $0.0000
+- claude-sonnet: 19 call(s) in the last 5h (cap 40), spent $0.0000
+- claude-supervisor: 19 call(s) in the last 5h (cap 40), spent $0.0000
 - codex: 1 call(s) in the last 5h (cap 30), spent $0.0000
 - dry: 2 call(s) in the last 5h (cap none), spent $0.0000
 
@@ -86,3 +86,5 @@ Started 2026-11-03 20:30:23, updated 2026-11-03 20:34:48, status **running**. Jo
 - 2026-11-03 20:34:34 unsolved/15: blocked: model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_per_mtok
 - 2026-11-03 20:34:44 published: 5 file(s) to branch results
 - 2026-11-03 20:34:48 unsolved/16: blocked: model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_per_mtok
+- 2026-11-03 20:35:03 published: 5 file(s) to branch results
+- 2026-11-03 20:35:08 unsolved/17: blocked: model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_per_mtok
