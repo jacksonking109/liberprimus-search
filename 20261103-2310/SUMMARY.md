@@ -1,12 +1,12 @@
 # Overnight run 20261103-2310
 
-Started 2026-11-03 23:10:06, updated 2026-11-03 23:38:10, status **running**. Jobs: pending 50, running 2, done 9
+Started 2026-11-03 23:10:06, updated 2026-11-03 23:41:45, status **running**. Jobs: pending 49, running 2, done 10
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
 | tier-claude | done | 2026-11-03 23:10:06 | 2026-11-03 23:27:44 | Claude Code proposers vs the random control |
 | sonnet/10 | done | 2026-11-03 23:28:00 | 2026-11-03 23:38:10 | Sonnet, briefed by Opus |
-| sonnet/11 | pending |  |  | Sonnet, briefed by Opus |
+| sonnet/11 | running | 2026-11-03 23:38:25 |  | Sonnet, briefed by Opus |
 | sonnet/12 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/13 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/14 | pending |  |  | Sonnet, briefed by Opus |
@@ -22,7 +22,7 @@ Started 2026-11-03 23:10:06, updated 2026-11-03 23:38:10, status **running**. Jo
 | sonnet/25 | pending |  |  | Sonnet, briefed by Opus |
 | codex/25 | done | 2026-11-03 23:10:06 | 2026-11-03 23:15:43 | Codex (exploratory) |
 | codex/24 | done | 2026-11-03 23:15:59 | 2026-11-03 23:21:04 | Codex (exploratory) |
-| codex/22 | running | 2026-11-03 23:21:38 |  | Codex (exploratory) |
+| codex/22 | done | 2026-11-03 23:21:38 | 2026-11-03 23:41:45 | Codex (exploratory) |
 | codex/21 | pending |  |  | Codex (exploratory) |
 | codex/20 | pending |  |  | Codex (exploratory) |
 | codex/19 | pending |  |  | Codex (exploratory) |
@@ -68,30 +68,31 @@ Started 2026-11-03 23:10:06, updated 2026-11-03 23:38:10, status **running**. Jo
 
 ## Now running
 
-**codex/22** (since 2026-11-03 23:21:38), latest log lines:
+**sonnet/11** (since 2026-11-03 23:38:25), latest log lines:
 ```
-23:26:44 [model] codex (proposer) ok 12.5s, tokens in/out 17249/464, reply 1470 chars
-round 3 [codex] proposals=8 valid=8 attempts=14296 passes=0 near=0 invalid=0
-23:26:45 [model] codex (proposer) calling...
-23:26:58 [model] codex (proposer) ok 12.7s, tokens in/out 18177/448, reply 1645 chars
-round 4 [codex] proposals=8 valid=8 attempts=18475 passes=0 near=1 invalid=0
-23:30:38 [model] codex (proposer) calling...
-23:31:07 [model] codex (proposer) ok 28.9s, tokens in/out 18488/483, reply 1531 chars
-round 5 [codex] proposals=8 valid=8 attempts=24508 passes=0 near=2 invalid=0
-23:34:04 [model] codex (proposer) calling...
-23:34:26 [model] codex (proposer) ok 22.1s, tokens in/out 18704/487, reply 1685 chars
+23:39:09 [model] claude-sonnet (proposer) calling...
+23:39:17 [model] claude-sonnet (proposer) ok 7.3s, tokens in/out 4208/892, reply 1955 chars
+round 2 [claude-sonnet] proposals=8 valid=8 attempts=7543 passes=0 near=4 invalid=3
+23:39:44 [model] claude-sonnet (proposer) calling...
+23:39:59 [model] claude-sonnet (proposer) ok 14.3s, tokens in/out 4898/859, reply 1862 chars
+round 3 [claude-sonnet] proposals=8 valid=8 attempts=16557 passes=0 near=5 invalid=3
+23:40:15 [model] claude-sonnet (proposer) calling...
+23:40:24 [model] claude-sonnet (proposer) ok 9.5s, tokens in/out 5546/1350, reply 2291 chars
+round 4 [claude-sonnet] proposals=8 valid=8 attempts=32557 passes=0 near=13 invalid=3
+23:41:39 [model] claude-sonnet (proposer) calling...
 ```
 **local/20** (since 2026-11-03 23:37:05), latest log lines:
 ```
-===== 2026-11-03 23:37:05 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 20 --gen
-== LP2:50.jpg/2-56.jpg/1  (1468 symbols)
-23:37:06 [model] qwen-local (proposer) calling...
-23:37:30 [model] qwen-local (proposer) ok 23.9s, tokens in/out 2331/766, reply 2076 chars
-23:37:30 [model] gemma-local (proposer) calling...
-23:37:44 [model] gemma-local (proposer) ok 14.3s, tokens in/out 2384/400, reply 1221 chars
-round 1 [qwen-local] proposals=8 valid=8 attempts=8 passes=0 near=0 invalid=0
-round 1 [gemma-local] proposals=8 valid=8 attempts=8 passes=0 near=0 invalid=0
-23:37:58 [model] qwen-local (proposer) calling...
+round 2 [gemma-local] proposals=8 valid=7 attempts=20 passes=0 near=0 invalid=1
+23:39:36 [model] qwen-local (proposer) calling...
+23:39:58 [model] qwen-local (proposer) ok 22.5s, tokens in/out 3269/680, reply 2418 chars
+23:39:58 [model] gemma-local (proposer) calling...
+23:40:15 [model] gemma-local (proposer) ok 16.4s, tokens in/out 3279/473, reply 1442 chars
+round 3 [qwen-local] proposals=8 valid=8 attempts=24 passes=0 near=0 invalid=0
+round 3 [gemma-local] proposals=8 valid=8 attempts=28 passes=0 near=0 invalid=1
+23:41:12 [model] qwen-local (proposer) calling...
+23:41:33 [model] qwen-local (proposer) ok 20.9s, tokens in/out 3414/610, reply 2035 chars
+23:41:33 [model] gemma-local (proposer) calling...
 ```
 
 ## Results so far
@@ -106,6 +107,8 @@ round 1 [gemma-local] proposals=8 valid=8 attempts=8 passes=0 near=0 invalid=0
   - LP2:54.jpg-55.jpg - 71.jpg-72.jpg: 29964 attempts, 47 hypotheses, **0 final pass(es)**
 - **codex/24** (done)
   - LP2:51.jpg/2-53.jpg - 68.jpg/2-70.jpg: 26431 attempts, 47 hypotheses, **0 final pass(es)**
+- **codex/22** (done)
+  - LP2:57.jpg-66.jpg/1: 32546 attempts, 48 hypotheses, **0 final pass(es)**
 - **local/17** (done)
   - LP2:- - 40.jpg-43.jpg: 190 attempts, 81 hypotheses, **0 final pass(es)**
 - **local/18** (done)
@@ -119,12 +122,12 @@ round 1 [gemma-local] proposals=8 valid=8 attempts=8 passes=0 near=0 invalid=0
 
 ## Model usage
 
-- qwen-local: 65 call(s) in the last 5h (cap none), spent $0.0000
-- gemma-local: 65 call(s) in the last 5h (cap none), spent $0.0000
+- qwen-local: 68 call(s) in the last 5h (cap none), spent $0.0000
+- gemma-local: 67 call(s) in the last 5h (cap none), spent $0.0000
 - granite: 2 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 124 call(s) in the last 5h (cap 120), spent $0.0000, paused until 01:31 (local cap, raise max_calls_per_window to allow more)
-- claude-sonnet: 124 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-supervisor: 124 call(s) in the last 5h (cap 200), spent $0.0000
+- claude-opus: 129 call(s) in the last 5h (cap 120), spent $0.0000, paused until 01:32 (local cap, raise max_calls_per_window to allow more)
+- claude-sonnet: 129 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-supervisor: 129 call(s) in the last 5h (cap 200), spent $0.0000
 - codex: 57 call(s) in the last 5h (cap 750), spent $0.0000
 - dry: 2 call(s) in the last 5h (cap none), spent $0.0000
 
@@ -135,10 +138,6 @@ round 1 [gemma-local] proposals=8 valid=8 attempts=8 passes=0 near=0 invalid=0
 
 ## Events
 
-- 2026-11-03 23:27:44 tier-claude: done (exit 0, 18 min)
-- 2026-11-03 23:28:00 published: 9 file(s) to branch results
-- 2026-11-03 23:28:00 sonnet/10: start (uses claude-plan)
-- 2026-11-03 23:28:00 3 running: codex/22, local/16, sonnet/10
 - 2026-11-03 23:31:40 codex/22: running 10 min | 23:31:07 [model] codex (proposer) ok 28.9s, tokens in/out 18488/483, reply 1531 chars
 - 2026-11-03 23:32:00 local/16: running 10 min | 23:31:46 [model] gemma-local (proposer) calling...
 - 2026-11-03 23:32:05 local/16: done (exit 0, 10 min)
@@ -160,3 +159,7 @@ round 1 [gemma-local] proposals=8 valid=8 attempts=8 passes=0 near=0 invalid=0
 - 2026-11-03 23:37:05 3 running: codex/22, sonnet/10, local/20
 - 2026-11-03 23:38:05 sonnet/10: running 10 min | 23:35:24 [model] claude-sonnet (proposer) ok 18.6s, tokens in/out 6881/1473, reply 1995 chars
 - 2026-11-03 23:38:10 sonnet/10: done (exit 0, 10 min)
+- 2026-11-03 23:38:25 published: 12 file(s) to branch results
+- 2026-11-03 23:38:25 sonnet/11: start (uses claude-plan)
+- 2026-11-03 23:38:25 3 running: codex/22, local/20, sonnet/11
+- 2026-11-03 23:41:45 codex/22: done (exit 0, 20 min)
