@@ -1,5 +1,86 @@
 # Start here: first run at home (Windows)
 
+## Next time at the PC (changes from Nov 4)
+
+Do these once, in the `liberprimus-search` folder, then delete this section.
+
+**1.** If a run is still going, stop it and wait for `[overnight] stopping`:
+
+```powershell
+New-Item STOP
+```
+
+```powershell
+Remove-Item STOP
+```
+
+**2.** Get the new code:
+
+```powershell
+git pull
+```
+
+**3.** Edit `config\models.toml` (Notepad is fine). In each block below, change the line if it
+is already there, or add it under the block's `[models....]` header if it is not:
+
+- `[models.claude-opus]`
+  - `max_calls_per_window = 250`
+  - `model_max_calls_per_window = 60`
+- `[models.claude-sonnet]`
+  - `max_calls_per_window = 250`
+  - `style = "exploratory"`
+  - optional, to pin Sonnet 5.5 instead of the current-Sonnet alias: `model = "claude-sonnet-5-5"`
+- `[models.claude-supervisor]`
+  - `max_calls_per_window = 250`
+  - `model_max_calls_per_window = 100`
+- `[models.granite]`
+  - `endpoint = "http://127.0.0.1:11435"`
+  - `timeout = 300`
+
+The three Claude entries share one quota of 250 calls per 5 hours. Opus as a proposer gets at
+most 60, the supervisor (Opus: check-ins plus a brief for each Sonnet section) at most 100, and
+Sonnet the rest. Edits to these numbers take effect even while a run is going.
+
+**4.** Take the new job queue. It has three lanes side by side (Sonnet briefed by Opus, Codex,
+and qwen/gemma with Granite), after the tier test. This overwrites `config\overnight.toml`, so
+note any changes you made to it first:
+
+```powershell
+Copy-Item config\overnight.example.toml config\overnight.toml -Force
+```
+
+**5.** Restart the model servers. Expect two `[OK]` lines: 11434 on the 5060 Ti, and 11435 for
+Granite on the CPU.
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\start_ollama.ps1
+```
+
+**6.** Check. Everything should be `[OK]`; a DeepSeek `[WARN]` is fine.
+
+```powershell
+.\.venv\Scripts\lpswarm.exe doctor
+```
+
+**7.** Start a fresh run:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\overnight.ps1 -New
+```
+
+**8.** What to expect:
+- The tier test runs first. Then three lanes run side by side: Sonnet (with a brief from Opus
+  before each section), Codex, and the local models.
+- Every lead has a **chance** number: how many attempts at least this good pure noise would
+  produce on that section. About 1 or more is noise. A real find needs below 0.01, and would
+  also be marked FINAL.
+
+**9.** When the EVGA cable arrives: install the 2060, reboot, then run step 5 again. It detects
+the second GPU and moves Granite onto it by itself. Run `doctor` to confirm; no config edits
+are needed.
+
+---
+
 Everything you need tonight, in order. Commands are for **PowerShell** on the desktop. Each
 command is in its own block so it can be copied on its own.
 
