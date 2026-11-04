@@ -1,6 +1,6 @@
 # Overnight run 20261103-2310
 
-Started 2026-11-03 23:10:06, updated 2026-11-04 01:26:25, status **running**. Jobs: pending 11, running 1, done 35, blocked 15
+Started 2026-11-03 23:10:06, updated 2026-11-04 01:27:29, status **running**. Jobs: pending 10, running 1, done 36, blocked 15
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -12,7 +12,7 @@ Started 2026-11-03 23:10:06, updated 2026-11-04 01:26:25, status **running**. Jo
 | sonnet/14 | done | 2026-11-04 00:12:32 | 2026-11-04 00:21:13 | Sonnet, briefed by Opus |
 | sonnet/15 | done | 2026-11-04 00:21:44 | 2026-11-04 00:21:49 | Sonnet, briefed by Opus |
 | sonnet/16 | done | 2026-11-04 00:22:05 | 2026-11-04 01:26:25 | Sonnet, briefed by Opus |
-| sonnet/17 | pending |  |  | Sonnet, briefed by Opus |
+| sonnet/17 | running | 2026-11-04 01:26:49 |  | Sonnet, briefed by Opus |
 | sonnet/18 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/19 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/20 | pending |  |  | Sonnet, briefed by Opus |
@@ -32,7 +32,7 @@ Started 2026-11-03 23:10:06, updated 2026-11-04 01:26:25, status **running**. Jo
 | codex/15 | done | 2026-11-04 00:48:49 | 2026-11-04 00:48:54 | Codex (exploratory) |
 | codex/14 | done | 2026-11-04 00:49:10 | 2026-11-04 01:10:40 | Codex (exploratory) |
 | codex/13 | done | 2026-11-04 01:11:19 | 2026-11-04 01:15:34 | Codex (exploratory) |
-| codex/12 | running | 2026-11-04 01:15:50 |  | Codex (exploratory) |
+| codex/12 | done | 2026-11-04 01:15:50 | 2026-11-04 01:27:29 | Codex (exploratory) |
 | codex/11 | pending |  |  | Codex (exploratory) |
 | codex/10 | pending |  |  | Codex (exploratory) |
 | local/17 | done | 2026-11-03 23:10:06 | 2026-11-03 23:14:52 | local models |
@@ -69,18 +69,18 @@ Started 2026-11-03 23:10:06, updated 2026-11-04 01:26:25, status **running**. Jo
 
 ## Now running
 
-**codex/12** (since 2026-11-04 01:15:50), latest log lines:
+**sonnet/17** (since 2026-11-04 01:26:49), latest log lines:
 ```
-01:20:18 [model] codex (proposer) ok 27.0s, tokens in/out 17465/384, reply 1491 chars
-round 2 [codex] proposals=8 valid=8 attempts=12123 passes=0 near=1 invalid=0
-01:21:08 [model] codex (proposer) calling...
-01:21:19 [model] codex (proposer) ok 11.7s, tokens in/out 17279/423, reply 1628 chars
-round 3 [codex] proposals=8 valid=8 attempts=20155 passes=0 near=1 invalid=0
-01:23:05 [model] codex (proposer) calling...
-01:23:27 [model] codex (proposer) ok 22.1s, tokens in/out 18267/490, reply 1671 chars
-round 4 [codex] proposals=8 valid=8 attempts=24285 passes=0 near=1 invalid=0
-01:23:30 [model] codex (proposer) calling...
-01:23:55 [model] codex (proposer) ok 24.7s, tokens in/out 18687/576, reply 1689 chars
+  | - The prime_totients stream at offset 0 with skip [F] used on the solved page.
+  | - Single-offset sequence tries. Always use offset_range.
+  | 1. Ciphertext autokey. Use source "ciphertext" with primers of length 1-4 given as integer lists, for example [0], [1], [28], [2,3]. Try combine sub, add and beaufort, each with map identity and w
+  | 2. Plaintext autokey with LP-themed primers: DIVINITY, CIRCUMFERENCE, PRIMES, TOTIENT, INSTAR, PARABLE, KOAN, WISDOM, EMERGE, CICADA. Try sub and beaufort. Use no skip, because resolve mode is not
+  | 3. Sequence streams over offset_range [0,2000]: prime_totients, primes, fibonacci, triangular, squares. Use scale 1 and 28 (the negation) and add 0. Try beaufort and add, not only sub. Add skip [F
+  | 4. pi_digits and e_digits over offset_range [0,2000]. Use scales 1, 2, 3, 28 and combine sub or beaufort.
+  | 5. reverse_text true combined with directions 1 and 3. The text may have been enciphered back to front.
+  | 6. Columnar transposition with widths 2-7. Try the identity order, the reversed order and a few permutations such as [1,0], [2,0,1] and [1,3,0,2]. Follow with prime_totients over offset_range [0,5
+01:27:11 [model] claude-sonnet (proposer) calling...
+01:27:20 [model] claude-sonnet (proposer) ok 8.6s, tokens in/out 4148/783, reply 1731 chars
 ```
 
 ## Results so far
@@ -127,6 +127,8 @@ round 4 [codex] proposals=8 valid=8 attempts=24285 passes=0 near=1 invalid=0
   - LP2:8.jpg-14.jpg - 25.jpg-31.jpg: 44217 attempts, 47 hypotheses, **0 final pass(es)**
 - **codex/13** (done)
   - LP2:6.jpg/2-7.jpg - 23.jpg/2-24.jpg: 14741 attempts, 48 hypotheses, **0 final pass(es)**
+- **codex/12** (done)
+  - LP2:20.jpg/2-23.jpg/1 - 3.jpg/2-6.jpg/1: 34409 attempts, 48 hypotheses, **0 final pass(es)**
 - **local/17** (done)
   - LP2:- - 40.jpg-43.jpg: 190 attempts, 81 hypotheses, **0 final pass(es)**
 - **local/18** (done)
@@ -160,13 +162,12 @@ round 4 [codex] proposals=8 valid=8 attempts=24285 passes=0 near=1 invalid=0
 
 ## Model usage
 
-- qwen-local: 123 call(s) in the last 5h (cap none), spent $0.0000
-- gemma-local: 123 call(s) in the last 5h (cap none), spent $0.0000
-- granite: 1 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 166 call(s) in the last 5h (cap 120), spent $0.0000, paused until 03:34 (local cap, raise max_calls_per_window to allow more)
-- claude-sonnet: 166 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-supervisor: 166 call(s) in the last 5h (cap 200), spent $0.0000
-- codex: 110 call(s) in the last 5h (cap 750), spent $0.0000
+- qwen-local: 122 call(s) in the last 5h (cap none), spent $0.0000
+- gemma-local: 122 call(s) in the last 5h (cap none), spent $0.0000
+- claude-opus: 168 call(s) in the last 5h (cap 120), spent $0.0000, paused until 03:35 (local cap, raise max_calls_per_window to allow more)
+- claude-sonnet: 168 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-supervisor: 168 call(s) in the last 5h (cap 200), spent $0.0000
+- codex: 111 call(s) in the last 5h (cap 750), spent $0.0000
 - dry: 1 call(s) in the last 5h (cap none), spent $0.0000
 
 ## Supervisor notes
@@ -181,15 +182,10 @@ round 4 [codex] proposals=8 valid=8 attempts=24285 passes=0 near=1 invalid=0
 - 2026-11-04 00:31:55: 00:31 check: run healthy. sonnet/16 and codex/16 are running and sonnet/17 is waiting for claude-plan. local/11 and local/25 have finished, and there are no failures and no FINAL leads. sonnet/15 finished in 5 seconds; this is expected because section 15 has only 9 symbols and is below the minimum length. local/25 (85 attempts) added nothing to the section 25 near misses (-0.23), and the sup1 refinement job still covers that section. Short and medium sections (about 120-330 runes) keep producing near misses around -0.3 at unrelated offsets, which points to a scoring baseline rather than real keys. The owner may want to make the pass threshold depend on section length. claude-opus is paused until 03:33. No jobs added; the pending queue covers the remaining sections.
 - 2026-11-04 00:48:49: 00:48 check: run healthy, no failures and no FINAL leads. codex/16 finished (32k attempts on the 1894-rune section); its best near misses are about -2.36 using pi_digits at adjacent offsets 109/110, which is noise. Action needed from the owner: at 00:39 the runner blocked 15 deepseek jobs (deepseek/10 to deepseek/25). The deepseek prices are 0 in config/models.toml, so its USD cap cannot work. Fill in price_in_per_mtok and price_out_per_mtok to unblock them. The other pending codex and sonnet jobs still cover those sections, so I did not add replacement jobs. Section 25 (-0.23) is still the only lead worth following, and the sup1 job covers it. sonnet/16 is still running and sonnet/17 is waiting for claude-plan.
 - 2026-11-04 01:11:19: 01:11 check: run healthy, no failures and no FINAL leads. codex/14 finished with 44k attempts on the 1729-rune section 8..31. Its only near miss is -2.38 (primes*2 @402), which is noise. sonnet/16 is still running at 45 min, and sonnet/17 is waiting for claude-plan. Section 25 (-0.23) is still the only lead, and the sup1 job covers it. The near misses around -0.3 on sections of 120-330 runes still look like a scoring baseline, not real keys. The deepseek jobs stay blocked until its prices are set in config/models.toml. No jobs added.
+- 2026-11-04 01:26:49: 01:26 check: run healthy, no failures and no FINAL leads. sonnet/16 finished after 64 min and 60k attempts on the 1894-rune section 15..39. Its best near misses are -2.36 to -2.37 using pi_digits @109/110 and @1055/1056, the same adjacent-offset pattern codex/16 found, so it is noise. codex/13 finished in 4 min with nothing new on section 6..24, and codex/12 is running. Section 25 (-0.23) is still the only lead and the sup1 job covers it, though it may be the same ~300-rune scoring baseline. deepseek stays blocked until its prices are set in config/models.toml. No jobs added.
 
 ## Events
 
-- 2026-11-04 00:49:10 codex/14: start (uses codex-plan)
-- 2026-11-04 00:49:10 2 running: sonnet/16, codex/14
-- 2026-11-04 00:52:15 sonnet/16: running 30 min | 00:46:48 [model] claude-sonnet (proposer) ok 19.9s, tokens in/out 6186/1591, reply 1870 chars
-- 2026-11-04 00:54:10 codex/14: running 5 min | 00:53:12 [model] codex (proposer) ok 12.8s, tokens in/out 17516/458, reply 1590 chars
-- 2026-11-04 00:57:15 sonnet/16: running 35 min | 00:46:48 [model] claude-sonnet (proposer) ok 19.9s, tokens in/out 6186/1591, reply 1870 chars
-- 2026-11-04 00:59:10 codex/14: running 10 min | 00:58:48 [model] codex (proposer) calling...
 - 2026-11-04 01:02:15 sonnet/16: running 40 min | 00:57:59 [model] claude-sonnet (proposer) ok 10.4s, tokens in/out 6844/1397, reply 2068 chars
 - 2026-11-04 01:04:10 codex/14: running 15 min | 01:01:39 [model] codex (proposer) ok 12.7s, tokens in/out 18752/465, reply 1601 chars
 - 2026-11-04 01:07:15 sonnet/16: running 45 min | 00:57:59 [model] claude-sonnet (proposer) ok 10.4s, tokens in/out 6844/1397, reply 2068 chars
@@ -209,3 +205,9 @@ round 4 [codex] proposals=8 valid=8 attempts=24285 passes=0 near=1 invalid=0
 - 2026-11-04 01:22:20 sonnet/16: running 60 min | 01:15:35 [model] claude-sonnet (proposer) ok 13.1s, tokens in/out 7432/1680, reply 1982 chars
 - 2026-11-04 01:25:50 codex/12: running 10 min | 01:23:55 [model] codex (proposer) ok 24.7s, tokens in/out 18687/576, reply 1689 chars
 - 2026-11-04 01:26:25 sonnet/16: done (exit 0, 64 min)
+- 2026-11-04 01:26:41 published: 36 file(s) to branch results
+- 2026-11-04 01:26:49 supervisor: note: 01:26 check: run healthy, no failures and no FINAL leads. sonnet/16 finished after 64 min and 60k attempts on the 1894-rune section 15..39. Its best near misses are -2.36 to -2.37 using pi_digits @109/110 and @1055/1056, the same adjacent-offset pattern codex/16 found, so it is noise. codex/13 fi...
+- 2026-11-04 01:26:49 sonnet/17: start (uses claude-plan)
+- 2026-11-04 01:26:49 2 running: codex/12, sonnet/17
+- 2026-11-04 01:26:49 sonnet/18 waiting: claude-plan in use by sonnet/17
+- 2026-11-04 01:27:29 codex/12: done (exit 0, 12 min)
