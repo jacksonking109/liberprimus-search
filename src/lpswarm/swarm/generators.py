@@ -44,6 +44,7 @@ class GenContext:
     task_id: str = ""      # internal (cost attribution); never shown to the model
     style: str = ""        # per-model role hint: "exploratory" | "volume" | ""
     brief: str = ""        # direction written by the run supervisor for this job (optional)
+    shared: str = ""       # cross-lane context: what other jobs tried here + the strategy note
 
     def stats(self) -> dict:
         c = self.ciphertext
@@ -172,6 +173,36 @@ STYLE_HINTS = {
 
 
 MAX_BRIEF_CHARS = 2000
+MAX_SHARED_CHARS = 5000
+MAX_STRATEGY_CHARS = 800
+
+
+def summarise_peers(rows: Sequence[dict], limit: int = 30) -> list[str]:
+    """Hypotheses other jobs tried on the same target, most-tested first. Only the
+    deterministic description (the model's free-text 'why' is stripped), with who tried it."""
+    c: Counter = Counter()
+    who: dict = {}
+    for r in rows:
+        desc = str(r["description"]).split(" | why:", 1)[0][:140]
+        c[desc] += int(r["attempts"])
+        who.setdefault(desc, str(r.get("proposer_model") or "?"))
+    return [f"{d} ({n} attempts, by {who[d]})" for d, n in c.most_common(limit)]
+
+
+def build_shared_context(peer_rows: Sequence[dict], strategy: str = "") -> str:
+    """Text for GenContext.shared from other lanes' work on this target and the
+    supervisor's current strategy note (either may be empty)."""
+    parts = []
+    peers = summarise_peers(peer_rows)
+    if peers:
+        parts.append("Other models in this run have already tested these on this same target "
+                     "(do not repeat them or trivial variations; look elsewhere):\n"
+                     + "\n".join(f"  - {x}" for x in peers))
+    if strategy.strip():
+        parts.append("Current strategy note from the run supervisor (a suggestion for what to "
+                     "favour next, based on every lane's results; your own style still applies):\n"
+                     + strategy.strip()[:MAX_STRATEGY_CHARS])
+    return "\n".join(parts)
 
 SYSTEM_PROMPT = ("You are a cryptanalysis assistant proposing hypotheses for an unsolved "
                  "historical-style cipher. Be concrete and diverse; do not repeat proposals that "
@@ -207,6 +238,8 @@ def build_prompt(ctx: GenContext, max_symbols: int = 300) -> list[dict]:
         lines += [f"  - {e}" for e in ctx.errors[-10:]]
     if ctx.style in STYLE_HINTS:
         lines.append(STYLE_HINTS[ctx.style])
+    if ctx.shared:
+        lines.append(ctx.shared[:MAX_SHARED_CHARS])
     if ctx.brief:
         lines.append("Direction from the run supervisor, who has read the results so far "
                      "(use it to choose what to try; the reply format and the rules above still "

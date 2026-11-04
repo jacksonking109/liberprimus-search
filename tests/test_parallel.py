@@ -1,4 +1,5 @@
 """Live window caps, thread-safe router, parallel swarm rounds, parallel overnight jobs."""
+import os
 import sys
 import threading
 import time
@@ -593,3 +594,53 @@ def test_extra_body_from_models_toml(tmp_path):
                  'model = "m"\nextra_body = "nope"\n', encoding="utf-8")
     with pytest.raises(ValueError):
         load_model_specs(f)
+
+
+def test_shared_context_peer_ledgers_and_strategy(tmp_path):
+    import json as _json
+    import numpy as np
+    from lpswarm.alphabet import Alphabet
+    from lpswarm.executor import Executor, ExplicitKeys, Target
+    from lpswarm.ledger.db import peer_tried
+    from lpswarm.oracle import FullOracle, OracleConfig
+    from lpswarm.overnight import apply_supervisor_reply
+    from lpswarm.programs import compile_spec
+    from lpswarm.swarm.generators import GenContext, build_prompt, build_shared_context
+    a = Alphabet.latin26()
+    ct = np.random.default_rng(0).integers(0, 26, 80)
+    # another lane's ledger with one attempt on this target
+    other = tmp_path / "other.sqlite"
+    with Ledger(other) as led:
+        h = led.add_hypothesis("program", "sub; sequence primes*1+0 @7 | why: secret idea", "codex", "proposer")
+        spec = compile_spec({"stream": {"kind": "sequence", "name": "primes", "offset": 7}, "combine": "sub"}, a)
+        s = Executor(led, FullOracle(a, OracleConfig(null_samples=100)), stop_file=None).run(
+            Target(a, ct, "t"), h, "program", ExplicitKeys([spec]))
+        tid = s.target_id
+        led.commit()
+    rows = peer_tried(other, tid)
+    assert len(rows) == 1 and rows[0]["proposer_model"] == "codex"
+    assert peer_tried(tmp_path / "missing.sqlite", tid) == []
+    text = build_shared_context(rows, "Favour transpositions next.")
+    assert "primes*1+0 @7" in text and "by codex" in text and "secret idea" not in text
+    assert "Favour transpositions" in text
+    ctx = GenContext("t", a, ct, 1, 4, shared=text)
+    assert "already tested these on this same target" in build_prompt(ctx)[1]["content"]
+    # the supervisor's strategy action writes the file every lane re-reads
+    cfg = OvernightConfig(models=str(tmp_path / "none.toml"), spend_ledger=str(tmp_path / "s.sqlite"),
+                          publish=False, jobs=[{"id": "x", "kind": "validate"}])
+    run = Overnight(cfg, tmp_path / "run", stop_file=tmp_path / "STOP", progress=False)
+    msg = apply_supervisor_reply(run, _json.dumps({"actions": [{"type": "strategy", "text": "X" * 2000}]}))[0]
+    assert msg.startswith("strategy note set (800 chars)")
+    assert (tmp_path / "run" / "strategy.txt").read_text(encoding="utf-8") == "X" * 800
+    # swarm jobs on the same section get each other's ledgers and the strategy file
+    from lpswarm.overnight import _job
+    j1 = _job("a/9", "swarm", ["--sections", "9"], "config")
+    j2 = _job("b/9", "swarm", ["--sections", "9"], "config")
+    j3 = _job("c/10", "swarm", ["--sections", "10"], "config")
+    run.state["jobs"] = [j1, j2, j3]
+    run.job_dir(j1).mkdir(parents=True)
+    (run.job_dir(j1) / "ledger.sqlite").write_text("", encoding="utf-8")
+    cmd = run.job_command(j2)
+    assert cmd[cmd.index("--peer-ledger") + 1].endswith("a_9" + os.sep + "ledger.sqlite")
+    assert cmd[cmd.index("--strategy-file") + 1].endswith("strategy.txt")
+    assert "--peer-ledger" not in run.job_command(j3)

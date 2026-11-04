@@ -68,7 +68,7 @@ class SwarmResult:
 
 def run_swarm(target: Target, ledger: Ledger, oracle: FullOracle, generators: Sequence,
               cfg: SwarmConfig | None = None, ranker=None, alphabet_values=None,
-              progress: bool = True, brief: str = "") -> SwarmResult:
+              progress: bool = True, brief: str = "", shared_fn=None) -> SwarmResult:
     cfg = cfg or SwarmConfig()
     alpha = target.alphabet
     tid = ledger.add_target(alpha, target.ciphertext, target.label, target.page_range,
@@ -107,12 +107,19 @@ def run_swarm(target: Target, ledger: Ledger, oracle: FullOracle, generators: Se
             break
         # Every generator sees the ledger as it was at the start of the round.
         tried_now = summarise_tried(ledger.tried(tid))
+        shared = ""
+        if shared_fn is not None:   # re-read every round: the strategy note can change
+            try:
+                shared = shared_fn(tid) or ""
+            except Exception:  # noqa: BLE001 - shared context is best-effort
+                shared = ""
         ctxs = {}
         for gen in generators:
             k = min(int(getattr(gen, "per_round", None) or cfg.per_round), 32)
             ctxs[gen.model] = GenContext(shown_label, alpha, target.ciphertext, rnd, k,
                                          history[gen.model], errors[gen.model], tried_now,
-                                         alphabet_values, task_id=target.label, brief=brief)
+                                         alphabet_values, task_id=target.label, brief=brief,
+                                         shared=shared)
         fetched = _fetch_proposals(generators, ctxs, cfg.parallel, rnd, progress)
         for gen in generators:
             stopped = _pre_check(stop_path, time_left, budget_left)

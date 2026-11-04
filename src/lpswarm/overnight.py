@@ -341,6 +341,11 @@ class Overnight:
         elif job["kind"] in ("swarm", "baseline"):
             args = _set_arg(args, "--report-dir", str(d))
             args = _set_arg(args, "--ledger", str(d / "ledger.sqlite"))
+            if job["kind"] == "swarm":
+                d.mkdir(parents=True, exist_ok=True)
+                for peer in self.peer_ledgers(job):
+                    args += ["--peer-ledger", str(peer)]
+                args = _set_arg(args, "--strategy-file", str(self.dir / "strategy.txt"))
             if job["kind"] == "swarm" and job.get("brief"):
                 d.mkdir(parents=True, exist_ok=True)
                 (d / "brief.txt").write_text(job["brief"], encoding="utf-8")
@@ -363,6 +368,21 @@ class Overnight:
             args = _set_arg(args, "--out", str(d))
         # Not --quiet: job.log gets round-by-round progress (and one line per model call).
         return [self.python, "-m", "lpswarm", job["kind"], *args]
+
+    def peer_ledgers(self, job: dict) -> list[Path]:
+        """Ledger files of other swarm jobs on the same section (whatever their lane), so
+        this job's generators can see what has already been tried there."""
+        sec = _arg_value(job["args"], "--sections")
+        if sec is None:
+            return []
+        out = []
+        for j in self.state["jobs"]:
+            if j is job or j["kind"] != "swarm" or _arg_value(j["args"], "--sections") != sec:
+                continue
+            f = self.job_dir(j) / "ledger.sqlite"
+            if f.is_file():
+                out.append(f)
+        return out
 
     def job_models(self, job: dict) -> list[str]:
         names = []
@@ -751,6 +771,9 @@ class Overnight:
         usage = self.usage_lines()
         if usage:
             lines += ["", "## Model usage", ""] + usage
+        if st.get("strategy"):
+            lines += ["", "## Current strategy note (read by every lane each round)", "",
+                      st["strategy"]]
         if st["notes"]:
             lines += ["", "## Supervisor notes", ""] + [f"- {n}" for n in st["notes"][-30:]]
         lines += ["", "## Events", ""] + [f"- {e}" for e in st["events"][-25:]]
@@ -800,6 +823,9 @@ Code runs the jobs; you can only answer with JSON choosing actions from this men
   {"type": "add_job", "sections": "unsolved" | [section indexes], "generators": [model names],
    "rounds": 1-8, "per_round": 1-8, "reason": "...",
    "brief": "..."}                                     queue a swarm job (limited per night)
+  {"type": "strategy", "text": "..."}                  a shared strategy note (max 800 characters)
+                                                       that EVERY running lane reads at the start
+                                                       of each round; replaces the previous note
   {"type": "skip_job", "id": "..."}                    skip a pending or running job
   {"type": "retry_job", "id": "..."}                   retry a failed/interrupted job (once)
   {"type": "restart_ollama", "reason": "..."}          restart the local model servers
@@ -807,6 +833,11 @@ Code runs the jobs; you can only answer with JSON choosing actions from this men
 Reply exactly: {"actions": [...]} . Prefer few actions; an empty list is fine.
 Do not add jobs that repeat ones already queued. A FINAL lead is a strong candidate that the
 owner should read; don't stop the run because of one.
+
+Strategy note: use it to coordinate the lanes, not to repeat their own history (each model
+already sees what others tried on the same section). Say which directions look exhausted
+across all sections and which untried ones to favour next, in a few concrete lines. Update it
+at most once per check-in, and only when the picture has changed; keep it short.
 
 Delegating: you are the planner; the proposer models do the volume work. To hand work to a
 model (e.g. claude-sonnet), add_job with it in "generators" and a "brief" (up to 2000
@@ -886,6 +917,14 @@ def apply_supervisor_reply(run: Overnight, reply: str) -> list[str]:
             if text:
                 run.state["notes"].append(f"{_now()}: {text}")
                 out.append("note: " + (text if len(text) <= 300 else text[:297] + "..."))
+        elif t == "strategy":
+            from lpswarm.swarm.generators import MAX_STRATEGY_CHARS
+            text = str(a.get("text", "")).strip()[:MAX_STRATEGY_CHARS]
+            run.state["strategy"] = text
+            (run.dir / "strategy.txt").write_text(text, encoding="utf-8")
+            run.state["notes"].append(f"{_now()}: strategy note set: {text}" if text
+                                      else f"{_now()}: strategy note cleared")
+            out.append("strategy note " + (f"set ({len(text)} chars): {text[:200]}" if text else "cleared"))
         elif t == "add_job":
             out.append(_add_job(run, a))
         elif t == "skip_job":

@@ -66,6 +66,28 @@ def target_id_for(alphabet: Alphabet, ciphertext: np.ndarray, breaks=None) -> st
     return h.hexdigest()
 
 
+def peer_tried(path: str | Path, target_id: str, limit: int = 400) -> list[dict]:
+    """Hypotheses another job tried on this target, read from that job's ledger file
+    (read-only, safe while that job is writing). [] if the file is missing or locked."""
+    p = Path(path)
+    if not p.is_file():
+        return []
+    try:
+        con = sqlite3.connect(p.resolve().as_uri() + "?mode=ro", uri=True, timeout=5)
+        try:
+            rows = con.execute(
+                "SELECT a.cipher_family, h.description, h.proposer_model, COUNT(*)"
+                " FROM attempt a JOIN hypothesis h ON h.id=a.hypothesis_id WHERE a.target_id=?"
+                " GROUP BY a.cipher_family, h.id ORDER BY h.id DESC LIMIT ?",
+                (target_id, limit)).fetchall()
+        finally:
+            con.close()
+    except sqlite3.Error:
+        return []
+    return [{"cipher_family": r[0], "description": r[1], "proposer_model": r[2], "attempts": r[3]}
+            for r in rows]
+
+
 class Ledger:
     def __init__(self, path: str | Path = ":memory:"):
         self.path = str(path)

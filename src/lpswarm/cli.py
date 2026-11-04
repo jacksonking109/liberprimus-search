@@ -295,6 +295,18 @@ def cmd_swarm(args) -> int:
             brief = read_text(args.brief_file).strip()
             print(f"brief for the generators ({len(brief)} chars): {brief[:200]}"
                   + ("..." if len(brief) > 200 else ""))
+        shared_fn = None
+        if args.peer_ledger or args.strategy_file:
+            from lpswarm.ledger.db import peer_tried
+            from lpswarm.swarm.generators import build_shared_context
+
+            def shared_fn(tid):
+                strategy = ""
+                if args.strategy_file and Path(args.strategy_file).is_file():
+                    from lpswarm.textio import read_text
+                    strategy = read_text(args.strategy_file)
+                rows = [r for p in args.peer_ledger for r in peer_tried(p, tid)]
+                return build_shared_context(rows, strategy)
         from dataclasses import asdict as _asdict
         from lpswarm.reports import default_report_dir, target_entry, write_run_report
         report_dir = Path(args.report_dir) if args.report_dir else default_report_dir("swarm")
@@ -331,7 +343,7 @@ def cmd_swarm(args) -> int:
             res = run_swarm(Target(alphabet, ct, label, page_range=page_range, is_synthetic=synthetic,
                                    breaks=breaks),
                             led, oracle, gens, sc, ranker=ranker, alphabet_values=values,
-                            progress=not args.quiet, brief=tgt_brief)
+                            progress=not args.quiet, brief=tgt_brief, shared_fn=shared_fn)
             n_final = sum(1 for r in res.final if r["passed_final"])
             print(f"stopped: {res.stopped or 'rounds done'}; final passes: {n_final}")
             entries.append(target_entry(led, res.target_id, label, len(ct), oracle=oracle, stopped=res.stopped,
@@ -584,6 +596,11 @@ def build_parser() -> argparse.ArgumentParser:
                         "cannot be judged)")
     p.add_argument("--brief-file", help="text file with direction for the model generators "
                    "(written by the overnight supervisor when it delegates a job)")
+    p.add_argument("--peer-ledger", action="append", default=[],
+                   help="another job's ledger file; what it tried on this target is shown to the "
+                        "generators every round (repeatable; written by the overnight runner)")
+    p.add_argument("--strategy-file", help="text file with the supervisor's current strategy note, "
+                   "re-read every round (written by the overnight runner)")
     p.add_argument("--auto-brief", metavar="MODEL",
                    help="before each target, ask this supervisor-role model (e.g. "
                         "claude-supervisor) to write a brief for the generators")

@@ -275,6 +275,11 @@ powershell -ExecutionPolicy Bypass -File scripts\overnight.ps1
   `claude-sonnet`) with a written brief: what to try on those sections, based on the per-section
   results so far. The brief goes into every generator's prompt for that job and is copied into
   SUMMARY's supervisor notes, so you can see what Opus told Sonnet.
+- **Shared context across lanes:** every model's prompt, each round, now lists what *other* lanes
+  have already tested on the same section (descriptions only, with who tried it), plus a short
+  **strategy note** the supervisor can set (`{"type": "strategy"}`, max 800 chars, shown under
+  "Current strategy note" in SUMMARY.md). Models still keep their own style; the note is a
+  suggestion. Nothing to configure.
 - **Usage limits:** Opus, Sonnet and the supervisor share one Claude quota (250 calls / 5 h by
   default, `max_calls_per_window`), with per-model shares (`model_max_calls_per_window`): Opus
   60, supervisor 100 (check-ins and briefs), Sonnet the rest. Codex has its own (90 / 5 h). At a cap or a usage-limit message the affected models
