@@ -1,6 +1,6 @@
 # Overnight run 20261104-0949
 
-Started 2026-11-04 09:49:00, updated 2026-11-04 10:43:48, status **running**. Jobs: pending 38, running 2, done 21
+Started 2026-11-04 09:49:00, updated 2026-11-04 10:47:24, status **running**. Jobs: pending 37, running 2, done 22
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -9,7 +9,7 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 10:43:48, status **running**. Jo
 | sonnet/11 | done | 2026-11-04 10:14:06 | 2026-11-04 10:18:37 | Sonnet, briefed by Opus |
 | sonnet/12 | done | 2026-11-04 10:18:53 | 2026-11-04 10:37:20 | Sonnet, briefed by Opus |
 | sonnet/13 | done | 2026-11-04 10:37:36 | 2026-11-04 10:41:22 | Sonnet, briefed by Opus |
-| sonnet/14 | running | 2026-11-04 10:41:37 |  | Sonnet, briefed by Opus |
+| sonnet/14 | done | 2026-11-04 10:41:37 | 2026-11-04 10:47:24 | Sonnet, briefed by Opus |
 | sonnet/15 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/16 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/17 | pending |  |  | Sonnet, briefed by Opus |
@@ -45,7 +45,7 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 10:43:48, status **running**. Jo
 | local/21 | done | 2026-11-04 10:27:20 | 2026-11-04 10:31:40 | local models |
 | local/13 | done | 2026-11-04 10:31:56 | 2026-11-04 10:35:46 | local models |
 | local/22 | done | 2026-11-04 10:36:15 | 2026-11-04 10:43:48 | local models |
-| local/12 | pending |  |  | local models |
+| local/12 | running | 2026-11-04 10:44:03 |  | local models |
 | local/24 | pending |  |  | local models |
 | local/11 | pending |  |  | local models |
 | local/25 | pending |  |  | local models |
@@ -68,24 +68,30 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 10:43:48, status **running**. Jo
 
 ## Now running
 
-**sonnet/14** (since 2026-11-04 10:41:37), latest log lines:
-```
-  | 6. **Reversed reading.** Set reverse_text true with directions 1 and 3. The key may run from the end of the 1729-symbol text (1729 = 7·13·19).
-  |    - Use offset_range to cover all starts.
-  |    - Try a columnar width of 7, 13 or 19, which match the factors.
-  | **Do NOT repeat:**
-  | - constant Caesar
-10:41:54 [model] claude-sonnet (proposer) calling...
-10:42:02 [model] claude-sonnet (proposer) ok 8.2s, tokens in/out 4160/906, reply 2044 chars
-round 1 [claude-sonnet] proposals=8 valid=4 attempts=4 passes=0 near=0 invalid=4
-10:42:15 [model] claude-sonnet (proposer) calling...
-10:42:24 [model] claude-sonnet (proposer) ok 9.0s, tokens in/out 4749/825, reply 1825 chars
-```
 **codex/18** (since 2026-11-04 10:43:33), latest log lines:
 ```
 ===== 2026-11-04 10:43:33 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 18 --gen
 == LP2:- - 44.jpg-49.jpg  (1433 symbols)
 10:43:34 [model] codex (proposer) calling...
+10:43:51 [model] codex (proposer) ok 17.1s, tokens in/out 17612/469, reply 1680 chars
+round 1 [codex] proposals=8 valid=8 attempts=6046 passes=0 near=0 invalid=0
+10:46:42 [model] codex (proposer) calling...
+10:47:04 [model] codex (proposer) ok 22.2s, tokens in/out 18041/395, reply 1559 chars
+round 2 [codex] proposals=8 valid=8 attempts=10114 passes=0 near=0 invalid=0
+10:47:08 [model] codex (proposer) calling...
+```
+**local/12** (since 2026-11-04 10:44:03), latest log lines:
+```
+10:45:53 [model] qwen-local (proposer) calling...
+10:46:12 [model] qwen-local (proposer) ok 19.5s, tokens in/out 2740/592, reply 2018 chars
+10:46:12 [model] gemma-local (proposer) calling...
+10:46:28 [model] gemma-local (proposer) ok 15.8s, tokens in/out 2863/472, reply 1383 chars
+round 2 [qwen-local] proposals=8 valid=7 attempts=15 passes=0 near=0 invalid=1
+round 2 [gemma-local] proposals=8 valid=8 attempts=92 passes=0 near=0 invalid=1
+10:46:28 [model] qwen-local (proposer) calling...
+10:46:49 [model] qwen-local (proposer) ok 21.2s, tokens in/out 3190/654, reply 2147 chars
+10:46:49 [model] gemma-local (proposer) calling...
+10:47:05 [model] gemma-local (proposer) ok 15.7s, tokens in/out 3291/471, reply 1432 chars
 ```
 
 ## Results so far
@@ -102,6 +108,8 @@ round 1 [claude-sonnet] proposals=8 valid=4 attempts=4 passes=0 near=0 invalid=4
   - LP2:20.jpg/2-23.jpg/1 - 3.jpg/2-6.jpg/1: 34650 attempts, 40 hypotheses, **0 final pass(es)**
 - **sonnet/13** (done)
   - LP2:6.jpg/2-7.jpg - 23.jpg/2-24.jpg: 16277 attempts, 34 hypotheses, **0 final pass(es)**
+- **sonnet/14** (done)
+  - LP2:8.jpg-14.jpg - 25.jpg-31.jpg: 23048 attempts, 41 hypotheses, **0 final pass(es)**
 - **codex/25** (done)
   - LP2:54.jpg-55.jpg - 71.jpg-72.jpg: 30269 attempts, 47 hypotheses, **0 final pass(es)**
 - **codex/24** (done)
@@ -137,12 +145,12 @@ round 1 [claude-sonnet] proposals=8 valid=4 attempts=4 passes=0 near=0 invalid=4
 
 ## Model usage
 
-- qwen-local: 54 call(s) in the last 5h (cap none), spent $0.0000
-- gemma-local: 54 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 80 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-sonnet: 80 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-supervisor: 80 call(s) in the last 5h (cap 550), spent $0.0000
-- codex: 36 call(s) in the last 5h (cap 750), spent $0.0000
+- qwen-local: 57 call(s) in the last 5h (cap none), spent $0.0000
+- gemma-local: 57 call(s) in the last 5h (cap none), spent $0.0000
+- claude-opus: 84 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-sonnet: 84 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-supervisor: 84 call(s) in the last 5h (cap 550), spent $0.0000
+- codex: 38 call(s) in the last 5h (cap 750), spent $0.0000
 
 ## Supervisor notes
 
@@ -153,12 +161,6 @@ round 1 [claude-sonnet] proposals=8 valid=4 attempts=4 passes=0 near=0 invalid=4
 
 ## Events
 
-- 2026-11-04 10:36:02 published: 19 file(s) to branch results
-- 2026-11-04 10:36:15 supervisor: note: 10:36 check: the run is healthy. local/13, local/14 and local/21 have finished, and sonnet/12 and codex/20 are running. Pending local and deepseek jobs cover the remaining sections. Every section done so far has 0 final passes. The near misses (sub with primes/prime_totients/e_digits, skip [0] re...
-- 2026-11-04 10:36:15 local/22: start (uses ollama:http://127.0.0.1:11434)
-- 2026-11-04 10:36:15 3 running: sonnet/12, codex/20, local/22
-- 2026-11-04 10:36:15 sonnet/13 waiting: claude-plan in use by sonnet/12
-- 2026-11-04 10:37:20 sonnet/12: done (exit 0, 18 min)
 - 2026-11-04 10:37:36 published: 20 file(s) to branch results
 - 2026-11-04 10:37:36 sonnet/13: start (uses claude-plan)
 - 2026-11-04 10:37:36 3 running: codex/20, local/22, sonnet/13
@@ -178,3 +180,9 @@ round 1 [claude-sonnet] proposals=8 valid=4 attempts=4 passes=0 near=0 invalid=4
 - 2026-11-04 10:43:33 3 running: local/22, sonnet/14, codex/18
 - 2026-11-04 10:43:33 sonnet/15 waiting: claude-plan in use by sonnet/14
 - 2026-11-04 10:43:48 local/22: done (exit 0, 8 min)
+- 2026-11-04 10:44:03 published: 24 file(s) to branch results
+- 2026-11-04 10:44:03 local/12: start (uses ollama:http://127.0.0.1:11434)
+- 2026-11-04 10:44:03 3 running: sonnet/14, codex/18, local/12
+- 2026-11-04 10:44:03 sonnet/15 waiting: claude-plan in use by sonnet/14
+- 2026-11-04 10:46:38 sonnet/14: running 5 min | 10:45:07 [model] claude-sonnet (proposer) ok 13.7s, tokens in/out 5300/846, reply 1836 chars
+- 2026-11-04 10:47:24 sonnet/14: done (exit 0, 6 min)
