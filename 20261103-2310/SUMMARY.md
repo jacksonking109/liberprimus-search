@@ -1,13 +1,13 @@
 # Overnight run 20261103-2310
 
-Started 2026-11-03 23:10:06, updated 2026-11-03 23:43:46, status **running**. Jobs: pending 48, running 2, done 11
+Started 2026-11-03 23:10:06, updated 2026-11-03 23:45:12, status **running**. Jobs: pending 48, running 2, done 12
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
 | tier-claude | done | 2026-11-03 23:10:06 | 2026-11-03 23:27:44 | Claude Code proposers vs the random control |
 | sonnet/10 | done | 2026-11-03 23:28:00 | 2026-11-03 23:38:10 | Sonnet, briefed by Opus |
 | sonnet/11 | done | 2026-11-03 23:38:25 | 2026-11-03 23:43:46 | Sonnet, briefed by Opus |
-| sonnet/12 | pending |  |  | Sonnet, briefed by Opus |
+| sonnet/12 | running | 2026-11-03 23:44:17 |  | Sonnet, briefed by Opus |
 | sonnet/13 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/14 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/15 | pending |  |  | Sonnet, briefed by Opus |
@@ -40,7 +40,7 @@ Started 2026-11-03 23:10:06, updated 2026-11-03 23:43:46, status **running**. Jo
 | local/16 | done | 2026-11-03 23:21:59 | 2026-11-03 23:32:05 | local models |
 | local/19 | done | 2026-11-03 23:32:28 | 2026-11-03 23:36:28 | local models |
 | local/15 | done | 2026-11-03 23:36:44 | 2026-11-03 23:36:49 | local models |
-| local/20 | running | 2026-11-03 23:37:05 |  | local models |
+| local/20 | done | 2026-11-03 23:37:05 | 2026-11-03 23:45:12 | local models |
 | local/14 | pending |  |  | local models |
 | local/21 | pending |  |  | local models |
 | local/13 | pending |  |  | local models |
@@ -65,34 +65,35 @@ Started 2026-11-03 23:10:06, updated 2026-11-03 23:43:46, status **running**. Jo
 | deepseek/22 | pending |  |  | DeepSeek (volume) |
 | deepseek/24 | pending |  |  | DeepSeek (volume) |
 | deepseek/25 | pending |  |  | DeepSeek (volume) |
+| sup1/25 | pending |  |  | added by supervisor. Section 25 has near misses at margin -0.23 to -0.29, an order of magnitude closer than any other se |
 
 ## Now running
 
+**sonnet/12** (since 2026-11-03 23:44:17), latest log lines:
+```
+  | 1. Prime-totient stream, the known LP precedent. Use {"kind":"sequence","name":"prime_totients"} with combine "sub", then repeat with "add", with offset_range [0,1500]. Run each with skip [0] (F) 
+  | 2. Autokey, aimed at the doubles deficit. The text has 4 adjacent doubles where 23.9 are expected, which is a strong anti-repeat signal typical of keys tied to the text. Try "autokey" with source 
+  | 3. Other sequence keys over long offset ranges. Use primes, pi_digits, e_digits, fibonacci, squares and triangular, each with offset_range [0,1000]. Use combine "sub" and "beaufort", with scale 1 
+  | 4. Long repeat words, because the IC is flat. Long periods (more than 10) or running keys could produce the flat IC. Use stream "repeat" with LP-themed words such as "DIVINITY", "CICADA", "PARABLE
+  | 5. Transposition plus a simple key. Use transpose columnar with widths 3 to 8: identity orders first, then reversed orders. Combine each with a constant shift 0..28 or the prime_totients stream ab
+  | 6. Interrupter variants. Run direction 1 with skip [0], skip [24] (A) and skip [26] (Y), each in "resolve" mode. In LP, F is a known literal interrupter.
+  | Do NOT spend proposals on:
+  | - short-period Vigenère (periods 1 to 8) without a transposition, because IC 1.0
+23:44:33 [model] claude-sonnet (proposer) calling...
+23:44:41 [model] claude-sonnet (proposer) ok 7.3s, tokens in/out 4178/882, reply 1981 chars
+```
 **codex/21** (since 2026-11-03 23:42:01), latest log lines:
 ```
-warning: section 21 (56.jpg/2) has corrupted or unknown characters; they are dropped, so positions after them may be shifted
-== LP2:56.jpg/2  (121 symbols)
-23:42:02 [model] codex (proposer) calling...
-23:42:30 [model] codex (proposer) ok 27.4s, tokens in/out 16491/419, reply 1596 chars
-round 1 [codex] proposals=8 valid=8 attempts=8010 passes=0 near=1 invalid=0
-23:43:02 [model] codex (proposer) calling...
-23:43:21 [model] codex (proposer) ok 19.7s, tokens in/out 16935/394, reply 1507 chars
-round 2 [codex] proposals=8 valid=8 attempts=14048 passes=0 near=1 invalid=0
 23:43:23 [model] codex (proposer) calling...
 23:43:35 [model] codex (proposer) ok 11.6s, tokens in/out 16810/413, reply 1546 chars
-```
-**local/20** (since 2026-11-03 23:37:05), latest log lines:
-```
-23:41:48 [model] gemma-local (proposer) ok 15.0s, tokens in/out 3414/411, reply 1201 chars
-round 4 [qwen-local] proposals=8 valid=8 attempts=32 passes=0 near=0 invalid=0
-round 4 [gemma-local] proposals=8 valid=7 attempts=34 passes=0 near=0 invalid=2
-23:42:49 [model] qwen-local (proposer) calling...
-23:43:11 [model] qwen-local (proposer) ok 22.1s, tokens in/out 3557/653, reply 2432 chars
-23:43:11 [model] gemma-local (proposer) calling...
-23:43:27 [model] gemma-local (proposer) ok 16.6s, tokens in/out 3571/488, reply 1440 chars
-round 5 [qwen-local] proposals=8 valid=8 attempts=37 passes=0 near=0 invalid=0
-round 5 [gemma-local] proposals=8 valid=8 attempts=48 passes=0 near=0 invalid=2
-23:43:28 [model] qwen-local (proposer) calling...
+round 3 [codex] proposals=8 valid=8 attempts=20091 passes=0 near=3 invalid=0
+23:43:53 [model] codex (proposer) calling...
+23:44:05 [model] codex (proposer) ok 12.2s, tokens in/out 17235/432, reply 1675 chars
+round 4 [codex] proposals=8 valid=8 attempts=28128 passes=0 near=5 invalid=0
+23:44:26 [model] codex (proposer) calling...
+23:44:38 [model] codex (proposer) ok 11.7s, tokens in/out 17658/438, reply 1628 chars
+round 5 [codex] proposals=8 valid=8 attempts=34195 passes=0 near=6 invalid=0
+23:45:02 [model] codex (proposer) calling...
 ```
 
 ## Results so far
@@ -121,31 +122,29 @@ round 5 [gemma-local] proposals=8 valid=8 attempts=48 passes=0 near=0 invalid=2
   - LP2:33.jpg - 50.jpg/1: 120 attempts, 88 hypotheses, **0 final pass(es)** (caution: short section (91 runes): many keys give plausible-looking text this short; treat any lead with extra caution)
 - **local/15** (done)
   - skip LP2:15.jpg/1 - 32.jpg/1: only 9 symbols (minimum 20, --min-length); too short to judge
+- **local/20** (done)
+  - LP2:50.jpg/2-56.jpg/1: 148 attempts, 87 hypotheses, **0 final pass(es)**
 
 ## Model usage
 
-- qwen-local: 69 call(s) in the last 5h (cap none), spent $0.0000
-- gemma-local: 69 call(s) in the last 5h (cap none), spent $0.0000
+- qwen-local: 70 call(s) in the last 5h (cap none), spent $0.0000
+- gemma-local: 70 call(s) in the last 5h (cap none), spent $0.0000
 - granite: 2 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 131 call(s) in the last 5h (cap 120), spent $0.0000, paused until 01:33 (local cap, raise max_calls_per_window to allow more)
-- claude-sonnet: 131 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-supervisor: 131 call(s) in the last 5h (cap 200), spent $0.0000
-- codex: 60 call(s) in the last 5h (cap 750), spent $0.0000
+- claude-opus: 134 call(s) in the last 5h (cap 120), spent $0.0000, paused until 01:34 (local cap, raise max_calls_per_window to allow more)
+- claude-sonnet: 134 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-supervisor: 134 call(s) in the last 5h (cap 200), spent $0.0000
+- codex: 62 call(s) in the last 5h (cap 750), spent $0.0000
 - dry: 2 call(s) in the last 5h (cap none), spent $0.0000
 
 ## Supervisor notes
 
 - 2026-11-03 23:21:38: 23:21 check: run healthy, 2 running, 56 pending, no failures. No FINAL leads yet; best is codex/25 (section 54-55..71-72), with near misses at margins -0.23 to -0.29 (sub/add with a primes stream, pi_digits). Watch claude-opus quota: 101 of 120 calls in the last 5h, so it may hit its cap during tier-claude. No jobs added; the queue already covers every section.
 - 2026-11-03 23:32:28: 23:32 check: run healthy. 2 running (codex/22, sonnet/10), local/16 just finished, no failures. No FINAL leads. The best near misses are still codex/25 (sec 54-55..71-72): sub/add with a primes stream at offsets ~954/1886 and pi_digits @593, margins -0.23 to -0.29. codex/22 reported 1 near miss in round 4. Local-model jobs have low attempt counts (~200-280 per section) compared with codex (~26-30k), so their yield per job is small. claude-opus is at 119/120 calls, so it is effectively capped. Sonnet jobs already cover sections 10-25. No jobs added.
+- 2026-11-03 23:44:17: 23:44 check: run healthy. 3 running (codex/21, local/20, sonnet/11 just finished), no failures, no FINAL leads. The best near misses are still on section 25 (54-55..71-72) from codex/25, at margins -0.23 to -0.29 using a primes stream @1886/@954, pi_digits @593 and prime_totients @134. That is far closer than any other section; the next best is about -2.2. I added one focused refinement job on section 25 with claude-sonnet and codex. claude-opus is paused until 01:33 (cap 120). Local jobs still produce few attempts per section.
+- 2026-11-03 23:44:17: brief for sup1 (claude-sonnet,codex): Section 25 (LP2:54.jpg-55.jpg - 71.jpg-72.jpg, 308 runes). codex/25 found four near misses, all just under the pass threshold: (1) sub, primes*1+0 @1886, skip [0]; (2) add, primes*1+0 @954, skip [0]; (3) sub, pi_digits*1+0 @593, skip [28]; (4) beaufort, prime_totients*1+0 @134, map reverse, skip [28]. Search the neighbourhood of these programs rather than starting fresh. Things to try: offsets within about ±40 of 1886, 954, 593 and 134. Swap sub/add/beaufort on each stream. Toggle skip [0] vs [28] vs none. Try primes*1+k for small k (the -1 / +57 style shifts used in Cicada page keys), primes mod 29, and prime_totients (phi(p)=p-1) at the same offsets, since primes and prime_totients differ only by 1. Also try reversed text and map reverse on the primes variants. Consider that a word-boundary-aware or per-line restart of the stream may explain why two different primes offsets each come close. Avoid: fresh unrelated streams (e_digits, fibonacci) unless combined with the near-miss settings; and Vigenere with English keywords, which the earlier rounds explored without results. Prefer many small, systematic variations per round over a few wide jumps.
 
 ## Events
 
-- 2026-11-03 23:32:28 sonnet/11 waiting: claude-plan in use by sonnet/10
-- 2026-11-03 23:33:03 sonnet/10: running 5 min | 23:32:54 [model] claude-sonnet (proposer) ok 7.2s, tokens in/out 5375/918, reply 2041 chars
-- 2026-11-03 23:36:28 local/19: done (exit 0, 4 min)
-- 2026-11-03 23:36:44 published: 11 file(s) to branch results
-- 2026-11-03 23:36:44 local/15: start (uses ollama:http://127.0.0.1:11434)
-- 2026-11-03 23:36:44 3 running: codex/22, sonnet/10, local/15
 - 2026-11-03 23:36:44 sonnet/11 waiting: claude-plan in use by sonnet/10
 - 2026-11-03 23:36:49 codex/22: running 15 min | 23:34:26 [model] codex (proposer) ok 22.1s, tokens in/out 18704/487, reply 1685 chars
 - 2026-11-03 23:36:49 local/15: done (exit 0, 0 min)
@@ -165,3 +164,9 @@ round 5 [gemma-local] proposals=8 valid=8 attempts=48 passes=0 near=0 invalid=2
 - 2026-11-03 23:42:06 local/20: running 5 min | 23:41:48 [model] gemma-local (proposer) ok 15.0s, tokens in/out 3414/411, reply 1201 chars
 - 2026-11-03 23:43:26 sonnet/11: running 5 min | 23:42:47 [model] claude-sonnet (proposer) ok 13.3s, tokens in/out 6800/1711, reply 2262 chars
 - 2026-11-03 23:43:46 sonnet/11: done (exit 0, 5 min)
+- 2026-11-03 23:44:01 published: 14 file(s) to branch results
+- 2026-11-03 23:44:17 supervisor: note: 23:44 check: run healthy. 3 running (codex/21, local/20, sonnet/11 just finished), no failures, no FINAL leads. The best near misses are still on section 25 (54-55..71-72) from codex/25, at margins -0.23 to -0.29 using a primes stream @1886/@954, pi_digits @593 and prime_totients @134. That is fa...
+- 2026-11-03 23:44:17 supervisor: added sup1: swarm on 1 section(s) with claude-sonnet,codex; brief: Section 25 (LP2:54.jpg-55.jpg - 71.jpg-72.jpg, 308 runes). codex/25 found four near misses, all just under the pass threshold: (1) sub, primes*1+0 @1886, skip [0]; (2) add, primes*1+0 @954, skip [0]; ...
+- 2026-11-03 23:44:17 sonnet/12: start (uses claude-plan)
+- 2026-11-03 23:44:17 3 running: local/20, codex/21, sonnet/12
+- 2026-11-03 23:45:12 local/20: done (exit 0, 8 min)
