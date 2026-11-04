@@ -1,6 +1,6 @@
 # Overnight run 20261104-0949
 
-Started 2026-11-04 09:49:00, updated 2026-11-04 11:26:43, status **running**. Jobs: pending 10, running 1, done 35, blocked 15
+Started 2026-11-04 09:49:00, updated 2026-11-04 11:29:30, status **running**. Jobs: pending 9, running 1, done 36, blocked 15
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -14,7 +14,7 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 11:26:43, status **running**. Jo
 | sonnet/16 | done | 2026-11-04 10:48:09 | 2026-11-04 11:04:59 | Sonnet, briefed by Opus |
 | sonnet/17 | done | 2026-11-04 11:05:18 | 2026-11-04 11:13:04 | Sonnet, briefed by Opus |
 | sonnet/18 | done | 2026-11-04 11:13:42 | 2026-11-04 11:26:43 | Sonnet, briefed by Opus |
-| sonnet/19 | pending |  |  | Sonnet, briefed by Opus |
+| sonnet/19 | done | 2026-11-04 11:27:10 | 2026-11-04 11:29:30 | Sonnet, briefed by Opus |
 | sonnet/20 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/21 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/22 | pending |  |  | Sonnet, briefed by Opus |
@@ -70,13 +70,16 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 11:26:43, status **running**. Jo
 
 **codex/14** (since 2026-11-04 11:21:28), latest log lines:
 ```
-===== 2026-11-04 11:21:28 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 14 --gen
-== LP2:8.jpg-14.jpg - 25.jpg-31.jpg  (1729 symbols)
 11:21:30 [model] codex (proposer) calling...
 11:21:53 [model] codex (proposer) ok 23.2s, tokens in/out 17623/489, reply 1687 chars
 round 1 [codex] proposals=8 valid=7 attempts=4053 passes=0 near=0 invalid=1
 11:25:02 [model] codex (proposer) calling...
 11:25:18 [model] codex (proposer) ok 15.7s, tokens in/out 18075/457, reply 1614 chars
+round 2 [codex] proposals=8 valid=8 attempts=8120 passes=0 near=0 invalid=1
+11:27:11 [model] codex (proposer) calling...
+11:27:32 [model] codex (proposer) ok 20.6s, tokens in/out 18457/416, reply 1614 chars
+round 3 [codex] proposals=8 valid=8 attempts=12185 passes=0 near=0 invalid=1
+11:29:17 [model] codex (proposer) calling...
 ```
 
 ## Results so far
@@ -103,6 +106,8 @@ round 1 [codex] proposals=8 valid=7 attempts=4053 passes=0 near=0 invalid=1
   - LP2:- - 40.jpg-43.jpg: 18227 attempts, 42 hypotheses, **0 final pass(es)**
 - **sonnet/18** (done)
   - LP2:- - 44.jpg-49.jpg: 22201 attempts, 45 hypotheses, **0 final pass(es)**
+- **sonnet/19** (done)
+  - LP2:33.jpg - 50.jpg/1: 8899 attempts, 22 hypotheses, **0 final pass(es)** (caution: short section (91 runes): many keys give plausible-looking text this short; treat any lead with extra caution)
 - **codex/25** (done)
   - LP2:54.jpg-55.jpg - 71.jpg-72.jpg: 30269 attempts, 47 hypotheses, **0 final pass(es)**
 - **codex/24** (done)
@@ -158,10 +163,10 @@ round 1 [codex] proposals=8 valid=7 attempts=4053 passes=0 near=0 invalid=1
 
 - qwen-local: 84 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 84 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 108 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-sonnet: 108 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-supervisor: 108 call(s) in the last 5h (cap 550), spent $0.0000
-- codex: 56 call(s) in the last 5h (cap 750), spent $0.0000
+- claude-opus: 116 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-sonnet: 116 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-supervisor: 116 call(s) in the last 5h (cap 550), spent $0.0000
+- codex: 57 call(s) in the last 5h (cap 750), spent $0.0000
 
 ## Supervisor notes
 
@@ -172,15 +177,10 @@ round 1 [codex] proposals=8 valid=7 attempts=4053 passes=0 near=0 invalid=1
 - 2026-11-04 10:47:49: 10:47 check: the run is healthy. sonnet/14 has finished, and codex/18 and local/12 are running. There are still 0 final passes across about 22 finished jobs. New near misses on section 19 (primes sub @1605-1607 with skip [0,7]) cluster tightly, but they are noise level on a 91-rune section, so I don't count them as a lead. The other near misses repeat the earlier pattern (primes/prime_totients/e_digits sub, skip [0] resolve) and don't settle on any one key. Pending deepseek/local/codex jobs still cover the remaining sections, so I added no jobs.
 - 2026-11-04 10:58:43: 10:58 check: the run is healthy. codex/18, local/12, local/24 and sonnet/15 (skipped as too short) have finished. codex/17 and sonnet/16 are running, and sonnet/17 is waiting on claude-plan. There are still 0 final passes across about 26 finished jobs. No new near misses beyond the noise-level patterns noted earlier (primes/prime_totients/e_digits sub, skip [0] resolve). Pending jobs still cover the remaining sections, so I added no jobs.
 - 2026-11-04 11:13:26: 11:13 check: the run is healthy. sonnet/16, sonnet/17, codex/17 and local/25 have finished. codex/16 and local/10 are running, and sonnet/18 is next. There are still 0 final passes across about 30 finished jobs. sonnet/17 and codex/17 together made about 48k attempts on the 40-43 section, and neither found any near miss. The near misses seen earlier (primes/prime_totients/e_digits sub, skip [0] resolve) are still at noise level and don't settle on any one key. The queue still covers the remaining sections, so I added no jobs.
+- 2026-11-04 11:27:09: 11:27 check: the run is healthy. sonnet/18 and codex/16 have finished, codex/15 was skipped (section too short), and codex/14 is running, with sonnet/19 next. All 15 deepseek jobs (deepseek/10 to deepseek/25) are blocked: price_in_per_mtok and price_out_per_mtok are 0 in config/models.toml, so the USD cap can't work. The owner needs to fill in those prices. The sections are still covered by sonnet, codex and local, so I added no replacement jobs. There are still 0 final passes across about 33 finished jobs. The new near misses from codex/16 (beaufort with pi_digits @1055-1056) are at noise level, like the earlier ones.
 
 ## Events
 
-- 2026-11-04 11:10:19 codex/16: running 5 min | 11:09:08 [model] codex (proposer) ok 17.0s, tokens in/out 18805/495, reply 1668 chars
-- 2026-11-04 11:12:39 local/10: running 5 min | 11:12:24 [model] gemma-local (proposer) ok 15.2s, tokens in/out 3546/431, reply 1332 chars
-- 2026-11-04 11:13:04 sonnet/17: done (exit 0, 8 min)
-- 2026-11-04 11:13:20 published: 33 file(s) to branch results
-- 2026-11-04 11:13:26 supervisor: note: 11:13 check: the run is healthy. sonnet/16, sonnet/17, codex/17 and local/25 have finished. codex/16 and local/10 are running, and sonnet/18 is next. There are still 0 final passes across about 30 finished jobs. sonnet/17 and codex/17 together made about 48k attempts on the 40-43 section, and nei...
-- 2026-11-04 11:13:26 local/10: done (exit 0, 6 min)
 - 2026-11-04 11:13:42 published: 34 file(s) to branch results
 - 2026-11-04 11:13:42 sonnet/18: start (uses claude-plan)
 - 2026-11-04 11:13:42 2 running: codex/16, sonnet/18
@@ -200,3 +200,9 @@ round 1 [codex] proposals=8 valid=7 attempts=4053 passes=0 near=0 invalid=1
 - 2026-11-04 11:23:43 sonnet/18: running 10 min | 11:21:25 [model] claude-sonnet (proposer) ok 15.1s, tokens in/out 6456/1007, reply 2224 chars
 - 2026-11-04 11:26:28 codex/14: running 5 min | 11:25:18 [model] codex (proposer) ok 15.7s, tokens in/out 18075/457, reply 1614 chars
 - 2026-11-04 11:26:43 sonnet/18: done (exit 0, 13 min)
+- 2026-11-04 11:26:59 published: 36 file(s) to branch results
+- 2026-11-04 11:27:09 supervisor: note: 11:27 check: the run is healthy. sonnet/18 and codex/16 have finished, codex/15 was skipped (section too short), and codex/14 is running, with sonnet/19 next. All 15 deepseek jobs (deepseek/10 to deepseek/25) are blocked: price_in_per_mtok and price_out_per_mtok are 0 in config/models.toml, so th...
+- 2026-11-04 11:27:10 sonnet/19: start (uses claude-plan)
+- 2026-11-04 11:27:10 2 running: codex/14, sonnet/19
+- 2026-11-04 11:27:10 sonnet/20 waiting: claude-plan in use by sonnet/19
+- 2026-11-04 11:29:30 sonnet/19: done (exit 0, 2 min)
