@@ -527,3 +527,32 @@ def test_auto_brief_by_a_proposer_model(tmp_path):
                 "--auto-brief", "cx"], capture_output=True, text=True, encoding="utf-8", cwd=ROOT)
     assert r.returncode == 0, r.stderr[-800:]
     assert "brief from cx" in r.stdout and "| 1. Try totient streams." in r.stdout
+
+
+def test_supervisor_generators_and_checkin_gap(tmp_path):
+    import json as _json
+    from lpswarm.overnight import apply_supervisor_reply
+    led = Ledger(tmp_path / "spend.sqlite")
+    specs = [ModelSpec("sup", "scripted", "s", (Role.SUPERVISOR,)),
+             ModelSpec("claude-opus", "scripted", "o", (Role.PROPOSER,)),
+             ModelSpec("codex", "scripted", "c", (Role.PROPOSER,))]
+    router = Router(specs, ledger=led, adapters={s.name: ScriptedAdapter(s.name, [_json.dumps({"actions": []})])
+                                                 for s in specs})
+    cfg = OvernightConfig(models=str(tmp_path / "none.toml"), spend_ledger=str(tmp_path / "s.sqlite"),
+                          publish=False, manifest=str(ROOT / "data" / "lp" / "manifest.json"),
+                          alphabet=str(ROOT / "data" / "alphabet" / "gematria_primus.json"),
+                          jobs=[{"id": "x", "kind": "validate"}], supervisor="sup",
+                          supervisor_generators=["codex"])
+    run = Overnight(cfg, tmp_path / "run", router=router, stop_file=tmp_path / "STOP", progress=False)
+    msg = apply_supervisor_reply(run, _json.dumps({"actions": [
+        {"type": "add_job", "sections": [16], "generators": ["claude-opus"]}]}))[0]
+    assert "refused" in msg and "allowed: codex" in msg
+    msg = apply_supervisor_reply(run, _json.dumps({"actions": [
+        {"type": "add_job", "sections": [16], "generators": ["codex"]}]}))[0]
+    assert msg.startswith("added")
+    run.last_tick = time.time() - 20 * 60          # 20 min ago: under the 30-minute gap
+    run.maybe_tick(force=True)
+    assert run.state["ticks"] == 0
+    run.last_tick = time.time() - 31 * 60
+    run.maybe_tick(force=True)
+    assert run.state["ticks"] == 1

@@ -267,8 +267,9 @@ powershell -ExecutionPolicy Bypass -File scripts\overnight.ps1
 - **Results:** `reports\overnight\<run>\SUMMARY.md` on the desktop, and on GitHub: branch
   **`results`** of this repo (open it in the GitHub app; only report `.md`/`.csv` files are
   pushed, never ledgers, logs or config). Uses your normal git login on the PC.
-- **Supervisor:** `claude-supervisor` (Claude Code Opus, tools off) checks in every 60 min and after
-  each job. It can only pick from a menu: write you a note, add a swarm job on chosen sections
+- **Supervisor:** `claude-supervisor` (Claude Code Opus, tools off) checks in every 2 hours and
+  after jobs, at most every 30 minutes (`tick_minutes`, `min_checkin_minutes`). It may only give
+  added jobs to the models in `supervisor_generators` (not Opus itself). It can only pick from a menu: write you a note, add a swarm job on chosen sections
   (max 5 per run, max 8 rounds), skip or retry a job, restart Ollama, or stop the run. Its notes
   appear in SUMMARY.md. When it adds a job it can **delegate** to a cheaper model (e.g.
   `claude-sonnet`) with a written brief: what to try on those sections, based on the per-section

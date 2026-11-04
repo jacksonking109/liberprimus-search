@@ -171,7 +171,8 @@ def run_checks(models_config: str | None = None, ping: bool = False,
                                      "have used its whole budget on hidden reasoning; add think = false "
                                      "to this model in the models config"))
                 else:
-                    out.append(Check(OK, f"ping {s.name}", f"{c.latency_s:.1f}s, reply: {c.text[:40]!r}"))
+                    out.append(Check(OK, f"ping {s.name}", f"{c.latency_s:.1f}s, reply: {c.text[:40]!r}"
+                                     + router._served_note(s.name, c)))
             except Exception as exc:  # noqa: BLE001
                 out.append(Check(FAIL, f"ping {s.name}", str(exc)[:200]))
     return out

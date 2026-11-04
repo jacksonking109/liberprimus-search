@@ -44,7 +44,6 @@ KINDS = ("tiertest", "swarm", "baseline", "validate")
 ORDERS = ("forward", "reverse", "middle")
 MAX_ROUNDS_ADDED = 8
 MAX_PER_ROUND_ADDED = 8
-MIN_FORCED_TICK_S = 600   # after-job supervisor check-ins at least 10 minutes apart
 
 
 # --------------------------------------------------------------------- config
@@ -62,6 +61,10 @@ class OvernightConfig:
     # How many jobs may use one backend at the same time (default 1), e.g.
     # {"codex-plan": 2} runs two Codex section jobs side by side.
     capacity: dict = field(default_factory=dict)
+    min_checkin_minutes: float = 30.0   # after-job supervisor check-ins at least this far apart
+    # Models the supervisor may put in jobs it adds (None: every proposer). Keeps the
+    # expensive planner (Opus) planning, and the volume on cheaper models.
+    supervisor_generators: list | None = None
     manifest: str = "data/lp/manifest.json"
     alphabet: str = "data/alphabet/gematria_primus.json"
     jobs: list[dict] = field(default_factory=list)
@@ -762,7 +765,7 @@ class Overnight:
         gap = time.time() - self.last_tick
         if not force and gap < self.cfg.tick_minutes * 60:
             return
-        if force and gap < MIN_FORCED_TICK_S:
+        if force and gap < float(self.cfg.min_checkin_minutes) * 60:
             return   # after-job check-ins at most every few minutes (saves plan quota)
         self.last_tick = time.time()
         self.state["ticks"] += 1
@@ -817,11 +820,8 @@ the brief only steers their choices. Keep each job to the sections the brief is 
 def supervisor_prompt(run: Overnight) -> list[dict]:
     summary = (run.dir / "SUMMARY.md").read_text(encoding="utf-8") if (run.dir / "SUMMARY.md").is_file() \
         else ""
-    gens = []
-    if run.router is not None:
-        from lpswarm.router.base import Role
-        gens = run.router.names(Role.PROPOSER)
-    extra = (f"Configured proposer models: {', '.join(gens) or 'none'}. Jobs added so far tonight: "
+    gens = sorted(_delegable(run) - {"random_program"})
+    extra = (f"Models you may use in add_job generators: {', '.join(gens) or 'none'}. Jobs added so far tonight: "
              f"{run.state['added_jobs']} of {run.cfg.max_added_jobs}. Time now: {_now()}.")
     digest = section_digest(run)
     return [{"role": "system", "content": SUPERVISOR_MENU},
@@ -916,13 +916,22 @@ def apply_supervisor_reply(run: Overnight, reply: str) -> list[str]:
     return out
 
 
+def _delegable(run: Overnight) -> set[str]:
+    from lpswarm.router.base import Role
+    allowed = set(run.router.names(Role.PROPOSER)) | {"random_program"} if run.router else {"random_program"}
+    if run.cfg.supervisor_generators is not None:
+        allowed &= set(map(str, run.cfg.supervisor_generators)) | {"random_program"}
+    return allowed
+
+
 def _add_job(run: Overnight, a: dict) -> str:
     try:
-        from lpswarm.router.base import Role
-        allowed = set(run.router.names(Role.PROPOSER)) | {"random_program"} if run.router else {"random_program"}
-        gens = [str(g) for g in a.get("generators", []) if str(g) in allowed]
+        allowed = _delegable(run)
+        asked = [str(g) for g in a.get("generators", [])]
+        gens = [g for g in asked if g in allowed]
         if not gens:
-            return "add_job refused: no configured proposer among generators"
+            return (f"add_job refused: none of {asked} may be used; allowed: "
+                    f"{', '.join(sorted(allowed - {'random_program'})) or 'none'}")
         rounds = max(1, min(MAX_ROUNDS_ADDED, int(a.get("rounds", 3))))
         per_round = max(1, min(MAX_PER_ROUND_ADDED, int(a.get("per_round", 6))))
         sec = a.get("sections", "unsolved")

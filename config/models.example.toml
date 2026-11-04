@@ -109,6 +109,7 @@ replies = ['{"proposals": [{"spec": {"stream": {"kind": "sequence", "name": "pri
 # max_calls_per_window = 250
 # window_hours = 5
 # style = "exploratory"
+# per_round = 12                    # more proposals per call = fewer Claude calls
 #
 # Supervisor for `lpswarm overnight` (answers with menu actions only; tools stay off).
 # [models.claude-supervisor]
@@ -129,7 +130,7 @@ replies = ['{"proposals": [{"spec": {"stream": {"kind": "sequence", "name": "pri
 # max_calls_per_window = 90
 # window_hours = 5
 # style = "exploratory"
-# per_round = 8
+# per_round = 16                    # Codex has more quota headroom than Claude
 # timeout = 600
 
 # Any other CLI that reads a prompt on stdin and prints the reply (no isolation,

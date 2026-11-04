@@ -210,7 +210,7 @@ if ((Test-Path $ModelsToml) -and -not $Force) {
         "window_hours = 5", "timeout = 600", "",
         "[models.claude-sonnet]", 'provider = "claude_code"', 'model = "sonnet"', 'roles = ["proposer"]',
         'quota_group = "claude-plan"', "max_calls_per_window = 250", "window_hours = 5", "timeout = 600",
-        'style = "exploratory"', "",
+        'style = "exploratory"', "per_round = 12", "",
         "[models.claude-supervisor]", 'provider = "claude_code"', 'model = "opus"', 'roles = ["supervisor"]',
         'quota_group = "claude-plan"', "max_calls_per_window = 250", "model_max_calls_per_window = 100",
         "window_hours = 5", "timeout = 600", "")
@@ -224,7 +224,7 @@ if ((Test-Path $ModelsToml) -and -not $Force) {
     }
     $codexBlock = @("[models.codex]", 'provider = "codex"', 'model = "default"', 'roles = ["proposer"]',
         'quota_group = "codex-plan"', "max_calls_per_window = 90", "window_hours = 5",
-        'style = "exploratory"', "per_round = 8", "timeout = 600", "")
+        'style = "exploratory"', "per_round = 16", "timeout = 600", "")
     if (Get-Command codex -ErrorAction SilentlyContinue) {
         $lines += @("# Codex on your ChatGPT plan: the explorer.") + $codexBlock
         Write-Step "OK" "found Codex; added model codex (90 calls / 5h)"

@@ -222,6 +222,7 @@ class CodexAdapter:
                 if Path(out_file).is_file() else ""
         tin = tout = 0
         errors = []
+        served = None    # the model Codex reports using, if its events name one
         for line in (r.stdout or "").splitlines():
             try:
                 ev = json.loads(line)
@@ -229,6 +230,7 @@ class CodexAdapter:
                 continue
             if not isinstance(ev, dict):
                 continue
+            served = served or _find_model(ev)
             u = ev.get("usage") if isinstance(ev.get("usage"), dict) else None
             if u:
                 tin += int(u.get("input_tokens") or 0)
@@ -243,7 +245,17 @@ class CodexAdapter:
             raise CLILimitError(f"Codex usage limit: {blob[:200]}", at, parsed)
         if r.returncode != 0 or not text.strip():
             raise AdapterError(f"codex exited {r.returncode}: {blob[:300]}")
-        return Completion(text, self.model or "codex", tin, tout, 0.0, time.monotonic() - t0)
+        return Completion(text, served or self.model or "codex", tin, tout, 0.0, time.monotonic() - t0)
+
+
+def _find_model(ev: dict) -> str | None:
+    """A model name in a Codex JSON event: a 'model' string at the top level or one
+    level down (event shapes vary by CLI version)."""
+    for d in [ev] + [v for v in ev.values() if isinstance(v, dict)]:
+        m = d.get("model")
+        if isinstance(m, str) and m.strip():
+            return m.strip()[:80]
+    return None
 
 
 def cli_version(exe: str, timeout: float = 30) -> str | None:

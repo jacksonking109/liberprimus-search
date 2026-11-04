@@ -58,7 +58,7 @@ if kind == "claude":
 else:
     out = argv[argv.index("-o") + 1]
     if mode == "ok":
-        print(json.dumps({"type": "thread.started"}))
+        print(json.dumps({"type": "thread.started", "session": {"model": os.environ.get("FAKE_MODEL", "")}}))
         print(json.dumps({"type": "turn.completed", "usage": {"input_tokens": 100, "output_tokens": 20}}))
         open(out, "w", encoding="utf-8").write("CODEX:" + stdin[-10:])
     elif mode == "limit":
@@ -335,3 +335,18 @@ def test_loop_never_spins_on_a_past_reset(oracle):
                     [LLMGenerator(r, "m")], SwarmConfig(rounds=2, stop_file=None, timeout_s=3),
                     progress=False)
     assert res.stopped == "timeout" and AlwaysLimited.calls <= 2
+
+
+def test_codex_reports_the_model_it_ran(fake, monkeypatch, capsys):
+    from lpswarm.router import ModelSpec, Role, Router
+    from lpswarm.ledger import Ledger
+    monkeypatch.setenv("FAKE_KIND", "codex")
+    monkeypatch.setenv("FAKE_MODEL", "gpt-test-1")
+    monkeypatch.setenv("LPSWARM_LOG_CALLS", "1")
+    spec = ModelSpec("codex", "codex", "default", (Role.PROPOSER,), extra={"exe": fake["codex"]})
+    c = Router([spec], ledger=Ledger()).complete("codex", MSGS, role="proposer")
+    assert c.model == "gpt-test-1"
+    assert "model gpt-test-1" in capsys.readouterr().out
+    monkeypatch.setenv("FAKE_MODEL", "")
+    Router([spec], ledger=Ledger()).complete("codex", MSGS, role="proposer")
+    assert "model not reported" in capsys.readouterr().out

@@ -118,7 +118,7 @@ def test_supervisor_menu_is_validated(tmp_path):
     a = added[0]["args"]
     assert a[a.index("--rounds") + 1] == "8" and a[a.index("--per-round") + 1] == "8"
     assert a[a.index("--generators") + 1] == "codex"
-    assert any("nightly limit" in m for m in msgs) and any("no configured proposer" in m for m in msgs)
+    assert any("nightly limit" in m for m in msgs) and any("may be used" in m for m in msgs)
     assert jobs["tier"]["status"] == "pending" and jobs["tier"]["retries"] == 1
     assert jobs["tier2"]["status"] == "skipped"
     assert any("unknown action" in m for m in msgs) and run.state["notes"][0].endswith("all quiet")

@@ -7,7 +7,10 @@
 models = "config/models.toml"
 spend_ledger = "reports/model_spend.sqlite"   # shared call/spend counts and usage pauses
 supervisor = "claude-supervisor"              # a model with roles = ["supervisor"]; "" to disable
-tick_minutes = 60                             # supervisor check-ins (also after every job)
+tick_minutes = 120                            # supervisor check-ins (also after jobs, see below)
+min_checkin_minutes = 30                      # after-job check-ins at least this far apart
+# Models the supervisor may put in jobs it adds: it plans, cheaper models do the volume.
+supervisor_generators = ["codex", "claude-sonnet", "qwen-local", "gemma-local"]
 publish = true                                # push report files to the `results` branch
 results_branch = "results"
 max_added_jobs = 5                            # cap on jobs the supervisor may add per run

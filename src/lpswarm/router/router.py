@@ -310,9 +310,21 @@ class Router:
             self._transcript(name, role_s, task_id, messages, None, str(exc)[:500], t0)
             raise
         self._log_call(f"[model] {name} ({role_s}) ok {c.latency_s or time.monotonic() - t0:.1f}s, "
-                       f"tokens in/out {c.tokens_in}/{c.tokens_out}, reply {len(c.text)} chars")
+                       f"tokens in/out {c.tokens_in}/{c.tokens_out}, reply {len(c.text)} chars"
+                       + self._served_note(name, c))
         self._transcript(name, role_s, task_id, messages, c.text, None, t0)
         return c
+
+    def _served_note(self, name: str, c: Completion) -> str:
+        """', model X' when the provider reported the model it actually ran (e.g. the
+        model Codex is set to), or a hint when a CLI on its default did not say."""
+        spec = self._models[name].spec
+        generic = {name, spec.model, "", "default", "codex", "claude"}
+        if c.model and c.model not in generic:
+            return f", model {c.model}"
+        if spec.provider == "codex" and spec.model in ("", "default", "codex"):
+            return ", model not reported (pin one with model = \"...\" in the models config)"
+        return ""
 
     def _log_call(self, line: str) -> None:
         if os.environ.get("LPSWARM_LOG_CALLS") == "1":
