@@ -1,6 +1,6 @@
 # Overnight run 20261104-1523
 
-Started 2026-11-04 15:23:11, updated 2026-11-04 17:01:21, status **running**. Jobs: pending 4, running 2, done 40, blocked 15
+Started 2026-11-04 15:23:11, updated 2026-11-04 17:16:12, status **running**. Jobs: pending 5, running 1, done 41, blocked 15
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -15,7 +15,7 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 17:01:21, status **running**. Jo
 | sonnet/17 | done | 2026-11-04 16:13:54 | 2026-11-04 16:21:41 | Sonnet, briefed by Opus |
 | sonnet/18 | done | 2026-11-04 16:21:57 | 2026-11-04 16:33:03 | Sonnet, briefed by Opus |
 | sonnet/19 | done | 2026-11-04 16:33:19 | 2026-11-04 16:36:29 | Sonnet, briefed by Opus |
-| sonnet/20 | running | 2026-11-04 16:36:44 |  | Sonnet, briefed by Opus |
+| sonnet/20 | done | 2026-11-04 16:36:44 | 2026-11-04 17:16:12 | Sonnet, briefed by Opus |
 | sonnet/21 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/22 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/24 | pending |  |  | Sonnet, briefed by Opus |
@@ -65,34 +65,22 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 17:01:21, status **running**. Jo
 | deepseek/22 | blocked |  | 2026-11-04 16:54:25 | model deepseek: environment variable sk-150ada4ce1e34d7eaf2eeb8b37ed10ae is not set |
 | deepseek/24 | blocked |  | 2026-11-04 16:54:25 | model deepseek: environment variable sk-150ada4ce1e34d7eaf2eeb8b37ed10ae is not set |
 | deepseek/25 | blocked |  | 2026-11-04 16:54:25 | model deepseek: environment variable sk-150ada4ce1e34d7eaf2eeb8b37ed10ae is not set |
+| sup1/13 | pending |  |  | added by supervisor. sonnet/13 made only 22 attempts from 10 hypotheses on the 333-rune section 13, so its proposals exp |
 
 ## Now running
 
-**sonnet/20** (since 2026-11-04 16:36:44), latest log lines:
-```
-16:37:14 [model] claude-sonnet (proposer) ok 9.4s, tokens in/out 4141/1246, reply 2850 chars
-round 1 [claude-sonnet] proposals=12 valid=7 attempts=7 passes=0 near=0 invalid=5
-16:37:24 [model] claude-sonnet (proposer) calling...
-16:37:37 [model] claude-sonnet (proposer) ok 13.1s, tokens in/out 5007/1808, reply 2618 chars
-round 2 [claude-sonnet] proposals=12 valid=12 attempts=12054 passes=0 near=0 invalid=5
-16:49:17 [model] claude-sonnet (proposer) calling...
-16:49:32 [model] claude-sonnet (proposer) ok 15.2s, tokens in/out 5948/1829, reply 2707 chars
-round 3 [claude-sonnet] proposals=12 valid=12 attempts=18159 passes=0 near=0 invalid=5
-16:57:02 [model] claude-sonnet (proposer) calling...
-16:57:14 [model] claude-sonnet (proposer) ok 12.0s, tokens in/out 6807/1581, reply 2425 chars
-```
 **codex/10** (since 2026-11-04 16:53:25), latest log lines:
 ```
-  | 2. Plaintext autokey. Use primers [k] and [k1,k2] from small values, and the words "DIVINITY", "CIRCUMFERENCE", "INSTAR", "PARABLE", "WISDOM" and "KOAN". Use sub and beaufort. Each of these also w
-  | 3. Totient stream with F skipped (the LP solved-page pattern). Use sequence prime_totients with skip [0] (F), skip_mode "resolve". Set offset_range [0,1500] and try sub, add and beaufort. Also run
-  | 4. Other sequences with skip_mode "resolve" on F. Use pi_digits, e_digits, fibonacci, squares and triangular with offset_range [0,2000] and combine sub or beaufort. Also try scale values 2, 3, 28 
-  | 5. Transposition, then a simple stream. Use columnar orders of width 2–9; 729 = 27² = 9·81, so prioritise width 9 and 27-friendly widths. Use identity order, reversed order, and the first rows of 
-  | 6. Repeat word plus reverse map plus F skip. Use the words "FIRFUMFERENFE", "CICADA", "PRIMES" and "LIBERPRIMUS" with skip [0] resolve. Use offs
-16:53:46 [model] codex (proposer) calling...
-16:54:12 [model] codex (proposer) ok 25.5s, tokens in/out 17656/1087, reply 3344 chars, model not reported (pin one with model = "..." in the models config)
-round 1 [codex] proposals=16 valid=16 attempts=5061 passes=0 near=0 invalid=0
-16:59:40 [model] codex (proposer) calling...
-17:00:03 [model] codex (proposer) ok 23.1s, tokens in/out 19011/947, reply 3063 chars, model not reported (pin one with model = "..." in the models config)
+round 4 [codex] proposals=16 valid=16 attempts=19698 passes=0 near=0 invalid=1
+17:10:52 [model] codex (proposer) calling...
+17:11:29 [model] codex (proposer) ok 37.0s, tokens in/out 20175/1223, reply 3232 chars, model not reported (pin one with model = "..." in the models config)
+round 5 [codex] proposals=16 valid=15 attempts=25238 passes=0 near=0 invalid=2
+17:14:55 [model] codex (proposer) calling...
+17:15:20 [model] codex (proposer) ok 25.1s, tokens in/out 20287/1052, reply 3058 chars, model not reported (pin one with model = "..." in the models config)
+round 6 [codex] proposals=16 valid=16 attempts=26991 passes=0 near=0 invalid=2
+stopped: stop_file; final passes: 0
+report: reports\overnight\20261104-1523\codex_10\report.md
+model spend (reports/model_spend.sqlite): deepseek=$0.0000, qwen-local=$0.0000, gemma-local=$0.0000, granite=$0.0000, claude-opus=$0.0000, claude-sonnet=$0.0000, claude-supervisor=$0.0000, codex=$0.00
 ```
 
 ## Results so far
@@ -121,6 +109,8 @@ round 1 [codex] proposals=16 valid=16 attempts=5061 passes=0 near=0 invalid=0
   - LP2:- - 44.jpg-49.jpg: 20515 attempts, 57 hypotheses, **0 final pass(es)**
 - **sonnet/19** (done)
   - LP2:33.jpg - 50.jpg/1: 26596 attempts, 55 hypotheses, **0 final pass(es)** (caution: short section (91 runes): many keys give plausible-looking text this short; treat any lead with extra caution)
+- **sonnet/20** (done)
+  - LP2:50.jpg/2-56.jpg/1: 29488 attempts, 59 hypotheses, **0 final pass(es)**, stopped: stop_file
 - **codex/25** (done)
   - LP2:54.jpg-55.jpg - 71.jpg-72.jpg: 60000 attempts, 57 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **codex/24** (done)
@@ -149,6 +139,8 @@ round 1 [codex] proposals=16 valid=16 attempts=5061 passes=0 near=0 invalid=0
   - LP2:20.jpg/2-23.jpg/1 - 3.jpg/2-6.jpg/1: 56284 attempts, 90 hypotheses, **0 final pass(es)**
 - **codex/11** (done)
   - LP2:20.jpg/1 - 3.jpg/1: 25842 attempts, 91 hypotheses, **0 final pass(es)**
+- **codex/10** (running)
+  - LP2:17.jpg, 18.jpg, 19.jpg - 0.jpg-2.jpg: 26991 attempts, 89 hypotheses, **0 final pass(es)**, stopped: stop_file
 - **local/17** (done)
   - LP2:- - 40.jpg-43.jpg: 2063 attempts, 70 hypotheses, **0 final pass(es)**
 - **local/18** (done)
@@ -184,28 +176,20 @@ round 1 [codex] proposals=16 valid=16 attempts=5061 passes=0 near=0 invalid=0
 
 - qwen-local: 84 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 84 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 201 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-sonnet: 201 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-supervisor: 201 call(s) in the last 5h (cap 550), spent $0.0000
-- codex: 77 call(s) in the last 5h (cap 750), spent $0.0000
+- claude-opus: 177 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-sonnet: 177 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-supervisor: 177 call(s) in the last 5h (cap 550), spent $0.0000
+- codex: 81 call(s) in the last 5h (cap 750), spent $0.0000
 
 ## Supervisor notes
 
 - 2026-11-04 15:54:33: 15:54 check: no final passes yet in any section. Many codex, local and deepseek jobs are still pending, so I added no jobs. Two things to look at: (1) sonnet/13 on LP2:6.jpg/2-7.jpg - 23.jpg/2-24.jpg (333 runes) made only 22 attempts from 10 hypotheses, far fewer than other jobs, so its proposals probably expanded to very few keys. Consider re-running it if later jobs on that section don't cover it. (2) local/15 was skipped because its section has only 9 symbols. qwen-local produces many invalid proposals (3 of 8 in local/20, round 1).
 - 2026-11-04 16:25:32: 16:25 check: still no final passes in any section. 4 jobs are running (codex/16, codex/14, sonnet/18, and codex/14's next round), and the codex queue is working down toward codex/13. codex/13 should give a fuller second pass on the 333-rune section LP2:6.jpg/2-7.jpg - 23.jpg/2-24.jpg, where sonnet/13 made only 22 attempts, so I added no jobs yet. codex/14 is testing 1729 = 7*13*19 columnar transpositions and autokey variants on the 1729-rune section; check its results. Sections with only claude-sonnet coverage so far are 10, 11 and 12 (729, 119 and 693 runes).
+- 2026-11-04 17:02:02: 17:01 check: there are still no final passes in any section. The 15 deepseek jobs (deepseek/10 to deepseek/25) are blocked. The config puts what looks like a literal API key (sk-150a...) where the environment variable name should go. Move the key into an environment variable, put that variable's name in the models config, and revoke the key if this config is shared or published. The results branch is being published to, so check it doesn't contain the key. codex/10 is running and is the first non-sonnet, non-local pass on section 10 (729 runes). claude-sonnet has not yet run sections 20 to 25 (sonnet/21 is queued). I queued one claude-sonnet re-run of section 13, because sonnet/13 made only 22 attempts.
+- 2026-11-04 17:02:02: brief for sup1 (claude-sonnet): Section LP2:6.jpg/2-7.jpg - 23.jpg/2-24.jpg (333 runes). An earlier claude-sonnet job made only 22 attempts here because its proposals were too narrow, often a single fixed key. This time each hypothesis should expand to many keys: give parameter ranges, sweep offsets over 0-28, and try both directions (add and subtract mod 29). codex/13 (28k attempts) and local/13 have also found no final pass. Try families like these: (1) Shift streams from sequences: primes, phi(prime) = p-1 (the method behind the known solved Liber Primus page), primes minus 1 with a skip on the F rune (literal Fs left uncounted), Fibonacci and Lucas mod 29, squares, triangular numbers, and the digits of pi and e. (2) Vigenere with candidate keywords from Cicada/Liber Primus vocabulary (DIVINITY, CIRCUMFERENCE, FIRFUMFERENFE, INSTAR, PARABLE, WISDOM, KOAN, PRIMES, TOTIENT, CONSUMPTION), and also their Atbash forms. (3) Plaintext and ciphertext autokey seeded with a short primer, sweeping primer lengths 1-6. (4) Running key from solved Liber Primus pages, at several start offsets. (5) Atbash combined with a shift (reverse the Gematria Primus index, then add k). (6) Light transposition before substitution: reversal, the even/odd rune split, and columnar with widths 3, 9, 37 and 111 (333 = 9*37). Avoid wasting proposals on plain Caesar or plain Atbash alone, which earlier runs covered. Prefer programs whose key space is at least in the hundreds.
 
 ## Events
 
-- 2026-11-04 16:48:58 published: 37 file(s) to branch results
-- 2026-11-04 16:48:58 codex/11: start (uses codex-plan)
-- 2026-11-04 16:48:58 4 running: sonnet/20, codex/12, local/25, codex/11
-- 2026-11-04 16:48:58 sonnet/21 waiting: claude-plan in use by sonnet/20
-- 2026-11-04 16:51:33 local/25: running 5 min | 16:51:22 [model] qwen-local (proposer) calling...
-- 2026-11-04 16:51:48 sonnet/20: running 15 min | 16:49:32 [model] claude-sonnet (proposer) ok 15.2s, tokens in/out 5948/1829, reply 2707 chars
-- 2026-11-04 16:52:43 codex/12: running 10 min | 16:51:49 [model] codex (proposer) ok 34.2s, tokens in/out 20141/1472, reply 4470 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-04 16:52:48 local/25: done (exit 0, 6 min)
-- 2026-11-04 16:53:04 published: 38 file(s) to branch results
-- 2026-11-04 16:53:04 local/10: start (uses ollama:http://127.0.0.1:11434)
 - 2026-11-04 16:53:04 4 running: sonnet/20, codex/12, codex/11, local/10
 - 2026-11-04 16:53:04 sonnet/21 waiting: claude-plan in use by sonnet/20
 - 2026-11-04 16:53:09 codex/12: done (exit 0, 10 min)
@@ -221,3 +205,13 @@ round 1 [codex] proposals=16 valid=16 attempts=5061 passes=0 near=0 invalid=0
 - 2026-11-04 16:58:06 local/10: running 5 min | 16:56:14 [model] gemma-local (proposer) ok 16.2s, tokens in/out 3458/477, reply 1486 chars
 - 2026-11-04 16:58:26 codex/10: running 5 min | 16:54:12 [model] codex (proposer) ok 25.5s, tokens in/out 17656/1087, reply 3344 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-04 17:01:21 local/10: done (exit 0, 8 min)
+- 2026-11-04 17:01:36 published: 41 file(s) to branch results
+- 2026-11-04 17:02:02 supervisor: note: 17:01 check: there are still no final passes in any section. The 15 deepseek jobs (deepseek/10 to deepseek/25) are blocked. The config puts what looks like a literal API key (sk-150a...) where the environment variable name should go. Move the key into an environment variable, put that variable's ...
+- 2026-11-04 17:02:02 supervisor: added sup1: swarm on 1 section(s) with claude-sonnet; brief: Section LP2:6.jpg/2-7.jpg - 23.jpg/2-24.jpg (333 runes). An earlier claude-sonnet job made only 22 attempts here because its proposals were too narrow, often a single fixed key. This time each hypothe...
+- 2026-11-04 17:02:07 sonnet/20: running 25 min | 16:57:14 [model] claude-sonnet (proposer) ok 12.0s, tokens in/out 6807/1581, reply 2425 chars
+- 2026-11-04 17:03:27 codex/10: running 10 min | 17:00:03 [model] codex (proposer) ok 23.1s, tokens in/out 19011/947, reply 3063 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-04 17:07:07 sonnet/20: running 30 min | 17:06:24 [model] claude-sonnet (proposer) ok 17.5s, tokens in/out 7253/1160, reply 2439 chars
+- 2026-11-04 17:08:27 codex/10: running 15 min | 17:08:08 [model] codex (proposer) ok 26.7s, tokens in/out 20100/1155, reply 3048 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-04 17:12:07 sonnet/20: running 35 min | 17:06:24 [model] claude-sonnet (proposer) ok 17.5s, tokens in/out 7253/1160, reply 2439 chars
+- 2026-11-04 17:13:27 codex/10: running 20 min | 17:11:29 [model] codex (proposer) ok 37.0s, tokens in/out 20175/1223, reply 3232 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-04 17:16:12 sonnet/20: done (exit 0, 39 min)
