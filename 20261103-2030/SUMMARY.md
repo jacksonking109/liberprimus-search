@@ -1,6 +1,6 @@
 # Overnight run 20261103-2030
 
-Started 2026-11-03 20:30:23, updated 2026-11-03 23:08:33, status **running**. Jobs: pending 4, done 12, blocked 15
+Started 2026-11-03 20:30:23, updated 2026-11-03 23:08:48, status **stopped**. Jobs: pending 4, done 12, blocked 15
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -86,8 +86,6 @@ Started 2026-11-03 20:30:23, updated 2026-11-03 23:08:33, status **running**. Jo
 
 ## Events
 
-- 2026-11-03 22:38:47 tier-claude: running 5 min | 22:38:46 [model] claude-sonnet (proposer) calling...
-- 2026-11-03 22:39:52 tier-claude: done (exit 0, 6 min)
 - 2026-11-03 22:40:08 published: 11 file(s) to branch results
 - 2026-11-03 22:40:08 sup1/17 waiting: codex-plan in use by sup1/16
 - 2026-11-03 22:41:03 sup1/16: running 5 min | 22:40:42 [model] codex (proposer) ok 31.1s, tokens in/out 18114/471, reply 1620 chars
@@ -111,3 +109,5 @@ Started 2026-11-03 20:30:23, updated 2026-11-03 23:08:33, status **running**. Jo
 - 2026-11-03 23:05:58 sup1/20: start (uses codex-plan, ollama:http://127.0.0.1:11434)
 - 2026-11-03 23:05:58 sup1/21 waiting: codex-plan in use by sup1/20
 - 2026-11-03 23:08:33 sup1/20: done (exit 0, 3 min)
+- 2026-11-03 23:08:48 published: 16 file(s) to branch results
+- 2026-11-03 23:08:48 stopping: STOP file
