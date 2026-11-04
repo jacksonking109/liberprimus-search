@@ -1,6 +1,6 @@
 # Overnight run 20261104-1523
 
-Started 2026-11-04 15:23:11, updated 2026-11-04 17:49:59, status **running**. Jobs: pending 9, running 1, done 52
+Started 2026-11-04 15:23:11, updated 2026-11-04 17:51:00, status **running**. Jobs: pending 8, running 1, done 53
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -59,7 +59,7 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 17:49:59, status **running**. Jo
 | deepseek/16 | done | 2026-11-04 17:41:03 | 2026-11-04 17:42:58 | DeepSeek (volume) |
 | deepseek/17 | done | 2026-11-04 17:43:13 | 2026-11-04 17:46:28 | DeepSeek (volume) |
 | deepseek/18 | done | 2026-11-04 17:46:44 | 2026-11-04 17:49:59 | DeepSeek (volume) |
-| deepseek/19 | pending |  | 2026-11-04 16:54:25 | retry requested |
+| deepseek/19 | done | 2026-11-04 17:50:15 | 2026-11-04 17:51:00 | DeepSeek (volume) |
 | deepseek/20 | pending |  | 2026-11-04 16:54:25 | retry requested |
 | deepseek/21 | pending |  | 2026-11-04 16:54:25 | retry requested |
 | deepseek/22 | pending |  | 2026-11-04 16:54:25 | retry requested |
@@ -191,10 +191,12 @@ round 3 [claude-sonnet] proposals=12 valid=12 attempts=7683 passes=0 near=0 inva
   - LP2:- - 40.jpg-43.jpg: 32574 attempts, 64 hypotheses, **0 final pass(es)**
 - **deepseek/18** (done)
   - LP2:- - 44.jpg-49.jpg: 32508 attempts, 76 hypotheses, **0 final pass(es)**
+- **deepseek/19** (done)
+  - LP2:33.jpg - 50.jpg/1: 20467 attempts, 65 hypotheses, **0 final pass(es)** (caution: short section (91 runes): many keys give plausible-looking text this short; treat any lead with extra caution)
 
 ## Model usage
 
-- deepseek: 50 call(s) in the last 5h (cap none), spent $0.1019
+- deepseek: 56 call(s) in the last 5h (cap none), spent $0.1134
 - qwen-local: 88 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 88 call(s) in the last 5h (cap none), spent $0.0000
 - granite: 4 call(s) in the last 5h (cap none), spent $0.0000
@@ -214,10 +216,6 @@ round 3 [claude-sonnet] proposals=12 valid=12 attempts=7683 passes=0 near=0 inva
 
 ## Events
 
-- 2026-11-04 17:37:21 deepseek/13: start (uses api:https://api.deepseek.com)
-- 2026-11-04 17:37:21 2 running: sonnet/22, deepseek/13
-- 2026-11-04 17:39:01 deepseek/13: done (exit 0, 2 min)
-- 2026-11-04 17:39:16 published: 48 file(s) to branch results
 - 2026-11-04 17:39:16 deepseek/14: start (uses api:https://api.deepseek.com)
 - 2026-11-04 17:39:16 2 running: sonnet/22, deepseek/14
 - 2026-11-04 17:40:26 deepseek/14: done (exit 0, 1 min)
@@ -239,3 +237,7 @@ round 3 [claude-sonnet] proposals=12 valid=12 attempts=7683 passes=0 near=0 inva
 - 2026-11-04 17:46:44 deepseek/18: start (uses api:https://api.deepseek.com)
 - 2026-11-04 17:46:44 2 running: sonnet/22, deepseek/18
 - 2026-11-04 17:49:59 deepseek/18: done (exit 0, 3 min)
+- 2026-11-04 17:50:15 published: 52 file(s) to branch results
+- 2026-11-04 17:50:15 deepseek/19: start (uses api:https://api.deepseek.com)
+- 2026-11-04 17:50:15 2 running: sonnet/22, deepseek/19
+- 2026-11-04 17:51:00 deepseek/19: done (exit 0, 1 min)
