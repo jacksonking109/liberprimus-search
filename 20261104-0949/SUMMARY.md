@@ -1,6 +1,6 @@
 # Overnight run 20261104-0949
 
-Started 2026-11-04 09:49:00, updated 2026-11-04 12:12:59, status **running**. Jobs: pending 12, done 49, blocked 15
+Started 2026-11-04 09:49:00, updated 2026-11-04 12:15:44, status **running**. Jobs: pending 11, done 50, blocked 15
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -68,7 +68,7 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 12:12:59, status **running**. Jo
 | sup1/10 | done | 2026-11-04 12:05:43 | 2026-11-04 12:07:43 | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
 | sup1/11 | done | 2026-11-04 12:07:59 | 2026-11-04 12:09:29 | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
 | sup1/12 | done | 2026-11-04 12:09:44 | 2026-11-04 12:12:59 | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
-| sup1/13 | pending |  |  | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
+| sup1/13 | done | 2026-11-04 12:13:24 | 2026-11-04 12:15:44 | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
 | sup1/14 | pending |  |  | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
 | sup1/15 | pending |  |  | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
 | sup1/16 | pending |  |  | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
@@ -183,14 +183,16 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 12:12:59, status **running**. Jo
   - LP2:20.jpg/1 - 3.jpg/1: 6657 attempts, 23 hypotheses, **0 final pass(es)**
 - **sup1/12** (done)
   - LP2:20.jpg/2-23.jpg/1 - 3.jpg/2-6.jpg/1: 4671 attempts, 24 hypotheses, **0 final pass(es)**
+- **sup1/13** (done)
+  - LP2:6.jpg/2-7.jpg - 23.jpg/2-24.jpg: 9314 attempts, 23 hypotheses, **0 final pass(es)**
 
 ## Model usage
 
 - qwen-local: 84 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 84 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 165 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-sonnet: 165 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-supervisor: 165 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-opus: 170 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-sonnet: 170 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-supervisor: 170 call(s) in the last 5h (cap 550), spent $0.0000
 - codex: 81 call(s) in the last 5h (cap 750), spent $0.0000
 
 ## Supervisor notes
@@ -216,14 +218,10 @@ Try these instead:
 Prefer the longer sections (1000+ runes). On short ones (91 and 121 runes) noise looks convincing, so don't chase near misses there. Keep each proposal distinct from the others and well-formed, because invalid proposals waste rounds.
 - 2026-11-04 11:51:35: 11:51 check: the run resumed at 11:51 after a STOP file at 11:40. sonnet/22, codex/11 and codex/10 are running. sonnet/21 and codex/12 finished with 0 final passes, and every near miss is still at noise level. There are still 0 final passes across about 40 finished jobs. The deepseek jobs are still blocked until the price fields in config/models.toml are filled in. sup1 (claude-opus, different cipher families) is queued, so I added no new jobs.
 - 2026-11-04 12:02:52: 12:02 check: the run is healthy. codex/11, sonnet/22, codex/10 and sonnet/24 have finished, and sonnet/25 is next on claude-plan. There are still 0 final passes across about 44 finished jobs. sonnet/24 made 32k attempts on the 534-rune section and found no near miss, and no new near misses have appeared since 11:51. The deepseek jobs are still blocked until the price fields in config/models.toml are filled in. The sup1 claude-opus job, which tries other cipher families, is still queued. I added no jobs, so I can see what sup1 finds before using more of tonight's job budget (1 of 5 used).
+- 2026-11-04 12:13:24: 12:13 check: the run is healthy. sonnet/25 has finished, and the first sup1 (claude-opus) jobs, sup1/10 to sup1/12, are done. sup1/13 is next on claude-plan. There are still 0 final passes across about 48 finished jobs. sup1/12 made 4.7k attempts and got 0 final. sonnet/25 found new near misses on the 308-rune section (prime_totients sub with map reverse, one with columnar width 7), but they are at noise level. The deepseek jobs are still blocked until the price fields in config/models.toml are filled in. I added no jobs, so I can see the rest of sup1's results first (1 of 5 jobs used tonight).
 
 ## Events
 
-- 2026-11-04 11:56:36 codex/10: running 5 min | 11:56:34 [model] codex (proposer) calling...
-- 2026-11-04 11:56:36 sonnet/24: start (uses claude-plan)
-- 2026-11-04 11:56:36 2 running: codex/10, sonnet/24
-- 2026-11-04 11:56:36 sonnet/25 waiting: claude-plan in use by sonnet/24
-- 2026-11-04 11:56:56 codex/10: done (exit 0, 6 min)
 - 2026-11-04 11:57:12 published: 45 file(s) to branch results
 - 2026-11-04 12:01:37 sonnet/24: running 5 min | 12:01:30 [model] claude-sonnet (proposer) calling...
 - 2026-11-04 12:02:22 sonnet/24: done (exit 0, 6 min)
@@ -244,3 +242,8 @@ Prefer the longer sections (1000+ runes). On short ones (91 and 121 runes) noise
 - 2026-11-04 12:09:44 sup1/12: start (uses claude-plan)
 - 2026-11-04 12:09:44 sup1/13 waiting: claude-plan in use by sup1/12
 - 2026-11-04 12:12:59 sup1/12: done (exit 0, 3 min)
+- 2026-11-04 12:13:15 published: 50 file(s) to branch results
+- 2026-11-04 12:13:24 supervisor: note: 12:13 check: the run is healthy. sonnet/25 has finished, and the first sup1 (claude-opus) jobs, sup1/10 to sup1/12, are done. sup1/13 is next on claude-plan. There are still 0 final passes across about 48 finished jobs. sup1/12 made 4.7k attempts and got 0 final. sonnet/25 found new near misses o...
+- 2026-11-04 12:13:24 sup1/13: start (uses claude-plan)
+- 2026-11-04 12:13:24 sup1/14 waiting: claude-plan in use by sup1/13
+- 2026-11-04 12:15:44 sup1/13: done (exit 0, 2 min)
