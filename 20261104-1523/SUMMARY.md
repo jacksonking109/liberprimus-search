@@ -1,6 +1,6 @@
 # Overnight run 20261104-1523
 
-Started 2026-11-04 15:23:11, updated 2026-11-04 17:46:28, status **running**. Jobs: pending 10, running 1, done 51
+Started 2026-11-04 15:23:11, updated 2026-11-04 17:49:59, status **running**. Jobs: pending 9, running 1, done 52
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -58,7 +58,7 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 17:46:28, status **running**. Jo
 | deepseek/15 | done | 2026-11-04 17:40:42 | 2026-11-04 17:40:47 | DeepSeek (volume) |
 | deepseek/16 | done | 2026-11-04 17:41:03 | 2026-11-04 17:42:58 | DeepSeek (volume) |
 | deepseek/17 | done | 2026-11-04 17:43:13 | 2026-11-04 17:46:28 | DeepSeek (volume) |
-| deepseek/18 | pending |  | 2026-11-04 16:54:25 | retry requested |
+| deepseek/18 | done | 2026-11-04 17:46:44 | 2026-11-04 17:49:59 | DeepSeek (volume) |
 | deepseek/19 | pending |  | 2026-11-04 16:54:25 | retry requested |
 | deepseek/20 | pending |  | 2026-11-04 16:54:25 | retry requested |
 | deepseek/21 | pending |  | 2026-11-04 16:54:25 | retry requested |
@@ -71,9 +71,6 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 17:46:28, status **running**. Jo
 
 **sonnet/22** (since 2026-11-04 17:36:20), latest log lines:
 ```
-  | 6. **Transposition plus key.** Undo a columnar transposition with widths 2–8, using identity order and reversed order. Follow it with a prime_totients or primes sequence over offset_range [0,200].
-  | 7. **Two-symbol skip sets.** Try skip [0,10] (F and I) and skip [2] (TH) in resolve mode, with the totient and primes streams. Reason: literal
-17:36:40 [model] claude-sonnet (proposer) calling...
 17:36:50 [model] claude-sonnet (proposer) ok 9.6s, tokens in/out 4135/1272, reply 2659 chars
 round 1 [claude-sonnet] proposals=12 valid=9 attempts=1222 passes=0 near=0 invalid=3
 17:38:33 [model] claude-sonnet (proposer) calling...
@@ -81,6 +78,9 @@ round 1 [claude-sonnet] proposals=12 valid=9 attempts=1222 passes=0 near=0 inval
 round 2 [claude-sonnet] proposals=12 valid=9 attempts=1986 passes=0 near=0 invalid=6
 17:39:24 [model] claude-sonnet (proposer) calling...
 17:39:33 [model] claude-sonnet (proposer) ok 9.2s, tokens in/out 5875/1336, reply 2890 chars
+round 3 [claude-sonnet] proposals=12 valid=12 attempts=7683 passes=0 near=0 invalid=6
+17:49:02 [model] claude-sonnet (proposer) calling...
+17:49:19 [model] claude-sonnet (proposer) ok 16.8s, tokens in/out 6789/1204, reply 2685 chars
 ```
 
 ## Results so far
@@ -189,10 +189,12 @@ round 2 [claude-sonnet] proposals=12 valid=9 attempts=1986 passes=0 near=0 inval
   - LP2:15.jpg/2- - 32.jpg/2-39.jpg: 28578 attempts, 67 hypotheses, **0 final pass(es)**
 - **deepseek/17** (done)
   - LP2:- - 40.jpg-43.jpg: 32574 attempts, 64 hypotheses, **0 final pass(es)**
+- **deepseek/18** (done)
+  - LP2:- - 44.jpg-49.jpg: 32508 attempts, 76 hypotheses, **0 final pass(es)**
 
 ## Model usage
 
-- deepseek: 44 call(s) in the last 5h (cap none), spent $0.0900
+- deepseek: 50 call(s) in the last 5h (cap none), spent $0.1019
 - qwen-local: 88 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 88 call(s) in the last 5h (cap none), spent $0.0000
 - granite: 4 call(s) in the last 5h (cap none), spent $0.0000
@@ -212,10 +214,6 @@ round 2 [claude-sonnet] proposals=12 valid=9 attempts=1986 passes=0 near=0 inval
 
 ## Events
 
-- 2026-11-04 17:36:20 2 running: deepseek/12, sonnet/22
-- 2026-11-04 17:36:20 sonnet/24 waiting: claude-plan in use by sonnet/22
-- 2026-11-04 17:37:05 deepseek/12: done (exit 0, 1 min)
-- 2026-11-04 17:37:21 published: 47 file(s) to branch results
 - 2026-11-04 17:37:21 deepseek/13: start (uses api:https://api.deepseek.com)
 - 2026-11-04 17:37:21 2 running: sonnet/22, deepseek/13
 - 2026-11-04 17:39:01 deepseek/13: done (exit 0, 2 min)
@@ -237,3 +235,7 @@ round 2 [claude-sonnet] proposals=12 valid=9 attempts=1986 passes=0 near=0 inval
 - 2026-11-04 17:43:13 2 running: sonnet/22, deepseek/17
 - 2026-11-04 17:46:23 sonnet/22: running 10 min | 17:39:33 [model] claude-sonnet (proposer) ok 9.2s, tokens in/out 5875/1336, reply 2890 chars
 - 2026-11-04 17:46:28 deepseek/17: done (exit 0, 3 min)
+- 2026-11-04 17:46:44 published: 51 file(s) to branch results
+- 2026-11-04 17:46:44 deepseek/18: start (uses api:https://api.deepseek.com)
+- 2026-11-04 17:46:44 2 running: sonnet/22, deepseek/18
+- 2026-11-04 17:49:59 deepseek/18: done (exit 0, 3 min)
