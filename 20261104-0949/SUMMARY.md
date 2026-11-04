@@ -1,6 +1,6 @@
 # Overnight run 20261104-0949
 
-Started 2026-11-04 09:49:00, updated 2026-11-04 12:05:27, status **running**. Jobs: pending 15, done 46, blocked 15
+Started 2026-11-04 09:49:00, updated 2026-11-04 12:07:43, status **running**. Jobs: pending 14, done 47, blocked 15
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -65,7 +65,7 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 12:05:27, status **running**. Jo
 | deepseek/22 | blocked |  | 2026-11-04 11:13:42 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
 | deepseek/24 | blocked |  | 2026-11-04 11:13:42 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
 | deepseek/25 | blocked |  | 2026-11-04 11:13:42 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
-| sup1/10 | pending |  |  | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
+| sup1/10 | done | 2026-11-04 12:05:43 | 2026-11-04 12:07:43 | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
 | sup1/11 | pending |  |  | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
 | sup1/12 | pending |  |  | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
 | sup1/13 | pending |  |  | added by supervisor. About 37 jobs have spent most of their attempts on primes, prime_totients and e_digits sequences wi |
@@ -177,14 +177,16 @@ Started 2026-11-04 09:49:00, updated 2026-11-04 12:05:27, status **running**. Jo
   - LP2:54.jpg-55.jpg - 71.jpg-72.jpg: 295 attempts, 83 hypotheses, **0 final pass(es)**
 - **local/10** (done)
   - LP2:17.jpg, 18.jpg, 19.jpg - 0.jpg-2.jpg: 122 attempts, 83 hypotheses, **0 final pass(es)**
+- **sup1/10** (done)
+  - LP2:17.jpg, 18.jpg, 19.jpg - 0.jpg-2.jpg: 8306 attempts, 24 hypotheses, **0 final pass(es)**
 
 ## Model usage
 
 - qwen-local: 84 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 84 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 153 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-sonnet: 153 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-supervisor: 153 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-opus: 157 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-sonnet: 157 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-supervisor: 157 call(s) in the last 5h (cap 550), spent $0.0000
 - codex: 81 call(s) in the last 5h (cap 750), spent $0.0000
 
 ## Supervisor notes
@@ -213,10 +215,6 @@ Prefer the longer sections (1000+ runes). On short ones (91 and 121 runes) noise
 
 ## Events
 
-- 2026-11-04 11:51:20 resume: auto_brief/lane updated from the config for jobs not yet started
-- 2026-11-04 11:51:20 sonnet/22: start (uses claude-plan)
-- 2026-11-04 11:51:20 codex/11: start (uses codex-plan)
-- 2026-11-04 11:51:20 2 running: sonnet/22, codex/11
 - 2026-11-04 11:51:20 codex/10: start (uses codex-plan)
 - 2026-11-04 11:51:20 3 running: sonnet/22, codex/11, codex/10
 - 2026-11-04 11:51:20 sonnet/24 waiting: claude-plan in use by sonnet/22
@@ -238,3 +236,7 @@ Prefer the longer sections (1000+ runes). On short ones (91 and 121 runes) noise
 - 2026-11-04 12:02:52 sonnet/25: start (uses claude-plan)
 - 2026-11-04 12:02:52 sup1/10 waiting: claude-plan in use by sonnet/25
 - 2026-11-04 12:05:27 sonnet/25: done (exit 0, 3 min)
+- 2026-11-04 12:05:43 published: 47 file(s) to branch results
+- 2026-11-04 12:05:43 sup1/10: start (uses claude-plan)
+- 2026-11-04 12:05:43 sup1/11 waiting: claude-plan in use by sup1/10
+- 2026-11-04 12:07:43 sup1/10: done (exit 0, 2 min)
