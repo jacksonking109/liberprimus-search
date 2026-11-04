@@ -239,3 +239,34 @@ def test_tiertest_recheck_handles_resolved_specs(tmp_path):
     aid = led.conn.execute("SELECT id FROM attempt").fetchone()[0]
     assert _decrypt_attempt(led, aid, case.ciphertext, 26, o) is not None
     assert _decrypt_attempt(led, aid, case.ciphertext, 26, None) is None   # no crash without LM
+
+
+def test_router_call_log_and_transcript(tmp_path, monkeypatch, capsys):
+    tr = tmp_path / "t.jsonl"
+    monkeypatch.setenv("LPSWARM_LOG_CALLS", "1")
+    monkeypatch.setenv("LPSWARM_TRANSCRIPT", str(tr))
+    r = Router([ModelSpec("codex", "scripted", "c", (Role.PROPOSER,))], ledger=Ledger(),
+               adapters={"codex": ScriptedAdapter("codex", ["hello"], tokens=(12, 3))})
+    r.complete("codex", [{"role": "user", "content": "q"}], role="proposer", task_id="x#r1")
+    out = capsys.readouterr().out
+    assert "[model] codex (proposer) ok" in out and "tokens in/out 12/3" in out
+    rec = json.loads(tr.read_text(encoding="utf-8").splitlines()[0])
+    assert rec["model"] == "codex" and rec["reply"] == "hello" and rec["messages"][0]["content"] == "q"
+
+
+def test_log_tail_skips_warning_noise(tmp_path):
+    from lpswarm.overnight import _log_tail
+    p = tmp_path / "job.log"
+    p.write_text("round 1 [codex] proposals=8\nC:\\x\\router.py:106: UserWarning: prices are 0\n"
+                 "  return cls(load_model_specs(path), ledger=ledger, **kw)\n\n", encoding="utf-8")
+    assert _log_tail(p, 3) == ["round 1 [codex] proposals=8"]
+
+
+def test_jobs_run_verbose_with_model_call_lines(tmp_path, monkeypatch):
+    monkeypatch.chdir(ROOT)
+    run = Overnight(_cfg(tmp_path, [SWARM]), tmp_path / "run", stop_file=tmp_path / "STOP",
+                    poll_s=0.5, progress=False)
+    assert "--quiet" not in run.job_command(run.state["jobs"][0])
+    run.run()
+    log = (tmp_path / "run" / "sw_9" / "job.log").read_text(encoding="utf-8")
+    assert "round 1 [random_program]" in log

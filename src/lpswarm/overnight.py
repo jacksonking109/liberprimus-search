@@ -183,7 +183,8 @@ class KeepAwake:
 class Overnight:
     def __init__(self, cfg: OvernightConfig, run_dir: str | Path, *, publish: bool | None = None,
                  router=None, stop_file: str | Path = "STOP", poll_s: float = 5.0,
-                 python: str | None = None, progress: bool = True, retry_failed: bool = False):
+                 python: str | None = None, progress: bool = True, retry_failed: bool = False,
+                 heartbeat_s: float = 300.0):
         self.cfg = cfg
         self.dir = Path(run_dir)
         self.dir.mkdir(parents=True, exist_ok=True)
@@ -195,6 +196,7 @@ class Overnight:
         self.python = python or sys.executable
         self.progress = progress
         self.until = _until_epoch(cfg.until)
+        self.heartbeat_s = heartbeat_s
         self.state = self._load_state()
         self.last_tick = 0.0
         if retry_failed:
@@ -252,7 +254,8 @@ class Overnight:
                 args = _set_arg(args, "--spend-ledger", self.cfg.spend_ledger)
         elif job["kind"] == "validate":
             args = _set_arg(args, "--out", str(d))
-        return [self.python, "-m", "lpswarm", job["kind"], *args, "--quiet"]
+        # Not --quiet: job.log gets round-by-round progress (and one line per model call).
+        return [self.python, "-m", "lpswarm", job["kind"], *args]
 
     def job_models(self, job: dict) -> list[str]:
         names = []
@@ -350,13 +353,24 @@ class Overnight:
         self.log(f"{job['id']}: start")
         kw: dict = {"creationflags": subprocess.CREATE_NEW_PROCESS_GROUP} if os.name == "nt" \
             else {"start_new_session": True}
+        env = dict(os.environ, LPSWARM_LOG_CALLS="1", PYTHONUNBUFFERED="1",
+                   LPSWARM_TRANSCRIPT=str(d / "transcript.jsonl"))
+        t_start = time.monotonic()
+        last_beat = t_start
         with (d / "job.log").open("a", encoding="utf-8") as logf:
             logf.write(f"\n===== {_now()} {' '.join(cmd)}\n")
             logf.flush()
-            proc = subprocess.Popen(cmd, stdout=logf, stderr=subprocess.STDOUT, **kw)
+            proc = subprocess.Popen(cmd, stdout=logf, stderr=subprocess.STDOUT, env=env, **kw)
             killed = None
             while proc.poll() is None:
                 time.sleep(self.poll_s)
+                if time.monotonic() - last_beat >= self.heartbeat_s:
+                    last_beat = time.monotonic()
+                    mins = (last_beat - t_start) / 60
+                    tail = _log_tail(d / "job.log", 1)
+                    self.log(f"{job['id']}: running {mins:.0f} min | {tail[-1] if tail else 'no output yet'}")
+                    self.save()
+                    self.write_summary()
                 reason = self.should_stop()
                 if reason or job.get("kill_requested"):
                     killed = reason or job.pop("kill_requested")
@@ -436,6 +450,12 @@ class Overnight:
                 note = f"added by {j['added_by']}. {note}"
             lines.append(f"| {j['id']} | {j['status']} | {j['started'] or ''} | {j['ended'] or ''} | "
                          f"{note[:120]} |")
+        running = [j for j in st["jobs"] if j["status"] == "running"]
+        if running:
+            lines += ["", "## Now running", ""]
+            for j in running:
+                lines.append(f"**{j['id']}** (since {j['started']}), latest log lines:")
+                lines += ["```"] + _log_tail(self.job_dir(j) / "job.log", 10) + ["```"]
         lines += ["", "## Results so far", ""]
         any_res = False
         for j in st["jobs"]:
@@ -540,7 +560,7 @@ def apply_supervisor_reply(run: Overnight, reply: str) -> list[str]:
             text = str(a.get("text", ""))[:1000].strip()
             if text:
                 run.state["notes"].append(f"{_now()}: {text}")
-                out.append("note added")
+                out.append("note: " + (text if len(text) <= 300 else text[:297] + "..."))
         elif t == "add_job":
             out.append(_add_job(run, a))
         elif t == "skip_job":
@@ -648,6 +668,21 @@ def publish_results(run_dir: Path, branch: str = "results", repo: str | Path = "
     _git(["commit", "-q", "-m", f"results: {run_dir.name} {_now()}"], wt)
     _git(["push", "-q", "-u", "origin", branch], wt)
     return f"{copied} file(s) to branch {branch}"
+
+
+def _log_tail(path: Path, n: int) -> list[str]:
+    """Last n meaningful lines of a job log (skips Python warning noise)."""
+    try:
+        with open(path, "rb") as f:
+            f.seek(0, 2)
+            size = f.tell()
+            f.seek(max(0, size - 16384))
+            text = f.read().decode("utf-8", errors="replace")
+    except OSError:
+        return []
+    lines = [x.rstrip() for x in text.splitlines() if x.strip()]
+    lines = [x for x in lines if "UserWarning" not in x and not x.lstrip().startswith("return cls(")]
+    return [x[:200] for x in lines[-n:]]
 
 
 def latest_unfinished(base: Path) -> Path | None:

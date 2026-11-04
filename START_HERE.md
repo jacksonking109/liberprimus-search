@@ -196,6 +196,16 @@ powershell -ExecutionPolicy Bypass -File scripts\overnight.ps1
   (Open a new PowerShell window afterwards so it is picked up.)
 - **Crashes and reboots:** a failing job doesn't stop the queue. If the PC restarts, run the same
   command again: it resumes the unfinished run (finished jobs and sections are skipped).
+- **Watching it:** the main window prints a heartbeat every 5 minutes (job, minutes running,
+  latest progress line) and the supervisor's notes and actions. Each job's `job.log` has
+  round-by-round progress and one line per model call (model, seconds, tokens, or the error or
+  usage pause). Follow the running job's log from a second window:
+
+```powershell
+Get-ChildItem reports\overnight -Recurse -Filter job.log | Sort-Object LastWriteTime | Select-Object -Last 1 | Get-Content -Tail 30 -Wait
+```
+
+  Every prompt and reply is saved per job in `transcript.jsonl` (kept on the PC, not pushed).
 - **Stop:** create a file named `STOP` in the repo folder (`New-Item STOP`); or pass
   `-Until 08:30` to stop at a time. Delete `STOP` before the next run.
 

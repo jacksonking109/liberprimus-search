@@ -8,6 +8,7 @@ budget holds across runs that share a ledger.
 from __future__ import annotations
 
 import json
+import os
 import time
 import warnings
 from dataclasses import dataclass
@@ -173,6 +174,50 @@ class Router:
     def complete(self, name: str, messages: Sequence[dict], role: Role | str,
                  task_id: str | None = None, temperature: float = 0.7,
                  max_tokens: int = 2048, schema: dict | None = None) -> Completion:
+        """Call a model, with optional per-call logging (LPSWARM_LOG_CALLS=1: one line per
+        call on stdout) and transcripts (LPSWARM_TRANSCRIPT=<file.jsonl>: every prompt and
+        reply appended). Both are set by `lpswarm overnight` for its jobs."""
+        t0 = time.monotonic()
+        role_s = Role(role).value if isinstance(role, (str, Role)) else str(role)
+        try:
+            c = self._complete(name, messages, role, task_id, temperature, max_tokens, schema)
+        except RateLimited as exc:
+            self._log_call(f"[model] {name} ({role_s}) paused: {exc}")
+            self._transcript(name, role_s, task_id, messages, None, f"paused: {exc}", t0)
+            raise
+        except BudgetExceeded as exc:
+            self._log_call(f"[model] {name} ({role_s}) budget: {exc}")
+            raise
+        except AdapterError as exc:
+            self._log_call(f"[model] {name} ({role_s}) error after {time.monotonic() - t0:.1f}s: "
+                           f"{str(exc)[:200]}")
+            self._transcript(name, role_s, task_id, messages, None, str(exc)[:500], t0)
+            raise
+        self._log_call(f"[model] {name} ({role_s}) ok {c.latency_s or time.monotonic() - t0:.1f}s, "
+                       f"tokens in/out {c.tokens_in}/{c.tokens_out}, reply {len(c.text)} chars")
+        self._transcript(name, role_s, task_id, messages, c.text, None, t0)
+        return c
+
+    def _log_call(self, line: str) -> None:
+        if os.environ.get("LPSWARM_LOG_CALLS") == "1":
+            print(f"{time.strftime('%H:%M:%S')} {line}", flush=True)
+
+    def _transcript(self, name, role, task_id, messages, reply, error, t0) -> None:
+        path = os.environ.get("LPSWARM_TRANSCRIPT")
+        if not path:
+            return
+        rec = {"time": time.strftime("%Y-%m-%d %H:%M:%S"), "model": name, "role": role,
+               "task": task_id, "seconds": round(time.monotonic() - t0, 2),
+               "messages": list(messages), "reply": reply, "error": error}
+        try:
+            with open(path, "a", encoding="utf-8") as f:
+                f.write(json.dumps(rec, ensure_ascii=False) + "\n")
+        except OSError:
+            pass
+
+    def _complete(self, name: str, messages: Sequence[dict], role: Role | str,
+                  task_id: str | None = None, temperature: float = 0.7,
+                  max_tokens: int = 2048, schema: dict | None = None) -> Completion:
         """`schema` (JSON schema for the reply) is used by adapters that support
         structured output (Ollama) and ignored by the others."""
         entry = self._models.get(name)
