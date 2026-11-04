@@ -8,6 +8,7 @@ and work the same on Windows and POSIX.
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import threading
 import time
@@ -63,6 +64,7 @@ class RunSummary:
     passes: int = 0
     near_misses: int = 0
     prior_passes: int = 0            # skipped attempts that had already passed
+    equivalent: int = 0              # skipped: same decryption as an earlier, different key
     unreachable: int = 0             # attempts whose threshold exceeded the best possible score
     stopped: str | None = None       # reason if a budget or kill switch stopped the run
     hits: list[Hit] = field(default_factory=list)
@@ -117,6 +119,7 @@ class Executor:
         self.ledger.commit()
         summary = RunSummary(tid, family_name, hypothesis_id)
         count = self.ledger.attempt_count(tid)
+        seen_outputs = self.ledger.output_hashes(tid)
         t0 = time.monotonic()
         since_commit = 0
         exhausted = True
@@ -137,18 +140,29 @@ class Executor:
                         if prior == "pass":
                             summary.prior_passes += 1
                         continue
-                    if kid is None:
-                        preview = kc.label or fam.key_preview(kc.key)
-                        kj = json.dumps(fam.key_json(kc.key), sort_keys=True, separators=(",", ":"))
-                        kid = self.ledger.key_candidate_id(khash, kc.derivation, preview,
-                                                           kc.corpus_item_id, kc.edition_id,
-                                                           kj if len(kj) <= MAX_KEY_JSON else None)
                     ts = time.perf_counter()
                     variant = fam.null_variant(kc.key) if hasattr(fam, "null_variant") else None
                     if variant:   # search-optimised decryption: needs the LM, own nulls
                         pt = fam.decrypt(ct, kc.key, n, lm=self.oracle.bigram_table(), **params)
                     else:
                         pt = fam.decrypt(ct, kc.key, n, **params)
+                    # A different key (or family) that decrypts to exactly the same text is
+                    # the same test: skip it, and do not count it as a new attempt.
+                    oh = hashlib.sha256((variant or "").encode() + b"|"
+                                        + np.asarray(pt, dtype=np.int16).tobytes()).hexdigest()[:32]
+                    prior = self.ledger.prior_output(tid, oh) if oh in seen_outputs else None
+                    if prior is not None:
+                        summary.skipped += 1
+                        summary.equivalent += 1
+                        if prior == "pass":
+                            summary.prior_passes += 1
+                        continue
+                    if kid is None:
+                        preview = kc.label or fam.key_preview(kc.key)
+                        kj = json.dumps(fam.key_json(kc.key), sort_keys=True, separators=(",", ":"))
+                        kid = self.ledger.key_candidate_id(khash, kc.derivation, preview,
+                                                           kc.corpus_item_id, kc.edition_id,
+                                                           kj if len(kj) <= MAX_KEY_JSON else None)
                     rep = self.oracle.score(pt, attempt_count=count + 1, breaks=breaks,
                                             variant=variant)
                     ms = (time.perf_counter() - ts) * 1000.0
@@ -156,10 +170,11 @@ class Executor:
                         hypothesis_id=hypothesis_id, key_candidate_id=kid, target_id=tid,
                         cipher_family=family_name, params=params, dedupe=dh,
                         executor_version=EXECUTOR_VERSION, runtime_ms=ms,
-                        page_range=target.page_range)
+                        page_range=target.page_range, output_hash=oh)
                     if aid is None:  # recorded concurrently by someone else; treat as skipped
                         summary.skipped += 1
                         continue
+                    seen_outputs.add(oh)
                     count += 1
                     preview_pt = alpha.decode(pt[:PREVIEW_CHARS]) if rep.stage == "full" else None
                     self.ledger.record_result(aid, rep, preview_pt)

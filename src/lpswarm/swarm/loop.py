@@ -207,7 +207,9 @@ def run_swarm(target: Target, ledger: Ledger, oracle: FullOracle, generators: Se
                     verdict = "fail"
                 if s.new_attempts == 0 and s.skipped:
                     gs.duplicates += 1
-                    verdict = f"duplicate (already tried): {verdict}"
+                    why = ("same decryption as a different key already tried (an equivalent "
+                           "program)" if s.equivalent == s.skipped else "already tried")
+                    verdict = f"duplicate ({why}): {verdict}"
                 history[gen.model].append(Feedback(desc, verdict))
                 if s.stopped in ("max_attempts", "stop_file", "timeout"):
                     stopped = s.stopped

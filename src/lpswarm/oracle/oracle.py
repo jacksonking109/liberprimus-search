@@ -428,6 +428,28 @@ class FullOracle:
         x = u + beta * math.log(p_u / a)
         return max(x, float(sorted_vals[-1]))
 
+    def _tail_prob(self, sorted_vals: np.ndarray, x: float) -> float:
+        """P(null >= x): empirical where the sample has data, else the same exponential
+        tail fit that _upper_quantile inverts."""
+        M = len(sorted_vals)
+        k = max(10, int(M * self.cfg.tail_fraction))
+        u = float(sorted_vals[-k - 1]) if M > k else float(sorted_vals[-k:][0])
+        if x <= u:
+            return float((M - np.searchsorted(sorted_vals, x, side="left")) / M)
+        tail = sorted_vals[-k:]
+        beta = max(float((tail - u).mean()), 1e-9)
+        return (k / M) * math.exp(-(x - u) / beta)
+
+    def chance_level(self, combined: float, length: int, total_attempts: int, breaks=None,
+                     variant: str | None = None) -> float:
+        """Expected number of pure-noise attempts scoring at least `combined` among
+        `total_attempts` on a target of this length (worst case over null types).
+        Length-independent: about 1 or more is what the best of the noise looks like;
+        below alpha (e.g. 0.01) is what a FINAL pass needs."""
+        ns = self.calibrate(self.scored_length(length), breaks, variant)
+        p = max(self._tail_prob(v, combined) for v in ns.combined.values())
+        return float(max(1, int(total_attempts)) * p)
+
     def alpha_eff(self, attempt_count: int) -> float:
         """Per-attempt level for the i-th attempt on a target (i = attempt_count).
 

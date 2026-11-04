@@ -416,3 +416,50 @@ def test_auto_brief_in_swarm_cli(tmp_path):
     assert "near_miss margin -0.10" in brief_call["messages"][1]["content"]
     prop_call = next(x for x in recs if x["model"] == "son")
     assert "Try prime streams" in prop_call["messages"][1]["content"]
+
+
+def test_group_total_is_the_largest_member_cap(tmp_path):
+    led = Ledger(tmp_path / "s.sqlite")
+    specs = [ModelSpec(n, "scripted", "x", (Role.PROPOSER,),
+                       extra={"quota_group": "g", "max_calls_per_window": c})
+             for n, c in (("opus", 2), ("sonnet", 5))]
+    r = Router(specs, ledger=led, adapters={s.name: ScriptedAdapter(s.name, ["ok"]) for s in specs})
+    for _ in range(4):
+        r.complete("opus", [], role="proposer")      # not stopped at its own 2
+    assert r.window_status("opus")["cap"] == 5
+
+
+def test_equivalent_programs_are_one_attempt():
+    from lpswarm.alphabet import get_alphabet
+    from lpswarm.executor import Executor, ExplicitKeys, Target
+    from lpswarm.oracle import FullOracle, OracleConfig
+    from lpswarm.programs import compile_spec
+    import numpy as np
+    a = get_alphabet(str(ROOT / "data" / "alphabet" / "gematria_primus.json"))
+    assert a.size == 29
+    o = FullOracle(a, OracleConfig(null_samples=100))
+    ct = np.random.default_rng(0).integers(0, 29, 120)
+    led = Ledger()
+    tot = compile_spec({"stream": {"kind": "sequence", "name": "prime_totients"}, "combine": "sub"}, a)
+    p28 = compile_spec({"stream": {"kind": "sequence", "name": "primes", "add": 28}, "combine": "sub"}, a)
+    h = led.add_hypothesis("program", "x", "t", "proposer")
+    ex = Executor(led, o, stop_file=None)
+    s1 = ex.run(Target(a, ct, "t"), h, "program", ExplicitKeys([tot]))
+    s2 = ex.run(Target(a, ct, "t"), h, "program", ExplicitKeys([p28]))
+    assert s1.new_attempts == 1 and s2.new_attempts == 0 and s2.equivalent == 1
+    assert led.attempt_count(s1.target_id) == 1
+
+
+def test_chance_level_is_monotone_and_sane():
+    from lpswarm.alphabet import Alphabet
+    from lpswarm.oracle import FullOracle, OracleConfig
+    o = FullOracle(Alphabet.latin26(), OracleConfig())   # enough nulls that nothing clamps
+    L, N = 200, 30000
+    thr_final = o.final_threshold(L, N)[1]
+    thr0 = o.threshold(L, 1)
+    at_final = o.chance_level(thr_final, L, N)
+    # at most alpha at the final threshold (less when the threshold is clamped up to the
+    # largest null sample, the conservative direction)
+    assert 0 < at_final <= 0.0101
+    assert o.chance_level(thr0, L, N) > 50            # the near-miss floor is noise level
+    assert o.chance_level(thr_final + 1, L, N) < at_final < o.chance_level(thr_final - 0.2, L, N)

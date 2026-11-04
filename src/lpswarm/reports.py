@@ -25,8 +25,32 @@ def short_note(symbols: int) -> str:
             "treat any lead with extra caution")
 
 
+def chance_text(chance: float | None) -> str:
+    """Plain reading of a lead's chance level (see FullOracle.chance_level)."""
+    if chance is None:
+        return ""
+    if chance >= 0.05:
+        return f"chance {chance:.2g}: noise level (pure noise does this well that often)"
+    if chance >= 0.01:
+        return f"chance {chance:.2g}: unusual, but not significant"
+    return f"chance {chance:.2g}: unlikely to be noise"
+
+
+def _chance(led: Ledger, oracle, target_id: str, row: dict, symbols: int) -> float | None:
+    if oracle is None or row.get("combined") is None:
+        return None
+    try:
+        info = led.target_info(target_id) or {}
+        breaks = json.loads(info["word_breaks"]) if info.get("word_breaks") else None
+        return oracle.chance_level(row["combined"], symbols, led.attempt_count(target_id),
+                                   breaks=breaks, variant=row.get("null_variant"))
+    except Exception:  # noqa: BLE001 - a report must never fail over this
+        return None
+
+
 def target_entry(led: Ledger, target_id: str, label: str, symbols: int, *, stopped: str | None = None,
-                 stats: dict | None = None, top: int = 10, elapsed_s: float | None = None) -> dict:
+                 stats: dict | None = None, top: int = 10, elapsed_s: float | None = None,
+                 oracle=None) -> dict:
     leads = led.leads(target_id, include_near_miss=True, limit=top)
     finals = [r for r in leads if r.get("passed_final")]
     tried = led.tried(target_id)
@@ -39,6 +63,7 @@ def target_entry(led: Ledger, target_id: str, label: str, symbols: int, *, stopp
         "leads": [{"final": bool(r.get("passed_final")), "verdict": r["verdict"],
                    "family": r["cipher_family"], "key": r["key_preview"], "params": r["params_json"],
                    "margin": round(r["combined"] - r["threshold"], 3), "by": r["proposer_model"],
+                   "chance": _chance(led, oracle, target_id, r, symbols),
                    "plaintext": r["plaintext_preview"]} for r in leads],
     }
 
@@ -54,7 +79,9 @@ def write_run_report(out_dir: str | Path, title: str, command: str, entries: lis
     lines = [f"# {title}", "", f"Updated {data['updated']}. Command: `{command}`", "",
              f"**{len(entries)} target(s), {total_final} final pass(es).** A FINAL lead survived "
              "the end-of-search check (Bonferroni over every attempt on that target); read the "
-             "text before trusting it.", ""]
+             "text before trusting it. A lead's *chance* is how many attempts at least this good "
+             "pure noise would produce among this target's attempts: about 1 or more is "
+             "noise level, whatever the margin or section length.", ""]
     lines += list(extra_lines or [])
     lines += ["| target | symbols | attempts | hypotheses | final passes | stopped |",
               "| --- | ---: | ---: | ---: | ---: | --- |"]
@@ -79,7 +106,9 @@ def write_run_report(out_dir: str | Path, title: str, command: str, entries: lis
             continue
         for ld in e["leads"]:
             tag = "**FINAL**" if ld["final"] else ld["verdict"]
-            lines.append(f"- {tag} ({ld['family']}, by {ld['by']}, margin {ld['margin']:+.2f}): "
+            ch = chance_text(ld.get("chance"))
+            lines.append(f"- {tag} ({ld['family']}, by {ld['by']}, margin {ld['margin']:+.2f}"
+                         + (f"; {ch}" if ch else "") + "): "
                          f"`{ld['key']}` {ld['params'] if ld['params'] != '{}' else ''}")
             lines.append(f"  `{ld['plaintext']}`")
     (out / "report.md").write_text("\n".join(lines) + "\n", encoding="utf-8")

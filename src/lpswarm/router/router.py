@@ -227,8 +227,12 @@ class Router:
         self.refresh_limits()
         spec = self.spec(name)
         hours = float(spec.extra.get("window_hours", 5))
-        cap = spec.extra.get("max_calls_per_window")
         members = self.quota_members(name)
+        # The group total is one number for every member: the largest any member sets (so
+        # members configured with different values do not each stop at their own).
+        caps = [int(c) for m in members
+                if (c := self._models[m].spec.extra.get("max_calls_per_window"))]
+        cap = max(caps) if caps else None
         since = now - hours * 3600
         calls = self.ledger.calls_since(members, since) if self.ledger is not None else []
         reply = self.ledger.active_limit(members, now) if self.ledger is not None else None

@@ -83,6 +83,7 @@ class Ledger:
         self._key_ids: dict[str, int] = {}
 
     _COLUMNS = {"target": {"word_breaks": "TEXT"},
+                "attempt": {"output_hash": "TEXT"},
                 "key_candidate": {"value_json": "TEXT"},
                 "result": {"unreachable": "INTEGER NOT NULL DEFAULT 0", "word_score": "REAL",
                            "null_variant": "TEXT"}}
@@ -209,6 +210,19 @@ class Ledger:
                                 " WHERE a.dedupe_hash=?", (dhash,)).fetchone()
         return row[0] if row else None
 
+    def prior_output(self, target_id: str, output_hash: str) -> str | None:
+        """Verdict of an earlier attempt on this target whose decryption was identical
+        (a different key or family that is the same cipher here), or None."""
+        row = self.conn.execute("SELECT r.verdict FROM attempt a JOIN result r ON r.attempt_id=a.id"
+                                " WHERE a.target_id=? AND a.output_hash=? LIMIT 1",
+                                (target_id, output_hash)).fetchone()
+        return row[0] if row else None
+
+    def output_hashes(self, target_id: str) -> set[str]:
+        return {r[0] for r in self.conn.execute(
+            "SELECT output_hash FROM attempt WHERE target_id=? AND output_hash IS NOT NULL",
+            (target_id,))}
+
     def attempt_count(self, target_id: str) -> int:
         return int(self.conn.execute("SELECT COUNT(*) FROM attempt WHERE target_id=?",
                                      (target_id,)).fetchone()[0])
@@ -216,14 +230,14 @@ class Ledger:
     def record_attempt(self, *, hypothesis_id: int, key_candidate_id: int, target_id: str,
                        cipher_family: str, params: dict, dedupe: str, executor_version: str,
                        runtime_ms: float | None = None, page_range: str | None = None,
-                       cost_usd: float = 0.0) -> int | None:
+                       cost_usd: float = 0.0, output_hash: str | None = None) -> int | None:
         """Insert an attempt; returns its id, or None if it was already recorded."""
         cur = self.conn.execute(
             "INSERT OR IGNORE INTO attempt (hypothesis_id, key_candidate_id, target_id,"
             " cipher_family, params_json, page_range, executor_version, runtime_ms, cost_usd,"
-            " dedupe_hash) VALUES (?,?,?,?,?,?,?,?,?,?)",
+            " dedupe_hash, output_hash) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
             (hypothesis_id, key_candidate_id, target_id, cipher_family, canonical_json(params),
-             page_range, executor_version, runtime_ms, cost_usd, dedupe))
+             page_range, executor_version, runtime_ms, cost_usd, dedupe, output_hash))
         return int(cur.lastrowid) if cur.rowcount else None
 
     def record_result(self, attempt_id: int, report: Any, plaintext_preview: str | None = None) -> None:
@@ -347,7 +361,7 @@ class Ledger:
             where.append("f.passed_final=1")
         sql = ("SELECT a.id AS attempt_id, a.target_id, a.cipher_family, a.params_json,"
                " k.value_preview AS key_preview, k.derivation, r.verdict, r.combined, r.threshold,"
-               " r.null_percentile, r.attempt_count_at_scoring, r.plaintext_preview,"
+               " r.null_percentile, r.attempt_count_at_scoring, r.plaintext_preview, r.null_variant,"
                " f.passed_final, f.threshold_final, f.attempt_count_final,"
                " h.proposer_model, h.proposer_role"
                " FROM attempt a JOIN result r ON r.attempt_id=a.id"

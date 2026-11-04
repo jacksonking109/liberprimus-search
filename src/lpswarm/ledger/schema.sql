@@ -63,9 +63,11 @@ CREATE TABLE IF NOT EXISTS attempt (
     runtime_ms REAL,
     cost_usd REAL NOT NULL DEFAULT 0,
     dedupe_hash TEXT NOT NULL UNIQUE,  -- sha256(target, family, params, key value_hash)
+    output_hash TEXT,                  -- sha256 of the decryption: equal keys share it
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 CREATE INDEX IF NOT EXISTS attempt_target ON attempt(target_id);
+CREATE INDEX IF NOT EXISTS attempt_output ON attempt(target_id, output_hash);
 CREATE INDEX IF NOT EXISTS attempt_hyp ON attempt(hypothesis_id);
 
 CREATE TABLE IF NOT EXISTS result (

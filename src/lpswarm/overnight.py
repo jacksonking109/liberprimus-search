@@ -810,8 +810,12 @@ def section_digest(run: Overnight, per_section: int = 4, limit_chars: int = 6000
             lst.append(f"  job {j['id']}: {t['attempts']} attempts, {t['hypotheses']} hypotheses, "
                        f"{t['final_passes']} final")
             for ld in t.get("leads", [])[:per_section]:
+                ch = ld.get("chance")
                 lst.append(f"    {'FINAL ' if ld['final'] else ''}{ld['verdict']} margin "
-                           f"{ld['margin']:+.2f} by {ld['by']}: {str(ld['key'])[:140]}")
+                           f"{ld['margin']:+.2f}"
+                           + (f" (chance {ch:.2g}: {'noise level' if ch >= 0.05 else 'notable'})"
+                              if ch is not None else "")
+                           + f" by {ld['by']}: {str(ld['key'])[:140]}")
     text = "\n".join(f"{k}\n" + "\n".join(v) for k, v in rows.items())
     return text[-limit_chars:]
 

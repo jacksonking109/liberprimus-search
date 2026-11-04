@@ -200,7 +200,7 @@ def cmd_baseline(args) -> int:
             t_start = time.monotonic()
             res = run_baseline(tgt, led, oracle, words, bc, user_key_texts + demo_keys,
                                progress=not args.quiet)
-            entries.append(target_entry(led, res.target_id, label, len(ct),
+            entries.append(target_entry(led, res.target_id, label, len(ct), oracle=oracle,
                                         elapsed_s=time.monotonic() - t_start))
             write_run_report(report_dir, "Brute-force baseline", cmdline, entries)
             n_final = sum(1 for r in res.final if r["passed_final"])
@@ -330,14 +330,16 @@ def cmd_swarm(args) -> int:
                             progress=not args.quiet, brief=tgt_brief)
             n_final = sum(1 for r in res.final if r["passed_final"])
             print(f"stopped: {res.stopped or 'rounds done'}; final passes: {n_final}")
-            entries.append(target_entry(led, res.target_id, label, len(ct), stopped=res.stopped,
+            entries.append(target_entry(led, res.target_id, label, len(ct), oracle=oracle, stopped=res.stopped,
                                         stats={k: _asdict(v) for k, v in res.stats.items()},
                                         elapsed_s=res.elapsed_s))
             write_run_report(report_dir, "Swarm run", cmdline, entries, usage_lines())
-            for r in led.leads(res.target_id, include_near_miss=True, limit=args.top):
-                tag = "FINAL" if r["passed_final"] else "     "
-                print(f"  {tag} {r['verdict']:<9} by {r['proposer_model']:<16} {r['key_preview']}\n"
-                      f"        {r['plaintext_preview']}")
+            from lpswarm.reports import chance_text
+            for ld in entries[-1]["leads"][: args.top]:
+                tag = "FINAL" if ld["final"] else "     "
+                ch = chance_text(ld.get("chance"))
+                print(f"  {tag} {ld['verdict']:<9} by {ld['by']:<16} {ld['key']}"
+                      + (f"  [{ch}]" if ch else "") + f"\n        {ld['plaintext']}")
         if entries:
             print(f"\nreport: {report_dir / 'report.md'}")
         if router:
