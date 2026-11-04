@@ -1,6 +1,6 @@
 # Overnight run 20261103-2310
 
-Started 2026-11-03 23:10:06, updated 2026-11-04 01:46:36, status **running**. Jobs: pending 7, done 40, blocked 15
+Started 2026-11-03 23:10:06, updated 2026-11-04 01:49:37, status **running**. Jobs: pending 6, done 41, blocked 15
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -14,7 +14,7 @@ Started 2026-11-03 23:10:06, updated 2026-11-04 01:46:36, status **running**. Jo
 | sonnet/16 | done | 2026-11-04 00:22:05 | 2026-11-04 01:26:25 | Sonnet, briefed by Opus |
 | sonnet/17 | done | 2026-11-04 01:26:49 | 2026-11-04 01:29:50 | Sonnet, briefed by Opus |
 | sonnet/18 | done | 2026-11-04 01:30:05 | 2026-11-04 01:46:36 | Sonnet, briefed by Opus |
-| sonnet/19 | pending |  |  | Sonnet, briefed by Opus |
+| sonnet/19 | done | 2026-11-04 01:46:52 | 2026-11-04 01:49:37 | Sonnet, briefed by Opus |
 | sonnet/20 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/21 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/22 | pending |  |  | Sonnet, briefed by Opus |
@@ -91,6 +91,8 @@ Started 2026-11-03 23:10:06, updated 2026-11-04 01:46:36, status **running**. Jo
   - LP2:- - 40.jpg-43.jpg: 5025 attempts, 25 hypotheses, **0 final pass(es)**
 - **sonnet/18** (done)
   - LP2:- - 44.jpg-49.jpg: 35094 attempts, 39 hypotheses, **0 final pass(es)**
+- **sonnet/19** (done)
+  - LP2:33.jpg - 50.jpg/1: 26509 attempts, 23 hypotheses, **0 final pass(es)** (caution: short section (91 runes): many keys give plausible-looking text this short; treat any lead with extra caution)
 - **codex/25** (done)
   - LP2:54.jpg-55.jpg - 71.jpg-72.jpg: 29964 attempts, 47 hypotheses, **0 final pass(es)**
 - **codex/24** (done)
@@ -156,9 +158,9 @@ Started 2026-11-03 23:10:06, updated 2026-11-04 01:46:36, status **running**. Jo
 
 - qwen-local: 122 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 122 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 142 call(s) in the last 5h (cap 120), spent $0.0000, paused until 03:39 (local cap, raise max_calls_per_window to allow more)
-- claude-sonnet: 142 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-supervisor: 142 call(s) in the last 5h (cap 200), spent $0.0000
+- claude-opus: 149 call(s) in the last 5h (cap 120), spent $0.0000, paused until 04:11 (local cap, raise max_calls_per_window to allow more)
+- claude-sonnet: 149 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-supervisor: 149 call(s) in the last 5h (cap 200), spent $0.0000
 - codex: 122 call(s) in the last 5h (cap 750), spent $0.0000
 
 ## Supervisor notes
@@ -178,10 +180,6 @@ Started 2026-11-03 23:10:06, updated 2026-11-04 01:46:36, status **running**. Jo
 
 ## Events
 
-- 2026-11-04 01:26:49 supervisor: note: 01:26 check: run healthy, no failures and no FINAL leads. sonnet/16 finished after 64 min and 60k attempts on the 1894-rune section 15..39. Its best near misses are -2.36 to -2.37 using pi_digits @109/110 and @1055/1056, the same adjacent-offset pattern codex/16 found, so it is noise. codex/13 fi...
-- 2026-11-04 01:26:49 sonnet/17: start (uses claude-plan)
-- 2026-11-04 01:26:49 2 running: codex/12, sonnet/17
-- 2026-11-04 01:26:49 sonnet/18 waiting: claude-plan in use by sonnet/17
 - 2026-11-04 01:27:29 codex/12: done (exit 0, 12 min)
 - 2026-11-04 01:27:45 published: 37 file(s) to branch results
 - 2026-11-04 01:27:45 codex/11: start (uses codex-plan)
@@ -203,3 +201,7 @@ Started 2026-11-03 23:10:06, updated 2026-11-04 01:46:36, status **running**. Jo
 - 2026-11-04 01:40:11 sonnet/18: running 10 min | 01:38:31 [model] claude-sonnet (proposer) ok 18.9s, tokens in/out 6612/1520, reply 1933 chars
 - 2026-11-04 01:45:11 sonnet/18: running 15 min | 01:41:36 [model] claude-sonnet (proposer) ok 17.9s, tokens in/out 7275/1618, reply 2123 chars
 - 2026-11-04 01:46:36 sonnet/18: done (exit 0, 17 min)
+- 2026-11-04 01:46:52 published: 41 file(s) to branch results
+- 2026-11-04 01:46:52 sonnet/19: start (uses claude-plan)
+- 2026-11-04 01:46:52 sonnet/20 waiting: claude-plan in use by sonnet/19
+- 2026-11-04 01:49:37 sonnet/19: done (exit 0, 3 min)
