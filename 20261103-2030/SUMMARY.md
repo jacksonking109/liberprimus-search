@@ -1,11 +1,11 @@
 # Overnight run 20261103-2030
 
-Started 2026-11-03 20:30:23, updated 2026-11-03 20:32:42, status **running**. Jobs: pending 15, failed 1
+Started 2026-11-03 20:30:23, updated 2026-11-03 20:33:05, status **running**. Jobs: pending 14, failed 1, blocked 1
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
 | tier-claude | failed | 2026-11-03 20:30:23 | 2026-11-03 20:32:42 | Claude Code proposers vs the random control |
-| unsolved/10 | pending |  |  | Codex (exploratory) + DeepSeek (volume) |
+| unsolved/10 | blocked |  | 2026-11-03 20:33:05 | model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_pe |
 | unsolved/11 | pending |  |  | Codex (exploratory) + DeepSeek (volume) |
 | unsolved/12 | pending |  |  | Codex (exploratory) + DeepSeek (volume) |
 | unsolved/13 | pending |  |  | Codex (exploratory) + DeepSeek (volume) |
@@ -38,14 +38,21 @@ Started 2026-11-03 20:30:23, updated 2026-11-03 20:32:42, status **running**. Jo
 - qwen-local: 2 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 2 call(s) in the last 5h (cap none), spent $0.0000
 - granite: 2 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 11 call(s) in the last 5h (cap 40), spent $0.0000
-- claude-sonnet: 11 call(s) in the last 5h (cap 40), spent $0.0000
-- claude-supervisor: 11 call(s) in the last 5h (cap 40), spent $0.0000
+- claude-opus: 12 call(s) in the last 5h (cap 40), spent $0.0000
+- claude-sonnet: 12 call(s) in the last 5h (cap 40), spent $0.0000
+- claude-supervisor: 12 call(s) in the last 5h (cap 40), spent $0.0000
 - codex: 1 call(s) in the last 5h (cap 30), spent $0.0000
 - dry: 2 call(s) in the last 5h (cap none), spent $0.0000
+
+## Supervisor notes
+
+- 2026-11-03 20:33:05: tier-claude failed at 20:32 with exit 2, a config error: 'skip_mode "resolve" needs a language model (lm=bigram table)'. I did not retry it because it would fail the same way until the tiertest command sets an LM (e.g. a bigram table) or uses a different skip_mode. Partial result before the failure: claude-opus recall 0.50 (1/2) over 11742 attempts; random control 0/6. Also a router warning: deepseek has max_usd set but prices are 0, so spend shows as $0 and the cost cap will not limit it. The 15 unsolved jobs are still pending. If they also use skip_mode resolve they may fail the same way.
 
 ## Events
 
 - 2026-11-03 20:30:23 started
 - 2026-11-03 20:30:23 tier-claude: start
 - 2026-11-03 20:32:42 tier-claude: failed (exit 2)
+- 2026-11-03 20:32:59 published: 5 file(s) to branch results
+- 2026-11-03 20:33:05 supervisor: note added
+- 2026-11-03 20:33:05 unsolved/10: blocked: model deepseek: prices are 0 in config/models.toml, so its USD cap cannot work; fill in price_in_per_mtok / price_out_per_mtok
