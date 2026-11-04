@@ -1,6 +1,6 @@
 # Overnight run 20261103-2310
 
-Started 2026-11-03 23:10:06, updated 2026-11-04 02:17:53, status **running**. Jobs: pending 2, done 45, blocked 15
+Started 2026-11-03 23:10:06, updated 2026-11-04 02:19:34, status **running**. Jobs: pending 1, done 46, blocked 15
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -19,7 +19,7 @@ Started 2026-11-03 23:10:06, updated 2026-11-04 02:17:53, status **running**. Jo
 | sonnet/21 | done | 2026-11-04 02:08:52 | 2026-11-04 02:11:47 | Sonnet, briefed by Opus |
 | sonnet/22 | done | 2026-11-04 02:12:02 | 2026-11-04 02:13:57 | Sonnet, briefed by Opus |
 | sonnet/24 | done | 2026-11-04 02:14:13 | 2026-11-04 02:17:53 | Sonnet, briefed by Opus |
-| sonnet/25 | pending |  |  | Sonnet, briefed by Opus |
+| sonnet/25 | done | 2026-11-04 02:18:08 | 2026-11-04 02:19:34 | Sonnet, briefed by Opus |
 | codex/25 | done | 2026-11-03 23:10:06 | 2026-11-03 23:15:43 | Codex (exploratory) |
 | codex/24 | done | 2026-11-03 23:15:59 | 2026-11-03 23:21:04 | Codex (exploratory) |
 | codex/22 | done | 2026-11-03 23:21:38 | 2026-11-03 23:41:45 | Codex (exploratory) |
@@ -101,6 +101,8 @@ Started 2026-11-03 23:10:06, updated 2026-11-04 02:17:53, status **running**. Jo
   - LP2:57.jpg-66.jpg/1: 6592 attempts, 45 hypotheses, **0 final pass(es)**
 - **sonnet/24** (done)
   - LP2:51.jpg/2-53.jpg - 68.jpg/2-70.jpg: 44528 attempts, 38 hypotheses, **0 final pass(es)**
+- **sonnet/25** (done)
+  - LP2:54.jpg-55.jpg - 71.jpg-72.jpg: 508 attempts, 45 hypotheses, **0 final pass(es)**
 - **codex/25** (done)
   - LP2:54.jpg-55.jpg - 71.jpg-72.jpg: 29964 attempts, 47 hypotheses, **0 final pass(es)**
 - **codex/24** (done)
@@ -166,9 +168,9 @@ Started 2026-11-03 23:10:06, updated 2026-11-04 02:17:53, status **running**. Jo
 
 - qwen-local: 122 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 122 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 179 call(s) in the last 5h (cap 120), spent $0.0000, paused until 04:20 (local cap, raise max_calls_per_window to allow more)
-- claude-sonnet: 179 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-supervisor: 179 call(s) in the last 5h (cap 200), spent $0.0000
+- claude-opus: 186 call(s) in the last 5h (cap 120), spent $0.0000, paused until 04:23 (local cap, raise max_calls_per_window to allow more)
+- claude-sonnet: 186 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-supervisor: 186 call(s) in the last 5h (cap 200), spent $0.0000
 - codex: 122 call(s) in the last 5h (cap 750), spent $0.0000
 
 ## Supervisor notes
@@ -190,10 +192,6 @@ Started 2026-11-03 23:10:06, updated 2026-11-04 02:17:53, status **running**. Jo
 
 ## Events
 
-- 2026-11-04 01:46:52 published: 41 file(s) to branch results
-- 2026-11-04 01:46:52 sonnet/19: start (uses claude-plan)
-- 2026-11-04 01:46:52 sonnet/20 waiting: claude-plan in use by sonnet/19
-- 2026-11-04 01:49:37 sonnet/19: done (exit 0, 3 min)
 - 2026-11-04 01:49:52 published: 42 file(s) to branch results
 - 2026-11-04 01:50:01 supervisor: note: 01:49 check: run healthy, no failures and no FINAL leads. sonnet/18 finished on section 44..49 (1433 runes) with 35k attempts and no near misses. codex/18 had already covered that section and also found nothing. sonnet/19 ran 3 min (26k attempts) on the 91-rune section 33..50/1. Its best results ...
 - 2026-11-04 01:50:01 sonnet/20: start (uses claude-plan)
@@ -215,3 +213,7 @@ Started 2026-11-03 23:10:06, updated 2026-11-04 02:17:53, status **running**. Jo
 - 2026-11-04 02:14:13 sonnet/24: start (uses claude-plan)
 - 2026-11-04 02:14:13 sonnet/25 waiting: claude-plan in use by sonnet/24
 - 2026-11-04 02:17:53 sonnet/24: done (exit 0, 4 min)
+- 2026-11-04 02:18:08 published: 46 file(s) to branch results
+- 2026-11-04 02:18:08 sonnet/25: start (uses claude-plan)
+- 2026-11-04 02:18:09 sup1/25 waiting: claude-plan in use by sonnet/25
+- 2026-11-04 02:19:34 sonnet/25: done (exit 0, 1 min)
