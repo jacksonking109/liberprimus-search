@@ -1,6 +1,6 @@
 # Overnight run 20261103-2310
 
-Started 2026-11-03 23:10:06, updated 2026-11-03 23:21:04, status **running**. Jobs: pending 56, running 2, done 3
+Started 2026-11-03 23:10:06, updated 2026-11-03 23:21:43, status **running**. Jobs: pending 55, running 2, done 4
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -22,7 +22,7 @@ Started 2026-11-03 23:10:06, updated 2026-11-03 23:21:04, status **running**. Jo
 | sonnet/25 | pending |  |  | Sonnet, briefed by Opus |
 | codex/25 | done | 2026-11-03 23:10:06 | 2026-11-03 23:15:43 | Codex (exploratory) |
 | codex/24 | done | 2026-11-03 23:15:59 | 2026-11-03 23:21:04 | Codex (exploratory) |
-| codex/22 | pending |  |  | Codex (exploratory) |
+| codex/22 | running | 2026-11-03 23:21:38 |  | Codex (exploratory) |
 | codex/21 | pending |  |  | Codex (exploratory) |
 | codex/20 | pending |  |  | Codex (exploratory) |
 | codex/19 | pending |  |  | Codex (exploratory) |
@@ -36,7 +36,7 @@ Started 2026-11-03 23:10:06, updated 2026-11-03 23:21:04, status **running**. Jo
 | codex/11 | pending |  |  | Codex (exploratory) |
 | codex/10 | pending |  |  | Codex (exploratory) |
 | local/17 | done | 2026-11-03 23:10:06 | 2026-11-03 23:14:52 | local models |
-| local/18 | running | 2026-11-03 23:15:08 |  | local models |
+| local/18 | done | 2026-11-03 23:15:08 | 2026-11-03 23:21:43 | local models |
 | local/16 | pending |  |  | local models |
 | local/19 | pending |  |  | local models |
 | local/15 | pending |  |  | local models |
@@ -70,9 +70,6 @@ Started 2026-11-03 23:10:06, updated 2026-11-03 23:21:04, status **running**. Jo
 
 **tier-claude** (since 2026-11-03 23:10:06), latest log lines:
 ```
-23:20:08 [model] claude-sonnet (proposer) calling...
-23:20:15 [model] claude-sonnet (proposer) ok 6.4s, tokens in/out 4202/772, reply 1722 chars
-23:20:16 [model] claude-sonnet (proposer) calling...
 23:20:23 [model] claude-sonnet (proposer) ok 7.1s, tokens in/out 4757/815, reply 1754 chars
 [claude-sonnet] 2/6 L=80 recovered=0 attempts=6543 calls=5 usd=0.0000
 23:20:32 [model] claude-sonnet (proposer) calling...
@@ -80,19 +77,15 @@ Started 2026-11-03 23:10:06, updated 2026-11-03 23:21:04, status **running**. Jo
 23:20:46 [model] claude-sonnet (proposer) calling...
 23:20:57 [model] claude-sonnet (proposer) ok 11.3s, tokens in/out 3109/1300, reply 1746 chars
 23:20:58 [model] claude-sonnet (proposer) calling...
+23:21:16 [model] claude-sonnet (proposer) ok 18.5s, tokens in/out 3676/2097, reply 1607 chars
+23:21:27 [model] claude-sonnet (proposer) calling...
+23:21:40 [model] claude-sonnet (proposer) ok 13.0s, tokens in/out 4136/1567, reply 2078 chars
 ```
-**local/18** (since 2026-11-03 23:15:08), latest log lines:
+**codex/22** (since 2026-11-03 23:21:38), latest log lines:
 ```
-23:18:37 [model] qwen-local (proposer) calling...
-23:19:01 [model] qwen-local (proposer) ok 23.9s, tokens in/out 3395/618, reply 2103 chars
-23:19:01 [model] gemma-local (proposer) calling...
-23:19:19 [model] gemma-local (proposer) ok 17.8s, tokens in/out 3471/456, reply 1398 chars
-round 5 [qwen-local] proposals=8 valid=8 attempts=87 passes=0 near=0 invalid=0
-round 5 [gemma-local] proposals=8 valid=8 attempts=173 passes=0 near=0 invalid=0
-23:20:10 [model] qwen-local (proposer) calling...
-23:20:32 [model] qwen-local (proposer) ok 21.6s, tokens in/out 3541/565, reply 1799 chars
-23:20:32 [model] gemma-local (proposer) calling...
-23:20:49 [model] gemma-local (proposer) ok 17.2s, tokens in/out 3622/456, reply 1355 chars
+===== 2026-11-03 23:21:38 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 22 --gen
+== LP2:57.jpg-66.jpg/1  (2474 symbols)
+23:21:40 [model] codex (proposer) calling...
 ```
 
 ## Results so far
@@ -107,24 +100,26 @@ round 5 [gemma-local] proposals=8 valid=8 attempts=173 passes=0 near=0 invalid=0
   - LP2:51.jpg/2-53.jpg - 68.jpg/2-70.jpg: 26431 attempts, 47 hypotheses, **0 final pass(es)**
 - **local/17** (done)
   - LP2:- - 40.jpg-43.jpg: 190 attempts, 81 hypotheses, **0 final pass(es)**
+- **local/18** (done)
+  - LP2:- - 44.jpg-49.jpg: 284 attempts, 91 hypotheses, **0 final pass(es)**
 
 ## Model usage
 
 - qwen-local: 52 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 52 call(s) in the last 5h (cap none), spent $0.0000
 - granite: 2 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 101 call(s) in the last 5h (cap 120), spent $0.0000
-- claude-sonnet: 101 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-supervisor: 101 call(s) in the last 5h (cap 200), spent $0.0000
+- claude-opus: 104 call(s) in the last 5h (cap 120), spent $0.0000
+- claude-sonnet: 104 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-supervisor: 104 call(s) in the last 5h (cap 200), spent $0.0000
 - codex: 51 call(s) in the last 5h (cap 750), spent $0.0000
 - dry: 2 call(s) in the last 5h (cap none), spent $0.0000
 
+## Supervisor notes
+
+- 2026-11-03 23:21:38: 23:21 check: run healthy, 2 running, 56 pending, no failures. No FINAL leads yet; best is codex/25 (section 54-55..71-72), with near misses at margins -0.23 to -0.29 (sub/add with a primes stream, pi_digits). Watch claude-opus quota: 101 of 120 calls in the last 5h, so it may hit its cap during tier-claude. No jobs added; the queue already covers every section.
+
 ## Events
 
-- 2026-11-03 23:10:06 started
-- 2026-11-03 23:10:06 tier-claude: start (uses claude-plan)
-- 2026-11-03 23:10:06 codex/25: start (uses codex-plan)
-- 2026-11-03 23:10:06 2 running: tier-claude, codex/25
 - 2026-11-03 23:10:06 local/17: start (uses ollama:http://127.0.0.1:11434)
 - 2026-11-03 23:10:06 3 running: tier-claude, codex/25, local/17
 - 2026-11-03 23:10:06 sonnet/10 waiting: claude-plan in use by tier-claude
@@ -144,3 +139,9 @@ round 5 [gemma-local] proposals=8 valid=8 attempts=173 passes=0 near=0 invalid=0
 - 2026-11-03 23:20:14 tier-claude: running 10 min | 23:20:08 [model] claude-sonnet (proposer) calling...
 - 2026-11-03 23:20:59 codex/24: running 5 min | 23:20:40 [model] codex (proposer) calling...
 - 2026-11-03 23:21:04 codex/24: done (exit 0, 5 min)
+- 2026-11-03 23:21:20 published: 8 file(s) to branch results
+- 2026-11-03 23:21:38 supervisor: note: 23:21 check: run healthy, 2 running, 56 pending, no failures. No FINAL leads yet; best is codex/25 (section 54-55..71-72), with near misses at margins -0.23 to -0.29 (sub/add with a primes stream, pi_digits). Watch claude-opus quota: 101 of 120 calls in the last 5h, so it may hit its cap during t...
+- 2026-11-03 23:21:38 codex/22: start (uses codex-plan)
+- 2026-11-03 23:21:38 3 running: tier-claude, local/18, codex/22
+- 2026-11-03 23:21:38 sonnet/10 waiting: claude-plan in use by tier-claude
+- 2026-11-03 23:21:43 local/18: done (exit 0, 7 min)
