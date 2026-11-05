@@ -1,6 +1,6 @@
 # Overnight run 20261104-2305
 
-Started 2026-11-04 23:05:16, updated 2026-11-04 23:12:29, status **running**. Jobs: pending 62, running 3, done 7
+Started 2026-11-04 23:05:16, updated 2026-11-04 23:13:50, status **running**. Jobs: pending 61, running 3, done 8
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -26,8 +26,8 @@ Started 2026-11-04 23:05:16, updated 2026-11-04 23:12:29, status **running**. Jo
 | codex/21 | done | 2026-11-04 23:07:55 | 2026-11-04 23:09:51 | Codex (exploratory) |
 | codex/20 | done | 2026-11-04 23:09:53 | 2026-11-04 23:12:29 | Codex (exploratory) |
 | codex/19 | done | 2026-11-04 23:09:53 | 2026-11-04 23:11:34 | Codex (exploratory) |
-| codex/18 | running | 2026-11-04 23:11:49 |  | Codex (exploratory) |
-| codex/17 | pending |  |  | Codex (exploratory) |
+| codex/18 | done | 2026-11-04 23:11:49 | 2026-11-04 23:13:50 | Codex (exploratory) |
+| codex/17 | running | 2026-11-04 23:12:45 |  | Codex (exploratory) |
 | codex/16 | pending |  |  | Codex (exploratory) |
 | codex/15 | pending |  |  | Codex (exploratory) |
 | codex/14 | pending |  |  | Codex (exploratory) |
@@ -81,8 +81,6 @@ Started 2026-11-04 23:05:16, updated 2026-11-04 23:12:29, status **running**. Jo
 
 **sonnet/10** (since 2026-11-04 23:10:14), latest log lines:
 ```
-  | 4. Exhaustive periodic keys. Use repeat exhaustive with key_length 1 through 4, combine sub. Run once with map identity and once with map reverse, and once more with skip [F] in mode "all". This c
-  | 5. Word keys. Use repeat with the words DIVINITY, FIRFUMFERENFE, CIRCUMFERENCE, LIBERPRIMUS, INSTAR, CONSUMPTION and ENLIGHTENMENT. Give each an offset_range [0,20] and try sub and beaufort with b
   | 6. Transposition plus key, as a lower priority. Use railfence with transpose_range [2,12], and grid with read "columns" and transpose_range [2,40]. Pair each with the prime_totients stream at offs
   | Do NOT:
   | - Try pure
@@ -91,19 +89,21 @@ Started 2026-11-04 23:05:16, updated 2026-11-04 23:12:29, status **running**. Jo
 round 1 [claude-sonnet] proposals=12 valid=4 attempts=24404 passes=0 near=0 invalid=8
 23:11:10 [model] claude-sonnet (proposer) calling...
 23:11:43 [model] claude-sonnet (proposer) ok 33.1s, tokens in/out 5891/1183, reply 2556 chars
+round 2 [claude-sonnet] proposals=12 valid=12 attempts=60000 passes=0 near=0 invalid=8
+stopped: max_attempts; final passes: 0
 ```
-**codex/18** (since 2026-11-04 23:11:49), latest log lines:
+**codex/17** (since 2026-11-04 23:12:45), latest log lines:
 ```
-23:11:51 [model] codex (proposer) calling...
-23:12:14 [model] codex (proposer) ok 23.7s, tokens in/out 18192/600, reply 1818 chars, model not reported (pin one with model = "..." in the models config)
-brief from codex (1818 chars):
-  | 1. Establish periodic baselines: stream repeat, exhaustive true, key_length 1, 2, 3, then 4; combine sub, map identity, no skip or transposition. Repeat with map reverse. IC normalised 0.991 sugge
-  | 2. Sweep sequence streams primes, prime_totients, naturals, squares and triangular with offset_range [0,1999], scale 1, add 0, combine sub and beaufort, map identity. Keep skip absent. These test 
-  | 3. Test e_digits, pi_digits and fibonacci with offset_range [0,1999], scale 1, add 0; use sub and beaufort, then repeat with map reverse. Keep each sequence/mode/map combination separate. These co
-  | 4. Prioritise ciphertext autokey: source ciphertext, primers [0] through [28], combine sub and beaufort. Then test plaintext autokey with the same primers. Use no skip or transposition. Only 13 ad
-  | 5. Test pure transpositions using constant value 0, combine sub: grid reads columns, columns_reversed, boustrophedon_rows, boustrophedon_columns, diagonal, spiral_in and spiral_out, each with tran
-  | 6. Follow a near_miss with reverse_text true, then individual skip candidates F, B and D, testing all and resolve separately for non-autokey streams. Start without skips: no symbol dominates. Noth
-23:12:14 [model] codex (proposer) calling...
+23:13:14 [model] codex (proposer) ok 27.5s, tokens in/out 18192/628, reply 1954 chars, model not reported (pin one with model = "..." in the models config)
+brief from codex (1954 chars):
+  | 1. Start with repeat streams, exhaustive:true, key_length 1, 2, 3, then 4; combine:"sub", identity map, no skips or transposition. IC 0.995 suggests a flattened alphabet; these sweeps establish wh
+  | 2. Prioritize autokey, source:"ciphertext", then source:"plaintext"; try every one-symbol primer [0] through [28], combine:"sub" and "beaufort", no skips. Only 11 adjacent doubles versus 35.2 expe
+  | 3. Sweep sequence streams primes and prime_totients, offset_range:[0,1999], scale:1, add:0, combine:"sub" and "beaufort". Use separate proposals for each sequence/mode. Uniform IC supports testing
+  | 4. Cover remaining sequence families: fibonacci, naturals, squares, triangular, pi_digits, e_digits; offsets 0..1999, scale:1, add:0, combine:"sub" and "beaufort". Then test scale:-1 with sub for 
+  | 5. Test interrupted prime and prime_totient streams with skip:[0], first skip_mode:"all", then "resolve"; sub, offsets 0..1999. Repeat with skip:[28] separately. These are boundary-symbol hypothes
+  | 6. Test pure routes using constant value:0, sub: grid reads columns, columns_reversed, boustrophedon_columns, diagonal, spiral_in and spiral_out, widths 2..500; railfence rails 2..64; decimate ste
+  | 7. On near_miss, test reverse_text:true and narrow stream/route combinations, keeping expansions <=5000. Nothing has been tried yet. Do not duplicate exhaustive sub with add, equivalent reverse-ma
+23:13:14 [model] codex (proposer) calling...
 ```
 **local/17** (since 2026-11-04 23:05:16), latest log lines:
 ```
@@ -135,6 +135,8 @@ brief from codex (1818 chars):
   - LP2:50.jpg/2-56.jpg/1: 60000 attempts, 40 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **codex/19** (done)
   - LP2:33.jpg - 50.jpg/1: 60000 attempts, 7 hypotheses, **0 final pass(es)**, stopped: max_attempts (caution: short section (91 runes): many keys give plausible-looking text this short; treat any lead with extra caution)
+- **codex/18** (done)
+  - LP2:- - 44.jpg-49.jpg: 60000 attempts, 4 hypotheses, **0 final pass(es)**, stopped: max_attempts
 
 ## Model usage
 
@@ -145,7 +147,7 @@ brief from codex (1818 chars):
 - claude-opus: 46 call(s) in the last 5h (cap 180), spent $0.0000
 - claude-sonnet: 46 call(s) in the last 5h (cap 180), spent $0.0000
 - claude-supervisor: 46 call(s) in the last 5h (cap 180), spent $0.0000
-- codex: 47 call(s) in the last 5h (cap 850), spent $0.0000
+- codex: 49 call(s) in the last 5h (cap 850), spent $0.0000
 
 ## Supervisor notes
 
@@ -153,11 +155,6 @@ brief from codex (1818 chars):
 
 ## Events
 
-- 2026-11-04 23:07:35 sonnet/10 waiting: claude-plan in use by tier-claude
-- 2026-11-04 23:07:40 codex/24: done (exit 0, 2 min)
-- 2026-11-04 23:07:55 published: 7 file(s) to branch results
-- 2026-11-04 23:07:55 codex/21: start (uses codex-plan)
-- 2026-11-04 23:07:55 4 running: tier-claude, local/17, codex/22, codex/21
 - 2026-11-04 23:09:35 codex/22: done (exit 0, 2 min)
 - 2026-11-04 23:09:51 published: 8 file(s) to branch results
 - 2026-11-04 23:09:51 codex/21: done (exit 0, 2 min)
@@ -178,3 +175,8 @@ brief from codex (1818 chars):
 - 2026-11-04 23:11:49 4 running: local/17, codex/20, sonnet/10, codex/18
 - 2026-11-04 23:11:49 sonnet/11 waiting: claude-plan in use by sonnet/10
 - 2026-11-04 23:12:29 codex/20: done (exit 0, 3 min)
+- 2026-11-04 23:12:45 published: 11 file(s) to branch results
+- 2026-11-04 23:12:45 codex/17: start (uses codex-plan)
+- 2026-11-04 23:12:45 4 running: local/17, sonnet/10, codex/18, codex/17
+- 2026-11-04 23:12:45 sonnet/11 waiting: claude-plan in use by sonnet/10
+- 2026-11-04 23:13:50 codex/18: done (exit 0, 2 min)
