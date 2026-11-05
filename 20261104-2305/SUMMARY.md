@@ -1,10 +1,10 @@
 # Overnight run 20261104-2305
 
-Started 2026-11-04 23:05:16, updated 2026-11-04 23:09:51, status **running**. Jobs: pending 66, running 2, done 4
+Started 2026-11-04 23:05:16, updated 2026-11-04 23:09:58, status **running**. Jobs: pending 64, running 3, done 5
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
-| tier-claude | running | 2026-11-04 23:05:16 |  | Claude Code proposers vs the random control |
+| tier-claude | done | 2026-11-04 23:05:16 | 2026-11-04 23:09:58 | Claude Code proposers vs the random control |
 | sonnet/10 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/11 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/12 | pending |  |  | Sonnet, briefed by Opus |
@@ -24,8 +24,8 @@ Started 2026-11-04 23:05:16, updated 2026-11-04 23:09:51, status **running**. Jo
 | codex/24 | done | 2026-11-04 23:05:16 | 2026-11-04 23:07:40 | Codex (exploratory) |
 | codex/22 | done | 2026-11-04 23:07:35 | 2026-11-04 23:09:35 | Codex (exploratory) |
 | codex/21 | done | 2026-11-04 23:07:55 | 2026-11-04 23:09:51 | Codex (exploratory) |
-| codex/20 | pending |  |  | Codex (exploratory) |
-| codex/19 | pending |  |  | Codex (exploratory) |
+| codex/20 | running | 2026-11-04 23:09:53 |  | Codex (exploratory) |
+| codex/19 | running | 2026-11-04 23:09:53 |  | Codex (exploratory) |
 | codex/18 | pending |  |  | Codex (exploratory) |
 | codex/17 | pending |  |  | Codex (exploratory) |
 | codex/16 | pending |  |  | Codex (exploratory) |
@@ -79,18 +79,18 @@ Started 2026-11-04 23:05:16, updated 2026-11-04 23:09:51, status **running**. Jo
 
 ## Now running
 
-**tier-claude** (since 2026-11-04 23:05:16), latest log lines:
+**codex/20** (since 2026-11-04 23:09:53), latest log lines:
 ```
-23:09:13 [model] claude-sonnet (proposer) calling...
-23:09:22 [model] claude-sonnet (proposer) ok 8.9s, tokens in/out 3449/1123, reply 2475 chars
-[claude-sonnet] 5/6 L=160 recovered=0 attempts=20000 calls=1 usd=0.0000 stopped=max_attempts
-23:09:30 [model] claude-sonnet (proposer) calling...
-23:09:38 [model] claude-sonnet (proposer) ok 7.6s, tokens in/out 3459/1080, reply 2316 chars
-[claude-sonnet] 6/6 L=160 recovered=0 attempts=20000 calls=1 usd=0.0000 stopped=max_attempts
-wrote reports\overnight\20261104-2305\tier-claude\tiertest.md
-  random_program:40    recall 0.00 (0/6)  attempts 192      calls 0     $0.0000
-  claude-opus          recall 0.33 (2/6)  attempts 99088    calls 6     $0.0000
-  claude-sonnet        recall 0.33 (2/6)  attempts 118614   calls 6     $0.0000
+===== 2026-11-04 23:09:53 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 20 --gen
+== LP2:50.jpg/2-56.jpg/1  (1468 symbols)
+23:09:55 [model] codex (proposer) calling...
+```
+**codex/19** (since 2026-11-04 23:09:53), latest log lines:
+```
+===== 2026-11-04 23:09:53 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 19 --gen
+note: short section (91 runes): many keys give plausible-looking text this short; treat any lead with extra caution
+== LP2:33.jpg - 50.jpg/1  (91 symbols)
+23:09:55 [model] codex (proposer) calling...
 ```
 **local/17** (since 2026-11-04 23:05:16), latest log lines:
 ```
@@ -106,7 +106,7 @@ wrote reports\overnight\20261104-2305\tier-claude\tiertest.md
 
 ## Results so far
 
-- **tier-claude** (running)
+- **tier-claude** (done)
   - random_program:40: recall 0.00 (0/6), 192 attempts, 0 model calls, $0.0000
   - claude-opus: recall 0.33 (2/6), 99088 attempts, 6 model calls, $0.0000
   - claude-sonnet: recall 0.33 (2/6), 118614 attempts, 6 model calls, $0.0000
@@ -136,10 +136,6 @@ wrote reports\overnight\20261104-2305\tier-claude\tiertest.md
 
 ## Events
 
-- 2026-11-04 23:05:16 started
-- 2026-11-04 23:05:16 tier-claude: start (uses claude-plan)
-- 2026-11-04 23:05:16 codex/25: start (uses codex-plan)
-- 2026-11-04 23:05:16 2 running: tier-claude, codex/25
 - 2026-11-04 23:05:16 codex/24: start (uses codex-plan)
 - 2026-11-04 23:05:16 3 running: tier-claude, codex/25, codex/24
 - 2026-11-04 23:05:16 local/17: start (uses ollama:http://127.0.0.1:11434, ollama:http://127.0.0.1:11435)
@@ -158,3 +154,10 @@ wrote reports\overnight\20261104-2305\tier-claude\tiertest.md
 - 2026-11-04 23:09:35 codex/22: done (exit 0, 2 min)
 - 2026-11-04 23:09:51 published: 8 file(s) to branch results
 - 2026-11-04 23:09:51 codex/21: done (exit 0, 2 min)
+- 2026-11-04 23:09:53 published: 9 file(s) to branch results
+- 2026-11-04 23:09:53 codex/20: start (uses codex-plan)
+- 2026-11-04 23:09:53 3 running: tier-claude, local/17, codex/20
+- 2026-11-04 23:09:53 codex/19: start (uses codex-plan)
+- 2026-11-04 23:09:53 4 running: tier-claude, local/17, codex/20, codex/19
+- 2026-11-04 23:09:53 sonnet/10 waiting: claude-plan in use by tier-claude
+- 2026-11-04 23:09:58 tier-claude: done (exit 0, 5 min)
