@@ -1,6 +1,6 @@
 # Overnight run 20261104-2305
 
-Started 2026-11-04 23:05:16, updated 2026-11-05 06:35:26, status **running**. Jobs: pending 3, running 1, done 78, failed 1
+Started 2026-11-04 23:05:16, updated 2026-11-05 06:44:17, status **running**. Jobs: pending 2, running 1, done 79, failed 1
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -80,7 +80,7 @@ Started 2026-11-04 23:05:16, updated 2026-11-05 06:35:26, status **running**. Jo
 | sup1/16 | done | 2026-11-05 03:04:53 | 2026-11-05 03:10:24 | added by supervisor. Long sections (1729, 1894 and 2474 runes) give the most reliable scoring. After about 45 jobs, ever |
 | sup1/22 | done | 2026-11-05 03:10:40 | 2026-11-05 03:28:21 | added by supervisor. Long sections (1729, 1894 and 2474 runes) give the most reliable scoring. After about 45 jobs, ever |
 | sup2/10 | done | 2026-11-05 06:33:21 | 2026-11-05 06:35:26 | added by supervisor. Mid-length sections (693-1468 runes) are long enough to judge, but so far they have only had the ge |
-| sup2/12 | pending |  |  | added by supervisor. Mid-length sections (693-1468 runes) are long enough to judge, but so far they have only had the ge |
+| sup2/12 | done | 2026-11-05 06:35:41 | 2026-11-05 06:44:17 | added by supervisor. Mid-length sections (693-1468 runes) are long enough to judge, but so far they have only had the ge |
 | sup2/17 | pending |  |  | added by supervisor. Mid-length sections (693-1468 runes) are long enough to judge, but so far they have only had the ge |
 | sup2/20 | pending |  |  | added by supervisor. Mid-length sections (693-1468 runes) are long enough to judge, but so far they have only had the ge |
 | sup3/13 | done | 2026-11-05 04:45:57 | 2026-11-05 04:49:07 | added by supervisor. No supervisor job has run on these medium and long sections yet. The families that have been tried  |
@@ -266,6 +266,8 @@ note: short section (91 runes): many keys give plausible-looking text this short
   - LP2:57.jpg-66.jpg/1: 50000 attempts, 28 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **sup2/10** (done)
   - LP2:17.jpg, 18.jpg, 19.jpg - 0.jpg-2.jpg: 50000 attempts, 18 hypotheses, **0 final pass(es)**, stopped: max_attempts
+- **sup2/12** (done)
+  - LP2:20.jpg/2-23.jpg/1 - 3.jpg/2-6.jpg/1: 50000 attempts, 15 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **sup3/13** (done)
   - LP2:6.jpg/2-7.jpg - 23.jpg/2-24.jpg: 50000 attempts, 24 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **sup3/18** (done)
@@ -278,13 +280,13 @@ note: short section (91 runes): many keys give plausible-looking text this short
 ## Model usage
 
 - deepseek: 24 call(s) in the last 5h (cap none), spent $0.3613
-- qwen-local: 10 call(s) in the last 5h (cap none), spent $0.0000
-- gemma-local: 10 call(s) in the last 5h (cap none), spent $0.0000
-- granite: 17 call(s) in the last 5h (cap none), spent $0.0000
+- qwen-local: 8 call(s) in the last 5h (cap none), spent $0.0000
+- gemma-local: 9 call(s) in the last 5h (cap none), spent $0.0000
+- granite: 16 call(s) in the last 5h (cap none), spent $0.0000
 - claude-opus: 26 call(s) in the last 5h (cap 180), spent $0.0000
 - claude-sonnet: 26 call(s) in the last 5h (cap 180), spent $0.0000
 - claude-supervisor: 26 call(s) in the last 5h (cap 180), spent $0.0000
-- codex: 5 call(s) in the last 5h (cap 850), spent $0.0000
+- codex: 6 call(s) in the last 5h (cap 850), spent $0.0000
 
 ## Current strategy note (read by every lane each round)
 
@@ -321,13 +323,6 @@ Prefer combinations missing from the section's history. A real hit should show s
 
 ## Events
 
-- 2026-11-05 05:51:18 exhaustive/25: running 65 min | 04:46:56 [model] codex (proposer) ok 57.6s, tokens in/out 19466/2624, reply 7679 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-05 05:55:23 exhaustive/19: running 256 min | 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-05 05:56:18 exhaustive/25: running 70 min | 05:53:44 [model] codex (proposer) ok 65.1s, tokens in/out 20746/2318, reply 7913 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-05 06:00:23 exhaustive/19: running 261 min | 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-05 06:01:18 exhaustive/25: running 75 min | 05:53:44 [model] codex (proposer) ok 65.1s, tokens in/out 20746/2318, reply 7913 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-05 06:05:23 exhaustive/19: running 266 min | 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-05 06:06:18 exhaustive/25: running 80 min | 05:53:44 [model] codex (proposer) ok 65.1s, tokens in/out 20746/2318, reply 7913 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-05 06:10:23 exhaustive/19: running 271 min | 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-05 06:11:18 exhaustive/25: running 85 min | 05:53:44 [model] codex (proposer) ok 65.1s, tokens in/out 20746/2318, reply 7913 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-05 06:15:23 exhaustive/19: running 276 min | 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
@@ -346,3 +341,10 @@ Prefer combinations missing from the section's history. A real hit should show s
 - 2026-11-05 06:33:21 sup2/12 waiting: codex-plan full (2/2: exhaustive/19, sup2/10)
 - 2026-11-05 06:35:26 exhaustive/19: running 296 min | 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-05 06:35:26 sup2/10: done (exit 0, 2 min)
+- 2026-11-05 06:35:41 published: 78 file(s) to branch results
+- 2026-11-05 06:35:41 sup2/12: start (uses codex-plan)
+- 2026-11-05 06:35:41 2 running: exhaustive/19, sup2/12
+- 2026-11-05 06:35:41 sup2/17 waiting: codex-plan full (2/2: exhaustive/19, sup2/12)
+- 2026-11-05 06:40:26 exhaustive/19: running 301 min | 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 06:40:42 sup2/12: running 5 min | 06:35:51 [model] codex (proposer) calling...
+- 2026-11-05 06:44:17 sup2/12: done (exit 0, 9 min)
