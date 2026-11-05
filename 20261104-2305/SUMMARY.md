@@ -1,6 +1,6 @@
 # Overnight run 20261104-2305
 
-Started 2026-11-04 23:05:16, updated 2026-11-04 23:39:29, status **running**. Jobs: pending 41, running 3, done 28
+Started 2026-11-04 23:05:16, updated 2026-11-04 23:40:03, status **running**. Jobs: pending 40, running 3, done 29
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -52,9 +52,9 @@ Started 2026-11-04 23:05:16, updated 2026-11-04 23:39:29, status **running**. Jo
 | local/10 | pending |  |  | local models |
 | structure/10 | done | 2026-11-04 23:22:41 | 2026-11-04 23:33:48 | Codex: transposition then substitution |
 | structure/12 | done | 2026-11-04 23:23:01 | 2026-11-04 23:31:06 | Codex: transposition then substitution |
-| structure/13 | running | 2026-11-04 23:31:22 |  | Codex: transposition then substitution |
+| structure/13 | done | 2026-11-04 23:31:22 | 2026-11-04 23:40:03 | Codex: transposition then substitution |
 | structure/14 | done | 2026-11-04 23:34:04 | 2026-11-04 23:39:29 | Codex: transposition then substitution |
-| structure/17 | pending |  |  | Codex: transposition then substitution |
+| structure/17 | running | 2026-11-04 23:39:58 |  | Codex: transposition then substitution |
 | structure/18 | pending |  |  | Codex: transposition then substitution |
 | structure/24 | pending |  |  | Codex: transposition then substitution |
 | exhaustive/11 | pending |  |  | Codex: every periodic key up to length 4 |
@@ -103,18 +103,12 @@ round 4 [claude-sonnet] proposals=12 valid=12 attempts=42749 passes=0 near=0 inv
 23:34:26 [model] granite (weighting) calling...
 23:34:27 [model] granite (weighting) ok 1.8s, tokens in/out 269/38, reply 69 chars
 ```
-**structure/13** (since 2026-11-04 23:31:22), latest log lines:
+**structure/17** (since 2026-11-04 23:39:58), latest log lines:
 ```
-23:31:24 [model] codex (proposer) calling...
-23:32:15 [model] codex (proposer) ok 50.0s, tokens in/out 19351/2272, reply 8028 chars, model not reported (pin one with model = "..." in the models config)
-round 1 [codex] proposals=32 valid=32 attempts=111696 passes=0 near=0 invalid=0
-23:34:32 [model] codex (proposer) calling...
-23:35:22 [model] codex (proposer) ok 50.3s, tokens in/out 21617/2283, reply 7617 chars, model not reported (pin one with model = "..." in the models config)
-round 2 [codex] proposals=32 valid=32 attempts=169720 passes=0 near=0 invalid=0
-23:36:13 [model] codex (proposer) calling...
-23:37:07 [model] codex (proposer) ok 53.5s, tokens in/out 21346/2483, reply 7954 chars, model not reported (pin one with model = "..." in the models config)
-round 3 [codex] proposals=32 valid=32 attempts=300000 passes=0 near=0 invalid=0
-stopped: max_attempts; final passes: 0
+===== 2026-11-04 23:39:58 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 17 --gen
+brief for the generators (718 chars): Two-stage programs: a transposition, then a substitution. Use the transpose field: grid widths (try the factors of the section length and their neighbours, e.g. 2
+== LP2:- - 40.jpg-43.jpg  (1021 symbols)
+23:40:01 [model] codex (proposer) calling...
 ```
 
 ## Results so far
@@ -175,33 +169,34 @@ stopped: max_attempts; final passes: 0
   - LP2:17.jpg, 18.jpg, 19.jpg - 0.jpg-2.jpg: 300000 attempts, 90 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **structure/12** (done)
   - LP2:20.jpg/2-23.jpg/1 - 3.jpg/2-6.jpg/1: 300000 attempts, 77 hypotheses, **0 final pass(es)**, stopped: max_attempts
+- **structure/13** (done)
+  - LP2:6.jpg/2-7.jpg - 23.jpg/2-24.jpg: 300000 attempts, 82 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **structure/14** (done)
   - LP2:8.jpg-14.jpg - 25.jpg-31.jpg: 300000 attempts, 26 hypotheses, **0 final pass(es)**, stopped: max_attempts
 
 ## Model usage
 
-- deepseek: 12 call(s) in the last 5h (cap none), spent $0.1873
+- deepseek: 10 call(s) in the last 5h (cap none), spent $0.1873
 - qwen-local: 6 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 6 call(s) in the last 5h (cap none), spent $0.0000
 - granite: 7 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 59 call(s) in the last 5h (cap 180), spent $0.0000
-- claude-sonnet: 59 call(s) in the last 5h (cap 180), spent $0.0000
-- claude-supervisor: 59 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-opus: 60 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-sonnet: 60 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-supervisor: 60 call(s) in the last 5h (cap 180), spent $0.0000
 - codex: 73 call(s) in the last 5h (cap 850), spent $0.0000
+
+## Current strategy note (read by every lane each round)
+
+Night so far: every section shows passes=0 and near=0, including 300k-attempt structure runs on 10/12/13/14. Simple single-stream shifts are not even coming close, so don't spend rounds on near-variants of what your section's history already shows. Favour combined programs, preferring ones not yet in your section's history: (1) a stream (prime, totient(prime), Fibonacci, or a running key from solved LP1 pages) combined with an interrupter/skip rule (skip F-rune positions, or reset per word/line); (2) a transposition (columnar or reversed lines/pages) before the stream; (3) atbash or reverse-alphabet followed by a shift; (4) a key offset tied to the page or section boundary. Be extra cautious on short sections (19: 91 runes; 11/21: about 120 runes).
 
 ## Supervisor notes
 
 - 2026-11-04 23:05:27: 23:05 check-in: run just started, 4 jobs running and 68 pending across sections 10-25 (sonnet, codex, local, structure, exhaustive, deepseek). No results yet, so I added no jobs and set no strategy note. I'll reassess when the first results come in.
+- 2026-11-04 23:39:58: 23:39 check-in: about 28 jobs done across sections 10-25. There are 0 final passes and 0 near hits anywhere, including the 300k-attempt structure runs on sections 10, 12, 13 and 14. Section 15 (9 runes) was skipped as too short. No leads to read yet. Plenty of jobs are still pending, so I added none and saved the job budget for when results suggest a direction.
+- 2026-11-04 23:39:58: strategy note set: Night so far: every section shows passes=0 and near=0, including 300k-attempt structure runs on 10/12/13/14. Simple single-stream shifts are not even coming close, so don't spend rounds on near-variants of what your section's history already shows. Favour combined programs, preferring ones not yet in your section's history: (1) a stream (prime, totient(prime), Fibonacci, or a running key from solved LP1 pages) combined with an interrupter/skip rule (skip F-rune positions, or reset per word/line); (2) a transposition (columnar or reversed lines/pages) before the stream; (3) atbash or reverse-alphabet followed by a shift; (4) a key offset tied to the page or section boundary. Be extra cautious on short sections (19: 91 runes; 11/21: about 120 runes).
 
 ## Events
 
-- 2026-11-04 23:31:21 published: 27 file(s) to branch results
-- 2026-11-04 23:31:22 structure/13: start (uses codex-plan)
-- 2026-11-04 23:31:22 4 running: structure/10, sonnet/14, local/19, structure/13
-- 2026-11-04 23:31:22 sonnet/15 waiting: claude-plan in use by sonnet/14
-- 2026-11-04 23:31:52 local/19: done (exit 0, 2 min)
-- 2026-11-04 23:32:07 published: 28 file(s) to branch results
-- 2026-11-04 23:32:07 local/15: start (uses ollama:http://127.0.0.1:11434, ollama:http://127.0.0.1:11435)
 - 2026-11-04 23:32:07 4 running: structure/10, sonnet/14, structure/13, local/15
 - 2026-11-04 23:32:07 sonnet/15 waiting: claude-plan in use by sonnet/14
 - 2026-11-04 23:32:12 local/15: done (exit 0, 0 min)
@@ -220,3 +215,10 @@ stopped: max_attempts; final passes: 0
 - 2026-11-04 23:39:04 structure/14: running 5 min | 23:35:02 [model] codex (proposer) ok 52.7s, tokens in/out 19318/2311, reply 7887 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-04 23:39:19 sonnet/14: running 15 min | 23:37:41 [model] claude-sonnet (proposer) ok 20.3s, tokens in/out 8596/1662, reply 2590 chars
 - 2026-11-04 23:39:29 structure/14: done (exit 0, 5 min)
+- 2026-11-04 23:39:45 published: 30 file(s) to branch results
+- 2026-11-04 23:39:58 supervisor: note: 23:39 check-in: about 28 jobs done across sections 10-25. There are 0 final passes and 0 near hits anywhere, including the 300k-attempt structure runs on sections 10, 12, 13 and 14. Section 15 (9 runes) was skipped as too short. No leads to read yet. Plenty of jobs are still pending, so I added n...
+- 2026-11-04 23:39:58 supervisor: strategy note set (758 chars): Night so far: every section shows passes=0 and near=0, including 300k-attempt structure runs on 10/12/13/14. Simple single-stream shifts are not even coming close, so don't spend rounds on near-varian
+- 2026-11-04 23:39:58 structure/17: start (uses codex-plan)
+- 2026-11-04 23:39:58 4 running: sonnet/14, structure/13, local/20, structure/17
+- 2026-11-04 23:39:58 sonnet/15 waiting: claude-plan in use by sonnet/14
+- 2026-11-04 23:40:03 structure/13: done (exit 0, 9 min)
