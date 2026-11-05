@@ -1,6 +1,6 @@
 # Overnight run 20261104-2305
 
-Started 2026-11-04 23:05:16, updated 2026-11-04 23:24:18, status **running**. Jobs: pending 48, running 3, done 21
+Started 2026-11-04 23:05:16, updated 2026-11-04 23:26:54, status **running**. Jobs: pending 47, running 3, done 22
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -36,7 +36,7 @@ Started 2026-11-04 23:05:16, updated 2026-11-04 23:24:18, status **running**. Jo
 | codex/11 | done | 2026-11-04 23:18:34 | 2026-11-04 23:20:09 | Codex (exploratory) |
 | codex/10 | done | 2026-11-04 23:20:25 | 2026-11-04 23:22:25 | Codex (exploratory) |
 | local/17 | done | 2026-11-04 23:05:16 | 2026-11-04 23:24:18 | local models |
-| local/18 | pending |  |  | local models |
+| local/18 | done | 2026-11-04 23:24:34 | 2026-11-04 23:26:54 | local models |
 | local/16 | pending |  |  | local models |
 | local/19 | pending |  |  | local models |
 | local/15 | pending |  |  | local models |
@@ -81,9 +81,16 @@ Started 2026-11-04 23:05:16, updated 2026-11-04 23:24:18, status **running**. Jo
 
 **sonnet/14** (since 2026-11-04 23:24:13), latest log lines:
 ```
-===== 2026-11-04 23:24:13 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 14 --gen
-== LP2:8.jpg-14.jpg - 25.jpg-31.jpg  (1729 symbols)
-23:24:15 [model] claude-supervisor (supervisor) calling...
+  | 3. Prime totients. Use sequence prime_totients with offset_range [0,2000] and sub, then add, then beaufort. Add skip [0] (F) with skip_mode "resolve", since the solved LP page left some F's in cle
+  | 4. Other sequences at unknown start. Use primes, fibonacci, pi_digits, e_digits, squares and triangular, each with offset_range [0,2000]. Try scale 1 and -1 (28), and add values 0, 1, 57. Use sub 
+  | 5. Transposition before a sequence key. Use grid "columns" and "diagonal" with transpose_range [2,60], or railfence with range [2,12]. Combine each with prime_totients over offset_range [0,80], ke
+  | 6. Long word keys. Use repeat words with offset_range [0, keylen-1]: FIRFUMFERENFE, CIRCUMFERENCE, DIVINITY, YAHEOOPYJ, INTUS, SHADOWS, INSTRUCTION. Use sub and beaufort, both with and without ski
+  | Do NOT repeat: constant
+23:24:35 [model] claude-sonnet (proposer) calling...
+23:24:44 [model] claude-sonnet (proposer) ok 9.4s, tokens in/out 5074/1282, reply 2791 chars
+round 1 [claude-sonnet] proposals=12 valid=5 attempts=3615 passes=0 near=0 invalid=7
+23:25:58 [model] claude-sonnet (proposer) calling...
+23:26:13 [model] claude-sonnet (proposer) ok 14.1s, tokens in/out 6078/1822, reply 2838 chars
 ```
 **structure/10** (since 2026-11-04 23:22:41), latest log lines:
 ```
@@ -100,6 +107,9 @@ brief for the generators (718 chars): Two-stage programs: a transposition, then 
 == LP2:20.jpg/2-23.jpg/1 - 3.jpg/2-6.jpg/1  (693 symbols)
 23:23:04 [model] codex (proposer) calling...
 23:23:56 [model] codex (proposer) ok 51.3s, tokens in/out 18719/2252, reply 7890 chars, model not reported (pin one with model = "..." in the models config)
+round 1 [codex] proposals=32 valid=32 attempts=130477 passes=0 near=0 invalid=0
+23:25:53 [model] codex (proposer) calling...
+23:26:52 [model] codex (proposer) ok 59.4s, tokens in/out 21541/2353, reply 8042 chars, model not reported (pin one with model = "..." in the models config)
 ```
 
 ## Results so far
@@ -148,17 +158,19 @@ brief for the generators (718 chars): Two-stage programs: a transposition, then 
   - LP2:17.jpg, 18.jpg, 19.jpg - 0.jpg-2.jpg: 60000 attempts, 4 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **local/17** (done)
   - LP2:- - 40.jpg-43.jpg: 60000 attempts, 17 hypotheses, **0 final pass(es)**, stopped: max_attempts
+- **local/18** (done)
+  - LP2:- - 44.jpg-49.jpg: 60000 attempts, 2 hypotheses, **0 final pass(es)**, stopped: max_attempts
 
 ## Model usage
 
 - deepseek: 12 call(s) in the last 5h (cap none), spent $0.1873
-- qwen-local: 2 call(s) in the last 5h (cap none), spent $0.0000
-- gemma-local: 2 call(s) in the last 5h (cap none), spent $0.0000
-- granite: 3 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 55 call(s) in the last 5h (cap 180), spent $0.0000
-- claude-sonnet: 55 call(s) in the last 5h (cap 180), spent $0.0000
-- claude-supervisor: 55 call(s) in the last 5h (cap 180), spent $0.0000
-- codex: 65 call(s) in the last 5h (cap 850), spent $0.0000
+- qwen-local: 3 call(s) in the last 5h (cap none), spent $0.0000
+- gemma-local: 3 call(s) in the last 5h (cap none), spent $0.0000
+- granite: 4 call(s) in the last 5h (cap none), spent $0.0000
+- claude-opus: 58 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-sonnet: 58 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-supervisor: 58 call(s) in the last 5h (cap 180), spent $0.0000
+- codex: 66 call(s) in the last 5h (cap 850), spent $0.0000
 
 ## Supervisor notes
 
@@ -166,11 +178,6 @@ brief for the generators (718 chars): Two-stage programs: a transposition, then 
 
 ## Events
 
-- 2026-11-04 23:18:34 published: 19 file(s) to branch results
-- 2026-11-04 23:18:34 codex/11: start (uses codex-plan)
-- 2026-11-04 23:18:34 4 running: local/17, sonnet/13, codex/12, codex/11
-- 2026-11-04 23:18:34 sonnet/14 waiting: claude-plan in use by sonnet/13
-- 2026-11-04 23:20:09 codex/11: done (exit 0, 2 min)
 - 2026-11-04 23:20:25 published: 20 file(s) to branch results
 - 2026-11-04 23:20:25 codex/10: start (uses codex-plan)
 - 2026-11-04 23:20:25 4 running: local/17, sonnet/13, codex/12, codex/10
@@ -191,3 +198,8 @@ brief for the generators (718 chars): Two-stage programs: a transposition, then 
 - 2026-11-04 23:24:13 sonnet/14: start (uses claude-plan)
 - 2026-11-04 23:24:13 4 running: local/17, structure/10, structure/12, sonnet/14
 - 2026-11-04 23:24:18 local/17: done (exit 0, 19 min)
+- 2026-11-04 23:24:34 published: 24 file(s) to branch results
+- 2026-11-04 23:24:34 local/18: start (uses ollama:http://127.0.0.1:11434, ollama:http://127.0.0.1:11435)
+- 2026-11-04 23:24:34 4 running: structure/10, structure/12, sonnet/14, local/18
+- 2026-11-04 23:24:34 sonnet/15 waiting: claude-plan in use by sonnet/14
+- 2026-11-04 23:26:54 local/18: done (exit 0, 2 min)
