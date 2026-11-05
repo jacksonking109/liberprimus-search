@@ -66,6 +66,53 @@ with 199 shuffles is 0.005.
 Outputs: `diagnostics_structure.json` and `diagnostics_structure.md` in `--out` (default
 `reports/diag`). A reference run on the bundled transcription is in `docs/diagnostics_sample/`.
 
+## Assumption audit (`python -m lpswarm.research_views {agnostic,bytes,numbers,all}`)
+
+Checks that drop the assumption that the sections are English text enciphered letter by letter. No
+models, no oracle, no ledger; fixed seeds, wall-clock caps, exploratory. Each result is printed next to
+synthetic controls with known answers.
+
+* `agnostic`: decrypt with position-keyed streams (8 sequences x 28 scales x 3,000 offsets x 3 treatments of
+  the F rune) and score by the index of coincidence of the first 600 runes, which is high for any natural
+  language and needs no word list. IC is unchanged by any relabelling of the alphabet, so affine maps,
+  reversal and sign choices need no separate runs. It also re-scores every packet candidate that `decrypt`
+  can evaluate by IC only (nothing goes through the oracle or a ledger, so packets stay unrun for
+  accounting). Flag: IC x 29 >= 1.25 and above the maximum of shuffled-ciphertext replicates.
+  **Blind spot:** the documented F-skip pages need each F resolved separately (see
+  `docs/lp_baseline_run.md`), so a stream that behaves that way is reachable only through the longest
+  F-free stretch (60-130 runes), and at that length noise alone reaches the IC that language reaches
+  (the report prints the null mean and maximum). Streams that fall out of step partway are likewise
+  hard to see.
+* `bytes`: the section as binary data: base-29 integer to bytes (both digit orders), 5-bit packing, one byte
+  per rune, rune pairs. Valid zlib / gzip / bzip2 / xz streams and magic numbers at offsets 0-31 (false
+  positives are negligible), plus printable fraction, longest printable run, entropy and compressibility
+  against 99 shuffles. Readable sections are included as sensitivity references. Encrypted binary (uniform
+  bytes) is undetectable by design.
+* `numbers`: words and lines read as numbers in fixed ways (base 29 either way round, decimal concatenation of
+  rune indexes, Gematria prime-value sum, index sum) with primality / square / Fibonacci fractions against a
+  shuffle null; and whether the text itself is a polynomial (finite differences up to order 8) or a linear
+  recurrence of order 2 or 3 mod 29 (all coefficients).
+
+`--derive diff|sum` runs the checks on the first differences `c[i]-c[i-1]` or neighbour sums `c[i]+c[i-1]` mod 29
+instead of the runes, which tests a running-sum construction under which the hidden stream is what a sweep should
+decrypt.
+
+The z-scores here use leave-one-out means and spreads (every sample is judged out-of-sample) and a minimum
+meaningful spread per statistic; p-values are the maximum over the readings tried.
+
+## Out-of-step prime stream (`python -m lpswarm.research_windows`)
+
+The solved prime page only decodes cleanly from its start (one skipped index, F-skip), so a whole-text test
+fails on a stream that is right but out of step. This searches locally in two stages. Stage 1 scores, with the
+oracle's English bigram model, every decryption `p = orient(c) - (a*prime[o+t] + b)` (orientation x scale +-1 x
+constant 0..28 x offset 0..6,000) of the three longest F-free stretches (60+ runes) in the first 800 runes of
+each section; an F-free stretch does not depend on how an F is treated. Stage 2 takes the best candidates,
+decrypts the 800 runes with the resolved F-skip at every global offset consistent with the stretch, and scores
+only the runes OUTSIDE the stretch (text the selection never saw) against 40 random candidates. A stage-2
+z >= 8 is a lead for the real oracle, not a result. Planted controls (English through prime-minus-one with the
+F-skip, with and without an extra skipped index) are found at z about 33-40; noise stays at 2-4. English
+bigram model only; one sequence family (primes) unless widened with `--sequences`.
+
 ## Limits
 
 * The power table uses English plaintext. If the true plaintext is another language, abbreviated or

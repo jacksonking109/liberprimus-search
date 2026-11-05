@@ -1,0 +1,2908 @@
+{
+ "agnostic": {
+  "complete": true,
+  "controls": [
+   {
+    "best_ic": 1.7729215358931552,
+    "bulk_mean": 1.013348818919982,
+    "bulk_sd": 0.017808335124017548,
+    "candidates": 2016000,
+    "case": "English through a totient stream, offset 777",
+    "flag": true,
+    "null_max_ic": 1.1733945464663327,
+    "null_replicates": 2,
+    "seconds": 36.1,
+    "stretch": {
+     "best_ic": 1.6730769230769231,
+     "flag": false,
+     "length": 104,
+     "null_max_ic": 1.6297610156833457,
+     "null_mean_ic": 1.5290515309932788,
+     "null_replicates": 20,
+     "start": 370,
+     "threshold": 1.7192161799529393,
+     "top": [
+      {
+       "ic": 1.6730769230769231,
+       "offset": 1147,
+       "scale": 1,
+       "sequence": "primes"
+      },
+      {
+       "ic": 1.6730769230769231,
+       "offset": 1147,
+       "scale": 1,
+       "sequence": "prime_totients"
+      },
+      {
+       "ic": 1.4781553398058251,
+       "offset": 694,
+       "scale": 2,
+       "sequence": "primes"
+      }
+     ],
+     "z_vs_bulk": 9.582029101383553
+    },
+    "top": [
+     {
+      "ic": 1.7729215358931552,
+      "offset": 777,
+      "scale": 1,
+      "sequence": "primes",
+      "treatment": "F untouched"
+     },
+     {
+      "ic": 1.7729215358931552,
+      "offset": 777,
+      "scale": 1,
+      "sequence": "prime_totients",
+      "treatment": "F untouched"
+     },
+     {
+      "ic": 1.7493600445186421,
+      "offset": 777,
+      "scale": 1,
+      "sequence": "primes",
+      "treatment": "F literal, key advances"
+     },
+     {
+      "ic": 1.7003005008347245,
+      "offset": 777,
+      "scale": 1,
+      "sequence": "prime_totients",
+      "treatment": "F literal, key advances"
+     },
+     {
+      "ic": 1.1343405676126879,
+      "offset": 459,
+      "scale": 28,
+      "sequence": "prime_totients",
+      "treatment": "F literal, key advances"
+     }
+    ],
+    "window": 600,
+    "z_vs_bulk": 42.652651788249486
+   },
+   {
+    "best_ic": 1.2153533667223149,
+    "bulk_mean": 1.0434180194117624,
+    "bulk_sd": 0.03672411224012938,
+    "candidates": 2016000,
+    "case": "English through a Fibonacci stream with the F-skip (F literal iff plaintext F; ambiguous as on the real pages)",
+    "flag": false,
+    "null_max_ic": 1.2645742904841402,
+    "null_replicates": 2,
+    "seconds": 33.54,
+    "stretch": {
+     "best_ic": 1.8621052631578947,
+     "flag": false,
+     "length": 76,
+     "null_max_ic": 2.106315789473684,
+     "null_mean_ic": 1.8010526315789472,
+     "null_replicates": 20,
+     "start": 366,
+     "threshold": 2.239423942194809,
+     "top": [
+      {
+       "ic": 1.8621052631578947,
+       "offset": 5,
+       "scale": 3,
+       "sequence": "fibonacci"
+      },
+      {
+       "ic": 1.7705263157894737,
+       "offset": 571,
+       "scale": 15,
+       "sequence": "pi_digits"
+      },
+      {
+       "ic": 1.7603508771929826,
+       "offset": 2080,
+       "scale": 14,
+       "sequence": "pi_digits"
+      }
+     ],
+     "z_vs_bulk": 7.972077817967413
+    },
+    "top": [
+     {
+      "ic": 1.2153533667223149,
+      "offset": 1524,
+      "scale": 3,
+      "sequence": "pi_digits",
+      "treatment": "F literal, key advances"
+     },
+     {
+      "ic": 1.2153533667223149,
+      "offset": 1612,
+      "scale": 3,
+      "sequence": "e_digits",
+      "treatment": "F literal, key does not advance"
+     },
+     {
+      "ic": 1.214062326099054,
+      "offset": 1721,
+      "scale": 13,
+      "sequence": "primes",
+      "treatment": "F literal, key does not advance"
+     },
+     {
+      "ic": 1.2064774624373957,
+      "offset": 301,
+      "scale": 3,
+      "sequence": "e_digits",
+      "treatment": "F literal, key advances"
+     },
+     {
+      "ic": 1.2050250417362272,
+      "offset": 689,
+      "scale": 6,
+      "sequence": "pi_digits",
+      "treatment": "F literal, key advances"
+     }
+    ],
+    "window": 600,
+    "z_vs_bulk": 4.681810854577291
+   },
+   {
+    "best_ic": 3.358158041179744,
+    "bulk_mean": 1.02275387279063,
+    "bulk_sd": 0.023491762854730945,
+    "candidates": 2016000,
+    "case": "non-English letters (iid, skewed) through a prime stream",
+    "flag": true,
+    "null_max_ic": 1.169844184752365,
+    "null_replicates": 2,
+    "seconds": 36.59,
+    "stretch": {
+     "best_ic": 3.006879606879607,
+     "flag": true,
+     "length": 111,
+     "null_max_ic": 1.577067977067977,
+     "null_mean_ic": 1.4875266175266175,
+     "null_replicates": 20,
+     "start": 6,
+     "threshold": 1.6794527111577662,
+     "top": [
+      {
+       "ic": 3.006879606879607,
+       "offset": 351,
+       "scale": 2,
+       "sequence": "primes"
+      },
+      {
+       "ic": 3.006879606879607,
+       "offset": 351,
+       "scale": 2,
+       "sequence": "prime_totients"
+      },
+      {
+       "ic": 1.52006552006552,
+       "offset": 1252,
+       "scale": 26,
+       "sequence": "primes"
+      }
+     ],
+     "z_vs_bulk": 28.8173444876661
+    },
+    "top": [
+     {
+      "ic": 3.358158041179744,
+      "offset": 345,
+      "scale": 2,
+      "sequence": "primes",
+      "treatment": "F literal, key advances"
+     },
+     {
+      "ic": 2.927918753478019,
+      "offset": 345,
+      "scale": 2,
+      "sequence": "primes",
+      "treatment": "F untouched"
+     },
+     {
+      "ic": 2.927918753478019,
+      "offset": 345,
+      "scale": 2,
+      "sequence": "prime_totients",
+      "treatment": "F untouched"
+     },
+     {
+      "ic": 2.87692264885921,
+      "offset": 345,
+      "scale": 2,
+      "sequence": "prime_totients",
+      "treatment": "F literal, key advances"
+     },
+     {
+      "ic": 1.1816249304396216,
+      "offset": 1045,
+      "scale": 5,
+      "sequence": "primes",
+      "treatment": "F literal, key does not advance"
+     }
+    ],
+    "window": 600,
+    "z_vs_bulk": 99.41374697296473
+   },
+   {
+    "best_ic": 1.1564496382860323,
+    "bulk_mean": 1.0144145837611853,
+    "bulk_sd": 0.018494943337224606,
+    "candidates": 2016000,
+    "case": "iid uniform noise (no cipher)",
+    "flag": false,
+    "null_max_ic": 1.146282693377852,
+    "null_replicates": 2,
+    "seconds": 39.38,
+    "stretch": {
+     "best_ic": 1.3339412360688956,
+     "flag": false,
+     "length": 141,
+     "null_max_ic": 1.4632218844984803,
+     "null_mean_ic": 1.3775734549138803,
+     "null_replicates": 20,
+     "start": 235,
+     "threshold": 1.5336909836177244,
+     "top": [
+      {
+       "ic": 1.3339412360688956,
+       "offset": 745,
+       "scale": 27,
+       "sequence": "pi_digits"
+      },
+      {
+       "ic": 1.3310030395136778,
+       "offset": 1419,
+       "scale": 4,
+       "sequence": "e_digits"
+      },
+      {
+       "ic": 1.32806484295846,
+       "offset": 2156,
+       "scale": 2,
+       "sequence": "e_digits"
+      }
+     ],
+     "z_vs_bulk": 6.555509056468729
+    },
+    "top": [
+     {
+      "ic": 1.1564496382860323,
+      "offset": 1155,
+      "scale": 8,
+      "sequence": "primes",
+      "treatment": "F literal, key advances"
+     },
+     {
+      "ic": 1.1545130773511407,
+      "offset": 151,
+      "scale": 11,
+      "sequence": "primes",
+      "treatment": "F literal, key does not advance"
+     },
+     {
+      "ic": 1.1378909293266555,
+      "offset": 2647,
+      "scale": 9,
+      "sequence": "e_digits",
+      "treatment": "F literal, key does not advance"
+     },
+     {
+      "ic": 1.1348247078464107,
+      "offset": 752,
+      "scale": 5,
+      "sequence": "primes",
+      "treatment": "F literal, key does not advance"
+     },
+     {
+      "ic": 1.1340178074568725,
+      "offset": 740,
+      "scale": 23,
+      "sequence": "prime_totients",
+      "treatment": "F literal, key advances"
+     }
+    ],
+    "window": 600,
+    "z_vs_bulk": 7.679669622938197
+   }
+  ],
+  "offsets": 3000,
+  "replicates": 2,
+  "seconds": 523.2,
+  "sections": {
+   "10": {
+    "best_ic": 1.2247134112409572,
+    "bulk_mean": 1.041150441200501,
+    "bulk_sd": 0.0355407385733072,
+    "candidates": 2016000,
+    "flag": false,
+    "null_max_ic": 1.2352031163049526,
+    "null_replicates": 2,
+    "packets": {
+     "best_ic": 1.0610290672188885,
+     "best_packet": "exp3_progressive",
+     "evaluated": 15109,
+     "flag": false,
+     "note": "packet candidates scored by IC only; not run through the oracle or any ledger",
+     "null_max_ic": 1.0483249860879242
+    },
+    "seconds": 33.19,
+    "stretch": {
+     "best_ic": 1.9333333333333333,
+     "flag": false,
+     "length": 66,
+     "null_max_ic": 1.9874125874125874,
+     "null_mean_ic": 1.8481585081585084,
+     "null_replicates": 20,
+     "start": 511,
+     "threshold": 2.106085191432361,
+     "top": [
+      {
+       "ic": 1.9333333333333333,
+       "offset": 1390,
+       "scale": 15,
+       "sequence": "e_digits"
+      },
+      {
+       "ic": 1.8657342657342657,
+       "offset": 2548,
+       "scale": 16,
+       "sequence": "e_digits"
+      },
+      {
+       "ic": 1.8251748251748252,
+       "offset": 1076,
+       "scale": 24,
+       "sequence": "primes"
+      }
+     ],
+     "z_vs_bulk": 8.412781167718357
+    },
+    "top": [
+     {
+      "ic": 1.2247134112409572,
+      "offset": 45,
+      "scale": 27,
+      "sequence": "primes",
+      "treatment": "F literal, key advances"
+     },
+     {
+      "ic": 1.216644407345576,
+      "offset": 484,
+      "scale": 23,
+      "sequence": "primes",
+      "treatment": "F literal, key does not advance"
+     },
+     {
+      "ic": 1.2143850862548693,
+      "offset": 236,
+      "scale": 28,
+      "sequence": "primes",
+      "treatment": "F literal, key advances"
+     },
+     {
+      "ic": 1.2100278241513633,
+      "offset": 2294,
+      "scale": 5,
+      "sequence": "prime_totients",
+      "treatment": "F literal, key advances"
+     },
+     {
+      "ic": 1.2064774624373957,
+      "offset": 810,
+      "scale": 9,
+      "sequence": "primes",
+      "treatment": "F literal, key advances"
+     }
+    ],
+    "window": 600,
+    "z_vs_bulk": 5.164860872596519
+   },
+   "12": {
+    "best_ic": 1.1412799109627156,
+    "bulk_mean": 1.0150737119515774,
+    "bulk_sd": 0.019256238068270974,
+    "candidates": 2016000,
+    "flag": false,
+    "null_max_ic": 1.154351697273233,
+    "null_replicates": 2,
+    "packets": {
+     "best_ic": 1.058543787591076,
+     "best_packet": "exp4_wordkeys_reversed",
+     "evaluated": 15109,
+     "flag": false,
+     "note": "packet candidates scored by IC only; not run through the oracle or any ledger",
+     "null_max_ic": 1.0562326099053978
+    },
+    "seconds": 33.76,
+    "stretch": {
+     "best_ic": 1.8428462709284628,
+     "flag": false,
+     "length": 73,
+     "null_max_ic": 2.173896499238965,
+     "null_mean_ic": 1.8014649923896495,
+     "null_replicates": 20,
+     "start": 279,
+     "threshold": 2.2334430545420214,
+     "top": [
+      {
+       "ic": 1.8428462709284628,
+       "offset": 1298,
+       "scale": 11,
+       "sequence": "e_digits"
+      },
+      {
+       "ic": 1.6883561643835616,
+       "offset": 329,
+       "scale": 25,
+       "sequence": "primes"
+      },
+      {
+       "ic": 1.6883561643835616,
+       "offset": 329,
+       "scale": 25,
+       "sequence": "prime_totients"
+      }
+     ],
+     "z_vs_bulk": 8.428330552315987
+    },
+    "top": [
+     {
+      "ic": 1.1412799109627156,
+      "offset": 868,
+      "scale": 4,
+      "sequence": "prime_totients",
+      "treatment": "F literal, key does not advance"
+     },
+     {
+      "ic": 1.1406343906510852,
+      "offset": 1394,
+      "scale": 12,
+      "sequence": "primes",
+      "treatment": "F literal, key advances"
+     },
+     {
+      "ic": 1.1396661101836394,
+      "offset": 106,
+      "scale": 9,
+      "sequence": "primes",
+      "treatment": "F literal, key does not advance"
+     },
+     {
+      "ic": 1.1395047301057317,
+      "offset": 1261,
+      "scale": 14,
+      "sequence": "pi_digits",
+      "treatment": "F literal, key does not advance"
+     },
+     {
+      "ic": 1.1375681691708404,
+      "offset": 543,
+      "scale": 23,
+      "sequence": "primes",
+      "treatment": "F literal, key does not advance"
+     }
+    ],
+    "window": 600,
+    "z_vs_bulk": 6.554042308974755
+   },
+   "13": {
+    "best_ic": 1.18616809580665,
+    "bulk_mean": 1.0005562252675098,
+    "bulk_sd": 0.022751750666938738,
+    "candidates": 2016000,
+    "flag": false,
+    "null_max_ic": 1.175151054669127,
+    "null_replicates": 2,
+    "packets": {
+     "best_ic": 1.1067775634259092,
+     "best_packet": "exp4_wordkeys_reversed",
+     "evaluated": 15109,
+     "flag": false,
+     "note": "packet candidates scored by IC only; not run through the oracle or any ledger",
+     "null_max_ic": 1.1057219815819168
+    },
+    "seconds": 32.13,
+    "stretch": {
+     "best_ic": 1.3025881222602533,
+     "flag": false,
+     "length": 183,
+     "null_max_ic": 1.320002401969615,
+     "null_mean_ic": 1.274638203326728,
+     "null_replicates": 20,
+     "start": 150,
+     "threshold": 1.3446783000442666,
+     "top": [
+      {
+       "ic": 1.3025881222602533,
+       "offset": 843,
+       "scale": 18,
+       "sequence": "e_digits"
+      },
+      {
+       "ic": 1.266018134870594,
+       "offset": 938,
+       "scale": 18,
+       "sequence": "pi_digits"
+      },
+      {
+       "ic": 1.2607938509577854,
+       "offset": 714,
+       "scale": 1,
+       "sequence": "primes"
+      }
+     ],
+     "z_vs_bulk": 7.037065561094848
+    },
+    "top": [
+     {
+      "ic": 1.18616809580665,
+      "offset": 1331,
+      "scale": 7,
+      "sequence": "e_digits",
+      "treatment": "F literal, key advances"
+     },
+     {
+      "ic": 1.1735771916494808,
+      "offset": 1331,
+      "scale": 7,
+      "sequence": "e_digits",
+      "treatment": "F untouched"
+     },
+     {
+      "ic": 1.1594124244726653,
+      "offset": 595,
+      "scale": 18,
+      "sequence": "pi_digits",
+      "treatment": "F literal, key does not advance"
+     },
+     {
+      "ic": 1.158363182459568,
+      "offset": 1089,
+      "scale": 25,
+      "sequence": "pi_digits",
+      "treatment": "F literal, key does not advance"
+     },
+     {
+      "ic": 1.1489200043416912,
+      "offset": 1863,
+      "scale": 11,
+      "sequence": "prime_totients",
+      "treatment": "F literal, key advances"
+     }
+    ],
+    "window": 333,
+    "z_vs_bulk": 8.158135752114168
+   },
+   "14": {
+    "best_ic": 1.1629048414023373,
+    "bulk_mean": 1.021637411550666,
+    "bulk_sd": 0.023021328337572484,
+    "candidates": 2016000,
+    "flag": false,
+    "null_max_ic": 1.1733945464663327,
+    "null_replicates": 2,
+    "packets": {
+     "best_ic": 1.0280512127645887,
+     "best_packet": "exp1_feedback",
+     "evaluated": 15109,
+     "flag": false,
+     "note": "packet candidates scored by IC only; not run through the oracle or any ledger",
+     "null_max_ic": 1.0586533110740122
+    },
+    "seconds": 38.84,
+    "stretch": {
+     "best_ic": 1.4177777777777778,
+     "flag": false,
+     "length": 126,
+     "null_max_ic": 1.5098412698412698,
+     "null_mean_ic": 1.4334285714285713,
+     "null_replicates": 20,
+     "start": 35,
+     "threshold": 1.6099237754072895,
+     "top": [
+      {
+       "ic": 1.4177777777777778,
+       "offset": 2281,
+       "scale": 27,
+       "sequence": "pi_digits"
+      },
+      {
+       "ic": 1.3846349206349207,
+       "offset": 610,
+       "scale": 11,
+       "sequence": "primes"
+      },
+      {
+       "ic": 1.3846349206349207,
+       "offset": 610,
+       "scale": 11,
+       "sequence": "prime_totients"
+      }
+     ],
+     "z_vs_bulk": 6.734037306036593
+    },
+    "top": [
+     {
+      "ic": 1.1629048414023373,
+      "offset": 1643,
+      "scale": 13,
+      "sequence": "primes",
+      "treatment": "F literal, key does not advance"
+     },
+     {
+      "ic": 1.1609682804674457,
+      "offset": 1635,
+      "scale": 17,
+      "sequence": "primes",
+      "treatment": "F literal, key does not advance"
+     },
+     {
+      "ic": 1.1583861992209237,
+      "offset": 448,
+      "scale": 16,
+      "sequence": "primes",
+      "treatment": "F literal, key does not advance"
+     },
+     {
+      "ic": 1.1564496382860323,
+      "offset": 2016,
+      "scale": 20,
+      "sequence": "primes",
+      "treatment": "F literal, key advances"
+     },
+     {
+      "ic": 1.15047857540345,
+      "offset": 2549,
+      "scale": 8,
+      "sequence": "primes",
+      "treatment": "F literal, key advances"
+     }
+    ],
+    "window": 600,
+    "z_vs_bulk": 6.1363717931563775
+   },
+   "16": {
+    "best_ic": 1.1706510851419032,
+    "bulk_mean": 1.0205153147358692,
+    "bulk_sd": 0.02276127525193385,
+    "candidates": 2016000,
+    "flag": false,
+    "null_max_ic": 1.1674234835837507,
+    "null_replicates": 2,
+    "packets": {
+     "best_ic": 1.025960145503553,
+     "best_packet": "exp1_feedback",
+     "evaluated": 15109,
+     "flag": false,
+     "note": "packet candidates scored by IC only; not run through the oracle or any ledger",
+     "null_max_ic": 1.0499387868670005
+    },
+    "seconds": 35.45,
+    "stretch": {
+     "best_ic": 1.5889271371199083,
+     "flag": false,
+     "length": 84,
+     "null_max_ic": 1.7969018932874354,
+     "null_mean_ic": 1.653815261044177,
+     "null_replicates": 20,
+     "start": 516,
+     "threshold": 1.9032039282564255,
+     "top": [
+      {
+       "ic": 1.5889271371199083,
+       "offset": 1448,
+       "scale": 25,
+       "sequence": "primes"
+      },
+      {
+       "ic": 1.5889271371199083,
+       "offset": 1448,
+       "scale": 25,
+       "sequence": "prime_totients"
+      },
+      {
+       "ic": 1.5889271371199083,
+       "offset": 2229,
+       "scale": 8,
+       "sequence": "e_digits"
+      }
+     ],
+     "z_vs_bulk": 6.9298008327200025
+    },
+    "top": [
+     {
+      "ic": 1.1706510851419032,
+      "offset": 2166,
+      "scale": 27,
+      "sequence": "primes",
+      "treatment": "F literal, key advances"
+     },
+     {
+      "ic": 1.1603227601558153,
+      "offset": 1092,
+      "scale": 17,
+      "sequence": "prime_totients",
+      "treatment": "F literal, key advances"
+     },
+     {
+      "ic": 1.1553199777406788,
+      "offset": 306,
+      "scale": 23,
+      "sequence": "primes",
+      "treatment": "F literal, key does not advance"
+     },
+     {
+      "ic": 1.154351697273233,
+      "offset": 800,
+      "scale": 22,
+      "sequence": "primes",
+      "treatment": "F literal, key does not advance"
+     },
+     {
+      "ic": 1.152253756260434,
+      "offset": 1716,
+      "scale": 1,
+      "sequence": "primes",
+      "treatment": "F literal, key does not advance"
+     }
+    ],
+    "window": 600,
+    "z_vs_bulk": 6.596105391470898
+   },
+   "17": {
+    "best_ic": 1.171619365609349,
+    "bulk_mean": 1.0242507561848013,
+    "bulk_sd": 0.02451948032147248,
+    "candidates": 2016000,
+    "flag": false,
+    "null_max_ic": 1.1825932109070674,
+    "null_replicates": 2,
+    "packets": {
+     "best_ic": 1.0370336161942697,
+     "best_packet": "exp3_progressive",
+     "evaluated": 15109,
+     "flag": false,
+     "note": "packet candidates scored by IC only; not run through the oracle or any ledger",
+     "null_max_ic": 1.0662381747356706
+    },
+    "seconds": 35.56,
+    "stretch": {
+     "best_ic": 1.6925518925518925,
+     "flag": false,
+     "length": 91,
+     "null_max_ic": 1.8058608058608059,
+     "null_mean_ic": 1.603675213675214,
+     "null_replicates": 20,
+     "start": 437,
+     "threshold": 1.864996975778987,
+     "top": [
+      {
+       "ic": 1.6925518925518925,
+       "offset": 1562,
+       "scale": 17,
+       "sequence": "primes"
+      },
+      {
+       "ic": 1.6925518925518925,
+       "offset": 1562,
+       "scale": 17,
+       "sequence": "prime_totients"
+      },
+      {
+       "ic": 1.543833943833944,
+       "offset": 2849,
+       "scale": 22,
+       "sequence": "primes"
+      }
+     ],
+     "z_vs_bulk": 8.534900195468918
+    },
+    "top": [
+     {
+      "ic": 1.171619365609349,
+      "offset": 1629,
+      "scale": 17,
+      "sequence": "pi_digits",
+      "treatment": "F literal, key advances"
+     },
+     {
+      "ic": 1.1691986644407346,
+      "offset": 1603,
+      "scale": 22,
+      "sequence": "e_digits",
+      "treatment": "F literal, key does not advance"
+     },
+     {
+      "ic": 1.1688759042849193,
+      "offset": 1920,
+      "scale": 15,
+      "sequence": "e_digits",
+      "treatment": "F literal, key advances"
+     },
+     {
+      "ic": 1.1662938230383972,
+      "offset": 2534,
+      "scale": 26,
+      "sequence": "primes",
+      "treatment": "F literal, key advances"
+     },
+     {
+      "ic": 1.1567723984418474,
+      "offset": 2845,
+      "scale": 17,
+      "sequence": "prime_totients",
+      "treatment": "F literal, key does not advance"
+     }
+    ],
+    "window": 600,
+    "z_vs_bulk": 6.0102664286686505
+   },
+   "18": {
+    "best_ic": 1.2017974401780747,
+    "bulk_mean": 1.0362821329779135,
+    "bulk_sd": 0.03245857523568709,
+    "candidates": 2016000,
+    "flag": false,
+    "null_max_ic": 1.2132554257095158,
+    "null_replicates": 2,
+    "packets": {
+     "best_ic": 1.0248536984333336,
+     "best_packet": "exp1_feedback",
+     "evaluated": 15109,
+     "flag": false,
+     "note": "packet candidates scored by IC only; not run through the oracle or any ledger",
+     "null_max_ic": 1.053973288814691
+    },
+    "seconds": 36.47,
+    "stretch": {
+     "best_ic": 1.516039603960396,
+     "flag": false,
+     "length": 101,
+     "null_max_ic": 1.6883168316831683,
+     "null_mean_ic": 1.5280990099009901,
+     "null_replicates": 20,
+     "start": 442,
+     "threshold": 1.796276871764479,
+     "top": [
+      {
+       "ic": 1.516039603960396,
+       "offset": 2457,
+       "scale": 11,
+       "sequence": "primes"
+      },
+      {
+       "ic": 1.516039603960396,
+       "offset": 2457,
+       "scale": 11,
+       "sequence": "prime_totients"
+      },
+      {
+       "ic": 1.5045544554455446,
+       "offset": 1231,
+       "scale": 19,
+       "sequence": "primes"
+      }
+     ],
+     "z_vs_bulk": 7.319291433457074
+    },
+    "top": [
+     {
+      "ic": 1.2017974401780747,
+      "offset": 204,
+      "scale": 8,
+      "sequence": "primes",
+      "treatment": "F literal, key advances"
+     },
+     {
+      "ic": 1.19259877573734,
+      "offset": 1705,
+      "scale": 14,
+      "sequence": "prime_totients",
+      "treatment": "F literal, key does not advance"
+     },
+     {
+      "ic": 1.1922760155815249,
+      "offset": 2539,
+      "scale": 21,
+      "sequence": "prime_totients",
+      "treatment": "F literal, key advances"
+     },
+     {
+      "ic": 1.1895325542570951,
+      "offset": 1610,
+      "scale": 4,
+      "sequence": "primes",
+      "treatment": "F literal, key advances"
+     },
+     {
+      "ic": 1.186627712854758,
+      "offset": 2827,
+      "scale": 15,
+      "sequence": "primes",
+      "treatment": "F literal, key does not advance"
+     }
+    ],
+    "window": 600,
+    "z_vs_bulk": 5.099278264628904
+   },
+   "20": {
+    "best_ic": 1.1353088480801337,
+    "bulk_mean": 1.0105062940825098,
+    "bulk_sd": 0.01664344102370605,
+    "candidates": 2016000,
+    "flag": false,
+    "null_max_ic": 1.133372287145242,
+    "null_replicates": 2,
+    "packets": {
+     "best_ic": 1.0256589566280143,
+     "best_packet": "exp1_feedback",
+     "evaluated": 15109,
+     "flag": false,
+     "note": "packet candidates scored by IC only; not run through the oracle or any ledger",
+     "null_max_ic": 1.061719532554257
+    },
+    "seconds": 35.26,
+    "stretch": {
+     "best_ic": 1.5984848484848484,
+     "flag": false,
+     "length": 88,
+     "null_max_ic": 1.7121212121212122,
+     "null_mean_ic": 1.6162878787878785,
+     "null_replicates": 20,
+     "start": 168,
+     "threshold": 1.8049611488143538,
+     "top": [
+      {
+       "ic": 1.5984848484848484,
+       "offset": 2114,
+       "scale": 10,
+       "sequence": "primes"
+      },
+      {
+       "ic": 1.5984848484848484,
+       "offset": 2114,
+       "scale": 10,
+       "sequence": "prime_totients"
+      },
+      {
+       "ic": 1.5909090909090908,
+       "offset": 1140,
+       "scale": 1,
+       "sequence": "e_digits"
+      }
+     ],
+     "z_vs_bulk": 6.869596920496709
+    },
+    "top": [
+     {
+      "ic": 1.1353088480801337,
+      "offset": 1650,
+      "scale": 12,
+      "sequence": "prime_totients",
+      "treatment": "F literal, key advances"
+     },
+     {
+      "ic": 1.1324040066777963,
+      "offset": 2171,
+      "scale": 4,
+      "sequence": "prime_totients",
+      "treatment": "F literal, key does not advance"
+     },
+     {
+      "ic": 1.121430161380078,
+      "offset": 2847,
+      "scale": 21,
+      "sequence": "primes",
+      "treatment": "F literal, key does not advance"
+     },
+     {
+      "ic": 1.1199777406789093,
+      "offset": 2926,
+      "scale": 21,
+      "sequence": "prime_totients",
+      "treatment": "F literal, key does not advance"
+     },
+     {
+      "ic": 1.118363939899833,
+      "offset": 1650,
+      "scale": 12,
+      "sequence": "primes",
+      "treatment": "F literal, key advances"
+     }
+    ],
+    "window": 600,
+    "z_vs_bulk": 7.498602832182456
+   },
+   "22": {
+    "best_ic": 1.2147078464106844,
+    "bulk_mean": 1.0305551589841093,
+    "bulk_sd": 0.028956056144742073,
+    "candidates": 2016000,
+    "flag": false,
+    "null_max_ic": 1.196956037840846,
+    "null_replicates": 2,
+    "packets": {
+     "best_ic": 1.024029281805341,
+     "best_packet": "exp1_feedback",
+     "evaluated": 15109,
+     "flag": false,
+     "note": "packet candidates scored by IC only; not run through the oracle or any ledger",
+     "null_max_ic": 1.0509070673344463
+    },
+    "seconds": 38.26,
+    "stretch": {
+     "best_ic": 1.432565551209619,
+     "flag": false,
+     "length": 118,
+     "null_max_ic": 1.5459944951470375,
+     "null_mean_ic": 1.4544111255975665,
+     "null_replicates": 20,
+     "start": 45,
+     "threshold": 1.5847591409987463,
+     "top": [
+      {
+       "ic": 1.432565551209619,
+       "offset": 2213,
+       "scale": 15,
+       "sequence": "primes"
+      },
+      {
+       "ic": 1.432565551209619,
+       "offset": 2213,
+       "scale": 15,
+       "sequence": "prime_totients"
+      },
+      {
+       "ic": 1.407359119223526,
+       "offset": 2735,
+       "scale": 3,
+       "sequence": "e_digits"
+      }
+     ],
+     "z_vs_bulk": 7.071368741216348
+    },
+    "top": [
+     {
+      "ic": 1.2147078464106844,
+      "offset": 130,
+      "scale": 11,
+      "sequence": "primes",
+      "treatment": "F literal, key does not advance"
+     },
+     {
+      "ic": 1.1872732331663884,
+      "offset": 196,
+      "scale": 16,
+      "sequence": "primes",
+      "treatment": "F literal, key does not advance"
+     },
+     {
+      "ic": 1.1813021702838062,
+      "offset": 1221,
+      "scale": 21,
+      "sequence": "primes",
+      "treatment": "F literal, key does not advance"
+     },
+     {
+      "ic": 1.1809794101279911,
+      "offset": 18,
+      "scale": 26,
+      "sequence": "primes",
+      "treatment": "F literal, key does not advance"
+     },
+     {
+      "ic": 1.1764607679465777,
+      "offset": 1346,
+      "scale": 14,
+      "sequence": "primes",
+      "treatment": "F literal, key advances"
+     }
+    ],
+    "window": 600,
+    "z_vs_bulk": 6.35972960219633
+   },
+   "24": {
+    "best_ic": 1.174582428624632,
+    "bulk_mean": 1.0218234151487515,
+    "bulk_sd": 0.024320711800787105,
+    "candidates": 2016000,
+    "flag": false,
+    "null_max_ic": 1.1925149847868401,
+    "null_replicates": 2,
+    "packets": {
+     "best_ic": 1.074934474495998,
+     "best_packet": "exp4_wordkeys_reversed",
+     "evaluated": 15109,
+     "flag": false,
+     "note": "packet candidates scored by IC only; not run through the oracle or any ledger",
+     "null_max_ic": 1.0563905811918965
+    },
+    "seconds": 31.09,
+    "stretch": {
+     "best_ic": 1.7245386192754615,
+     "flag": false,
+     "length": 77,
+     "null_max_ic": 1.9921394395078607,
+     "null_mean_ic": 1.7413875598086122,
+     "null_replicates": 20,
+     "start": 346,
+     "threshold": 2.093662254777983,
+     "top": [
+      {
+       "ic": 1.7245386192754615,
+       "offset": 2792,
+       "scale": 17,
+       "sequence": "e_digits"
+      },
+      {
+       "ic": 1.684894053315106,
+       "offset": 2081,
+       "scale": 7,
+       "sequence": "primes"
+      },
+      {
+       "ic": 1.684894053315106,
+       "offset": 2081,
+       "scale": 7,
+       "sequence": "prime_totients"
+      }
+     ],
+     "z_vs_bulk": 7.390978408484932
+    },
+    "top": [
+     {
+      "ic": 1.174582428624632,
+      "offset": 362,
+      "scale": 10,
+      "sequence": "prime_totients",
+      "treatment": "F literal, key advances"
+     },
+     {
+      "ic": 1.168876615300293,
+      "offset": 303,
+      "scale": 4,
+      "sequence": "primes",
+      "treatment": "F literal, key does not advance"
+     },
+     {
+      "ic": 1.1678577200638038,
+      "offset": 648,
+      "scale": 17,
+      "sequence": "primes",
+      "treatment": "F literal, key does not advance"
+     },
+     {
+      "ic": 1.1656161505435279,
+      "offset": 2182,
+      "scale": 18,
+      "sequence": "primes",
+      "treatment": "F literal, key advances"
+     },
+     {
+      "ic": 1.1595027791245933,
+      "offset": 968,
+      "scale": 12,
+      "sequence": "pi_digits",
+      "treatment": "F literal, key does not advance"
+     }
+    ],
+    "window": 534,
+    "z_vs_bulk": 6.281025601846763
+   },
+   "25": {
+    "best_ic": 1.2040906975760397,
+    "bulk_mean": 1.0062872180557147,
+    "bulk_sd": 0.026363120718067876,
+    "candidates": 2016000,
+    "flag": false,
+    "null_max_ic": 1.2047040906975761,
+    "null_replicates": 2,
+    "packets": {
+     "best_ic": 1.1268031642624476,
+     "best_packet": "exp3_progressive",
+     "evaluated": 15109,
+     "flag": false,
+     "note": "packet candidates scored by IC only; not run through the oracle or any ledger",
+     "null_max_ic": 1.0912263632133339
+    },
+    "seconds": 26.48,
+    "stretch": {
+     "best_ic": 1.359375,
+     "flag": false,
+     "length": 129,
+     "null_max_ic": 1.4928536821705427,
+     "null_mean_ic": 1.4168059593023254,
+     "null_replicates": 20,
+     "start": 66,
+     "threshold": 1.560402020373069,
+     "top": [
+      {
+       "ic": 1.359375,
+       "offset": 2403,
+       "scale": 8,
+       "sequence": "primes"
+      },
+      {
+       "ic": 1.359375,
+       "offset": 2403,
+       "scale": 8,
+       "sequence": "prime_totients"
+      },
+      {
+       "ic": 1.355862403100775,
+       "offset": 1197,
+       "scale": 19,
+       "sequence": "primes"
+      }
+     ],
+     "z_vs_bulk": 6.239005577667295
+    },
+    "top": [
+     {
+      "ic": 1.2040906975760397,
+      "offset": 629,
+      "scale": 13,
+      "sequence": "prime_totients",
+      "treatment": "F literal, key advances"
+     },
+     {
+      "ic": 1.194889800752993,
+      "offset": 1015,
+      "scale": 2,
+      "sequence": "pi_digits",
+      "treatment": "F literal, key does not advance"
+     },
+     {
+      "ic": 1.1899826557807014,
+      "offset": 26,
+      "scale": 12,
+      "sequence": "squares",
+      "treatment": "F literal, key advances"
+     },
+     {
+      "ic": 1.189369262659165,
+      "offset": 1585,
+      "scale": 19,
+      "sequence": "primes",
+      "treatment": "F literal, key does not advance"
+     },
+     {
+      "ic": 1.1875290832945555,
+      "offset": 699,
+      "scale": 21,
+      "sequence": "primes",
+      "treatment": "F literal, key does not advance"
+     }
+    ],
+    "window": 308,
+    "z_vs_bulk": 7.503037354176397
+   }
+  }
+ },
+ "bytes": {
+  "complete": true,
+  "controls": [
+   {
+    "bytes": {
+     "5-bit packing": 1570,
+     "base 29, digits least significant first": 1526,
+     "base 29, digits most significant first": 1525,
+     "one byte per rune": 2512,
+     "two runes to one byte": 1256
+    },
+    "case": "zlib-compressed text written in base 29",
+    "complete": true,
+    "hits": {
+     "5-bit packing": [],
+     "base 29, digits least significant first": [],
+     "base 29, digits most significant first": [
+      {
+       "kind": "valid zlib stream",
+       "offset": 0
+      }
+     ],
+     "one byte per rune": [],
+     "two runes to one byte": []
+    },
+    "max_abs_z": 2.1411222342810246,
+    "p_max_over_stats": 0.43,
+    "rune_index_bytes": {
+     "entropy": 4.8513368013078795,
+     "longest printable run": 3.0,
+     "lzma ratio": 0.6671974522292994,
+     "printable fraction": 0.07484076433121019,
+     "zlib ratio": 0.6345541401273885
+    },
+    "runes": 2512,
+    "seconds": 1.26,
+    "shuffles": 99,
+    "stats_tested": 25,
+    "top": [
+     {
+      "stat": "5-bit packing: entropy",
+      "z": 2.1411222342810246
+     },
+     {
+      "stat": "base 29, digits most significant first: lzma ratio",
+      "z": 1.9340985212533357
+     },
+     {
+      "stat": "two runes to one byte: printable fraction",
+      "z": -1.2976883400141714
+     },
+     {
+      "stat": "two runes to one byte: longest printable run",
+      "z": 1.25424623913289
+     }
+    ]
+   },
+   {
+    "bytes": {
+     "5-bit packing": 412,
+     "base 29, digits least significant first": 401,
+     "base 29, digits most significant first": 400,
+     "one byte per rune": 659,
+     "two runes to one byte": 329
+    },
+    "case": "random bytes written in base 29",
+    "complete": true,
+    "hits": {
+     "5-bit packing": [],
+     "base 29, digits least significant first": [],
+     "base 29, digits most significant first": [],
+     "one byte per rune": [],
+     "two runes to one byte": []
+    },
+    "max_abs_z": 2.5310723863821685,
+    "p_max_over_stats": 0.22,
+    "rune_index_bytes": {
+     "entropy": 4.838421170075237,
+     "longest printable run": 2.0,
+     "lzma ratio": 0.7890743550834598,
+     "printable fraction": 0.06069802731411229,
+     "zlib ratio": 0.6570561456752656
+    },
+    "runes": 659,
+    "seconds": 0.58,
+    "shuffles": 99,
+    "stats_tested": 25,
+    "top": [
+     {
+      "stat": "one byte per rune: lzma ratio",
+      "z": 2.5310723863821685
+     },
+     {
+      "stat": "base 29, digits most significant first: lzma ratio",
+      "z": -1.4396530867660287
+     },
+     {
+      "stat": "5-bit packing: entropy",
+      "z": -1.3833144215513222
+     },
+     {
+      "stat": "5-bit packing: longest printable run",
+      "z": 1.3223396835798102
+     }
+    ]
+   },
+   {
+    "bytes": {
+     "5-bit packing": 375,
+     "base 29, digits least significant first": 365,
+     "base 29, digits most significant first": 365,
+     "one byte per rune": 600,
+     "two runes to one byte": 300
+    },
+    "case": "uniform random runes",
+    "complete": true,
+    "hits": {
+     "5-bit packing": [],
+     "base 29, digits least significant first": [],
+     "base 29, digits most significant first": [],
+     "one byte per rune": [],
+     "two runes to one byte": []
+    },
+    "max_abs_z": 3.178076508545016,
+    "p_max_over_stats": 0.1,
+    "rune_index_bytes": {
+     "entropy": 4.827458185155138,
+     "longest printable run": 3.0,
+     "lzma ratio": 0.8066666666666666,
+     "printable fraction": 0.055,
+     "zlib ratio": 0.6583333333333333
+    },
+    "runes": 600,
+    "seconds": 0.56,
+    "shuffles": 99,
+    "stats_tested": 25,
+    "top": [
+     {
+      "stat": "two runes to one byte: longest printable run",
+      "z": 3.178076508545016
+     },
+     {
+      "stat": "one byte per rune: lzma ratio",
+      "z": 2.8143651981887463
+     },
+     {
+      "stat": "one byte per rune: longest printable run",
+      "z": 2.2626262626262625
+     },
+     {
+      "stat": "base 29, digits most significant first: entropy",
+      "z": -1.9218167292198511
+     }
+    ]
+   },
+   {
+    "bytes": {
+     "5-bit packing": 375,
+     "base 29, digits least significant first": 365,
+     "base 29, digits most significant first": 364,
+     "one byte per rune": 600,
+     "two runes to one byte": 300
+    },
+    "case": "English plaintext runes",
+    "complete": true,
+    "hits": {
+     "5-bit packing": [],
+     "base 29, digits least significant first": [],
+     "base 29, digits most significant first": [],
+     "one byte per rune": [],
+     "two runes to one byte": []
+    },
+    "max_abs_z": 15.112483687763662,
+    "p_max_over_stats": 0.01,
+    "rune_index_bytes": {
+     "entropy": 4.342043466025257,
+     "longest printable run": 2.0,
+     "lzma ratio": 0.74,
+     "printable fraction": 0.13166666666666665,
+     "zlib ratio": 0.58
+    },
+    "runes": 600,
+    "seconds": 0.56,
+    "shuffles": 99,
+    "stats_tested": 25,
+    "top": [
+     {
+      "stat": "one byte per rune: zlib ratio",
+      "z": -15.112483687763662
+     },
+     {
+      "stat": "two runes to one byte: entropy",
+      "z": -5.818733294146634
+     },
+     {
+      "stat": "one byte per rune: lzma ratio",
+      "z": -2.8311580249782677
+     },
+     {
+      "stat": "base 29, digits most significant first: lzma ratio",
+      "z": -2.451550735871773
+     }
+    ]
+   }
+  ],
+  "references": {
+   "27": {
+    "bytes": {
+     "5-bit packing": 59,
+     "base 29, digits least significant first": 57,
+     "base 29, digits most significant first": 57,
+     "one byte per rune": 94,
+     "two runes to one byte": 47
+    },
+    "complete": true,
+    "hits": {
+     "5-bit packing": [],
+     "base 29, digits least significant first": [],
+     "base 29, digits most significant first": [],
+     "one byte per rune": [],
+     "two runes to one byte": []
+    },
+    "max_abs_z": 2.9407293913447976,
+    "p_max_over_stats": 0.18,
+    "rune_index_bytes": {
+     "entropy": 4.032926427982062,
+     "longest printable run": 3.0,
+     "lzma ratio": 1.4893617021276595,
+     "printable fraction": 0.19148936170212766,
+     "zlib ratio": 0.8085106382978723
+    },
+    "runes": 94,
+    "seconds": 0.38,
+    "shuffles": 99,
+    "stats_tested": 25,
+    "top": [
+     {
+      "stat": "base 29, digits most significant first: longest printable run",
+      "z": 2.9407293913447976
+     },
+     {
+      "stat": "5-bit packing: printable fraction",
+      "z": 1.5535221319537738
+     },
+     {
+      "stat": "two runes to one byte: zlib ratio",
+      "z": -1.234067065811541
+     },
+     {
+      "stat": "base 29, digits most significant first: printable fraction",
+      "z": 1.219840760970506
+     }
+    ]
+   },
+   "3": {
+    "bytes": {
+     "5-bit packing": 99,
+     "base 29, digits least significant first": 96,
+     "base 29, digits most significant first": 96,
+     "one byte per rune": 157,
+     "two runes to one byte": 78
+    },
+    "complete": true,
+    "hits": {
+     "5-bit packing": [],
+     "base 29, digits least significant first": [],
+     "base 29, digits most significant first": [],
+     "one byte per rune": [],
+     "two runes to one byte": []
+    },
+    "max_abs_z": 2.7777976819904917,
+    "p_max_over_stats": 0.12,
+    "rune_index_bytes": {
+     "entropy": 4.285622257612364,
+     "longest printable run": 2.0,
+     "lzma ratio": 1.197452229299363,
+     "printable fraction": 0.10191082802547771,
+     "zlib ratio": 0.7261146496815286
+    },
+    "runes": 157,
+    "seconds": 0.4,
+    "shuffles": 99,
+    "stats_tested": 25,
+    "top": [
+     {
+      "stat": "one byte per rune: zlib ratio",
+      "z": -2.7777976819904917
+     },
+     {
+      "stat": "two runes to one byte: printable fraction",
+      "z": -1.6545701127637058
+     },
+     {
+      "stat": "two runes to one byte: entropy",
+      "z": -1.4501738417642704
+     },
+     {
+      "stat": "5-bit packing: entropy",
+      "z": -1.3466394317077985
+     }
+    ]
+   },
+   "7": {
+    "bytes": {
+     "5-bit packing": 394,
+     "base 29, digits least significant first": 382,
+     "base 29, digits most significant first": 382,
+     "one byte per rune": 629,
+     "two runes to one byte": 314
+    },
+    "complete": true,
+    "hits": {
+     "5-bit packing": [],
+     "base 29, digits least significant first": [],
+     "base 29, digits most significant first": [],
+     "one byte per rune": [],
+     "two runes to one byte": []
+    },
+    "max_abs_z": 58.00000000000006,
+    "p_max_over_stats": 0.01,
+    "rune_index_bytes": {
+     "entropy": 4.231393016660761,
+     "longest printable run": 3.0,
+     "lzma ratio": 0.6359300476947536,
+     "printable fraction": 0.1192368839427663,
+     "zlib ratio": 0.4864864864864865
+    },
+    "runes": 629,
+    "seconds": 0.57,
+    "shuffles": 99,
+    "stats_tested": 25,
+    "top": [
+     {
+      "stat": "two runes to one byte: zlib ratio",
+      "z": -58.00000000000006
+     },
+     {
+      "stat": "one byte per rune: zlib ratio",
+      "z": -51.10557701981713
+     },
+     {
+      "stat": "two runes to one byte: lzma ratio",
+      "z": -31.999999999999993
+     },
+     {
+      "stat": "5-bit packing: zlib ratio",
+      "z": -16.000000000000224
+     }
+    ]
+   },
+   "9": {
+    "bytes": {
+     "5-bit packing": 56,
+     "base 29, digits least significant first": 54,
+     "base 29, digits most significant first": 55,
+     "one byte per rune": 89,
+     "two runes to one byte": 44
+    },
+    "complete": true,
+    "hits": {
+     "5-bit packing": [],
+     "base 29, digits least significant first": [],
+     "base 29, digits most significant first": [],
+     "one byte per rune": [],
+     "two runes to one byte": []
+    },
+    "max_abs_z": 5.110610389962604,
+    "p_max_over_stats": 0.01,
+    "rune_index_bytes": {
+     "entropy": 4.05535861203828,
+     "longest printable run": 3.0,
+     "lzma ratio": 1.5280898876404494,
+     "printable fraction": 0.15730337078651685,
+     "zlib ratio": 0.8426966292134831
+    },
+    "runes": 89,
+    "seconds": 0.4,
+    "shuffles": 99,
+    "stats_tested": 25,
+    "top": [
+     {
+      "stat": "base 29, digits most significant first: longest printable run",
+      "z": 5.110610389962604
+     },
+     {
+      "stat": "base 29, digits most significant first: lzma ratio",
+      "z": -3.6069517615046736
+     },
+     {
+      "stat": "two runes to one byte: entropy",
+      "z": -2.1661131711339867
+     },
+     {
+      "stat": "two runes to one byte: zlib ratio",
+      "z": -1.6893069671634127
+     }
+    ]
+   }
+  },
+  "seconds": 13.09,
+  "sections": {
+   "10": {
+    "bytes": {
+     "5-bit packing": 456,
+     "base 29, digits least significant first": 443,
+     "base 29, digits most significant first": 443,
+     "one byte per rune": 729,
+     "two runes to one byte": 364
+    },
+    "complete": true,
+    "hits": {
+     "5-bit packing": [],
+     "base 29, digits least significant first": [],
+     "base 29, digits most significant first": [],
+     "one byte per rune": [],
+     "two runes to one byte": []
+    },
+    "max_abs_z": 1.8621533696280554,
+    "p_max_over_stats": 0.64,
+    "rune_index_bytes": {
+     "entropy": 4.838433636741839,
+     "longest printable run": 2.0,
+     "lzma ratio": 0.757201646090535,
+     "printable fraction": 0.07133058984910837,
+     "zlib ratio": 0.6529492455418381
+    },
+    "runes": 729,
+    "seconds": 0.63,
+    "shuffles": 99,
+    "stats_tested": 25,
+    "top": [
+     {
+      "stat": "one byte per rune: lzma ratio",
+      "z": -1.8621533696280554
+     },
+     {
+      "stat": "two runes to one byte: longest printable run",
+      "z": -1.2420642342330839
+     },
+     {
+      "stat": "5-bit packing: longest printable run",
+      "z": 0.9653805004395901
+     },
+     {
+      "stat": "5-bit packing: entropy",
+      "z": 0.8221611173897164
+     }
+    ]
+   },
+   "12": {
+    "bytes": {
+     "5-bit packing": 434,
+     "base 29, digits least significant first": 421,
+     "base 29, digits most significant first": 421,
+     "one byte per rune": 693,
+     "two runes to one byte": 346
+    },
+    "complete": true,
+    "hits": {
+     "5-bit packing": [],
+     "base 29, digits least significant first": [],
+     "base 29, digits most significant first": [],
+     "one byte per rune": [],
+     "two runes to one byte": []
+    },
+    "max_abs_z": 2.48474625398096,
+    "p_max_over_stats": 0.26,
+    "rune_index_bytes": {
+     "entropy": 4.828533741079548,
+     "longest printable run": 1.0,
+     "lzma ratio": 0.7676767676767676,
+     "printable fraction": 0.06060606060606061,
+     "zlib ratio": 0.6551226551226551
+    },
+    "runes": 693,
+    "seconds": 0.6,
+    "shuffles": 99,
+    "stats_tested": 25,
+    "top": [
+     {
+      "stat": "base 29, digits least significant first: entropy",
+      "z": -2.48474625398096
+     },
+     {
+      "stat": "one byte per rune: longest printable run",
+      "z": -2.1616161616161618
+     },
+     {
+      "stat": "5-bit packing: entropy",
+      "z": -1.744593059920766
+     },
+     {
+      "stat": "base 29, digits most significant first: entropy",
+      "z": 1.6268642866653988
+     }
+    ]
+   },
+   "13": {
+    "bytes": {
+     "5-bit packing": 209,
+     "base 29, digits least significant first": 203,
+     "base 29, digits most significant first": 203,
+     "one byte per rune": 333,
+     "two runes to one byte": 166
+    },
+    "complete": true,
+    "hits": {
+     "5-bit packing": [],
+     "base 29, digits least significant first": [],
+     "base 29, digits most significant first": [],
+     "one byte per rune": [],
+     "two runes to one byte": []
+    },
+    "max_abs_z": 2.0470136498769147,
+    "p_max_over_stats": 0.35,
+    "rune_index_bytes": {
+     "entropy": 4.798647025624591,
+     "longest printable run": 2.0,
+     "lzma ratio": 0.9129129129129129,
+     "printable fraction": 0.08108108108108109,
+     "zlib ratio": 0.6936936936936937
+    },
+    "runes": 333,
+    "seconds": 0.47,
+    "shuffles": 99,
+    "stats_tested": 25,
+    "top": [
+     {
+      "stat": "base 29, digits least significant first: printable fraction",
+      "z": -2.0470136498769147
+     },
+     {
+      "stat": "two runes to one byte: printable fraction",
+      "z": 1.6380282143278102
+     },
+     {
+      "stat": "5-bit packing: longest printable run",
+      "z": -1.3231103448829933
+     },
+     {
+      "stat": "one byte per rune: lzma ratio",
+      "z": -1.0032300403857943
+     }
+    ]
+   },
+   "14": {
+    "bytes": {
+     "5-bit packing": 1081,
+     "base 29, digits least significant first": 1050,
+     "base 29, digits most significant first": 1050,
+     "one byte per rune": 1729,
+     "two runes to one byte": 864
+    },
+    "complete": true,
+    "hits": {
+     "5-bit packing": [],
+     "base 29, digits least significant first": [],
+     "base 29, digits most significant first": [],
+     "one byte per rune": [],
+     "two runes to one byte": []
+    },
+    "max_abs_z": 1.529895422552257,
+    "p_max_over_stats": 0.9,
+    "rune_index_bytes": {
+     "entropy": 4.846775808661904,
+     "longest printable run": 2.0,
+     "lzma ratio": 0.6847888953152111,
+     "printable fraction": 0.06882591093117409,
+     "zlib ratio": 0.6367842683632158
+    },
+    "runes": 1729,
+    "seconds": 0.97,
+    "shuffles": 99,
+    "stats_tested": 25,
+    "top": [
+     {
+      "stat": "5-bit packing: longest printable run",
+      "z": 1.529895422552257
+     },
+     {
+      "stat": "two runes to one byte: longest printable run",
+      "z": -1.4483384548270466
+     },
+     {
+      "stat": "two runes to one byte: printable fraction",
+      "z": -1.280728142913331
+     },
+     {
+      "stat": "5-bit packing: entropy",
+      "z": 0.9831403672847093
+     }
+    ]
+   },
+   "16": {
+    "bytes": {
+     "5-bit packing": 1184,
+     "base 29, digits least significant first": 1150,
+     "base 29, digits most significant first": 1151,
+     "one byte per rune": 1894,
+     "two runes to one byte": 947
+    },
+    "complete": true,
+    "hits": {
+     "5-bit packing": [],
+     "base 29, digits least significant first": [],
+     "base 29, digits most significant first": [],
+     "one byte per rune": [],
+     "two runes to one byte": []
+    },
+    "max_abs_z": 1.9851672046213178,
+    "p_max_over_stats": 0.52,
+    "rune_index_bytes": {
+     "entropy": 4.846837887186454,
+     "longest printable run": 2.0,
+     "lzma ratio": 0.6800422386483632,
+     "printable fraction": 0.06863780359028511,
+     "zlib ratio": 0.6372756071805702
+    },
+    "runes": 1894,
+    "seconds": 1.02,
+    "shuffles": 99,
+    "stats_tested": 25,
+    "top": [
+     {
+      "stat": "5-bit packing: longest printable run",
+      "z": 1.9851672046213178
+     },
+     {
+      "stat": "one byte per rune: zlib ratio",
+      "z": 1.3596012813840472
+     },
+     {
+      "stat": "base 29, digits least significant first: entropy",
+      "z": -1.3522130658758529
+     },
+     {
+      "stat": "two runes to one byte: entropy",
+      "z": -1.2619089738559253
+     }
+    ]
+   },
+   "17": {
+    "bytes": {
+     "5-bit packing": 639,
+     "base 29, digits least significant first": 620,
+     "base 29, digits most significant first": 620,
+     "one byte per rune": 1021,
+     "two runes to one byte": 510
+    },
+    "complete": true,
+    "hits": {
+     "5-bit packing": [],
+     "base 29, digits least significant first": [],
+     "base 29, digits most significant first": [],
+     "one byte per rune": [],
+     "two runes to one byte": []
+    },
+    "max_abs_z": 1.5856059668001437,
+    "p_max_over_stats": 0.81,
+    "rune_index_bytes": {
+     "entropy": 4.841366776961391,
+     "longest printable run": 2.0,
+     "lzma ratio": 0.7208619000979432,
+     "printable fraction": 0.07247796278158668,
+     "zlib ratio": 0.6444662095984329
+    },
+    "runes": 1021,
+    "seconds": 0.71,
+    "shuffles": 99,
+    "stats_tested": 25,
+    "top": [
+     {
+      "stat": "two runes to one byte: printable fraction",
+      "z": -1.5856059668001437
+     },
+     {
+      "stat": "one byte per rune: lzma ratio",
+      "z": -1.5447755224561148
+     },
+     {
+      "stat": "two runes to one byte: entropy",
+      "z": -1.466225596471436
+     },
+     {
+      "stat": "5-bit packing: entropy",
+      "z": 1.2433118449847307
+     }
+    ]
+   },
+   "18": {
+    "bytes": {
+     "5-bit packing": 896,
+     "base 29, digits least significant first": 871,
+     "base 29, digits most significant first": 871,
+     "one byte per rune": 1433,
+     "two runes to one byte": 716
+    },
+    "complete": true,
+    "hits": {
+     "5-bit packing": [],
+     "base 29, digits least significant first": [],
+     "base 29, digits most significant first": [],
+     "one byte per rune": [],
+     "two runes to one byte": []
+    },
+    "max_abs_z": 2.080605209951006,
+    "p_max_over_stats": 0.42,
+    "rune_index_bytes": {
+     "entropy": 4.850103465758767,
+     "longest printable run": 2.0,
+     "lzma ratio": 0.6978367062107467,
+     "printable fraction": 0.06699232379623168,
+     "zlib ratio": 0.6378227494766224
+    },
+    "runes": 1433,
+    "seconds": 0.86,
+    "shuffles": 99,
+    "stats_tested": 25,
+    "top": [
+     {
+      "stat": "two runes to one byte: longest printable run",
+      "z": 2.080605209951006
+     },
+     {
+      "stat": "two runes to one byte: entropy",
+      "z": -1.0510764747290833
+     },
+     {
+      "stat": "base 29, digits most significant first: printable fraction",
+      "z": 1.0453734082234227
+     },
+     {
+      "stat": "5-bit packing: entropy",
+      "z": 0.9983185250387553
+     }
+    ]
+   },
+   "20": {
+    "bytes": {
+     "5-bit packing": 918,
+     "base 29, digits least significant first": 892,
+     "base 29, digits most significant first": 892,
+     "one byte per rune": 1468,
+     "two runes to one byte": 734
+    },
+    "complete": true,
+    "hits": {
+     "5-bit packing": [],
+     "base 29, digits least significant first": [],
+     "base 29, digits most significant first": [],
+     "one byte per rune": [],
+     "two runes to one byte": []
+    },
+    "max_abs_z": 1.8984607882717868,
+    "p_max_over_stats": 0.64,
+    "rune_index_bytes": {
+     "entropy": 4.847597394325612,
+     "longest printable run": 2.0,
+     "lzma ratio": 0.6948228882833788,
+     "printable fraction": 0.07561307901907358,
+     "zlib ratio": 0.638283378746594
+    },
+    "runes": 1468,
+    "seconds": 0.87,
+    "shuffles": 99,
+    "stats_tested": 25,
+    "top": [
+     {
+      "stat": "base 29, digits least significant first: entropy",
+      "z": -1.8984607882717868
+     },
+     {
+      "stat": "base 29, digits most significant first: longest printable run",
+      "z": -1.15893800210518
+     },
+     {
+      "stat": "two runes to one byte: longest printable run",
+      "z": 1.0736324144844953
+     },
+     {
+      "stat": "5-bit packing: printable fraction",
+      "z": 1.071622316954574
+     }
+    ]
+   },
+   "22": {
+    "bytes": {
+     "5-bit packing": 1547,
+     "base 29, digits least significant first": 1503,
+     "base 29, digits most significant first": 1502,
+     "one byte per rune": 2474,
+     "two runes to one byte": 1237
+    },
+    "complete": true,
+    "hits": {
+     "5-bit packing": [],
+     "base 29, digits least significant first": [],
+     "base 29, digits most significant first": [],
+     "one byte per rune": [],
+     "two runes to one byte": []
+    },
+    "max_abs_z": 2.3895912666180634,
+    "p_max_over_stats": 0.31,
+    "rune_index_bytes": {
+     "entropy": 4.846520684650515,
+     "longest printable run": 2.0,
+     "lzma ratio": 0.6677445432497979,
+     "printable fraction": 0.07639450282942603,
+     "zlib ratio": 0.6337914308811641
+    },
+    "runes": 2474,
+    "seconds": 1.25,
+    "shuffles": 99,
+    "stats_tested": 25,
+    "top": [
+     {
+      "stat": "5-bit packing: printable fraction",
+      "z": 2.3895912666180634
+     },
+     {
+      "stat": "two runes to one byte: longest printable run",
+      "z": 2.298796534746429
+     },
+     {
+      "stat": "base 29, digits most significant first: printable fraction",
+      "z": 1.7736627745421116
+     },
+     {
+      "stat": "base 29, digits most significant first: lzma ratio",
+      "z": 1.7237981948565035
+     }
+    ]
+   },
+   "24": {
+    "bytes": {
+     "5-bit packing": 334,
+     "base 29, digits least significant first": 325,
+     "base 29, digits most significant first": 325,
+     "one byte per rune": 534,
+     "two runes to one byte": 267
+    },
+    "complete": true,
+    "hits": {
+     "5-bit packing": [],
+     "base 29, digits least significant first": [],
+     "base 29, digits most significant first": [],
+     "one byte per rune": [],
+     "two runes to one byte": []
+    },
+    "max_abs_z": 2.125608420523611,
+    "p_max_over_stats": 0.43,
+    "rune_index_bytes": {
+     "entropy": 4.83969187874829,
+     "longest printable run": 2.0,
+     "lzma ratio": 0.8164794007490637,
+     "printable fraction": 0.05805243445692884,
+     "zlib ratio": 0.6685393258426966
+    },
+    "runes": 534,
+    "seconds": 0.54,
+    "shuffles": 99,
+    "stats_tested": 25,
+    "top": [
+     {
+      "stat": "one byte per rune: zlib ratio",
+      "z": 2.125608420523611
+     },
+     {
+      "stat": "two runes to one byte: entropy",
+      "z": -1.6012391214247828
+     },
+     {
+      "stat": "5-bit packing: longest printable run",
+      "z": 1.576311864885426
+     },
+     {
+      "stat": "5-bit packing: entropy",
+      "z": -1.3666617652362516
+     }
+    ]
+   },
+   "25": {
+    "bytes": {
+     "5-bit packing": 193,
+     "base 29, digits least significant first": 187,
+     "base 29, digits most significant first": 188,
+     "one byte per rune": 308,
+     "two runes to one byte": 154
+    },
+    "complete": true,
+    "hits": {
+     "5-bit packing": [],
+     "base 29, digits least significant first": [],
+     "base 29, digits most significant first": [],
+     "one byte per rune": [],
+     "two runes to one byte": []
+    },
+    "max_abs_z": 2.3041106249661443,
+    "p_max_over_stats": 0.51,
+    "rune_index_bytes": {
+     "entropy": 4.80402542283287,
+     "longest printable run": 1.0,
+     "lzma ratio": 0.935064935064935,
+     "printable fraction": 0.05194805194805195,
+     "zlib ratio": 0.698051948051948
+    },
+    "runes": 308,
+    "seconds": 0.46,
+    "shuffles": 99,
+    "stats_tested": 25,
+    "top": [
+     {
+      "stat": "base 29, digits most significant first: lzma ratio",
+      "z": -2.3041106249661443
+     },
+     {
+      "stat": "base 29, digits most significant first: entropy",
+      "z": -1.401763652433531
+     },
+     {
+      "stat": "5-bit packing: entropy",
+      "z": -1.3671101513625126
+     },
+     {
+      "stat": "5-bit packing: printable fraction",
+      "z": -1.2403804491087334
+     }
+    ]
+   }
+  }
+ },
+ "label": "EXPLORATORY: fixed readings and sweeps, no language model; a flag is a lead to inspect, not a result",
+ "numbers": {
+  "controls": {
+   "words from random runes": {
+    "complete": true,
+    "lines": 40,
+    "max_abs_z": 1.393201251268376,
+    "p_max_over_readings": 0.86,
+    "readings_tested": 15,
+    "seconds": 0.34,
+    "shuffles": 99,
+    "top": [
+     {
+      "observed": 0.09,
+      "reading": "W3 decimal concatenation of indexes: fraction prime",
+      "shuffle_mean": 0.07292929292929294,
+      "z": 1.393201251268376
+     },
+     {
+      "observed": 0.05,
+      "reading": "W5 sum of indexes: fraction square",
+      "shuffle_mean": 0.06795454545454545,
+      "z": -1.3856211628838606
+     },
+     {
+      "observed": 0.0525,
+      "reading": "W5 sum of indexes: fraction Fibonacci",
+      "shuffle_mean": 0.04085858585858586,
+      "z": 1.1783849383956024
+     },
+     {
+      "observed": 0.025,
+      "reading": "W4 sum of Gematria prime values: fraction prime",
+      "shuffle_mean": 0.03227272727272728,
+      "z": -1.0310326501479357
+     },
+     {
+      "observed": 0.0875,
+      "reading": "W2 base 29, least significant first: fraction prime",
+      "shuffle_mean": 0.07752525252525252,
+      "z": 0.7904356985452964
+     },
+     {
+      "observed": 0.0,
+      "reading": "W3 decimal concatenation of indexes: fraction square",
+      "shuffle_mean": 0.0011616161616161617,
+      "z": -0.7401066908674051
+     }
+    ],
+    "words": 400
+   },
+   "words that are primes written in base 29": {
+    "complete": true,
+    "lines": 40,
+    "max_abs_z": 68.17888844803556,
+    "p_max_over_readings": 0.01,
+    "readings_tested": 15,
+    "seconds": 0.34,
+    "shuffles": 99,
+    "top": [
+     {
+      "observed": 1.0,
+      "reading": "W1 base 29, most significant first: fraction prime",
+      "shuffle_mean": 0.08146464646464648,
+      "z": 68.17888844803556
+     },
+     {
+      "observed": 0.3725,
+      "reading": "W2 base 29, least significant first: fraction prime",
+      "shuffle_mean": 0.07997474747474746,
+      "z": 23.37822517243353
+     },
+     {
+      "observed": 0.535,
+      "reading": "W5 sum of indexes: fraction prime",
+      "shuffle_mean": 0.23108585858585856,
+      "z": 15.08745796820362
+     },
+     {
+      "observed": 0.0325,
+      "reading": "W5 sum of indexes: fraction square",
+      "shuffle_mean": 0.06593434343434344,
+      "z": -2.804103672624091
+     },
+     {
+      "observed": 0.06,
+      "reading": "W5 sum of indexes: fraction Fibonacci",
+      "shuffle_mean": 0.041010101010101004,
+      "z": 1.9003002103196314
+     },
+     {
+      "observed": 0.03,
+      "reading": "W4 sum of Gematria prime values: fraction prime",
+      "shuffle_mean": 0.02083333333333333,
+      "z": 1.4325736352772562
+     }
+    ],
+    "words": 400
+   }
+  },
+  "seconds": 12.05,
+  "sequence_controls": {
+   "cubic polynomial in position": {
+    "finite_differences": {
+     "flag": true,
+     "ic_by_order": [
+      1.9198831943986912,
+      0.9536534399982073,
+      29.0,
+      29.0,
+      29.0,
+      29.0,
+      29.0,
+      29.0
+     ],
+     "null_max_ic": 1.0871296084332305
+    },
+    "recurrence_order_2": {
+     "best_ic": 2.0148568931614594,
+     "coefficients": [
+      6,
+      2
+     ],
+     "flag": true,
+     "null_max_ic": 1.9263149638941643
+    },
+    "recurrence_order_3": {
+     "best_ic": 29.0,
+     "coefficients": [
+      3,
+      26,
+      1
+     ],
+     "flag": true,
+     "null_max_ic": 1.9265848256944678
+    },
+    "seconds": 0.34,
+    "window": 600
+   },
+   "second-order recurrence (3, 5)": {
+    "finite_differences": {
+     "flag": false,
+     "ic_by_order": [
+      0.9538696043014835,
+      0.9538159022537437,
+      0.9539194855710319,
+      0.954018385877841,
+      0.9542766601590131,
+      0.9542019407112156,
+      0.9539560639897908,
+      0.9537030685507842
+     ],
+     "null_max_ic": 1.020411396881985
+    },
+    "recurrence_order_2": {
+     "best_ic": 29.0,
+     "coefficients": [
+      3,
+      5
+     ],
+     "flag": true,
+     "null_max_ic": 1.060066217374498
+    },
+    "recurrence_order_3": {
+     "best_ic": 29.0,
+     "coefficients": [
+      0,
+      14,
+      15
+     ],
+     "flag": true,
+     "null_max_ic": 1.076664081031556
+    },
+    "seconds": 0.34,
+    "window": 600
+   },
+   "uniform random runes": {
+    "finite_differences": {
+     "flag": false,
+     "ic_by_order": [
+      1.0286765568031446,
+      1.0054788995142938,
+      0.9925522466920733,
+      0.9834583497828662,
+      0.9961237020060549,
+      1.008374924057892,
+      0.9813818877899823,
+      0.9913339735674761
+     ],
+     "null_max_ic": 1.0200423863998906
+    },
+    "recurrence_order_2": {
+     "best_ic": 1.0644526982739786,
+     "coefficients": [
+      0,
+      26
+     ],
+     "flag": false,
+     "null_max_ic": 1.0469067746760559
+    },
+    "recurrence_order_3": {
+     "best_ic": 1.073240924982856,
+     "coefficients": [
+      0,
+      26,
+      24
+     ],
+     "flag": false,
+     "null_max_ic": 1.07112182838128
+    },
+    "seconds": 0.34,
+    "window": 600
+   }
+  },
+  "sequence_fits": {
+   "10": {
+    "finite_differences": {
+     "flag": false,
+     "ic_by_order": [
+      1.0231712832424162,
+      1.0144143235687915,
+      0.9993985587894731,
+      1.0035756584513,
+      0.9989135047958577,
+      0.9902623764343832,
+      0.9947643680780275,
+      0.9873553756802488
+     ],
+     "null_max_ic": 1.0387836618992399
+    },
+    "recurrence_order_2": {
+     "best_ic": 1.050968331064464,
+     "coefficients": [
+      9,
+      14
+     ],
+     "flag": false,
+     "null_max_ic": 1.0506434065533912
+    },
+    "recurrence_order_3": {
+     "best_ic": 1.0724258878284039,
+     "coefficients": [
+      28,
+      21,
+      28
+     ],
+     "flag": false,
+     "null_max_ic": 1.0740559621373085
+    },
+    "seconds": 0.34,
+    "window": 600
+   },
+   "12": {
+    "finite_differences": {
+     "flag": false,
+     "ic_by_order": [
+      1.0455162171065489,
+      0.9866332778720805,
+      0.9840758602857689,
+      1.0047205459364954,
+      0.9939903234020881,
+      0.9928969288159845,
+      0.9889818148671436,
+      0.9893446746238624
+     ],
+     "null_max_ic": 1.0345813773301127
+    },
+    "recurrence_order_2": {
+     "best_ic": 1.0511307933200003,
+     "coefficients": [
+      5,
+      2
+     ],
+     "flag": false,
+     "null_max_ic": 1.049018783998028
+    },
+    "recurrence_order_3": {
+     "best_ic": 1.0709588209503895,
+     "coefficients": [
+      7,
+      14,
+      11
+     ],
+     "flag": false,
+     "null_max_ic": 1.068024687194361
+    },
+    "seconds": 0.34,
+    "window": 600
+   },
+   "13": {
+    "finite_differences": {
+     "flag": false,
+     "ic_by_order": [
+      1.0413314890983876,
+      1.0232170649089078,
+      1.0540112369899604,
+      1.0228148862035733,
+      0.9890542254046394,
+      1.0011069210708992,
+      0.996319018404908,
+      0.9875973409306743
+     ],
+     "null_max_ic": 1.0586514719848052
+    },
+    "recurrence_order_2": {
+     "best_ic": 1.0821569165980043,
+     "coefficients": [
+      24,
+      14
+     ],
+     "flag": false,
+     "null_max_ic": 1.1102993683054105
+    },
+    "recurrence_order_3": {
+     "best_ic": 1.1202542138712352,
+     "coefficients": [
+      27,
+      11,
+      5
+     ],
+     "flag": false,
+     "null_max_ic": 1.1352123054250713
+    },
+    "seconds": 0.19,
+    "window": 333
+   },
+   "14": {
+    "finite_differences": {
+     "flag": false,
+     "ic_by_order": [
+      1.0490784529399613,
+      1.0137644745466463,
+      0.996627432464335,
+      1.0176414189837009,
+      1.0112214582802819,
+      1.0027765002469893,
+      0.9886513832550932,
+      1.0089061142360636
+     ],
+     "null_max_ic": 1.0223338821054557
+    },
+    "recurrence_order_2": {
+     "best_ic": 1.0503184820423186,
+     "coefficients": [
+      1,
+      0
+     ],
+     "flag": false,
+     "null_max_ic": 1.0532428026419725
+    },
+    "recurrence_order_3": {
+     "best_ic": 1.0761750587388845,
+     "coefficients": [
+      20,
+      20,
+      18
+     ],
+     "flag": false,
+     "null_max_ic": 1.0740559621373085
+    },
+    "seconds": 0.34,
+    "window": 600
+   },
+   "16": {
+    "finite_differences": {
+     "flag": false,
+     "ic_by_order": [
+      1.030295754909241,
+      1.0209128137902443,
+      1.0153732870167391,
+      0.9989961085105183,
+      1.008923973629856,
+      1.0282987264437518,
+      0.9979034683925072,
+      1.0002858188137376
+     ],
+     "null_max_ic": 1.0343240651965484
+    },
+    "recurrence_order_2": {
+     "best_ic": 1.048531397231419,
+     "coefficients": [
+      2,
+      6
+     ],
+     "flag": false,
+     "null_max_ic": 1.0538926516641176
+    },
+    "recurrence_order_3": {
+     "best_ic": 1.0795982147875844,
+     "coefficients": [
+      11,
+      9,
+      2
+     ],
+     "flag": false,
+     "null_max_ic": 1.0698177689341561
+    },
+    "seconds": 0.34,
+    "window": 600
+   },
+   "17": {
+    "finite_differences": {
+     "flag": false,
+     "ic_by_order": [
+      0.9862535664234148,
+      1.0168512574018365,
+      1.0021696851146111,
+      1.015515199368338,
+      1.0113855643267409,
+      0.9856519097665809,
+      0.9941035048539264,
+      0.9790666300818585
+     ],
+     "null_max_ic": 1.0226858392962945
+    },
+    "recurrence_order_2": {
+     "best_ic": 1.0415455202433572,
+     "coefficients": [
+      9,
+      12
+     ],
+     "flag": false,
+     "null_max_ic": 1.0496686330201734
+    },
+    "recurrence_order_3": {
+     "best_ic": 1.0681876946252515,
+     "coefficients": [
+      26,
+      19,
+      20
+     ],
+     "flag": false,
+     "null_max_ic": 1.0719368655357324
+    },
+    "seconds": 0.34,
+    "window": 600
+   },
+   "18": {
+    "finite_differences": {
+     "flag": false,
+     "ic_by_order": [
+      1.0471354152126453,
+      1.0058038240253666,
+      0.9998875810821445,
+      0.9914725621792341,
+      0.9930056871233341,
+      0.9889451002435825,
+      1.0045121006335171,
+      0.9820505784972791
+     ],
+     "null_max_ic": 1.0199190787426082
+    },
+    "recurrence_order_2": {
+     "best_ic": 1.046419387909447,
+     "coefficients": [
+      1,
+      0
+     ],
+     "flag": false,
+     "null_max_ic": 1.051943104597682
+    },
+    "recurrence_order_3": {
+     "best_ic": 1.06068935280429,
+     "coefficients": [
+      9,
+      21,
+      24
+     ],
+     "flag": false,
+     "null_max_ic": 1.073566939844637
+    },
+    "seconds": 0.34,
+    "window": 600
+   },
+   "20": {
+    "finite_differences": {
+     "flag": false,
+     "ic_by_order": [
+      1.012484575742179,
+      1.006616135303048,
+      0.9930412689847448,
+      0.9847667926230895,
+      1.0112214582802819,
+      0.9942142050067851,
+      0.9960860945262294,
+      1.0226654319293913
+     ],
+     "null_max_ic": 1.032652074691129
+    },
+    "recurrence_order_2": {
+     "best_ic": 1.0486938594869555,
+     "coefficients": [
+      20,
+      14
+     ],
+     "flag": false,
+     "null_max_ic": 1.053567727153045
+    },
+    "recurrence_order_3": {
+     "best_ic": 1.0696547615032657,
+     "coefficients": [
+      16,
+      9,
+      1
+     ],
+     "flag": false,
+     "null_max_ic": 1.075686036446213
+    },
+    "seconds": 0.34,
+    "window": 600
+   },
+   "22": {
+    "finite_differences": {
+     "flag": false,
+     "ic_by_order": [
+      1.00260746729499,
+      0.9963810132042599,
+      1.0015176553910492,
+      0.9883650104337037,
+      0.9848003848003848,
+      0.9914149931013337,
+      0.984520988104462,
+      1.012884712123291
+     ],
+     "null_max_ic": 1.0105638633557414
+    },
+    "recurrence_order_2": {
+     "best_ic": 1.0478815482092738,
+     "coefficients": [
+      20,
+      11
+     ],
+     "flag": false,
+     "null_max_ic": 1.055517274219481
+    },
+    "recurrence_order_3": {
+     "best_ic": 1.0632974716985375,
+     "coefficients": [
+      16,
+      12,
+      11
+     ],
+     "flag": false,
+     "null_max_ic": 1.0688397243488135
+    },
+    "seconds": 0.35,
+    "window": 600
+   },
+   "24": {
+    "finite_differences": {
+     "flag": false,
+     "ic_by_order": [
+      1.0186347670301457,
+      1.0097418687962845,
+      1.0077816863873788,
+      0.9896636587366694,
+      1.0210302457466918,
+      1.0332427692484618,
+      1.013318807223613,
+      0.9823139598044541
+     ],
+     "null_max_ic": 1.0223490387701966
+    },
+    "recurrence_order_2": {
+     "best_ic": 1.0651770669611882,
+     "coefficients": [
+      10,
+      15
+     ],
+     "flag": false,
+     "null_max_ic": 1.0581963383033857
+    },
+    "recurrence_order_3": {
+     "best_ic": 1.0883630032334861,
+     "coefficients": [
+      13,
+      12,
+      4
+     ],
+     "flag": false,
+     "null_max_ic": 1.0850655580428525
+    },
+    "seconds": 0.3,
+    "window": 534
+   },
+   "25": {
+    "finite_differences": {
+     "flag": false,
+     "ic_by_order": [
+      1.0804538970854356,
+      0.9992928318868531,
+      0.9708369283865401,
+      0.9866901163800591,
+      0.9875199440473849,
+      0.9896151899848188,
+      0.9955703211517165,
+      0.9912374581939799
+     ],
+     "null_max_ic": 1.044565383690687
+    },
+    "recurrence_order_2": {
+     "best_ic": 1.1012107575270544,
+     "coefficients": [
+      13,
+      21
+     ],
+     "flag": false,
+     "null_max_ic": 1.117368477445623
+    },
+    "recurrence_order_3": {
+     "best_ic": 1.1516177739430544,
+     "coefficients": [
+      6,
+      26,
+      15
+     ],
+     "flag": false,
+     "null_max_ic": 1.1509922346850734
+    },
+    "seconds": 0.18,
+    "window": 308
+   }
+  },
+  "words_and_lines": {
+   "complete": true,
+   "lines": 167,
+   "max_abs_z": 1.9654881185620332,
+   "p_max_over_readings": 0.63,
+   "readings_tested": 21,
+   "seconds": 5.94,
+   "shuffles": 99,
+   "top": [
+    {
+     "observed": 0.009929078014184398,
+     "reading": "W3 decimal concatenation of indexes: fraction square",
+     "shuffle_mean": 0.013496668815817752,
+     "z": -1.9654881185620332
+    },
+    {
+     "observed": 0.008865248226950355,
+     "reading": "W3 decimal concatenation of indexes: fraction Fibonacci",
+     "shuffle_mean": 0.011354681567447525,
+     "z": -1.2981581854690463
+    },
+    {
+     "observed": 0.042907801418439716,
+     "reading": "W4 sum of Gematria prime values: fraction square",
+     "shuffle_mean": 0.03825488931871911,
+     "z": 1.244807109650799
+    },
+    {
+     "observed": 0.0,
+     "reading": "L2 base 29, least significant first: fraction prime",
+     "shuffle_mean": 0.00931470392548237,
+     "z": -1.2233762809127937
+    },
+    {
+     "observed": 0.050709219858156025,
+     "reading": "W5 sum of indexes: fraction Fibonacci",
+     "shuffle_mean": 0.0556916684576259,
+     "z": -1.0967934591000084
+    },
+    {
+     "observed": 0.009574468085106383,
+     "reading": "W2 base 29, least significant first: fraction Fibonacci",
+     "shuffle_mean": 0.011257969768608064,
+     "z": -0.9215770876989468
+    }
+   ],
+   "words": 2820
+  }
+ },
+ "seed": 20261105
+}
