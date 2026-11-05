@@ -1,6 +1,6 @@
 # Overnight run 20261104-2305
 
-Started 2026-11-04 23:05:16, updated 2026-11-05 00:52:40, status **running**. Jobs: pending 31, running 3, done 41
+Started 2026-11-04 23:05:16, updated 2026-11-05 00:55:31, status **running**. Jobs: pending 30, running 3, done 42
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -61,7 +61,7 @@ Started 2026-11-04 23:05:16, updated 2026-11-05 00:52:40, status **running**. Jo
 | exhaustive/19 | pending |  |  | Codex: every periodic key up to length 4 |
 | exhaustive/21 | pending |  |  | Codex: every periodic key up to length 4 |
 | exhaustive/25 | pending |  |  | Codex: every periodic key up to length 4 |
-| deepseek/10 | pending |  |  | DeepSeek (volume) |
+| deepseek/10 | done | 2026-11-05 00:52:56 | 2026-11-05 00:55:31 | DeepSeek (volume) |
 | deepseek/11 | pending |  |  | DeepSeek (volume) |
 | deepseek/12 | pending |  |  | DeepSeek (volume) |
 | deepseek/13 | pending |  |  | DeepSeek (volume) |
@@ -206,10 +206,12 @@ round 1 [codex] proposals=32 valid=32 attempts=148195 passes=0 near=0 invalid=0
   - LP2:6.jpg/2-7.jpg - 23.jpg/2-24.jpg: 300000 attempts, 82 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **structure/14** (done)
   - LP2:8.jpg-14.jpg - 25.jpg-31.jpg: 300000 attempts, 26 hypotheses, **0 final pass(es)**, stopped: max_attempts
+- **deepseek/10** (done)
+  - LP2:17.jpg, 18.jpg, 19.jpg - 0.jpg-2.jpg: 60000 attempts, 19 hypotheses, **0 final pass(es)**, stopped: max_attempts
 
 ## Model usage
 
-- deepseek: 0 call(s) in the last 5h (cap none), spent $0.1873
+- deepseek: 2 call(s) in the last 5h (cap none), spent $0.1953
 - qwen-local: 9 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 9 call(s) in the last 5h (cap none), spent $0.0000
 - granite: 12 call(s) in the last 5h (cap none), spent $0.0000
@@ -238,14 +240,6 @@ Prefer variants that are absent from the section's history. Long sections should
 
 ## Events
 
-- 2026-11-05 00:37:42 local/20: running 65 min | stopped: max_attempts; final passes: 0
-- 2026-11-05 00:37:57 local/20: done (exit 0, 65 min)
-- 2026-11-05 00:38:13 published: 39 file(s) to branch results
-- 2026-11-05 00:38:13 local/14: start (uses ollama:http://127.0.0.1:11434, ollama:http://127.0.0.1:11435)
-- 2026-11-05 00:38:13 4 running: structure/17, structure/18, sonnet/22, local/14
-- 2026-11-05 00:38:13 sonnet/24 waiting: claude-plan in use by sonnet/22
-- 2026-11-05 00:40:08 structure/17: running 60 min | 00:39:30 [model] codex (proposer) ok 59.4s, tokens in/out 21313/2698, reply 8362 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-05 00:40:28 structure/18: running 60 min | 00:28:32 [model] codex (proposer) ok 62.3s, tokens in/out 21212/2563, reply 8529 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-05 00:41:18 sonnet/22: running 10 min | 00:32:15 [model] claude-sonnet (proposer) ok 14.0s, tokens in/out 6269/1919, reply 2773 chars
 - 2026-11-05 00:43:13 local/14: running 5 min | 00:41:43 [model] qwen-local (proposer) calling...
 - 2026-11-05 00:45:08 structure/17: running 65 min | 00:39:30 [model] codex (proposer) ok 59.4s, tokens in/out 21313/2698, reply 8362 chars, model not reported (pin one with model = "..." in the models config)
@@ -263,3 +257,11 @@ Prefer variants that are absent from the section's history. Long sections should
 - 2026-11-05 00:50:10 structure/17: running 70 min | 00:39:30 [model] codex (proposer) ok 59.4s, tokens in/out 21313/2698, reply 8362 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-05 00:50:30 structure/18: running 70 min | 00:28:32 [model] codex (proposer) ok 62.3s, tokens in/out 21212/2563, reply 8529 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-05 00:52:40 sonnet/25: done (exit 0, 3 min)
+- 2026-11-05 00:52:56 published: 42 file(s) to branch results
+- 2026-11-05 00:52:56 deepseek/10: start (uses api:https://api.deepseek.com)
+- 2026-11-05 00:52:56 4 running: structure/17, structure/18, local/14, deepseek/10
+- 2026-11-05 00:52:56 local/21 waiting: ollama:http://127.0.0.1:11434 in use by local/14
+- 2026-11-05 00:53:16 local/14: running 15 min | 00:47:59 [model] granite (weighting) ok 0.9s, tokens in/out 213/19, reply 27 chars
+- 2026-11-05 00:55:11 structure/17: running 75 min | 00:39:30 [model] codex (proposer) ok 59.4s, tokens in/out 21313/2698, reply 8362 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 00:55:31 structure/18: running 75 min | 00:28:32 [model] codex (proposer) ok 62.3s, tokens in/out 21212/2563, reply 8529 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 00:55:31 deepseek/10: done (exit 0, 3 min)
