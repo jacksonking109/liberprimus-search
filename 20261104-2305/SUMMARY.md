@@ -1,6 +1,6 @@
 # Overnight run 20261104-2305
 
-Started 2026-11-04 23:05:16, updated 2026-11-05 00:31:01, status **running**. Jobs: pending 35, running 3, done 37
+Started 2026-11-04 23:05:16, updated 2026-11-05 00:37:57, status **running**. Jobs: pending 34, running 3, done 38
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -17,7 +17,7 @@ Started 2026-11-04 23:05:16, updated 2026-11-05 00:31:01, status **running**. Jo
 | sonnet/19 | done | 2026-11-05 00:06:23 | 2026-11-05 00:09:13 | Sonnet, briefed by Opus |
 | sonnet/20 | done | 2026-11-05 00:09:28 | 2026-11-05 00:29:19 | Sonnet, briefed by Opus |
 | sonnet/21 | done | 2026-11-05 00:29:51 | 2026-11-05 00:31:01 | Sonnet, briefed by Opus |
-| sonnet/22 | pending |  |  | Sonnet, briefed by Opus |
+| sonnet/22 | running | 2026-11-05 00:31:17 |  | Sonnet, briefed by Opus |
 | sonnet/24 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/25 | pending |  |  | Sonnet, briefed by Opus |
 | codex/25 | done | 2026-11-04 23:05:16 | 2026-11-04 23:07:19 | Codex (exploratory) |
@@ -40,7 +40,7 @@ Started 2026-11-04 23:05:16, updated 2026-11-05 00:31:01, status **running**. Jo
 | local/16 | done | 2026-11-04 23:27:10 | 2026-11-04 23:29:30 | local models |
 | local/19 | done | 2026-11-04 23:29:46 | 2026-11-04 23:31:52 | local models |
 | local/15 | done | 2026-11-04 23:32:07 | 2026-11-04 23:32:12 | local models |
-| local/20 | running | 2026-11-04 23:32:28 |  | local models |
+| local/20 | done | 2026-11-04 23:32:28 | 2026-11-05 00:37:57 | local models |
 | local/14 | pending |  |  | local models |
 | local/21 | pending |  |  | local models |
 | local/13 | pending |  |  | local models |
@@ -82,16 +82,18 @@ Started 2026-11-04 23:05:16, updated 2026-11-05 00:31:01, status **running**. Jo
 
 ## Now running
 
-**local/20** (since 2026-11-04 23:32:28), latest log lines:
+**sonnet/22** (since 2026-11-05 00:31:17), latest log lines:
 ```
-===== 2026-11-04 23:32:28 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 20 --gen
-== LP2:50.jpg/2-56.jpg/1  (1468 symbols)
-23:32:31 [model] qwen-local (proposer) calling...
-23:33:53 [model] qwen-local (proposer) ok 82.3s, tokens in/out 3551/732, reply 2455 chars
-23:33:53 [model] gemma-local (proposer) calling...
-23:34:26 [model] gemma-local (proposer) ok 32.6s, tokens in/out 3687/499, reply 1470 chars
-23:34:26 [model] granite (weighting) calling...
-23:34:27 [model] granite (weighting) ok 1.8s, tokens in/out 269/38, reply 69 chars
+  | 2. **Other number sequences.** Use primes, pi_digits, e_digits, fibonacci and squares, each with offset_range [0,2000]. Try combine sub and beaufort, and map identity and reverse. Try scale 1, 2 a
+  | 3. **Ciphertext autokey.** Use stream autokey, source ciphertext, primer length 1 to 3 (try all 29 single symbols as primers), with combine sub, add and beaufort. Then do the same with source plai
+  | 4. **Known Liber Primus key words.** Use repeat with the words DIVINITY, FIRFUMFERENFE, CIRCUMFERENCE, KOAN, PRIMES, TOTIENT, INSTAR, PARABLE, WISDOM and CICADA. Add offset_range [0,20] and try bo
+  | 5. **Transposition, then a simple key.** Use grid with each read mode in turn, transpose_range [2,120]. Pair each with a constant stream run as exhaustive key_length 1, then key_length 2. Also try
+  | 6. **Long exhaustive periodic keys.** Use repeat exhaustive key_length 3 and 4, combine sub only. Run once with ma
+00:31:37 [model] claude-sonnet (proposer) calling...
+00:31:46 [model] claude-sonnet (proposer) ok 8.8s, tokens in/out 5334/1217, reply 2654 chars
+round 1 [claude-sonnet] proposals=12 valid=4 attempts=128 passes=0 near=0 invalid=8
+00:32:01 [model] claude-sonnet (proposer) calling...
+00:32:15 [model] claude-sonnet (proposer) ok 14.0s, tokens in/out 6269/1919, reply 2773 chars
 ```
 **structure/17** (since 2026-11-04 23:39:58), latest log lines:
 ```
@@ -186,6 +188,8 @@ round 1 [codex] proposals=32 valid=32 attempts=148195 passes=0 near=0 invalid=0
   - LP2:33.jpg - 50.jpg/1: 60000 attempts, 3 hypotheses, **0 final pass(es)**, stopped: max_attempts (caution: short section (91 runes): many keys give plausible-looking text this short; treat any lead with extra caution)
 - **local/15** (done)
   - skip LP2:15.jpg/1 - 32.jpg/1: only 9 symbols (minimum 20, --min-length); too short to judge
+- **local/20** (done)
+  - LP2:50.jpg/2-56.jpg/1: 60000 attempts, 7 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **structure/10** (done)
   - LP2:17.jpg, 18.jpg, 19.jpg - 0.jpg-2.jpg: 300000 attempts, 90 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **structure/12** (done)
@@ -201,9 +205,9 @@ round 1 [codex] proposals=32 valid=32 attempts=148195 passes=0 near=0 invalid=0
 - qwen-local: 6 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 6 call(s) in the last 5h (cap none), spent $0.0000
 - granite: 7 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 70 call(s) in the last 5h (cap 180), spent $0.0000
-- claude-sonnet: 70 call(s) in the last 5h (cap 180), spent $0.0000
-- claude-supervisor: 70 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-opus: 73 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-sonnet: 73 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-supervisor: 73 call(s) in the last 5h (cap 180), spent $0.0000
 - codex: 46 call(s) in the last 5h (cap 850), spent $0.0000
 
 ## Current strategy note (read by every lane each round)
@@ -226,15 +230,6 @@ Prefer variants that are absent from the section's history. Long sections should
 
 ## Events
 
-- 2026-11-05 00:09:28 4 running: local/20, structure/17, structure/18, sonnet/20
-- 2026-11-05 00:10:03 structure/17: running 30 min | 00:02:33 [model] codex (proposer) ok 58.7s, tokens in/out 21588/2719, reply 8973 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-05 00:10:23 structure/18: running 30 min | 23:41:14 [model] codex (proposer) ok 52.6s, tokens in/out 18738/2446, reply 8924 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-05 00:12:38 local/20: running 40 min | 23:34:27 [model] granite (weighting) ok 1.8s, tokens in/out 269/38, reply 69 chars
-- 2026-11-05 00:14:28 sonnet/20: running 5 min | 00:10:01 [model] claude-sonnet (proposer) ok 9.4s, tokens in/out 6280/1234, reply 2735 chars
-- 2026-11-05 00:15:03 structure/17: running 35 min | 00:02:33 [model] codex (proposer) ok 58.7s, tokens in/out 21588/2719, reply 8973 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-05 00:15:23 structure/18: running 35 min | 23:41:14 [model] codex (proposer) ok 52.6s, tokens in/out 18738/2446, reply 8924 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-05 00:17:39 local/20: running 45 min | 23:34:27 [model] granite (weighting) ok 1.8s, tokens in/out 269/38, reply 69 chars
-- 2026-11-05 00:19:29 sonnet/20: running 10 min | 00:10:01 [model] claude-sonnet (proposer) ok 9.4s, tokens in/out 6280/1234, reply 2735 chars
 - 2026-11-05 00:20:04 structure/17: running 40 min | 00:02:33 [model] codex (proposer) ok 58.7s, tokens in/out 21588/2719, reply 8973 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-05 00:20:24 structure/18: running 40 min | 23:41:14 [model] codex (proposer) ok 52.6s, tokens in/out 18738/2446, reply 8924 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-05 00:22:39 local/20: running 50 min | 23:34:27 [model] granite (weighting) ok 1.8s, tokens in/out 269/38, reply 69 chars
@@ -251,3 +246,12 @@ Prefer variants that are absent from the section's history. Long sections should
 - 2026-11-05 00:30:06 structure/17: running 50 min | 00:02:33 [model] codex (proposer) ok 58.7s, tokens in/out 21588/2719, reply 8973 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-05 00:30:26 structure/18: running 50 min | 00:28:32 [model] codex (proposer) ok 62.3s, tokens in/out 21212/2563, reply 8529 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-05 00:31:01 sonnet/21: done (exit 0, 1 min)
+- 2026-11-05 00:31:17 published: 38 file(s) to branch results
+- 2026-11-05 00:31:17 sonnet/22: start (uses claude-plan)
+- 2026-11-05 00:31:17 4 running: local/20, structure/17, structure/18, sonnet/22
+- 2026-11-05 00:32:42 local/20: running 60 min | 23:34:27 [model] granite (weighting) ok 1.8s, tokens in/out 269/38, reply 69 chars
+- 2026-11-05 00:35:07 structure/17: running 55 min | 00:02:33 [model] codex (proposer) ok 58.7s, tokens in/out 21588/2719, reply 8973 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 00:35:27 structure/18: running 55 min | 00:28:32 [model] codex (proposer) ok 62.3s, tokens in/out 21212/2563, reply 8529 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 00:36:17 sonnet/22: running 5 min | 00:32:15 [model] claude-sonnet (proposer) ok 14.0s, tokens in/out 6269/1919, reply 2773 chars
+- 2026-11-05 00:37:42 local/20: running 65 min | stopped: max_attempts; final passes: 0
+- 2026-11-05 00:37:57 local/20: done (exit 0, 65 min)
