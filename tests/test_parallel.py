@@ -850,3 +850,28 @@ def test_example_queue_structure_and_exhaustive_jobs_carry_briefs():
     assert [j["id"] for j in ex] == [f"exhaustive/{i}" for i in (11, 19, 21, 25)]
     assert "transpose_range" in st[0]["brief"] and "key_length" in ex[0]["brief"]
     assert len(st[0]["brief"]) <= 2000 and len(ex[0]["brief"]) <= 2000
+
+
+def test_new_run_sees_earlier_runs_ledgers_and_brief_is_saved(tmp_path):
+    import json
+    from lpswarm.overnight import _job
+    base = tmp_path / "overnight"
+    old = base / "20261101-0000"
+    (old / "sw_9").mkdir(parents=True)
+    (old / "sw_9" / "ledger.sqlite").write_bytes(b"x")
+    j = _job("sw/9", "swarm", ["--sections", "9"], "config")
+    (old / "state.json").write_text(json.dumps({"jobs": [j]}), encoding="utf-8")
+    cfg = OvernightConfig(models=str(tmp_path / "none.toml"), spend_ledger=str(tmp_path / "s.sqlite"),
+                          publish=False, jobs=[{"id": "x", "kind": "validate"}])
+    run = Overnight(cfg, base / "20261102-0000", stop_file=tmp_path / "STOP", progress=False)
+    now = _job("c/9", "swarm", ["--sections", "9"], "config")
+    other = _job("c/10", "swarm", ["--sections", "10"], "config")
+    run.state["jobs"] = [now, other]
+    assert [p.parent.name for p in run.peer_ledgers(now)] == ["sw_9"]
+    assert run.peer_ledgers(other) == []
+    assert "--peer-ledger" in run.job_command(now) and "--peer-ledger" not in run.job_command(other)
+
+
+def test_autokey_primer_note_in_the_language_doc():
+    from lpswarm.swarm.generators import LANGUAGE_DOC
+    assert "ONE proposal covers all primers" in LANGUAGE_DOC

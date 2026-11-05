@@ -387,6 +387,34 @@ class Overnight:
             f = self.job_dir(j) / "ledger.sqlite"
             if f.is_file():
                 out.append(f)
+        return out + self.earlier_run_ledgers(sec)
+
+    def earlier_run_ledgers(self, sec: str, max_runs: int = 3) -> list[Path]:
+        """Ledgers of swarm jobs on this section from the most recent earlier runs (sibling
+        folders of this run's), so a new run knows what was already tried there."""
+        key = (sec, max_runs)
+        cache = self.__dict__.setdefault("_earlier", {})
+        if key in cache:
+            return cache[key]
+        out: list[Path] = []
+        try:
+            runs = sorted((d for d in self.dir.parent.iterdir()
+                           if d.is_dir() and d != self.dir and (d / "state.json").is_file()),
+                          reverse=True)[:max_runs]
+        except OSError:
+            runs = []
+        for d in runs:
+            try:
+                st = json.loads((d / "state.json").read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError):
+                continue
+            for j in st.get("jobs", []):
+                if j.get("kind") != "swarm" or _arg_value(j.get("args", []), "--sections") != sec:
+                    continue
+                f = d / re.sub(r"[^A-Za-z0-9_.-]+", "_", j["id"]) / "ledger.sqlite"
+                if f.is_file() and f.stat().st_size > 0:
+                    out.append(f)
+        cache[key] = out
         return out
 
     def job_models(self, job: dict) -> list[str]:

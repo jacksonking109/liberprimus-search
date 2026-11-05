@@ -98,7 +98,9 @@ Decryption of ciphertext symbols c (integers 0..N-1), in this order:
        {"decimate": {"step": k}}               every k-th position, wrapping (k must share no
                                                factor with the text length; others are skipped)
      "transpose_range": [lo, hi]             with grid/railfence/decimate: try every width, rail
-                                               count or step in lo..hi in one proposal
+                                               count or step in lo..hi in one proposal (lo >= 2;
+                                               a bound outside the allowed range makes the whole
+                                               proposal invalid)
   2. "reverse_text": true                 read the text backwards (optional)
   3. "skip": [symbols]                    ciphertext symbols left as plaintext; the key
                                           stream does NOT advance there (optional)
@@ -114,6 +116,9 @@ Decryption of ciphertext symbols c (integers 0..N-1), in this order:
        {"kind": "autokey", "primer": [..] or "word": "..", "source": "plaintext"|"ciphertext"}
        {"kind": "sequence", "name": NAME, "offset": 0, "scale": 1, "add": 0}
           k_t = (scale * NAME[offset + t] + add) mod N, NAME in: %(sequences)s
+  Autokey: with "source": "ciphertext" the primer only changes the first len(primer) plaintext
+  symbols (every later symbol is c_i - c_(i-m)), so ONE proposal covers all primers; do not
+  enumerate them. With "source": "plaintext" the primer feeds the whole chain, so primers matter.
   Optional "offset_range": [lo, hi] (at most 2000 values) tries every start offset of a
   repeat/sequence stream in one proposal. A repeat stream may instead be
   {"kind": "repeat", "exhaustive": true, "key_length": m} (m = 1..4): EVERY key of that length

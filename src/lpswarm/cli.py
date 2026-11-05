@@ -249,9 +249,15 @@ def _auto_brief(args, router, alphabet, ct, label, values) -> str:
         return ""
     text = c.text.strip()[:MAX_BRIEF_CHARS]
     print(f"brief from {args.auto_brief} ({len(text)} chars):", flush=True)
+    import textwrap
     for line in text.splitlines():
-        if line.strip():
-            print(f"  | {line[:200]}", flush=True)
+        for part in textwrap.wrap(line, 150) if line.strip() else []:
+            print(f"  | {part}", flush=True)
+    if args.report_dir:      # also saved in full (published to the results branch as .md)
+        d = Path(args.report_dir)
+        d.mkdir(parents=True, exist_ok=True)
+        with (d / "brief.md").open("a", encoding="utf-8") as f:
+            f.write(f"## Brief for {label} (from {args.auto_brief})\n\n{text}\n\n")
     return text
 
 
