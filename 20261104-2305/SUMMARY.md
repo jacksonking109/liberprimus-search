@@ -1,6 +1,6 @@
 # Overnight run 20261104-2305
 
-Started 2026-11-04 23:05:16, updated 2026-11-04 23:22:25, status **running**. Jobs: pending 51, running 3, done 18
+Started 2026-11-04 23:05:16, updated 2026-11-04 23:22:46, status **running**. Jobs: pending 50, running 3, done 19
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -32,7 +32,7 @@ Started 2026-11-04 23:05:16, updated 2026-11-04 23:22:25, status **running**. Jo
 | codex/15 | done | 2026-11-04 23:15:06 | 2026-11-04 23:15:11 | Codex (exploratory) |
 | codex/14 | done | 2026-11-04 23:15:27 | 2026-11-04 23:17:28 | Codex (exploratory) |
 | codex/13 | done | 2026-11-04 23:16:28 | 2026-11-04 23:18:19 | Codex (exploratory) |
-| codex/12 | running | 2026-11-04 23:17:44 |  | Codex (exploratory) |
+| codex/12 | done | 2026-11-04 23:17:44 | 2026-11-04 23:22:46 | Codex (exploratory) |
 | codex/11 | done | 2026-11-04 23:18:34 | 2026-11-04 23:20:09 | Codex (exploratory) |
 | codex/10 | done | 2026-11-04 23:20:25 | 2026-11-04 23:22:25 | Codex (exploratory) |
 | local/17 | running | 2026-11-04 23:05:16 |  | local models |
@@ -50,7 +50,7 @@ Started 2026-11-04 23:05:16, updated 2026-11-04 23:22:25, status **running**. Jo
 | local/11 | pending |  |  | local models |
 | local/25 | pending |  |  | local models |
 | local/10 | pending |  |  | local models |
-| structure/10 | pending |  |  | Codex: transposition then substitution |
+| structure/10 | running | 2026-11-04 23:22:41 |  | Codex: transposition then substitution |
 | structure/12 | pending |  |  | Codex: transposition then substitution |
 | structure/13 | pending |  |  | Codex: transposition then substitution |
 | structure/14 | pending |  |  | Codex: transposition then substitution |
@@ -81,8 +81,6 @@ Started 2026-11-04 23:05:16, updated 2026-11-04 23:22:25, status **running**. Jo
 
 **sonnet/13** (since 2026-11-04 23:17:23), latest log lines:
 ```
-  |    Reason: if the text is only transposed under Atbash or plain substitution, the IC should rise toward English levels.
-  | 6. Combined transposition and totient. Use railfence 2 to 12 or grid columns 2 to 30, with prime_totients sub at offset_range [0,500] and skip [0]. Then use re
 23:17:52 [model] claude-sonnet (proposer) calling...
 23:18:01 [model] claude-sonnet (proposer) ok 8.8s, tokens in/out 5042/1328, reply 2800 chars
 round 1 [claude-sonnet] proposals=12 valid=3 attempts=201 passes=0 near=0 invalid=9
@@ -91,24 +89,11 @@ round 1 [claude-sonnet] proposals=12 valid=3 attempts=201 passes=0 near=0 invali
 round 2 [claude-sonnet] proposals=12 valid=12 attempts=18774 passes=0 near=0 invalid=9
 23:21:11 [model] claude-sonnet (proposer) calling...
 23:21:20 [model] claude-sonnet (proposer) ok 9.2s, tokens in/out 7064/1261, reply 2726 chars
-```
-**codex/12** (since 2026-11-04 23:17:44), latest log lines:
-```
-  | 4. Sweep sequence streams primes and prime_totients first, then naturals, triangular, squares, fibonacci, pi_digits and e_digits. Use offset_range [0,1999], scale 1, add 0, sub and beaufort as sep
-  | 5. For primes and prime_totients, repeat offsets [0,1999] with skip [F], skip_mode all, then resolve, combine sub. Also test reverse map without skips. These cover a literal F interrupting key adv
-  | 6. Test grid columns and boustrophedon_columns, transpose_range [2,64], with primes offsets [0,63], sub, no skips: 4,032 expansions per proposal. Test railfence [2,32] likewise. Transposition coul
-23:18:14 [model] codex (proposer) calling...
-23:18:52 [model] codex (proposer) ok 37.5s, tokens in/out 18682/1675, reply 5666 chars, model not reported (pin one with model = "..." in the models config)
-round 1 [codex] proposals=32 valid=32 attempts=51300 passes=0 near=0 invalid=0
-23:19:28 [model] codex (proposer) calling...
-23:20:10 [model] codex (proposer) ok 42.4s, tokens in/out 20032/1890, reply 5786 chars, model not reported (pin one with model = "..." in the models config)
-round 2 [codex] proposals=32 valid=32 attempts=60000 passes=0 near=0 invalid=0
-stopped: max_attempts; final passes: 0
+round 3 [claude-sonnet] proposals=12 valid=11 attempts=27045 passes=0 near=0 invalid=10
+23:22:44 [model] claude-sonnet (proposer) calling...
 ```
 **local/17** (since 2026-11-04 23:05:16), latest log lines:
 ```
-23:06:06 [model] qwen-local (proposer) ok 48.2s, tokens in/out 2919/769, reply 2885 chars
-23:06:06 [model] gemma-local (proposer) calling...
 23:06:40 [model] gemma-local (proposer) ok 33.8s, tokens in/out 3001/510, reply 1666 chars
 23:06:40 [model] granite (weighting) calling...
 23:07:14 [model] granite (weighting) ok 34.4s, tokens in/out 252/38, reply 69 chars
@@ -117,6 +102,15 @@ round 1 [qwen-local] proposals=8 valid=8 attempts=24712 passes=0 near=0 invalid=
 23:21:40 [model] granite (weighting) ok 12.7s, tokens in/out 206/39, reply 67 chars
 round 1 [gemma-local] proposals=8 valid=7 attempts=853 passes=0 near=0 invalid=1
 23:21:41 [model] qwen-local (proposer) calling...
+23:22:25 [model] qwen-local (proposer) ok 44.5s, tokens in/out 3476/713, reply 2372 chars
+23:22:25 [model] gemma-local (proposer) calling...
+```
+**structure/10** (since 2026-11-04 23:22:41), latest log lines:
+```
+===== 2026-11-04 23:22:41 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 10 --gen
+brief for the generators (718 chars): Two-stage programs: a transposition, then a substitution. Use the transpose field: grid widths (try the factors of the section length and their neighbours, e.g. 2
+== LP2:17.jpg, 18.jpg, 19.jpg - 0.jpg-2.jpg  (729 symbols)
+23:22:44 [model] codex (proposer) calling...
 ```
 
 ## Results so far
@@ -155,6 +149,8 @@ round 1 [gemma-local] proposals=8 valid=7 attempts=853 passes=0 near=0 invalid=1
   - LP2:8.jpg-14.jpg - 25.jpg-31.jpg: 60000 attempts, 4 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **codex/13** (done)
   - LP2:6.jpg/2-7.jpg - 23.jpg/2-24.jpg: 60000 attempts, 4 hypotheses, **0 final pass(es)**, stopped: max_attempts
+- **codex/12** (done)
+  - LP2:20.jpg/2-23.jpg/1 - 3.jpg/2-6.jpg/1: 60000 attempts, 59 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **codex/11** (done)
   - LP2:20.jpg/1 - 3.jpg/1: 60000 attempts, 4 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **codex/10** (done)
@@ -163,7 +159,7 @@ round 1 [gemma-local] proposals=8 valid=7 attempts=853 passes=0 near=0 invalid=1
 ## Model usage
 
 - deepseek: 12 call(s) in the last 5h (cap none), spent $0.1873
-- qwen-local: 1 call(s) in the last 5h (cap none), spent $0.0000
+- qwen-local: 2 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 1 call(s) in the last 5h (cap none), spent $0.0000
 - granite: 2 call(s) in the last 5h (cap none), spent $0.0000
 - claude-opus: 53 call(s) in the last 5h (cap 180), spent $0.0000
@@ -177,11 +173,6 @@ round 1 [gemma-local] proposals=8 valid=7 attempts=853 passes=0 near=0 invalid=1
 
 ## Events
 
-- 2026-11-04 23:16:28 codex/13: start (uses codex-plan)
-- 2026-11-04 23:16:28 4 running: local/17, codex/14, sonnet/12, codex/13
-- 2026-11-04 23:16:28 sonnet/13 waiting: claude-plan in use by sonnet/12
-- 2026-11-04 23:17:08 sonnet/12: done (exit 0, 1 min)
-- 2026-11-04 23:17:23 published: 17 file(s) to branch results
 - 2026-11-04 23:17:23 sonnet/13: start (uses claude-plan)
 - 2026-11-04 23:17:23 4 running: local/17, codex/14, codex/13, sonnet/13
 - 2026-11-04 23:17:28 codex/14: done (exit 0, 2 min)
@@ -202,3 +193,8 @@ round 1 [gemma-local] proposals=8 valid=7 attempts=853 passes=0 near=0 invalid=1
 - 2026-11-04 23:20:35 local/17: running 15 min | 23:07:14 [model] granite (weighting) ok 34.4s, tokens in/out 252/38, reply 69 chars
 - 2026-11-04 23:22:25 sonnet/13: running 5 min | 23:21:20 [model] claude-sonnet (proposer) ok 9.2s, tokens in/out 7064/1261, reply 2726 chars
 - 2026-11-04 23:22:25 codex/10: done (exit 0, 2 min)
+- 2026-11-04 23:22:41 published: 21 file(s) to branch results
+- 2026-11-04 23:22:41 structure/10: start (uses codex-plan)
+- 2026-11-04 23:22:41 4 running: local/17, sonnet/13, codex/12, structure/10
+- 2026-11-04 23:22:41 sonnet/14 waiting: claude-plan in use by sonnet/13
+- 2026-11-04 23:22:46 codex/12: done (exit 0, 5 min)
