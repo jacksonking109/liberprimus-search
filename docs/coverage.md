@@ -55,9 +55,11 @@ table or column is reported `unsupported_schema` and is **not** treated as empty
   ciphers or decryptions.
 - **identity**: the target id (sha256 of alphabet, ciphertext and word breaks). Transcription version
   is not recorded: `unknown`. Word breaks are shown as present/absent, a count and a short hash.
-- **evaluator group**: ledgers are totalled together only if their recorded `executor_version` set is
-  identical. The oracle configuration (alpha, null samples, near-miss rule) is **not recorded**, so
-  `oracle_config` is `unknown` for everyone; old runs are never labelled with today's settings.
+- **evaluator group**: ledgers are totalled together only if their recorded `executor_version` set
+  and recorded oracle configuration are identical. Ledgers written by `swarm`/`baseline` since the
+  evidence manifest existed carry the ACTUAL configuration (`run_meta`, below); older ledgers have
+  `oracle_config: unknown` and are never labelled with today's settings. A ledger used with two
+  different configurations is flagged "per-attempt attribution unknown", not split by guesswork.
 - **completion** (evidence only, never inferred from counts):
   `completed` = a finished lean sweep, or a hypothesis recorded `ruled_out` (its key source ran out);
   `incomplete` = a lean sweep stopped early, or a hypothesis left `open` with stored attempts (stopped
@@ -76,31 +78,55 @@ table or column is reported `unsupported_schema` and is **not** treated as empty
   "Survivors" counts only candidates with a recorded recheck that passed.
 - Free-text rationales that models attached to proposals (after ` | why:`) are dropped.
 
+## Evidence recorded by new runs (older ledgers: `unknown`)
+
+**Evidence manifest.** Each `swarm`/`baseline` invocation appends a row to the ledger's `run_meta`
+table: lpswarm and executor version, development git SHA (`unknown` plus the reason if it cannot be
+read), Python/platform, the **actual oracle configuration** after command-line overrides (and its
+hash), a hash of the bundled language texts, the alphabet and manifest hashes, the target labels with
+their recorded section hashes, resource caps, and the generator/ranker model *names*. No credentials,
+prompts, config files, transcripts or held-out data. If capture fails, a row with an explicit
+`meta_error` is written and the oracle configuration stays `unknown`; nothing is filled in. An
+overnight run also writes `manifest.json` in its run folder: the same facts plus the SHA-256 of
+`overnight.toml` and `models.toml` (hashes only, never contents).
+
+**Lean-sweep checkpoints.** A lean summary now also records the proposal's canonical spec, the
+expansion-order version, the text length, the requested size (an upper bound), the **cursor**
+(candidates fully processed in the deterministic expansion order; the candidate that hit a stop is not
+counted), how many of those were skipped as the same decryption, and the stop reason (`exhausted`,
+`max_attempts`, `timeout`, `stop_file`, `stop_event`). Coverage reports requested, counted attempts,
+cursor, remaining, equivalents skipped and stop reason separately, and for an incomplete sweep
+re-expands the spec read-only (`--no-reconstruct` skips this) to name the first and last completed
+cipher and the first remaining one. A different expansion version, or a missing checkpoint, stays
+`unknown`. **Resume is unchanged:** an unfinished sweep is re-run from the start; the cursor is never
+used to skip work, and logical attempt counts and the end-of-search threshold are unaffected.
+
 ## Known limitations
 
-1. The oracle configuration is not recorded (only `executor_version`, and per result the threshold and
-   alpha actually applied).
-2. A lean summary does not store the proposal's spec or the completed subset.
-3. Why an unfinished job stopped is recorded only in `report.json` (when present); invalid proposals
-   never reach a ledger.
+1. Ledgers written before the evidence manifest have no oracle configuration (only
+   `executor_version`, and per result the threshold and alpha actually applied).
+2. Lean summaries written before checkpoints do not store the spec, cursor or stop reason; their
+   completed subset is unknown.
+3. For hypotheses that are not lean sweeps, why an unfinished job stopped is recorded only in
+   `report.json` (when present); invalid proposals never reach a ledger.
 4. Hypotheses with no attempts cannot be tied to a target; they are counted per ledger
    (`hypotheses_without_attempts`).
 5. No cross-job or cross-run deduplication, so totals may overlap.
 
 ## Sample
 
-`docs/coverage_sample/` holds output generated from the reproducible fixture in
-`tests/test_coverage.py` (`make_runs`: three small synthetic ledgers in two runs, one lean sweep, one
-job with a `report.json` and `state.json`). Timestamps in it are from when it was generated.
+`docs/coverage_sample/` holds output generated from small synthetic ledgers (built with the helpers in
+`tests/test_coverage.py` and `tests/test_evidence.py`): one run with a recorded evidence manifest, one
+lean sweep stopped at 200 of 676 candidates (with its reconstructed completed prefix), and an older
+ledger with no manifest, so both the recorded and `unknown` cases show. Timestamps and the git SHA are
+from when it was generated.
 
-## Follow-ups (not done here; for items 2-4 of the plan)
+## Follow-ups still open
 
-- **Evaluator identity in execution:** record the oracle configuration (and `lpswarm` version) once per
-  ledger or per run, so groups can be told apart instead of `unknown`.
-- **Lean sweeps:** store the proposal's spec JSON and, for stopped sweeps, a checkpoint of the
-  completed range, so "requested" versus "completed" is evidence, not `unknown`; and remember a compact
-  set of output hashes so repeated coverage of the same ciphers is skipped and counted once.
-- **Stop reasons:** write the stop reason (max attempts, timeout, stop file, budget) into the ledger
-  per hypothesis, so it no longer depends on `report.json`.
+- **Output-hash memory for lean sweeps:** a second proposal covering the same ciphers as an earlier
+  lean sweep is currently counted again (conservative, but slower).
+- **Stop reasons for non-lean hypotheses** in the ledger, so they no longer depend on `report.json`.
+- **Resume from the cursor:** deliberately not done; it needs its own design so that unknown work is
+  never skipped under an assumed checkpoint.
 - **Capability matrix / versioned briefs:** the coverage JSON is the input they should read; they
   should cite its `target_id` and `sources[].ledger` references.

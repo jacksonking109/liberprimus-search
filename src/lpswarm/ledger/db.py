@@ -115,7 +115,11 @@ class Ledger:
                 "attempt": {"output_hash": "TEXT"},
                 "key_candidate": {"value_json": "TEXT"},
                 "result": {"unreachable": "INTEGER NOT NULL DEFAULT 0", "word_score": "REAL",
-                           "null_variant": "TEXT"}}
+                           "null_variant": "TEXT"},
+                "sweep_summary": {"spec_json": "TEXT", "expansion_version": "INTEGER",
+                                  "text_length": "INTEGER", "requested": "INTEGER",
+                                  "cursor": "INTEGER", "equivalent": "INTEGER",
+                                  "stop_reason": "TEXT"}}
 
     def _migrate(self) -> None:
         """Add columns introduced after a ledger was created (tables are created by the
@@ -269,12 +273,28 @@ class Ledger:
         return int(row[0]) if row else None
 
     def record_sweep(self, target_id: str, hypothesis_id: int, family: str, sweep_id: str,
-                     attempts: int, screened: int, best_margin: float | None, complete: bool) -> None:
+                     attempts: int, screened: int, best_margin: float | None, complete: bool,
+                     checkpoint: dict | None = None) -> None:
+        """One summary row per (target, proposal); a re-run replaces it. `checkpoint` (optional):
+        spec_json, expansion_version, text_length, requested, cursor, equivalent, stop_reason."""
+        c = checkpoint or {}
         self.conn.execute(
             "INSERT OR REPLACE INTO sweep_summary (target_id, hypothesis_id, family, sweep_id,"
-            " attempts, screened, best_margin, complete) VALUES (?,?,?,?,?,?,?,?)",
+            " attempts, screened, best_margin, complete, spec_json, expansion_version,"
+            " text_length, requested, cursor, equivalent, stop_reason)"
+            " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
             (target_id, hypothesis_id, family, sweep_id, attempts, screened, best_margin,
-             int(complete)))
+             int(complete), c.get("spec_json"), c.get("expansion_version"), c.get("text_length"),
+             c.get("requested"), c.get("cursor"), c.get("equivalent"), c.get("stop_reason")))
+
+    def record_run_meta(self, meta: dict) -> str:
+        """Store what this invocation was evaluated with; returns the oracle-config hash."""
+        import hashlib
+        h = hashlib.sha256(canonical_json(meta.get("oracle_config", "unknown")).encode()).hexdigest()
+        self.conn.execute("INSERT INTO run_meta (config_hash, meta_json) VALUES (?, ?)",
+                          (h, canonical_json(meta)))
+        self.conn.commit()
+        return h
 
     def record_attempt(self, *, hypothesis_id: int, key_candidate_id: int, target_id: str,
                        cipher_family: str, params: dict, dedupe: str, executor_version: str,

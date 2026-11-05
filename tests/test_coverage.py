@@ -192,7 +192,8 @@ def test_old_schema_reports_unknowns_and_does_not_merge_different_evaluators(tmp
     assert srcs["old.sqlite"]["status"] == "ok"
     assert srcs["old.sqlite"]["schema"] == {"has_sweep_summary": False, "has_final_check": False,
                                             "has_null_variant": False, "has_output_hash": False,
-                                            "has_sweep_complete": False}
+                                            "has_sweep_complete": False,
+                                            "has_sweep_checkpoint": False, "has_run_meta": False}
     sec_old = [s for s in rep["sections"] if s["target_id"] == "t1"][0]
     assert sec_old["sources"][0]["final_check_summary"] == {"rechecked": "unknown", "survivors": "unknown"}
     assert sec_old["transcription_version"] == "unknown"

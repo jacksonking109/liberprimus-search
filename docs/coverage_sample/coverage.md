@@ -12,15 +12,16 @@ Target `820874ee9ac2`, 240 symbols, alphabet latin26, word breaks not used, tran
 
 | evaluator (executor version; oracle config unknown) | ledgers | stored rows | lean counted | logical (summed, may overlap) |
 | --- | ---: | ---: | ---: | ---: |
-| phase1-0.1.0 | 3 | 53 | 675 | 728 |
+| phase1-0.1.0 | 1 | 26 | 0 | 26 |
+| phase1-0.1.0 | 2 | 27 | 199 | 226 |
 
 Most-tested hypotheses (3 of 3):
 
 | attempts | proposer | description | completion | where |
 | ---: | --- | --- | --- | --- |
-| 676 (lean) | sonnet | all 2-keys | completed (finished lean sweep) | 20260101-0000/sonnet_1 |
+| 200 (lean) | sonnet | all 2-keys | incomplete (lean sweep stopped: max_attempts; 200 of at most 676 candidates processed) | 20260101-0000/sonnet_1 |
 | 26 | codex | constant shifts | has a recorded pass; whether the enumeration finished is not recorded | 20260101-0000/codex_1 |
-| 26 | codex | again | has a recorded pass; whether the enumeration finished is not recorded | 20260102-0000/codex_1 |
+| 26 | codex | older run, no manifest | has a recorded pass; whether the enumeration finished is not recorded | 20260102-0000/codex_1 |
 
 Recorded stop reasons (from report.json): codex_1: max_attempts.
 

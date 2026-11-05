@@ -117,8 +117,26 @@ CREATE TABLE IF NOT EXISTS sweep_summary (
     screened INTEGER NOT NULL DEFAULT 0,
     best_margin REAL,                  -- best (combined - threshold) among them
     complete INTEGER NOT NULL DEFAULT 0,
+    -- checkpoint (added later; NULL in older rows = unknown): the proposal, the order it was
+    -- expanded in, and how far the enumeration got, so the completed prefix can be reconstructed
+    spec_json TEXT,                    -- canonical compiled spec of the proposal (the template)
+    expansion_version INTEGER,         -- version of the deterministic expansion order
+    text_length INTEGER,               -- text length used when expanding (decimation depends on it)
+    requested INTEGER,                 -- upper bound on the number of expanded ciphers
+    cursor INTEGER,                    -- expanded ciphers fully processed, in expansion order
+    equivalent INTEGER,                -- of those, skipped as the same decryption as an earlier one
+    stop_reason TEXT,                  -- exhausted | max_attempts | timeout | stop_file | stop_event
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     UNIQUE (target_id, sweep_id)
+);
+
+-- What a run was evaluated with: one row per swarm/baseline invocation on this ledger. Never
+-- holds credentials, prompts or configuration files; absent in older ledgers (= unknown).
+CREATE TABLE IF NOT EXISTS run_meta (
+    id INTEGER PRIMARY KEY,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    config_hash TEXT NOT NULL,         -- sha256 of the canonical oracle configuration
+    meta_json TEXT NOT NULL
 );
 
 -- Usage limits hit by subscription CLIs; a model is paused until resume_at.

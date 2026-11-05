@@ -42,6 +42,10 @@ from lpswarm.alphabet import Alphabet
 from lpswarm.programs.sequences import MAX_INDEX, SEQUENCES, window
 
 SPEC_VERSION = 1
+# Version of the deterministic order in which `expand_iter` yields ciphers. A sweep checkpoint
+# (a cursor into that order) is only meaningful for the version that wrote it: bump this if the
+# order, or what a spec expands to, ever changes.
+EXPANSION_VERSION = 1
 MAX_KEY_LEN = 64
 MAX_OFFSET = 1_000_000
 MAX_OFFSET_SPAN = 2000

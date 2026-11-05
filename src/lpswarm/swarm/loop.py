@@ -198,9 +198,16 @@ def run_swarm(target: Target, ledger: Ledger, oracle: FullOracle, generators: Se
                 try:
                     lean_id = (spec_hash(spec) if cfg.lean_threshold and
                                expansion_size(spec) >= cfg.lean_threshold else None)
+                    lean_spec = None
+                    if lean_id is not None:
+                        from lpswarm.programs.spec import EXPANSION_VERSION, canonical
+                        lean_spec = {"spec_json": canonical(spec), "expansion_version": EXPANSION_VERSION,
+                                     "text_length": int(len(target.ciphertext)),
+                                     "requested": expansion_size(spec)}
                     s = ex.run(target, hyp, "program",
                                ExplicitKeys(expand_iter(spec, len(target.ciphertext)),
-                                            derivation=f"model:{gen.model}"), lean_id=lean_id)
+                                            derivation=f"model:{gen.model}"), lean_id=lean_id,
+                               lean_spec=lean_spec)
                 except (SpecError, ValueError) as exc:
                     gs.invalid += 1
                     errors[gen.model].append(f"{desc} -> could not run: {str(exc)[:160]}")

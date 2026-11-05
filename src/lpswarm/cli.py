@@ -165,6 +165,24 @@ def _targets_from_args(args, alphabet) -> list[tuple]:
     return out
 
 
+def _record_run_meta(led, command: str, oracle, args, targets, caps: dict, models: dict) -> None:
+    """Save what this invocation was evaluated with (see lpswarm.runmeta). Never raises: a
+    failure is recorded as an explicit meta_error, and never replaced by guessed values."""
+    from lpswarm import runmeta
+    try:
+        meta = runmeta.collect(command, oracle.cfg, alphabet_path=getattr(args, "alphabet", None),
+                               manifest_path=getattr(args, "manifest", None),
+                               targets=[(t[1], len(t[0])) for t in targets], caps=caps, models=models)
+        led.record_run_meta(meta)
+    except Exception as exc:  # noqa: BLE001
+        print(f"warning: could not record run metadata: {exc}", file=sys.stderr)
+        try:
+            led.record_run_meta({"schema": 1, "command": command, "oracle_config": "unknown",
+                                 "meta_error": str(exc)[:300]})
+        except Exception:  # noqa: BLE001
+            pass
+
+
 def cmd_baseline(args) -> int:
     from lpswarm.baseline import BaselineConfig, load_key_texts, run_baseline
     from lpswarm.executor import Target
@@ -191,6 +209,9 @@ def cmd_baseline(args) -> int:
     entries: list[dict] = []
     cmdline = "lpswarm " + " ".join(sys.argv[1:])
     with Ledger(args.ledger) as led:
+        _record_run_meta(led, "baseline", oracle, args, targets,
+                         {"max_attempts": args.max_attempts, "timeout_s": args.timeout,
+                          "min_length": args.min_length}, {})
         for ct, label, page_range, synthetic, demo_keys, breaks in targets:
             if len(ct) < max(args.min_length, oracle.min_length):
                 print(f"skip {label}: only {len(ct)} symbols under alphabet {alphabet.name} "
@@ -287,6 +308,12 @@ def cmd_swarm(args) -> int:
         "timeout_s": args.timeout, "parallel": False if args.serial else None,
         "lean_threshold": args.lean_threshold})
     with Ledger(args.ledger) as led:
+        _record_run_meta(led, "swarm", oracle, args, targets,
+                         {"rounds": sc.rounds, "per_round": sc.per_round, "max_attempts": sc.max_attempts,
+                          "timeout_s": sc.timeout_s, "lean_threshold": sc.lean_threshold,
+                          "stop_on_pass": sc.stop_on_pass, "parallel": sc.parallel,
+                          "min_length": args.min_length},
+                         {"generators": list(names), "ranker": args.ranker or None})
         # Model calls are counted in one shared spend ledger (also used by tiertest and
         # doctor), so per-model USD caps and call-per-window caps hold across all runs.
         spend = Ledger(args.spend_ledger) if args.models else None
@@ -430,7 +457,8 @@ def cmd_coverage(args) -> int:
     if not specs and not notes:
         raise SystemExit("coverage: no ledgers selected")
     report = C.build(specs, notes, top_leads=args.top_leads, max_hypotheses=args.max_hypotheses,
-                     version=getattr(lpswarm, "__version__", C.UNKNOWN))
+                     version=getattr(lpswarm, "__version__", C.UNKNOWN),
+                     reconstruct=not args.no_reconstruct)
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
     (out / "coverage.json").write_text(C.to_json(report), encoding="utf-8")
@@ -503,6 +531,12 @@ def cmd_overnight(args) -> int:
         raise SystemExit(f"supervisor {cfg.supervisor} configured but {cfg.models} not found")
     run = Overnight(cfg, run_dir, publish=False if args.no_publish else None, router=router,
                     retry_failed=args.retry_failed, echo_jobs=not args.quiet_jobs)
+    if not (Path(run_dir) / "manifest.json").exists():     # once, at run creation
+        try:
+            from lpswarm.runmeta import write_run_manifest
+            write_run_manifest(Path(run_dir), cfg, args.config)
+        except Exception as exc:  # noqa: BLE001
+            print(f"[overnight] note: could not write manifest.json: {exc}", flush=True)
     try:
         st = run.run()
     finally:
@@ -722,6 +756,8 @@ def build_parser() -> argparse.ArgumentParser:
                    "and ledger")
     p.add_argument("--max-hypotheses", type=int, default=500, help="hypotheses listed per target and "
                    "ledger in coverage.json (totals always cover all)")
+    p.add_argument("--no-reconstruct", action="store_true", help="do not re-expand incomplete lean "
+                   "sweeps to describe their completed prefix (faster on huge sweeps)")
     p.set_defaults(func=cmd_coverage)
 
     p = sub.add_parser("disk", help="free disk space, size of each overnight run, and "

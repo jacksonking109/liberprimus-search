@@ -98,11 +98,16 @@ class Executor:
         return None
 
     def run(self, target: Target, hypothesis_id: int, family_name: str, keys: KeySource,
-            param_limits: dict[str, Any] | None = None, lean_id: str | None = None) -> RunSummary:
+            param_limits: dict[str, Any] | None = None, lean_id: str | None = None,
+            lean_spec: dict | None = None) -> RunSummary:
         """Run every key of `keys` on the target. With `lean_id` (a hash of the proposal) the
         run is a *lean sweep*, for expansions too large to store row by row: attempts that fail
         are only counted (they still count towards the Bonferroni total), passes and near misses
-        are stored in full, and a finished sweep of the same proposal is skipped whole."""
+        are stored in full, and a finished sweep of the same proposal is skipped whole.
+        `lean_spec` (spec_json, expansion_version, text_length, requested) is stored with the
+        summary as a checkpoint: with the cursor (candidates fully processed, in expansion order)
+        the completed prefix can be reconstructed later. A re-run still starts from the
+        beginning; the cursor is never used to skip work."""
         fam = get_family(family_name)
         alpha = target.alphabet
         n = alpha.size
@@ -134,11 +139,13 @@ class Executor:
         count = self.ledger.attempt_count(tid)
         seen_outputs = self.ledger.output_hashes(tid)
         lean_screened, lean_best = 0, None
+        processed = 0
         t0 = time.monotonic()
         since_commit = 0
         exhausted = True
         try:
             for kc in keys.candidates(fam, n, L):
+                processed += 1
                 khash = fam.key_hash(kc.key)
                 kid = None
                 for params in fam.param_grid(L, kc.key, **lim):
@@ -146,6 +153,7 @@ class Executor:
                     if stop:
                         summary.stopped = stop
                         exhausted = False
+                        processed -= 1       # the candidate that hit the stop was not processed
                         raise _Stop
                     dh = dedupe_hash(tid, family_name, params, khash)
                     prior = self.ledger.prior_verdict(dh)
@@ -226,8 +234,12 @@ class Executor:
             self.ledger.commit()
             raise
         if lean_id is not None:
+            ck = None
+            if lean_spec is not None:
+                ck = dict(lean_spec, cursor=processed, equivalent=summary.equivalent,
+                          stop_reason=summary.stopped or ("exhausted" if exhausted else "unknown"))
             self.ledger.record_sweep(tid, hypothesis_id, family_name, lean_id, summary.lean,
-                                     lean_screened, lean_best, complete=exhausted)
+                                     lean_screened, lean_best, complete=exhausted, checkpoint=ck)
         self.ledger.commit()
         tried = summary.new_attempts + summary.skipped
         if summary.passes or summary.prior_passes or self.ledger.hypothesis_has_pass(hypothesis_id):

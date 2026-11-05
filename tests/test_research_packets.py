@@ -80,6 +80,14 @@ def _run_packet(tmp_path, monkeypatch, sections, name, section, expected):
 def test_exp2_packet_runs_through_the_real_swarm_with_the_scripted_proposer(tmp_path, monkeypatch, sections):
     run = _run_packet(tmp_path, monkeypatch, sections, "exp2_two_shear", 24, 33)
     assert main(["coverage", "--ledger", str(run / "ledger.sqlite"), "--out", str(tmp_path / "cov")]) == 0
+    # the swarm recorded what it was evaluated with, and coverage shows the ACTUAL configuration
+    cov = json.loads((tmp_path / "cov" / "coverage.json").read_text(encoding="utf-8"))
+    group = cov["sections"][0]["evaluator_groups"][0]
+    assert group["oracle_config"]["null_samples"] == 200 and len(group["oracle_config_hash"]) == 64
+    meta = cov["inputs"]["ledgers"][0]["run_meta"][0]
+    assert meta["command"] == "swarm" and meta["caps"]["max_attempts"] == 40 and meta["caps"]["rounds"] == 2
+    assert meta["models"]["generators"] == ["packet-exp2_two_shear"]
+    assert meta["alphabet_sha256"] != "unknown" and meta["corpus_sha256"] != "unknown"
 
 
 def test_exp1_packet_runs_through_the_real_swarm_with_the_scripted_proposer(tmp_path, monkeypatch, sections):

@@ -32,6 +32,9 @@ REQUIRED_TABLES = {"target": {"id", "label", "alphabet", "length", "word_breaks"
                    "result": {"attempt_id", "stage", "verdict", "attempt_count_at_scoring",
                               "alpha_eff"}}
 UNKNOWN = "unknown"
+CHECKPOINT_COLUMNS = {"spec_json", "expansion_version", "text_length", "requested", "cursor",
+                      "equivalent", "stop_reason"}
+MAX_RECONSTRUCT = 2_000_000
 # Only these job arguments are ever copied from an overnight state.json.
 SAFE_ARGS = ("--sections", "--max-attempts", "--rounds", "--per-round", "--generators",
              "--lean-threshold", "--timeout")
@@ -119,7 +122,7 @@ def _check_schema(con: sqlite3.Connection) -> tuple[dict, str | None]:
     if missing:
         return {}, f"unsupported schema: missing table(s) {', '.join(missing)}"
     cols = {t: _columns(con, t) for t in tables if t in REQUIRED_TABLES
-            or t in ("sweep_summary", "final_check")}
+            or t in ("sweep_summary", "final_check", "run_meta")}
     for t, need in REQUIRED_TABLES.items():
         gone = sorted(need - cols[t])
         if gone:
@@ -128,7 +131,9 @@ def _check_schema(con: sqlite3.Connection) -> tuple[dict, str | None]:
             "has_final_check": "final_check" in tables,
             "has_null_variant": "null_variant" in cols["result"],
             "has_output_hash": "output_hash" in cols["attempt"],
-            "has_sweep_complete": "complete" in cols.get("sweep_summary", set())}, None
+            "has_sweep_complete": "complete" in cols.get("sweep_summary", set()),
+            "has_sweep_checkpoint": CHECKPOINT_COLUMNS <= cols.get("sweep_summary", set()),
+            "has_run_meta": "run_meta" in tables}, None
 
 
 def _clean_description(text: str) -> str:
@@ -137,7 +142,7 @@ def _clean_description(text: str) -> str:
     return " ".join(str(text).split(" | why:", 1)[0].split())[:240]
 
 
-def read_ledger(path: Path, top_leads: int, max_hypotheses: int) -> dict:
+def read_ledger(path: Path, top_leads: int, max_hypotheses: int, reconstruct: bool = True) -> dict:
     """Aggregates of one ledger, read inside a single read transaction. Raises
     sqlite3.Error for unreadable / locked / corrupt files."""
     con = _connect_ro(path)
@@ -188,11 +193,14 @@ def read_ledger(path: Path, top_leads: int, max_hypotheses: int) -> dict:
                                                            "sweeps": 0})
         if schema["has_sweep_summary"]:
             cc = "s.complete" if schema["has_sweep_complete"] else "NULL"
-            for (tid, hid, fam, sid, att, scr, best, comp, desc, model, role, status) in \
-                    con.execute(
+            ck = ("s.spec_json, s.expansion_version, s.text_length, s.requested, s.cursor,"
+                  " s.equivalent, s.stop_reason" if schema["has_sweep_checkpoint"]
+                  else "NULL, NULL, NULL, NULL, NULL, NULL, NULL")
+            for (tid, hid, fam, sid, att, scr, best, comp, desc, model, role, status,
+                 *ckv) in con.execute(
                         "SELECT s.target_id, s.hypothesis_id, s.family, s.sweep_id, s.attempts,"
                         f" s.screened, s.best_margin, {cc}, h.description, h.proposer_model,"
-                        " h.proposer_role, h.status FROM sweep_summary s"
+                        f" h.proposer_role, h.status, {ck} FROM sweep_summary s"
                         " JOIN hypothesis h ON h.id=s.hypothesis_id"):
                 entry = hyps[tid].setdefault(hid, {
                     "hypothesis_id": hid, "family": fam, "description": _clean_description(desc),
@@ -202,7 +210,8 @@ def read_ledger(path: Path, top_leads: int, max_hypotheses: int) -> dict:
                     "lean": None})
                 done = None if comp is None else bool(comp)
                 entry["lean"] = {"sweep_id": sid, "counted_attempts": att, "screened_out": scr,
-                                 "best_recorded_margin_of_counted": best, "complete": done}
+                                 "best_recorded_margin_of_counted": best, "complete": done,
+                                 **_checkpoint_fields(ckv, done, reconstruct)}
                 lt = lean_total[tid]
                 lt["sweeps"] += 1
                 key = "complete" if done is True else "incomplete" if done is False \
@@ -268,9 +277,86 @@ def read_ledger(path: Path, top_leads: int, max_hypotheses: int) -> dict:
                 "hypotheses_truncated": len(hl) > max_hypotheses,
                 "leads": leads.get(tid, []), "final_check_summary": finals.get(tid)})
         return {"status": "ok", "schema": schema, "targets": out_targets,
-                "hypotheses_without_attempts": n_unlinked}
+                "hypotheses_without_attempts": n_unlinked, "run_meta": _read_run_meta(con, schema)}
     finally:
         con.close()
+
+
+# --------------------------------------------------------------- checkpoints
+def _checkpoint_fields(ckv: list, done: bool | None, reconstruct: bool) -> dict:
+    """Checkpoint facts of a lean sweep, kept apart: requested (an upper bound), counted attempts
+    (elsewhere), the cursor (candidates fully processed, in expansion order), equivalents skipped
+    and the stop reason. All `unknown` for rows written before checkpoints existed."""
+    spec_json, version, length, requested, cursor, equivalent, stop = ckv
+    if spec_json is None or cursor is None:
+        return {"checkpoint": UNKNOWN, "completed_prefix": {
+            "status": UNKNOWN, "reason": "no checkpoint recorded (older ledger or summary)"}}
+    ck = {"requested_upper_bound": requested, "cursor_candidates_processed": cursor,
+          "equivalent_skipped": equivalent, "stop_reason": stop or UNKNOWN,
+          "text_length": length, "expansion_version": version}
+    if done is True:
+        prefix = {"status": "complete_by_recorded_flag"}
+    elif not reconstruct:
+        prefix = {"status": "not_reconstructed", "reason": "--no-reconstruct"}
+    else:
+        prefix = _completed_prefix(spec_json, version, length, cursor, requested)
+    return {"checkpoint": ck, "completed_prefix": prefix}
+
+
+def _completed_prefix(spec_json: str, version: int, length: int, cursor: int, requested) -> dict:
+    """The first `cursor` ciphers of the proposal in expansion order (re-expanded read-only)."""
+    from lpswarm.programs.spec import EXPANSION_VERSION, describe, expand_iter
+    if version != EXPANSION_VERSION:
+        return {"status": UNKNOWN, "reason": f"expansion order version {version} differs from this "
+                f"tool's {EXPANSION_VERSION}; the completed subset cannot be reconstructed"}
+    bound = int(requested or cursor)
+    if bound > MAX_RECONSTRUCT:
+        return {"status": "not_reconstructed", "completed": cursor, "requested_upper_bound": bound,
+                "reason": f"expansion larger than {MAX_RECONSTRUCT}; counts only"}
+    try:
+        spec = json.loads(spec_json)
+        first = last = nxt = None
+        total = 0
+        for i, s in enumerate(expand_iter(spec, length)):
+            total += 1
+            if i == 0:
+                first = describe(s)
+            if i == cursor - 1:
+                last = describe(s)
+            if i == cursor:
+                nxt = describe(s)
+        return {"status": "reconstructed", "completed": cursor, "expanded_total": total,
+                "remaining": max(total - cursor, 0), "first_completed": first,
+                "last_completed": last, "first_remaining": nxt,
+                "note": "the first `completed` ciphers in deterministic expansion order; the "
+                        "decryptions themselves are not rescored here"}
+    except Exception as exc:  # noqa: BLE001
+        return {"status": UNKNOWN, "reason": f"could not re-expand the recorded spec: {str(exc)[:120]}"}
+
+
+def _read_run_meta(con: sqlite3.Connection, schema: dict) -> list[dict]:
+    if not schema.get("has_run_meta"):
+        return []
+    out = []
+    for rid, created, chash, mj in con.execute(
+            "SELECT id, created_at, config_hash, meta_json FROM run_meta ORDER BY id"):
+        try:
+            m = json.loads(mj)
+        except ValueError:
+            m = None
+        if not isinstance(m, dict):
+            out.append({"id": rid, "created_at": created, "config_hash": chash, "unreadable": True})
+            continue
+        out.append({"id": rid, "created_at": created, "config_hash": chash,
+                    "command": m.get("command"), "git_sha": m.get("git_sha", UNKNOWN),
+                    "lpswarm_version": m.get("lpswarm_version", UNKNOWN),
+                    "executor_version": m.get("executor_version", UNKNOWN),
+                    "oracle_config": m.get("oracle_config", UNKNOWN),
+                    "caps": m.get("caps", {}), "models": m.get("models", {}),
+                    "corpus_sha256": (m.get("corpus") or {}).get("sha256", UNKNOWN),
+                    "alphabet_sha256": (m.get("alphabet") or {}).get("sha256", UNKNOWN),
+                    "capture_error": m.get("meta_error") or m.get("git_sha_error")})
+    return out
 
 
 # ----------------------------------------------------------------- sidecars
@@ -315,6 +401,11 @@ def completion_of(h: dict) -> str:
         if lean["complete"] is True:
             return "completed (finished lean sweep)"
         if lean["complete"] is False:
+            ck = lean.get("checkpoint")
+            if isinstance(ck, dict):
+                return (f"incomplete (lean sweep stopped: {ck['stop_reason']}; "
+                        f"{ck['cursor_candidates_processed']} of at most {ck['requested_upper_bound']} "
+                        "candidates processed)")
             return "incomplete (lean sweep stopped before finishing; reason not recorded in the ledger)"
         return "unknown (lean summary without a completion flag)"
     st = h["recorded_status"]
@@ -332,7 +423,7 @@ def completion_of(h: dict) -> str:
 
 # --------------------------------------------------------------- aggregation
 def build(ledger_specs: list[dict], notes: list[str], top_leads: int = 10,
-          max_hypotheses: int = 500, version: str = UNKNOWN) -> dict:
+          max_hypotheses: int = 500, version: str = UNKNOWN, reconstruct: bool = True) -> dict:
     sources: list[dict] = []
     per_target: dict[str, dict] = {}
     for spec in ledger_specs:
@@ -350,7 +441,7 @@ def build(ledger_specs: list[dict], notes: list[str], top_leads: int = 10,
             continue
         src["size_bytes"] = p.stat().st_size
         try:
-            data = read_ledger(p, top_leads, max_hypotheses)
+            data = read_ledger(p, top_leads, max_hypotheses, reconstruct)
         except sqlite3.OperationalError as exc:
             msg = str(exc)
             src.update(status="locked" if "locked" in msg or "busy" in msg else "unreadable",
@@ -365,6 +456,7 @@ def build(ledger_specs: list[dict], notes: list[str], top_leads: int = 10,
         if data["status"] != "ok":
             src.update(status=data["status"], error=data["error"])
             continue
+        src["run_meta"] = data["run_meta"] if data["schema"].get("has_run_meta") else UNKNOWN
         src.update(status="ok", schema=data["schema"],
                    hypotheses_without_attempts=data["hypotheses_without_attempts"],
                    snapshot="one read transaction per ledger: committed rows at read time; the "
@@ -387,6 +479,7 @@ def build(ledger_specs: list[dict], notes: list[str], top_leads: int = 10,
                 h["completion"] = completion_of(h)
             entry["ledgers"].append({
                 "ledger": src["path"], "run": spec["run"], "job": spec["job"],
+                "run_meta": data["run_meta"] if data["schema"].get("has_run_meta") else UNKNOWN,
                 "stored_rows": t["stored_rows"], "stored_by_stage": t["stored_by_stage"],
                 "stored_by_verdict": t["stored_by_verdict"],
                 "attempts_without_result_row": t["attempts_without_result_row"],
@@ -413,15 +506,40 @@ def build(ledger_specs: list[dict], notes: list[str], top_leads: int = 10,
                        "counts": {"read": len(ok), "failed": len(bad)}},
             "definitions": DEFINITIONS, "sections": sections,
             "limitations": [
-                "The oracle configuration (alpha, null samples, near-miss rule) is not recorded in "
-                "the ledgers: evaluator_config is unknown for every attempt.",
-                "Lean-sweep summaries record a count, a completion flag and the proposal's "
-                "description, not its spec; the completed subset of an incomplete sweep is unknown.",
+                "The oracle configuration (alpha, null samples, near-miss rule) is recorded only in "
+                "ledgers written after the evidence manifest existed (run_meta); for all others it "
+                "is unknown.",
+                "Lean-sweep summaries written before checkpoints record a count, a completion flag and "
+                "the proposal's description, not its spec; their completed subset is unknown.",
                 "Why an unfinished job stopped is recorded only in report.json beside the ledger, "
                 "when present; invalid proposals never reach a ledger.",
                 "No cross-job or cross-run deduplication exists, so summed totals may overlap.",
                 "Transcription version is not recorded; identity is the target id only.",
                 "History is not rescored: recorded thresholds and margins are shown as they were."]}
+
+
+def _config_key(run_meta) -> str:
+    """The recorded oracle-config hash of a ledger: 'unknown' if none was recorded (older ledgers),
+    'multiple:...' if the ledger was used with different configurations (per-attempt attribution
+    is then unknown)."""
+    if not isinstance(run_meta, list) or not run_meta:
+        return "unknown (not recorded)"
+    hashes = sorted({m.get("config_hash") for m in run_meta if not m.get("unreadable")} - {None})
+    unknown_cfg = [m for m in run_meta if m.get("oracle_config") in (None, UNKNOWN)]
+    if not hashes or (len(hashes) == 1 and unknown_cfg):
+        return "unknown (capture failed)"
+    return hashes[0] if len(hashes) == 1 else "multiple:" + ",".join(h[:12] for h in hashes)
+
+
+def _config_of(run_meta, key: str):
+    if key.startswith("multiple"):
+        return "multiple configurations recorded in one ledger; per-attempt attribution unknown"
+    if key.startswith("unknown"):
+        return UNKNOWN
+    for m in run_meta:
+        if m.get("config_hash") == key:
+            return m.get("oracle_config", UNKNOWN)
+    return UNKNOWN
 
 
 def _section(e: dict) -> dict:
@@ -435,11 +553,14 @@ def _section(e: dict) -> dict:
               if isinstance(wlist, list) else {"present": False})
     groups: dict[tuple, list[dict]] = defaultdict(list)
     for led in e["ledgers"]:
-        groups[tuple(led["executor_versions"]) or (UNKNOWN,)].append(led)
+        groups[(tuple(led["executor_versions"]) or (UNKNOWN,), _config_key(led["run_meta"]))].append(led)
     evaluator_groups = []
-    for versions, leds in sorted(groups.items()):
+    for (versions, cfg_key), leds in sorted(groups.items()):
         evaluator_groups.append({
-            "executor_versions": list(versions), "oracle_config": UNKNOWN,
+            "executor_versions": list(versions), "oracle_config": _config_of(leds[0]["run_meta"], cfg_key),
+            "oracle_config_hash": cfg_key if not cfg_key.startswith(("unknown", "multiple")) else UNKNOWN,
+            "git_shas": sorted({m.get("git_sha", UNKNOWN) for led in leds
+                                for m in (led["run_meta"] if isinstance(led["run_meta"], list) else [])}),
             "ledgers": [led["ledger"] for led in leds],
             "stored_rows": sum(led["stored_rows"] for led in leds),
             "lean_counted": sum(led["lean_counted"] for led in leds),
@@ -498,10 +619,12 @@ def to_markdown(report: dict, top_hypotheses: int = 25) -> str:
               f"{s['final_check']['rechecked']} candidate(s) rechecked, "
               f"{s['final_check']['survivors']} survived (a candidate with no recheck recorded "
               f"has no final verdict).", ""]
-        L += ["| evaluator (executor version; oracle config unknown) | ledgers | stored rows | lean counted | logical (summed, may overlap) |",
+        L += ["| evaluator (executor version; oracle config hash, or unknown if not recorded) | ledgers | stored rows | lean counted | logical (summed, may overlap) |",
               "| --- | ---: | ---: | ---: | ---: |"]
         for g in s["evaluator_groups"]:
-            L.append(f"| {', '.join(g['executor_versions'])} | {len(g['ledgers'])} | {g['stored_rows']} "
+            h = g.get("oracle_config_hash", "unknown")
+            cfg = h[:10] if h != "unknown" else ("multiple" if "multiple" in str(g["oracle_config"]) else "unknown")
+            L.append(f"| {', '.join(g['executor_versions'])}; config {cfg} | {len(g['ledgers'])} | {g['stored_rows']} "
                      f"| {g['lean_counted']} | {g['logical_attempts_summed_over_ledgers']} |")
         hy = []
         for led in s["sources"]:
