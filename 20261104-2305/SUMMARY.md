@@ -1,11 +1,11 @@
 # Overnight run 20261104-2305
 
-Started 2026-11-04 23:05:16, updated 2026-11-04 23:13:50, status **running**. Jobs: pending 61, running 3, done 8
+Started 2026-11-04 23:05:16, updated 2026-11-04 23:14:10, status **running**. Jobs: pending 60, running 3, done 9
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
 | tier-claude | done | 2026-11-04 23:05:16 | 2026-11-04 23:09:58 | Claude Code proposers vs the random control |
-| sonnet/10 | running | 2026-11-04 23:10:14 |  | Sonnet, briefed by Opus |
+| sonnet/10 | done | 2026-11-04 23:10:14 | 2026-11-04 23:14:10 | Sonnet, briefed by Opus |
 | sonnet/11 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/12 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/13 | pending |  |  | Sonnet, briefed by Opus |
@@ -28,7 +28,7 @@ Started 2026-11-04 23:05:16, updated 2026-11-04 23:13:50, status **running**. Jo
 | codex/19 | done | 2026-11-04 23:09:53 | 2026-11-04 23:11:34 | Codex (exploratory) |
 | codex/18 | done | 2026-11-04 23:11:49 | 2026-11-04 23:13:50 | Codex (exploratory) |
 | codex/17 | running | 2026-11-04 23:12:45 |  | Codex (exploratory) |
-| codex/16 | pending |  |  | Codex (exploratory) |
+| codex/16 | running | 2026-11-04 23:14:05 |  | Codex (exploratory) |
 | codex/15 | pending |  |  | Codex (exploratory) |
 | codex/14 | pending |  |  | Codex (exploratory) |
 | codex/13 | pending |  |  | Codex (exploratory) |
@@ -79,22 +79,8 @@ Started 2026-11-04 23:05:16, updated 2026-11-04 23:13:50, status **running**. Jo
 
 ## Now running
 
-**sonnet/10** (since 2026-11-04 23:10:14), latest log lines:
-```
-  | 6. Transposition plus key, as a lower priority. Use railfence with transpose_range [2,12], and grid with read "columns" and transpose_range [2,40]. Pair each with the prime_totients stream at offs
-  | Do NOT:
-  | - Try pure
-23:10:39 [model] claude-sonnet (proposer) calling...
-23:10:53 [model] claude-sonnet (proposer) ok 13.9s, tokens in/out 4937/1148, reply 2486 chars
-round 1 [claude-sonnet] proposals=12 valid=4 attempts=24404 passes=0 near=0 invalid=8
-23:11:10 [model] claude-sonnet (proposer) calling...
-23:11:43 [model] claude-sonnet (proposer) ok 33.1s, tokens in/out 5891/1183, reply 2556 chars
-round 2 [claude-sonnet] proposals=12 valid=12 attempts=60000 passes=0 near=0 invalid=8
-stopped: max_attempts; final passes: 0
-```
 **codex/17** (since 2026-11-04 23:12:45), latest log lines:
 ```
-23:13:14 [model] codex (proposer) ok 27.5s, tokens in/out 18192/628, reply 1954 chars, model not reported (pin one with model = "..." in the models config)
 brief from codex (1954 chars):
   | 1. Start with repeat streams, exhaustive:true, key_length 1, 2, 3, then 4; combine:"sub", identity map, no skips or transposition. IC 0.995 suggests a flattened alphabet; these sweeps establish wh
   | 2. Prioritize autokey, source:"ciphertext", then source:"plaintext"; try every one-symbol primer [0] through [28], combine:"sub" and "beaufort", no skips. Only 11 adjacent doubles versus 35.2 expe
@@ -104,6 +90,13 @@ brief from codex (1954 chars):
   | 6. Test pure routes using constant value:0, sub: grid reads columns, columns_reversed, boustrophedon_columns, diagonal, spiral_in and spiral_out, widths 2..500; railfence rails 2..64; decimate ste
   | 7. On near_miss, test reverse_text:true and narrow stream/route combinations, keeping expansions <=5000. Nothing has been tried yet. Do not duplicate exhaustive sub with add, equivalent reverse-ma
 23:13:14 [model] codex (proposer) calling...
+23:13:54 [model] codex (proposer) ok 39.8s, tokens in/out 18711/1809, reply 5626 chars, model not reported (pin one with model = "..." in the models config)
+```
+**codex/16** (since 2026-11-04 23:14:05), latest log lines:
+```
+===== 2026-11-04 23:14:05 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 16 --gen
+== LP2:15.jpg/2- - 32.jpg/2-39.jpg  (1894 symbols)
+23:14:07 [model] codex (proposer) calling...
 ```
 **local/17** (since 2026-11-04 23:05:16), latest log lines:
 ```
@@ -123,6 +116,8 @@ brief from codex (1954 chars):
   - random_program:40: recall 0.00 (0/6), 192 attempts, 0 model calls, $0.0000
   - claude-opus: recall 0.33 (2/6), 99088 attempts, 6 model calls, $0.0000
   - claude-sonnet: recall 0.33 (2/6), 118614 attempts, 6 model calls, $0.0000
+- **sonnet/10** (done)
+  - LP2:17.jpg, 18.jpg, 19.jpg - 0.jpg-2.jpg: 60000 attempts, 14 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **codex/25** (done)
   - LP2:54.jpg-55.jpg - 71.jpg-72.jpg: 60000 attempts, 2 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **codex/24** (done)
@@ -147,7 +142,7 @@ brief from codex (1954 chars):
 - claude-opus: 46 call(s) in the last 5h (cap 180), spent $0.0000
 - claude-sonnet: 46 call(s) in the last 5h (cap 180), spent $0.0000
 - claude-supervisor: 46 call(s) in the last 5h (cap 180), spent $0.0000
-- codex: 49 call(s) in the last 5h (cap 850), spent $0.0000
+- codex: 50 call(s) in the last 5h (cap 850), spent $0.0000
 
 ## Supervisor notes
 
@@ -155,11 +150,6 @@ brief from codex (1954 chars):
 
 ## Events
 
-- 2026-11-04 23:09:35 codex/22: done (exit 0, 2 min)
-- 2026-11-04 23:09:51 published: 8 file(s) to branch results
-- 2026-11-04 23:09:51 codex/21: done (exit 0, 2 min)
-- 2026-11-04 23:09:53 published: 9 file(s) to branch results
-- 2026-11-04 23:09:53 codex/20: start (uses codex-plan)
 - 2026-11-04 23:09:53 3 running: tier-claude, local/17, codex/20
 - 2026-11-04 23:09:53 codex/19: start (uses codex-plan)
 - 2026-11-04 23:09:53 4 running: tier-claude, local/17, codex/20, codex/19
@@ -180,3 +170,8 @@ brief from codex (1954 chars):
 - 2026-11-04 23:12:45 4 running: local/17, sonnet/10, codex/18, codex/17
 - 2026-11-04 23:12:45 sonnet/11 waiting: claude-plan in use by sonnet/10
 - 2026-11-04 23:13:50 codex/18: done (exit 0, 2 min)
+- 2026-11-04 23:14:05 published: 12 file(s) to branch results
+- 2026-11-04 23:14:05 codex/16: start (uses codex-plan)
+- 2026-11-04 23:14:05 4 running: local/17, sonnet/10, codex/17, codex/16
+- 2026-11-04 23:14:05 sonnet/11 waiting: claude-plan in use by sonnet/10
+- 2026-11-04 23:14:10 sonnet/10: done (exit 0, 4 min)
