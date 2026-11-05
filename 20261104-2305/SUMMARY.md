@@ -1,6 +1,6 @@
 # Overnight run 20261104-2305
 
-Started 2026-11-04 23:05:16, updated 2026-11-05 00:49:50, status **running**. Jobs: pending 32, running 3, done 40
+Started 2026-11-04 23:05:16, updated 2026-11-05 00:52:40, status **running**. Jobs: pending 31, running 3, done 41
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -19,7 +19,7 @@ Started 2026-11-04 23:05:16, updated 2026-11-05 00:49:50, status **running**. Jo
 | sonnet/21 | done | 2026-11-05 00:29:51 | 2026-11-05 00:31:01 | Sonnet, briefed by Opus |
 | sonnet/22 | done | 2026-11-05 00:31:17 | 2026-11-05 00:47:58 | Sonnet, briefed by Opus |
 | sonnet/24 | done | 2026-11-05 00:48:14 | 2026-11-05 00:49:50 | Sonnet, briefed by Opus |
-| sonnet/25 | pending |  |  | Sonnet, briefed by Opus |
+| sonnet/25 | done | 2026-11-05 00:50:05 | 2026-11-05 00:52:40 | Sonnet, briefed by Opus |
 | codex/25 | done | 2026-11-04 23:05:16 | 2026-11-04 23:07:19 | Codex (exploratory) |
 | codex/24 | done | 2026-11-04 23:05:16 | 2026-11-04 23:07:40 | Codex (exploratory) |
 | codex/22 | done | 2026-11-04 23:07:35 | 2026-11-04 23:09:35 | Codex (exploratory) |
@@ -154,6 +154,8 @@ round 1 [codex] proposals=32 valid=32 attempts=148195 passes=0 near=0 invalid=0
   - LP2:57.jpg-66.jpg/1: 60000 attempts, 17 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **sonnet/24** (done)
   - LP2:51.jpg/2-53.jpg - 68.jpg/2-70.jpg: 60000 attempts, 6 hypotheses, **0 final pass(es)**, stopped: max_attempts
+- **sonnet/25** (done)
+  - LP2:54.jpg-55.jpg - 71.jpg-72.jpg: 60000 attempts, 11 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **codex/25** (done)
   - LP2:54.jpg-55.jpg - 71.jpg-72.jpg: 60000 attempts, 2 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **codex/24** (done)
@@ -211,9 +213,9 @@ round 1 [codex] proposals=32 valid=32 attempts=148195 passes=0 near=0 invalid=0
 - qwen-local: 9 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 9 call(s) in the last 5h (cap none), spent $0.0000
 - granite: 12 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 76 call(s) in the last 5h (cap 180), spent $0.0000
-- claude-sonnet: 76 call(s) in the last 5h (cap 180), spent $0.0000
-- claude-supervisor: 76 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-opus: 79 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-sonnet: 79 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-supervisor: 79 call(s) in the last 5h (cap 180), spent $0.0000
 - codex: 47 call(s) in the last 5h (cap 850), spent $0.0000
 
 ## Current strategy note (read by every lane each round)
@@ -236,12 +238,6 @@ Prefer variants that are absent from the section's history. Long sections should
 
 ## Events
 
-- 2026-11-05 00:31:17 sonnet/22: start (uses claude-plan)
-- 2026-11-05 00:31:17 4 running: local/20, structure/17, structure/18, sonnet/22
-- 2026-11-05 00:32:42 local/20: running 60 min | 23:34:27 [model] granite (weighting) ok 1.8s, tokens in/out 269/38, reply 69 chars
-- 2026-11-05 00:35:07 structure/17: running 55 min | 00:02:33 [model] codex (proposer) ok 58.7s, tokens in/out 21588/2719, reply 8973 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-05 00:35:27 structure/18: running 55 min | 00:28:32 [model] codex (proposer) ok 62.3s, tokens in/out 21212/2563, reply 8529 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-05 00:36:17 sonnet/22: running 5 min | 00:32:15 [model] claude-sonnet (proposer) ok 14.0s, tokens in/out 6269/1919, reply 2773 chars
 - 2026-11-05 00:37:42 local/20: running 65 min | stopped: max_attempts; final passes: 0
 - 2026-11-05 00:37:57 local/20: done (exit 0, 65 min)
 - 2026-11-05 00:38:13 published: 39 file(s) to branch results
@@ -261,3 +257,9 @@ Prefer variants that are absent from the section's history. Long sections should
 - 2026-11-05 00:48:14 sonnet/24: start (uses claude-plan)
 - 2026-11-05 00:48:15 4 running: structure/17, structure/18, local/14, sonnet/24
 - 2026-11-05 00:49:50 sonnet/24: done (exit 0, 2 min)
+- 2026-11-05 00:50:05 published: 41 file(s) to branch results
+- 2026-11-05 00:50:05 sonnet/25: start (uses claude-plan)
+- 2026-11-05 00:50:05 4 running: structure/17, structure/18, local/14, sonnet/25
+- 2026-11-05 00:50:10 structure/17: running 70 min | 00:39:30 [model] codex (proposer) ok 59.4s, tokens in/out 21313/2698, reply 8362 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 00:50:30 structure/18: running 70 min | 00:28:32 [model] codex (proposer) ok 62.3s, tokens in/out 21212/2563, reply 8529 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 00:52:40 sonnet/25: done (exit 0, 3 min)
