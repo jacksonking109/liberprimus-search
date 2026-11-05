@@ -1,6 +1,6 @@
 # Overnight run 20261104-2305
 
-Started 2026-11-04 23:05:16, updated 2026-11-05 00:09:13, status **running**. Jobs: pending 34, running 3, done 35
+Started 2026-11-04 23:05:16, updated 2026-11-05 00:29:19, status **running**. Jobs: pending 33, running 3, done 36
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -15,7 +15,7 @@ Started 2026-11-04 23:05:16, updated 2026-11-05 00:09:13, status **running**. Jo
 | sonnet/17 | done | 2026-11-04 23:56:46 | 2026-11-05 00:04:21 | Sonnet, briefed by Opus |
 | sonnet/18 | done | 2026-11-05 00:04:37 | 2026-11-05 00:06:07 | Sonnet, briefed by Opus |
 | sonnet/19 | done | 2026-11-05 00:06:23 | 2026-11-05 00:09:13 | Sonnet, briefed by Opus |
-| sonnet/20 | pending |  |  | Sonnet, briefed by Opus |
+| sonnet/20 | done | 2026-11-05 00:09:28 | 2026-11-05 00:29:19 | Sonnet, briefed by Opus |
 | sonnet/21 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/22 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/24 | pending |  |  | Sonnet, briefed by Opus |
@@ -108,6 +108,9 @@ brief for the generators (718 chars): Two-stage programs: a transposition, then 
 == LP2:- - 44.jpg-49.jpg  (1433 symbols)
 23:40:22 [model] codex (proposer) calling...
 23:41:14 [model] codex (proposer) ok 52.6s, tokens in/out 18738/2446, reply 8924 chars, model not reported (pin one with model = "..." in the models config)
+round 1 [codex] proposals=32 valid=32 attempts=148195 passes=0 near=0 invalid=0
+00:27:30 [model] codex (proposer) calling...
+00:28:32 [model] codex (proposer) ok 62.3s, tokens in/out 21212/2563, reply 8529 chars, model not reported (pin one with model = "..." in the models config)
 ```
 
 ## Results so far
@@ -136,6 +139,8 @@ brief for the generators (718 chars): Two-stage programs: a transposition, then 
   - LP2:- - 44.jpg-49.jpg: 60000 attempts, 4 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **sonnet/19** (done)
   - LP2:33.jpg - 50.jpg/1: 60000 attempts, 38 hypotheses, **0 final pass(es)**, stopped: max_attempts (caution: short section (91 runes): many keys give plausible-looking text this short; treat any lead with extra caution)
+- **sonnet/20** (done)
+  - LP2:50.jpg/2-56.jpg/1: 60000 attempts, 32 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **codex/25** (done)
   - LP2:54.jpg-55.jpg - 71.jpg-72.jpg: 60000 attempts, 2 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **codex/24** (done)
@@ -191,10 +196,10 @@ brief for the generators (718 chars): Two-stage programs: a transposition, then 
 - qwen-local: 6 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 6 call(s) in the last 5h (cap none), spent $0.0000
 - granite: 7 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 73 call(s) in the last 5h (cap 180), spent $0.0000
-- claude-sonnet: 73 call(s) in the last 5h (cap 180), spent $0.0000
-- claude-supervisor: 73 call(s) in the last 5h (cap 180), spent $0.0000
-- codex: 65 call(s) in the last 5h (cap 850), spent $0.0000
+- claude-opus: 67 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-sonnet: 67 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-supervisor: 67 call(s) in the last 5h (cap 180), spent $0.0000
+- codex: 46 call(s) in the last 5h (cap 850), spent $0.0000
 
 ## Current strategy note (read by every lane each round)
 
@@ -208,28 +213,28 @@ Night so far: every section shows passes=0 and near=0, including 300k-attempt st
 
 ## Events
 
-- 2026-11-04 23:52:35 local/20: running 20 min | 23:34:27 [model] granite (weighting) ok 1.8s, tokens in/out 269/38, reply 69 chars
-- 2026-11-04 23:53:35 sonnet/16: running 5 min | 23:49:22 [model] claude-sonnet (proposer) ok 14.5s, tokens in/out 5600/1943, reply 2698 chars
-- 2026-11-04 23:55:00 structure/17: running 15 min | 23:41:03 [model] codex (proposer) ok 61.9s, tokens in/out 19153/2539, reply 8548 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-04 23:55:20 structure/18: running 15 min | 23:41:14 [model] codex (proposer) ok 52.6s, tokens in/out 18738/2446, reply 8924 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-04 23:56:30 sonnet/16: done (exit 0, 8 min)
-- 2026-11-04 23:56:46 published: 33 file(s) to branch results
-- 2026-11-04 23:56:46 sonnet/17: start (uses claude-plan)
-- 2026-11-04 23:56:46 4 running: local/20, structure/17, structure/18, sonnet/17
-- 2026-11-04 23:57:36 local/20: running 25 min | 23:34:27 [model] granite (weighting) ok 1.8s, tokens in/out 269/38, reply 69 chars
-- 2026-11-05 00:00:01 structure/17: running 20 min | 23:41:03 [model] codex (proposer) ok 61.9s, tokens in/out 19153/2539, reply 8548 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-05 00:00:21 structure/18: running 20 min | 23:41:14 [model] codex (proposer) ok 52.6s, tokens in/out 18738/2446, reply 8924 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-05 00:01:46 sonnet/17: running 5 min | 00:00:44 [model] claude-sonnet (proposer) ok 15.0s, tokens in/out 8930/1922, reply 2737 chars
-- 2026-11-05 00:02:36 local/20: running 30 min | 23:34:27 [model] granite (weighting) ok 1.8s, tokens in/out 269/38, reply 69 chars
-- 2026-11-05 00:04:21 sonnet/17: done (exit 0, 8 min)
-- 2026-11-05 00:04:37 published: 34 file(s) to branch results
-- 2026-11-05 00:04:37 sonnet/18: start (uses claude-plan)
-- 2026-11-05 00:04:37 4 running: local/20, structure/17, structure/18, sonnet/18
-- 2026-11-05 00:05:02 structure/17: running 25 min | 00:02:33 [model] codex (proposer) ok 58.7s, tokens in/out 21588/2719, reply 8973 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-05 00:05:22 structure/18: running 25 min | 23:41:14 [model] codex (proposer) ok 52.6s, tokens in/out 18738/2446, reply 8924 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-05 00:06:07 sonnet/18: done (exit 0, 2 min)
 - 2026-11-05 00:06:23 published: 35 file(s) to branch results
 - 2026-11-05 00:06:23 sonnet/19: start (uses claude-plan)
 - 2026-11-05 00:06:23 4 running: local/20, structure/17, structure/18, sonnet/19
 - 2026-11-05 00:07:38 local/20: running 35 min | 23:34:27 [model] granite (weighting) ok 1.8s, tokens in/out 269/38, reply 69 chars
 - 2026-11-05 00:09:13 sonnet/19: done (exit 0, 3 min)
+- 2026-11-05 00:09:28 published: 36 file(s) to branch results
+- 2026-11-05 00:09:28 sonnet/20: start (uses claude-plan)
+- 2026-11-05 00:09:28 4 running: local/20, structure/17, structure/18, sonnet/20
+- 2026-11-05 00:10:03 structure/17: running 30 min | 00:02:33 [model] codex (proposer) ok 58.7s, tokens in/out 21588/2719, reply 8973 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 00:10:23 structure/18: running 30 min | 23:41:14 [model] codex (proposer) ok 52.6s, tokens in/out 18738/2446, reply 8924 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 00:12:38 local/20: running 40 min | 23:34:27 [model] granite (weighting) ok 1.8s, tokens in/out 269/38, reply 69 chars
+- 2026-11-05 00:14:28 sonnet/20: running 5 min | 00:10:01 [model] claude-sonnet (proposer) ok 9.4s, tokens in/out 6280/1234, reply 2735 chars
+- 2026-11-05 00:15:03 structure/17: running 35 min | 00:02:33 [model] codex (proposer) ok 58.7s, tokens in/out 21588/2719, reply 8973 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 00:15:23 structure/18: running 35 min | 23:41:14 [model] codex (proposer) ok 52.6s, tokens in/out 18738/2446, reply 8924 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 00:17:39 local/20: running 45 min | 23:34:27 [model] granite (weighting) ok 1.8s, tokens in/out 269/38, reply 69 chars
+- 2026-11-05 00:19:29 sonnet/20: running 10 min | 00:10:01 [model] claude-sonnet (proposer) ok 9.4s, tokens in/out 6280/1234, reply 2735 chars
+- 2026-11-05 00:20:04 structure/17: running 40 min | 00:02:33 [model] codex (proposer) ok 58.7s, tokens in/out 21588/2719, reply 8973 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 00:20:24 structure/18: running 40 min | 23:41:14 [model] codex (proposer) ok 52.6s, tokens in/out 18738/2446, reply 8924 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 00:22:39 local/20: running 50 min | 23:34:27 [model] granite (weighting) ok 1.8s, tokens in/out 269/38, reply 69 chars
+- 2026-11-05 00:24:29 sonnet/20: running 15 min | 00:21:27 [model] claude-sonnet (proposer) ok 13.7s, tokens in/out 7292/1923, reply 3066 chars
+- 2026-11-05 00:25:04 structure/17: running 45 min | 00:02:33 [model] codex (proposer) ok 58.7s, tokens in/out 21588/2719, reply 8973 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 00:25:24 structure/18: running 45 min | 23:41:14 [model] codex (proposer) ok 52.6s, tokens in/out 18738/2446, reply 8924 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 00:27:39 local/20: running 55 min | 23:34:27 [model] granite (weighting) ok 1.8s, tokens in/out 269/38, reply 69 chars
+- 2026-11-05 00:29:19 sonnet/20: done (exit 0, 20 min)
