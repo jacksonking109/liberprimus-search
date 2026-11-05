@@ -1,6 +1,6 @@
 # Overnight run 20261104-2305
 
-Started 2026-11-04 23:05:16, updated 2026-11-04 23:31:06, status **running**. Jobs: pending 45, running 3, done 24
+Started 2026-11-04 23:05:16, updated 2026-11-04 23:31:52, status **running**. Jobs: pending 44, running 3, done 25
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -38,7 +38,7 @@ Started 2026-11-04 23:05:16, updated 2026-11-04 23:31:06, status **running**. Jo
 | local/17 | done | 2026-11-04 23:05:16 | 2026-11-04 23:24:18 | local models |
 | local/18 | done | 2026-11-04 23:24:34 | 2026-11-04 23:26:54 | local models |
 | local/16 | done | 2026-11-04 23:27:10 | 2026-11-04 23:29:30 | local models |
-| local/19 | running | 2026-11-04 23:29:46 |  | local models |
+| local/19 | done | 2026-11-04 23:29:46 | 2026-11-04 23:31:52 | local models |
 | local/15 | pending |  |  | local models |
 | local/20 | pending |  |  | local models |
 | local/14 | pending |  |  | local models |
@@ -52,7 +52,7 @@ Started 2026-11-04 23:05:16, updated 2026-11-04 23:31:06, status **running**. Jo
 | local/10 | pending |  |  | local models |
 | structure/10 | running | 2026-11-04 23:22:41 |  | Codex: transposition then substitution |
 | structure/12 | done | 2026-11-04 23:23:01 | 2026-11-04 23:31:06 | Codex: transposition then substitution |
-| structure/13 | pending |  |  | Codex: transposition then substitution |
+| structure/13 | running | 2026-11-04 23:31:22 |  | Codex: transposition then substitution |
 | structure/14 | pending |  |  | Codex: transposition then substitution |
 | structure/17 | pending |  |  | Codex: transposition then substitution |
 | structure/18 | pending |  |  | Codex: transposition then substitution |
@@ -92,15 +92,6 @@ round 2 [claude-sonnet] proposals=12 valid=12 attempts=16470 passes=0 near=0 inv
 23:29:19 [model] claude-sonnet (proposer) calling...
 23:29:35 [model] claude-sonnet (proposer) ok 16.0s, tokens in/out 6970/1239, reply 2630 chars
 ```
-**local/19** (since 2026-11-04 23:29:46), latest log lines:
-```
-===== 2026-11-04 23:29:46 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 19 --gen
-note: short section (91 runes): many keys give plausible-looking text this short; treat any lead with extra caution
-== LP2:33.jpg - 50.jpg/1  (91 symbols)
-23:29:48 [model] qwen-local (proposer) calling...
-23:30:33 [model] qwen-local (proposer) ok 45.0s, tokens in/out 2330/745, reply 2512 chars
-23:30:33 [model] gemma-local (proposer) calling...
-```
 **structure/10** (since 2026-11-04 23:22:41), latest log lines:
 ```
 ===== 2026-11-04 23:22:41 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 10 --gen
@@ -111,6 +102,15 @@ brief for the generators (718 chars): Two-stage programs: a transposition, then 
 round 1 [codex] proposals=32 valid=32 attempts=116216 passes=0 near=0 invalid=0
 23:27:13 [model] codex (proposer) calling...
 23:28:17 [model] codex (proposer) ok 64.1s, tokens in/out 21188/2567, reply 8158 chars, model not reported (pin one with model = "..." in the models config)
+round 2 [codex] proposals=32 valid=32 attempts=217234 passes=0 near=0 invalid=0
+23:31:15 [model] codex (proposer) calling...
+```
+**structure/13** (since 2026-11-04 23:31:22), latest log lines:
+```
+===== 2026-11-04 23:31:22 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 13 --gen
+brief for the generators (718 chars): Two-stage programs: a transposition, then a substitution. Use the transpose field: grid widths (try the factors of the section length and their neighbours, e.g. 2
+== LP2:6.jpg/2-7.jpg - 23.jpg/2-24.jpg  (333 symbols)
+23:31:24 [model] codex (proposer) calling...
 ```
 
 ## Results so far
@@ -163,6 +163,8 @@ round 1 [codex] proposals=32 valid=32 attempts=116216 passes=0 near=0 invalid=0
   - LP2:- - 44.jpg-49.jpg: 60000 attempts, 2 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **local/16** (done)
   - LP2:15.jpg/2- - 32.jpg/2-39.jpg: 60000 attempts, 1 hypotheses, **0 final pass(es)**, stopped: max_attempts
+- **local/19** (done)
+  - LP2:33.jpg - 50.jpg/1: 60000 attempts, 3 hypotheses, **0 final pass(es)**, stopped: max_attempts (caution: short section (91 runes): many keys give plausible-looking text this short; treat any lead with extra caution)
 - **structure/12** (done)
   - LP2:20.jpg/2-23.jpg/1 - 3.jpg/2-6.jpg/1: 300000 attempts, 77 hypotheses, **0 final pass(es)**, stopped: max_attempts
 
@@ -170,8 +172,8 @@ round 1 [codex] proposals=32 valid=32 attempts=116216 passes=0 near=0 invalid=0
 
 - deepseek: 12 call(s) in the last 5h (cap none), spent $0.1873
 - qwen-local: 5 call(s) in the last 5h (cap none), spent $0.0000
-- gemma-local: 4 call(s) in the last 5h (cap none), spent $0.0000
-- granite: 5 call(s) in the last 5h (cap none), spent $0.0000
+- gemma-local: 5 call(s) in the last 5h (cap none), spent $0.0000
+- granite: 6 call(s) in the last 5h (cap none), spent $0.0000
 - claude-opus: 59 call(s) in the last 5h (cap 180), spent $0.0000
 - claude-sonnet: 59 call(s) in the last 5h (cap 180), spent $0.0000
 - claude-supervisor: 59 call(s) in the last 5h (cap 180), spent $0.0000
@@ -183,11 +185,6 @@ round 1 [codex] proposals=32 valid=32 attempts=116216 passes=0 near=0 invalid=0
 
 ## Events
 
-- 2026-11-04 23:23:01 structure/12: start (uses codex-plan)
-- 2026-11-04 23:23:01 4 running: local/17, sonnet/13, structure/10, structure/12
-- 2026-11-04 23:23:57 sonnet/13: done (exit 0, 7 min)
-- 2026-11-04 23:24:13 published: 23 file(s) to branch results
-- 2026-11-04 23:24:13 sonnet/14: start (uses claude-plan)
 - 2026-11-04 23:24:13 4 running: local/17, structure/10, structure/12, sonnet/14
 - 2026-11-04 23:24:18 local/17: done (exit 0, 19 min)
 - 2026-11-04 23:24:34 published: 24 file(s) to branch results
@@ -208,3 +205,8 @@ round 1 [codex] proposals=32 valid=32 attempts=116216 passes=0 near=0 invalid=0
 - 2026-11-04 23:29:46 4 running: structure/10, structure/12, sonnet/14, local/19
 - 2026-11-04 23:29:46 sonnet/15 waiting: claude-plan in use by sonnet/14
 - 2026-11-04 23:31:06 structure/12: done (exit 0, 8 min)
+- 2026-11-04 23:31:21 published: 27 file(s) to branch results
+- 2026-11-04 23:31:22 structure/13: start (uses codex-plan)
+- 2026-11-04 23:31:22 4 running: structure/10, sonnet/14, local/19, structure/13
+- 2026-11-04 23:31:22 sonnet/15 waiting: claude-plan in use by sonnet/14
+- 2026-11-04 23:31:52 local/19: done (exit 0, 2 min)
