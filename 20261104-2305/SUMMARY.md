@@ -1,6 +1,6 @@
 # Overnight run 20261104-2305
 
-Started 2026-11-04 23:05:16, updated 2026-11-04 23:18:19, status **running**. Jobs: pending 53, running 3, done 16
+Started 2026-11-04 23:05:16, updated 2026-11-04 23:20:09, status **running**. Jobs: pending 52, running 3, done 17
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -33,7 +33,7 @@ Started 2026-11-04 23:05:16, updated 2026-11-04 23:18:19, status **running**. Jo
 | codex/14 | done | 2026-11-04 23:15:27 | 2026-11-04 23:17:28 | Codex (exploratory) |
 | codex/13 | done | 2026-11-04 23:16:28 | 2026-11-04 23:18:19 | Codex (exploratory) |
 | codex/12 | running | 2026-11-04 23:17:44 |  | Codex (exploratory) |
-| codex/11 | pending |  |  | Codex (exploratory) |
+| codex/11 | done | 2026-11-04 23:18:34 | 2026-11-04 23:20:09 | Codex (exploratory) |
 | codex/10 | pending |  |  | Codex (exploratory) |
 | local/17 | running | 2026-11-04 23:05:16 |  | local models |
 | local/18 | pending |  |  | local models |
@@ -81,7 +81,6 @@ Started 2026-11-04 23:05:16, updated 2026-11-04 23:18:19, status **running**. Jo
 
 **sonnet/13** (since 2026-11-04 23:17:23), latest log lines:
 ```
-  | 5. Transposition, then a simple substitution:
   |    - grid width 2 to 200 (transpose_range), for each read mode (columns, columns_reversed, diagonal, spiral_in, boustrophedon_rows), with constant value 0, combine sub, map identity and reverse.
   |    - railfence rails 2 to 64.
   |    - decimate step 2 to 332.
@@ -91,12 +90,10 @@ Started 2026-11-04 23:05:16, updated 2026-11-04 23:18:19, status **running**. Jo
 23:18:01 [model] claude-sonnet (proposer) ok 8.8s, tokens in/out 5042/1328, reply 2800 chars
 round 1 [claude-sonnet] proposals=12 valid=3 attempts=201 passes=0 near=0 invalid=9
 23:18:08 [model] claude-sonnet (proposer) calling...
+23:18:20 [model] claude-sonnet (proposer) ok 12.1s, tokens in/out 6061/1733, reply 2944 chars
 ```
 **codex/12** (since 2026-11-04 23:17:44), latest log lines:
 ```
-23:17:45 [model] codex (proposer) calling...
-23:18:14 [model] codex (proposer) ok 28.9s, tokens in/out 18245/687, reply 1993 chars, model not reported (pin one with model = "..." in the models config)
-brief from codex (1993 chars):
   | 1. Prioritize stream kind autokey, source ciphertext, each one-token primer 0..28, combine sub and beaufort, no skips. Only 4 adjacent doubles occur versus 23.9 expected: one-symbol ciphertext fee
   | 2. Extend ciphertext autokey to two-token primers, all 841 pairs, using sub and beaufort without skips. Try plaintext-source autokey with every one-token primer separately. These test short feedba
   | 3. Establish periodic baselines with repeat/exhaustive key_length 1..4, combine sub, identity map, no skips. Each length is a separate proposal. Length 4 expands to 707,281 keys, within the exhaus
@@ -104,6 +101,9 @@ brief from codex (1993 chars):
   | 5. For primes and prime_totients, repeat offsets [0,1999] with skip [F], skip_mode all, then resolve, combine sub. Also test reverse map without skips. These cover a literal F interrupting key adv
   | 6. Test grid columns and boustrophedon_columns, transpose_range [2,64], with primes offsets [0,63], sub, no skips: 4,032 expansions per proposal. Test railfence [2,32] likewise. Transposition coul
 23:18:14 [model] codex (proposer) calling...
+23:18:52 [model] codex (proposer) ok 37.5s, tokens in/out 18682/1675, reply 5666 chars, model not reported (pin one with model = "..." in the models config)
+round 1 [codex] proposals=32 valid=32 attempts=51300 passes=0 near=0 invalid=0
+23:19:28 [model] codex (proposer) calling...
 ```
 **local/17** (since 2026-11-04 23:05:16), latest log lines:
 ```
@@ -153,6 +153,8 @@ brief from codex (1993 chars):
   - LP2:8.jpg-14.jpg - 25.jpg-31.jpg: 60000 attempts, 4 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **codex/13** (done)
   - LP2:6.jpg/2-7.jpg - 23.jpg/2-24.jpg: 60000 attempts, 4 hypotheses, **0 final pass(es)**, stopped: max_attempts
+- **codex/11** (done)
+  - LP2:20.jpg/1 - 3.jpg/1: 60000 attempts, 4 hypotheses, **0 final pass(es)**, stopped: max_attempts
 
 ## Model usage
 
@@ -163,7 +165,7 @@ brief from codex (1993 chars):
 - claude-opus: 52 call(s) in the last 5h (cap 180), spent $0.0000
 - claude-sonnet: 52 call(s) in the last 5h (cap 180), spent $0.0000
 - claude-supervisor: 52 call(s) in the last 5h (cap 180), spent $0.0000
-- codex: 57 call(s) in the last 5h (cap 850), spent $0.0000
+- codex: 60 call(s) in the last 5h (cap 850), spent $0.0000
 
 ## Supervisor notes
 
@@ -171,11 +173,6 @@ brief from codex (1993 chars):
 
 ## Events
 
-- 2026-11-04 23:15:06 sonnet/12 waiting: claude-plan in use by sonnet/11
-- 2026-11-04 23:15:11 codex/15: done (exit 0, 0 min)
-- 2026-11-04 23:15:27 published: 14 file(s) to branch results
-- 2026-11-04 23:15:27 codex/14: start (uses codex-plan)
-- 2026-11-04 23:15:27 4 running: local/17, codex/16, sonnet/11, codex/14
 - 2026-11-04 23:15:32 local/17: running 10 min | 23:07:14 [model] granite (weighting) ok 34.4s, tokens in/out 252/38, reply 69 chars
 - 2026-11-04 23:15:32 sonnet/11: done (exit 0, 1 min)
 - 2026-11-04 23:15:47 published: 15 file(s) to branch results
@@ -196,3 +193,8 @@ brief from codex (1993 chars):
 - 2026-11-04 23:17:44 4 running: local/17, codex/13, sonnet/13, codex/12
 - 2026-11-04 23:17:44 sonnet/14 waiting: claude-plan in use by sonnet/13
 - 2026-11-04 23:18:19 codex/13: done (exit 0, 2 min)
+- 2026-11-04 23:18:34 published: 19 file(s) to branch results
+- 2026-11-04 23:18:34 codex/11: start (uses codex-plan)
+- 2026-11-04 23:18:34 4 running: local/17, sonnet/13, codex/12, codex/11
+- 2026-11-04 23:18:34 sonnet/14 waiting: claude-plan in use by sonnet/13
+- 2026-11-04 23:20:09 codex/11: done (exit 0, 2 min)
