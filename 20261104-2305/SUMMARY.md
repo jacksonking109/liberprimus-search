@@ -1,6 +1,6 @@
 # Overnight run 20261104-2305
 
-Started 2026-11-04 23:05:16, updated 2026-11-04 23:29:30, status **running**. Jobs: pending 46, running 3, done 23
+Started 2026-11-04 23:05:16, updated 2026-11-04 23:31:06, status **running**. Jobs: pending 45, running 3, done 24
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -38,7 +38,7 @@ Started 2026-11-04 23:05:16, updated 2026-11-04 23:29:30, status **running**. Jo
 | local/17 | done | 2026-11-04 23:05:16 | 2026-11-04 23:24:18 | local models |
 | local/18 | done | 2026-11-04 23:24:34 | 2026-11-04 23:26:54 | local models |
 | local/16 | done | 2026-11-04 23:27:10 | 2026-11-04 23:29:30 | local models |
-| local/19 | pending |  |  | local models |
+| local/19 | running | 2026-11-04 23:29:46 |  | local models |
 | local/15 | pending |  |  | local models |
 | local/20 | pending |  |  | local models |
 | local/14 | pending |  |  | local models |
@@ -51,7 +51,7 @@ Started 2026-11-04 23:05:16, updated 2026-11-04 23:29:30, status **running**. Jo
 | local/25 | pending |  |  | local models |
 | local/10 | pending |  |  | local models |
 | structure/10 | running | 2026-11-04 23:22:41 |  | Codex: transposition then substitution |
-| structure/12 | running | 2026-11-04 23:23:01 |  | Codex: transposition then substitution |
+| structure/12 | done | 2026-11-04 23:23:01 | 2026-11-04 23:31:06 | Codex: transposition then substitution |
 | structure/13 | pending |  |  | Codex: transposition then substitution |
 | structure/14 | pending |  |  | Codex: transposition then substitution |
 | structure/17 | pending |  |  | Codex: transposition then substitution |
@@ -81,7 +81,6 @@ Started 2026-11-04 23:05:16, updated 2026-11-04 23:29:30, status **running**. Jo
 
 **sonnet/14** (since 2026-11-04 23:24:13), latest log lines:
 ```
-  | 5. Transposition before a sequence key. Use grid "columns" and "diagonal" with transpose_range [2,60], or railfence with range [2,12]. Combine each with prime_totients over offset_range [0,80], ke
   | 6. Long word keys. Use repeat words with offset_range [0, keylen-1]: FIRFUMFERENFE, CIRCUMFERENCE, DIVINITY, YAHEOOPYJ, INTUS, SHADOWS, INSTRUCTION. Use sub and beaufort, both with and without ski
   | Do NOT repeat: constant
 23:24:35 [model] claude-sonnet (proposer) calling...
@@ -91,6 +90,16 @@ round 1 [claude-sonnet] proposals=12 valid=5 attempts=3615 passes=0 near=0 inval
 23:26:13 [model] claude-sonnet (proposer) ok 14.1s, tokens in/out 6078/1822, reply 2838 chars
 round 2 [claude-sonnet] proposals=12 valid=12 attempts=16470 passes=0 near=0 invalid=7
 23:29:19 [model] claude-sonnet (proposer) calling...
+23:29:35 [model] claude-sonnet (proposer) ok 16.0s, tokens in/out 6970/1239, reply 2630 chars
+```
+**local/19** (since 2026-11-04 23:29:46), latest log lines:
+```
+===== 2026-11-04 23:29:46 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 19 --gen
+note: short section (91 runes): many keys give plausible-looking text this short; treat any lead with extra caution
+== LP2:33.jpg - 50.jpg/1  (91 symbols)
+23:29:48 [model] qwen-local (proposer) calling...
+23:30:33 [model] qwen-local (proposer) ok 45.0s, tokens in/out 2330/745, reply 2512 chars
+23:30:33 [model] gemma-local (proposer) calling...
 ```
 **structure/10** (since 2026-11-04 23:22:41), latest log lines:
 ```
@@ -102,19 +111,6 @@ brief for the generators (718 chars): Two-stage programs: a transposition, then 
 round 1 [codex] proposals=32 valid=32 attempts=116216 passes=0 near=0 invalid=0
 23:27:13 [model] codex (proposer) calling...
 23:28:17 [model] codex (proposer) ok 64.1s, tokens in/out 21188/2567, reply 8158 chars, model not reported (pin one with model = "..." in the models config)
-```
-**structure/12** (since 2026-11-04 23:23:01), latest log lines:
-```
-===== 2026-11-04 23:23:01 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 12 --gen
-brief for the generators (718 chars): Two-stage programs: a transposition, then a substitution. Use the transpose field: grid widths (try the factors of the section length and their neighbours, e.g. 2
-== LP2:20.jpg/2-23.jpg/1 - 3.jpg/2-6.jpg/1  (693 symbols)
-23:23:04 [model] codex (proposer) calling...
-23:23:56 [model] codex (proposer) ok 51.3s, tokens in/out 18719/2252, reply 7890 chars, model not reported (pin one with model = "..." in the models config)
-round 1 [codex] proposals=32 valid=32 attempts=130477 passes=0 near=0 invalid=0
-23:25:53 [model] codex (proposer) calling...
-23:26:52 [model] codex (proposer) ok 59.4s, tokens in/out 21541/2353, reply 8042 chars, model not reported (pin one with model = "..." in the models config)
-round 2 [codex] proposals=32 valid=32 attempts=266313 passes=0 near=0 invalid=0
-23:29:16 [model] codex (proposer) calling...
 ```
 
 ## Results so far
@@ -167,17 +163,19 @@ round 2 [codex] proposals=32 valid=32 attempts=266313 passes=0 near=0 invalid=0
   - LP2:- - 44.jpg-49.jpg: 60000 attempts, 2 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **local/16** (done)
   - LP2:15.jpg/2- - 32.jpg/2-39.jpg: 60000 attempts, 1 hypotheses, **0 final pass(es)**, stopped: max_attempts
+- **structure/12** (done)
+  - LP2:20.jpg/2-23.jpg/1 - 3.jpg/2-6.jpg/1: 300000 attempts, 77 hypotheses, **0 final pass(es)**, stopped: max_attempts
 
 ## Model usage
 
 - deepseek: 12 call(s) in the last 5h (cap none), spent $0.1873
-- qwen-local: 4 call(s) in the last 5h (cap none), spent $0.0000
+- qwen-local: 5 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 4 call(s) in the last 5h (cap none), spent $0.0000
 - granite: 5 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 58 call(s) in the last 5h (cap 180), spent $0.0000
-- claude-sonnet: 58 call(s) in the last 5h (cap 180), spent $0.0000
-- claude-supervisor: 58 call(s) in the last 5h (cap 180), spent $0.0000
-- codex: 67 call(s) in the last 5h (cap 850), spent $0.0000
+- claude-opus: 59 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-sonnet: 59 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-supervisor: 59 call(s) in the last 5h (cap 180), spent $0.0000
+- codex: 68 call(s) in the last 5h (cap 850), spent $0.0000
 
 ## Supervisor notes
 
@@ -185,11 +183,6 @@ round 2 [codex] proposals=32 valid=32 attempts=266313 passes=0 near=0 invalid=0
 
 ## Events
 
-- 2026-11-04 23:22:41 structure/10: start (uses codex-plan)
-- 2026-11-04 23:22:41 4 running: local/17, sonnet/13, codex/12, structure/10
-- 2026-11-04 23:22:41 sonnet/14 waiting: claude-plan in use by sonnet/13
-- 2026-11-04 23:22:46 codex/12: done (exit 0, 5 min)
-- 2026-11-04 23:23:01 published: 22 file(s) to branch results
 - 2026-11-04 23:23:01 structure/12: start (uses codex-plan)
 - 2026-11-04 23:23:01 4 running: local/17, sonnet/13, structure/10, structure/12
 - 2026-11-04 23:23:57 sonnet/13: done (exit 0, 7 min)
@@ -210,3 +203,8 @@ round 2 [codex] proposals=32 valid=32 attempts=266313 passes=0 near=0 invalid=0
 - 2026-11-04 23:28:05 structure/12: running 5 min | 23:26:52 [model] codex (proposer) ok 59.4s, tokens in/out 21541/2353, reply 8042 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-04 23:29:15 sonnet/14: running 5 min | 23:26:13 [model] claude-sonnet (proposer) ok 14.1s, tokens in/out 6078/1822, reply 2838 chars
 - 2026-11-04 23:29:30 local/16: done (exit 0, 2 min)
+- 2026-11-04 23:29:46 published: 26 file(s) to branch results
+- 2026-11-04 23:29:46 local/19: start (uses ollama:http://127.0.0.1:11434, ollama:http://127.0.0.1:11435)
+- 2026-11-04 23:29:46 4 running: structure/10, structure/12, sonnet/14, local/19
+- 2026-11-04 23:29:46 sonnet/15 waiting: claude-plan in use by sonnet/14
+- 2026-11-04 23:31:06 structure/12: done (exit 0, 8 min)
