@@ -1,6 +1,6 @@
 # Overnight run 20261104-1523
 
-Started 2026-11-04 15:23:11, updated 2026-11-04 19:06:28, status **running**. Jobs: pending 3, running 1, done 62
+Started 2026-11-04 15:23:11, updated 2026-11-04 19:12:59, status **running**. Jobs: pending 2, running 1, done 63
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -18,7 +18,7 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 19:06:28, status **running**. Jo
 | sonnet/20 | done | 2026-11-04 16:36:44 | 2026-11-04 17:16:12 | Sonnet, briefed by Opus |
 | sonnet/21 | done | 2026-11-04 17:32:18 | 2026-11-04 17:36:04 | Sonnet, briefed by Opus |
 | sonnet/22 | done | 2026-11-04 17:36:20 | 2026-11-04 19:06:28 | Sonnet, briefed by Opus |
-| sonnet/24 | pending |  |  | Sonnet, briefed by Opus |
+| sonnet/24 | done | 2026-11-04 19:06:44 | 2026-11-04 19:12:59 | Sonnet, briefed by Opus |
 | sonnet/25 | pending |  |  | Sonnet, briefed by Opus |
 | codex/25 | done | 2026-11-04 15:23:11 | 2026-11-04 15:35:47 | Codex (exploratory) |
 | codex/24 | done | 2026-11-04 15:23:11 | 2026-11-04 15:40:48 | Codex (exploratory) |
@@ -75,7 +75,6 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 19:06:28, status **running**. Jo
 
 **sup2/14** (since 2026-11-04 18:54:12), latest log lines:
 ```
-===== 2026-11-04 18:54:12 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 14 --gen
 brief for the generators (1096 chars): Sections and lengths: 10 = 729 (27*27, 9*81, 3^6), 12 = 693 (7*9*11), 13 = 333 (9*37), 14 = 1729 (7*13*19). Every earlier pass from sonnet, codex, deepseek and l
 == LP2:8.jpg-14.jpg - 25.jpg-31.jpg  (1729 symbols)
 18:54:15 [model] codex (proposer) calling...
@@ -83,6 +82,9 @@ brief for the generators (1096 chars): Sections and lengths: 10 = 729 (27*27, 9*
 round 1 [codex] proposals=16 valid=6 attempts=10014 passes=0 near=0 invalid=10
 19:00:29 [model] codex (proposer) calling...
 19:00:59 [model] codex (proposer) ok 29.3s, tokens in/out 20053/1292, reply 4083 chars, model not reported (pin one with model = "..." in the models config)
+round 2 [codex] proposals=16 valid=16 attempts=36056 passes=0 near=0 invalid=10
+19:09:44 [model] codex (proposer) calling...
+19:10:16 [model] codex (proposer) ok 32.2s, tokens in/out 21622/1431, reply 4190 chars, model not reported (pin one with model = "..." in the models config)
 ```
 
 ## Results so far
@@ -117,6 +119,8 @@ round 1 [codex] proposals=16 valid=6 attempts=10014 passes=0 near=0 invalid=10
   - LP2:56.jpg/2: 42296 attempts, 57 hypotheses, **0 final pass(es)**
 - **sonnet/22** (done)
   - LP2:57.jpg-66.jpg/1: 37994 attempts, 98 hypotheses, **0 final pass(es)**
+- **sonnet/24** (done)
+  - LP2:51.jpg/2-53.jpg - 68.jpg/2-70.jpg: 9170 attempts, 49 hypotheses, **0 final pass(es)**
 - **codex/25** (done)
   - LP2:54.jpg-55.jpg - 71.jpg-72.jpg: 60000 attempts, 57 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **codex/24** (done)
@@ -220,10 +224,10 @@ round 1 [codex] proposals=16 valid=6 attempts=10014 passes=0 near=0 invalid=10
 - qwen-local: 88 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 88 call(s) in the last 5h (cap none), spent $0.0000
 - granite: 4 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 167 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-sonnet: 167 call(s) in the last 5h (cap 550), spent $0.0000
-- claude-supervisor: 167 call(s) in the last 5h (cap 550), spent $0.0000
-- codex: 96 call(s) in the last 5h (cap 850), spent $0.0000
+- claude-opus: 174 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-sonnet: 174 call(s) in the last 5h (cap 550), spent $0.0000
+- claude-supervisor: 174 call(s) in the last 5h (cap 550), spent $0.0000
+- codex: 97 call(s) in the last 5h (cap 850), spent $0.0000
 - dry: 4 call(s) in the last 5h (cap none), spent $0.0000
 
 ## Current strategy note (read by every lane each round)
@@ -245,13 +249,6 @@ round 1 [codex] proposals=16 valid=6 attempts=10014 passes=0 near=0 invalid=10
 
 ## Events
 
-- 2026-11-04 18:49:27 sup2/10: running 10 min | 18:48:58 [model] codex (proposer) calling...
-- 2026-11-04 18:49:27 sup2/12: running 10 min | 18:48:35 [model] codex (proposer) ok 35.5s, tokens in/out 22627/1584, reply 4252 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-04 18:49:52 deepseek/25: running 5 min | 18:49:42 [model] deepseek (proposer) ok 12.7s, tokens in/out 5915/1305, reply 3639 chars
-- 2026-11-04 18:49:58 sonnet/22: running 55 min | 18:49:43 [model] claude-sonnet (proposer) calling...
-- 2026-11-04 18:52:43 sup2/12: done (exit 0, 13 min)
-- 2026-11-04 18:53:07 published: 59 file(s) to branch results
-- 2026-11-04 18:53:07 sup2/13: start (uses codex-plan)
 - 2026-11-04 18:53:07 4 running: sonnet/22, sup2/10, deepseek/25, sup2/13
 - 2026-11-04 18:53:07 sonnet/24 waiting: claude-plan in use by sonnet/22
 - 2026-11-04 18:53:47 sup2/10: done (exit 0, 14 min)
@@ -270,3 +267,10 @@ round 1 [codex] proposals=16 valid=6 attempts=10014 passes=0 near=0 invalid=10
 - 2026-11-04 19:04:13 sup2/14: running 10 min | 19:00:59 [model] codex (proposer) ok 29.3s, tokens in/out 20053/1292, reply 4083 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-04 19:05:03 sonnet/22: running 70 min | 18:49:59 [model] claude-sonnet (proposer) ok 15.3s, tokens in/out 9697/2102, reply 3196 chars
 - 2026-11-04 19:06:28 sonnet/22: done (exit 0, 72 min)
+- 2026-11-04 19:06:44 published: 62 file(s) to branch results
+- 2026-11-04 19:06:44 sonnet/24: start (uses claude-plan)
+- 2026-11-04 19:06:44 2 running: sup2/14, sonnet/24
+- 2026-11-04 19:06:44 sonnet/25 waiting: claude-plan in use by sonnet/24
+- 2026-11-04 19:09:14 sup2/14: running 15 min | 19:00:59 [model] codex (proposer) ok 29.3s, tokens in/out 20053/1292, reply 4083 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-04 19:11:44 sonnet/24: running 5 min | 19:11:33 [model] claude-sonnet (proposer) calling...
+- 2026-11-04 19:12:59 sonnet/24: done (exit 0, 6 min)
