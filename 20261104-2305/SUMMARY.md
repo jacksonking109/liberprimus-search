@@ -1,6 +1,6 @@
 # Overnight run 20261104-2305
 
-Started 2026-11-04 23:05:16, updated 2026-11-04 23:14:51, status **running**. Jobs: pending 59, running 3, done 10
+Started 2026-11-04 23:05:16, updated 2026-11-04 23:15:11, status **running**. Jobs: pending 58, running 3, done 11
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -29,7 +29,7 @@ Started 2026-11-04 23:05:16, updated 2026-11-04 23:14:51, status **running**. Jo
 | codex/18 | done | 2026-11-04 23:11:49 | 2026-11-04 23:13:50 | Codex (exploratory) |
 | codex/17 | done | 2026-11-04 23:12:45 | 2026-11-04 23:14:51 | Codex (exploratory) |
 | codex/16 | running | 2026-11-04 23:14:05 |  | Codex (exploratory) |
-| codex/15 | pending |  |  | Codex (exploratory) |
+| codex/15 | done | 2026-11-04 23:15:06 | 2026-11-04 23:15:11 | Codex (exploratory) |
 | codex/14 | pending |  |  | Codex (exploratory) |
 | codex/13 | pending |  |  | Codex (exploratory) |
 | codex/12 | pending |  |  | Codex (exploratory) |
@@ -81,7 +81,6 @@ Started 2026-11-04 23:05:16, updated 2026-11-04 23:14:51, status **running**. Jo
 
 **sonnet/11** (since 2026-11-04 23:14:26), latest log lines:
 ```
-  | Brief for LP2:20.jpg/1-3.jpg/1 (119 symbols)
   | Key statistics: the normalised IC is 0.954, which is flat, so this is not monoalphabetic and not a transposition of English. There is 1 adjacent double against 4.1 expected. That doubles deficit i
   | 1. prime_totients stream, combine "sub", offset_range [0,2000]. Run with no skip, then with skip [0] (F in clear, as in the solved LP page). Repeat both with "beaufort" and "add". Reason: this is 
   | 2. The same totient sweep with "map": "reverse" (Atbash) for sub and add, offset_range [0,500]. Solved LP pages used Atbash plus shift, so also test map reverse with a constant stream, values 0..2
@@ -91,6 +90,7 @@ Started 2026-11-04 23:05:16, updated 2026-11-04 23:14:51, status **running**. Jo
   | 6. Other sequences: primes, pi_digits, e_digits, fibonacci, naturals and squares. Use combine sub and beaufort, offset_range [0,1000], with scale 1 and scale -1 (add 0). Test each with and without
   | 7. Only after 1-6: reverse_text true combined with the totient and primes streams from 1 and 6. Then a cheap layer of grid "columns" with transpose_range [2,60] under the constant stream (all 29 v
 23:14:50 [model] claude-sonnet (proposer) calling...
+23:14:59 [model] claude-sonnet (proposer) ok 8.8s, tokens in/out 4311/1087, reply 2366 chars
 ```
 **codex/16** (since 2026-11-04 23:14:05), latest log lines:
 ```
@@ -141,6 +141,8 @@ brief from codex (2000 chars):
   - LP2:- - 44.jpg-49.jpg: 60000 attempts, 4 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **codex/17** (done)
   - LP2:- - 40.jpg-43.jpg: 60000 attempts, 4 hypotheses, **0 final pass(es)**, stopped: max_attempts
+- **codex/15** (done)
+  - skip LP2:15.jpg/1 - 32.jpg/1: only 9 symbols (minimum 20, --min-length); too short to judge
 
 ## Model usage
 
@@ -148,9 +150,9 @@ brief from codex (2000 chars):
 - qwen-local: 1 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 1 call(s) in the last 5h (cap none), spent $0.0000
 - granite: 1 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 47 call(s) in the last 5h (cap 180), spent $0.0000
-- claude-sonnet: 47 call(s) in the last 5h (cap 180), spent $0.0000
-- claude-supervisor: 47 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-opus: 48 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-sonnet: 48 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-supervisor: 48 call(s) in the last 5h (cap 180), spent $0.0000
 - codex: 51 call(s) in the last 5h (cap 850), spent $0.0000
 
 ## Supervisor notes
@@ -159,11 +161,6 @@ brief from codex (2000 chars):
 
 ## Events
 
-- 2026-11-04 23:09:58 tier-claude: done (exit 0, 5 min)
-- 2026-11-04 23:10:14 published: 9 file(s) to branch results
-- 2026-11-04 23:10:14 sonnet/10: start (uses claude-plan)
-- 2026-11-04 23:10:14 4 running: local/17, codex/20, codex/19, sonnet/10
-- 2026-11-04 23:10:19 local/17: running 5 min | 23:07:14 [model] granite (weighting) ok 34.4s, tokens in/out 252/38, reply 69 chars
 - 2026-11-04 23:11:34 codex/19: done (exit 0, 2 min)
 - 2026-11-04 23:11:49 published: 10 file(s) to branch results
 - 2026-11-04 23:11:49 codex/18: start (uses codex-plan)
@@ -184,3 +181,8 @@ brief from codex (2000 chars):
 - 2026-11-04 23:14:26 sonnet/11: start (uses claude-plan)
 - 2026-11-04 23:14:26 4 running: local/17, codex/17, codex/16, sonnet/11
 - 2026-11-04 23:14:51 codex/17: done (exit 0, 2 min)
+- 2026-11-04 23:15:06 published: 14 file(s) to branch results
+- 2026-11-04 23:15:06 codex/15: start (uses codex-plan)
+- 2026-11-04 23:15:06 4 running: local/17, codex/16, sonnet/11, codex/15
+- 2026-11-04 23:15:06 sonnet/12 waiting: claude-plan in use by sonnet/11
+- 2026-11-04 23:15:11 codex/15: done (exit 0, 0 min)
