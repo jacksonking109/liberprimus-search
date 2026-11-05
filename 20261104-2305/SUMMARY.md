@@ -1,6 +1,6 @@
 # Overnight run 20261104-2305
 
-Started 2026-11-04 23:05:16, updated 2026-11-04 23:48:20, status **running**. Jobs: pending 38, running 3, done 31
+Started 2026-11-04 23:05:16, updated 2026-11-04 23:56:30, status **running**. Jobs: pending 37, running 3, done 32
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -11,7 +11,7 @@ Started 2026-11-04 23:05:16, updated 2026-11-04 23:48:20, status **running**. Jo
 | sonnet/13 | done | 2026-11-04 23:17:23 | 2026-11-04 23:23:57 | Sonnet, briefed by Opus |
 | sonnet/14 | done | 2026-11-04 23:24:13 | 2026-11-04 23:47:59 | Sonnet, briefed by Opus |
 | sonnet/15 | done | 2026-11-04 23:48:15 | 2026-11-04 23:48:20 | Sonnet, briefed by Opus |
-| sonnet/16 | pending |  |  | Sonnet, briefed by Opus |
+| sonnet/16 | done | 2026-11-04 23:48:35 | 2026-11-04 23:56:30 | Sonnet, briefed by Opus |
 | sonnet/17 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/18 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/19 | pending |  |  | Sonnet, briefed by Opus |
@@ -125,6 +125,8 @@ brief for the generators (718 chars): Two-stage programs: a transposition, then 
   - LP2:8.jpg-14.jpg - 25.jpg-31.jpg: 57382 attempts, 61 hypotheses, **0 final pass(es)**
 - **sonnet/15** (done)
   - skip LP2:15.jpg/1 - 32.jpg/1: only 9 symbols (minimum 20, --min-length); too short to judge
+- **sonnet/16** (done)
+  - LP2:15.jpg/2- - 32.jpg/2-39.jpg: 60000 attempts, 19 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **codex/25** (done)
   - LP2:54.jpg-55.jpg - 71.jpg-72.jpg: 60000 attempts, 2 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **codex/24** (done)
@@ -176,14 +178,14 @@ brief for the generators (718 chars): Two-stage programs: a transposition, then 
 
 ## Model usage
 
-- deepseek: 3 call(s) in the last 5h (cap none), spent $0.1873
+- deepseek: 0 call(s) in the last 5h (cap none), spent $0.1873
 - qwen-local: 6 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 6 call(s) in the last 5h (cap none), spent $0.0000
 - granite: 7 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 61 call(s) in the last 5h (cap 180), spent $0.0000
-- claude-sonnet: 61 call(s) in the last 5h (cap 180), spent $0.0000
-- claude-supervisor: 61 call(s) in the last 5h (cap 180), spent $0.0000
-- codex: 71 call(s) in the last 5h (cap 850), spent $0.0000
+- claude-opus: 63 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-sonnet: 63 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-supervisor: 63 call(s) in the last 5h (cap 180), spent $0.0000
+- codex: 67 call(s) in the last 5h (cap 850), spent $0.0000
 
 ## Current strategy note (read by every lane each round)
 
@@ -197,16 +199,6 @@ Night so far: every section shows passes=0 and near=0, including 300k-attempt st
 
 ## Events
 
-- 2026-11-04 23:36:24 structure/13: running 5 min | 23:36:13 [model] codex (proposer) calling...
-- 2026-11-04 23:37:29 local/20: running 5 min | 23:34:27 [model] granite (weighting) ok 1.8s, tokens in/out 269/38, reply 69 chars
-- 2026-11-04 23:39:04 structure/14: running 5 min | 23:35:02 [model] codex (proposer) ok 52.7s, tokens in/out 19318/2311, reply 7887 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-04 23:39:19 sonnet/14: running 15 min | 23:37:41 [model] claude-sonnet (proposer) ok 20.3s, tokens in/out 8596/1662, reply 2590 chars
-- 2026-11-04 23:39:29 structure/14: done (exit 0, 5 min)
-- 2026-11-04 23:39:45 published: 30 file(s) to branch results
-- 2026-11-04 23:39:58 supervisor: note: 23:39 check-in: about 28 jobs done across sections 10-25. There are 0 final passes and 0 near hits anywhere, including the 300k-attempt structure runs on sections 10, 12, 13 and 14. Section 15 (9 runes) was skipped as too short. No leads to read yet. Plenty of jobs are still pending, so I added n...
-- 2026-11-04 23:39:58 supervisor: strategy note set (758 chars): Night so far: every section shows passes=0 and near=0, including 300k-attempt structure runs on 10/12/13/14. Simple single-stream shifts are not even coming close, so don't spend rounds on near-varian
-- 2026-11-04 23:39:58 structure/17: start (uses codex-plan)
-- 2026-11-04 23:39:58 4 running: sonnet/14, structure/13, local/20, structure/17
 - 2026-11-04 23:39:58 sonnet/15 waiting: claude-plan in use by sonnet/14
 - 2026-11-04 23:40:03 structure/13: done (exit 0, 9 min)
 - 2026-11-04 23:40:19 published: 31 file(s) to branch results
@@ -222,3 +214,13 @@ Night so far: every section shows passes=0 and near=0, including 300k-attempt st
 - 2026-11-04 23:48:15 sonnet/15: start (uses claude-plan)
 - 2026-11-04 23:48:15 4 running: local/20, structure/17, structure/18, sonnet/15
 - 2026-11-04 23:48:20 sonnet/15: done (exit 0, 0 min)
+- 2026-11-04 23:48:35 published: 32 file(s) to branch results
+- 2026-11-04 23:48:35 sonnet/16: start (uses claude-plan)
+- 2026-11-04 23:48:35 4 running: local/20, structure/17, structure/18, sonnet/16
+- 2026-11-04 23:50:00 structure/17: running 10 min | 23:41:03 [model] codex (proposer) ok 61.9s, tokens in/out 19153/2539, reply 8548 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-04 23:50:20 structure/18: running 10 min | 23:41:14 [model] codex (proposer) ok 52.6s, tokens in/out 18738/2446, reply 8924 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-04 23:52:35 local/20: running 20 min | 23:34:27 [model] granite (weighting) ok 1.8s, tokens in/out 269/38, reply 69 chars
+- 2026-11-04 23:53:35 sonnet/16: running 5 min | 23:49:22 [model] claude-sonnet (proposer) ok 14.5s, tokens in/out 5600/1943, reply 2698 chars
+- 2026-11-04 23:55:00 structure/17: running 15 min | 23:41:03 [model] codex (proposer) ok 61.9s, tokens in/out 19153/2539, reply 8548 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-04 23:55:20 structure/18: running 15 min | 23:41:14 [model] codex (proposer) ok 52.6s, tokens in/out 18738/2446, reply 8924 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-04 23:56:30 sonnet/16: done (exit 0, 8 min)
