@@ -1,6 +1,6 @@
 # Overnight run 20261104-2305
 
-Started 2026-11-04 23:05:16, updated 2026-11-05 05:05:56, status **running**. Jobs: pending 4, running 2, done 77
+Started 2026-11-04 23:05:16, updated 2026-11-05 06:32:54, status **running**. Jobs: pending 4, running 1, done 77, failed 1
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -60,7 +60,7 @@ Started 2026-11-04 23:05:16, updated 2026-11-05 05:05:56, status **running**. Jo
 | exhaustive/11 | done | 2026-11-05 01:31:28 | 2026-11-05 03:13:05 | Codex: every periodic key up to length 4 |
 | exhaustive/19 | running | 2026-11-05 01:39:45 |  | Codex: every periodic key up to length 4 |
 | exhaustive/21 | done | 2026-11-05 03:13:33 | 2026-11-05 04:45:25 | Codex: every periodic key up to length 4 |
-| exhaustive/25 | running | 2026-11-05 04:45:57 |  | Codex: every periodic key up to length 4 |
+| exhaustive/25 | failed | 2026-11-05 04:45:57 | 2026-11-05 06:32:54 | Codex: every periodic key up to length 4 |
 | deepseek/10 | done | 2026-11-05 00:52:56 | 2026-11-05 00:55:31 | DeepSeek (volume) |
 | deepseek/11 | done | 2026-11-05 00:55:47 | 2026-11-05 01:00:47 | DeepSeek (volume) |
 | deepseek/12 | done | 2026-11-05 01:01:26 | 2026-11-05 01:11:19 | DeepSeek (volume) |
@@ -98,14 +98,6 @@ note: short section (91 runes): many keys give plausible-looking text this short
 == LP2:33.jpg - 50.jpg/1  (91 symbols)
 01:39:50 [model] codex (proposer) calling...
 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
-```
-**exhaustive/25** (since 2026-11-05 04:45:57), latest log lines:
-```
-===== 2026-11-05 04:45:57 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 25 --gen
-brief for the generators (354 chars): Use exhaustive repeat streams: {"kind": "repeat", "exhaustive": true, "key_length": m}. Propose m = 1, 2, 3 and 4 (one proposal each) with combine "sub" and with 
-== LP2:54.jpg-55.jpg - 71.jpg-72.jpg  (308 symbols)
-04:45:59 [model] codex (proposer) calling...
-04:46:56 [model] codex (proposer) ok 57.6s, tokens in/out 19466/2624, reply 7679 chars, model not reported (pin one with model = "..." in the models config)
 ```
 
 ## Results so far
@@ -222,6 +214,20 @@ brief for the generators (354 chars): Use exhaustive repeat streams: {"kind": "r
   - LP2:20.jpg/1 - 3.jpg/1: 5000000 attempts, 31 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **exhaustive/21** (done)
   - LP2:56.jpg/2: 5000000 attempts, 31 hypotheses, **0 final pass(es)**, stopped: max_attempts
+- **exhaustive/25** (failed)
+  - last log lines:
+    >   File "C:\Users\ihazp\liberprimus-search\src\lpswarm\reports.py", line 68, in target_entry
+    >     tried = led.tried(target_id)
+    >   File "C:\Users\ihazp\liberprimus-search\src\lpswarm\ledger\db.py", line 362, in tried
+    >     rows = self.conn.execute(
+    >            ~~~~~~~~~~~~~~~~~^
+    >         "SELECT a.cipher_family, h.description, h.proposer_model, COUNT(*) AS attempts"
+    >         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    >         " FROM attempt a JOIN hypothesis h ON h.id=a.hypothesis_id WHERE a.target_id=?"
+    >         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    >         " GROUP BY a.cipher_family, h.id ORDER BY h.id", (target_id,)).fetchall()
+    >         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    > sqlite3.OperationalError: database or disk is full
 - **deepseek/10** (done)
   - LP2:17.jpg, 18.jpg, 19.jpg - 0.jpg-2.jpg: 60000 attempts, 19 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **deepseek/11** (done)
@@ -269,14 +275,14 @@ brief for the generators (354 chars): Use exhaustive repeat streams: {"kind": "r
 
 ## Model usage
 
-- deepseek: 40 call(s) in the last 5h (cap none), spent $0.3613
-- qwen-local: 23 call(s) in the last 5h (cap none), spent $0.0000
-- gemma-local: 23 call(s) in the last 5h (cap none), spent $0.0000
-- granite: 38 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 48 call(s) in the last 5h (cap 180), spent $0.0000
-- claude-sonnet: 48 call(s) in the last 5h (cap 180), spent $0.0000
-- claude-supervisor: 48 call(s) in the last 5h (cap 180), spent $0.0000
-- codex: 12 call(s) in the last 5h (cap 850), spent $0.0000
+- deepseek: 24 call(s) in the last 5h (cap none), spent $0.3613
+- qwen-local: 11 call(s) in the last 5h (cap none), spent $0.0000
+- gemma-local: 11 call(s) in the last 5h (cap none), spent $0.0000
+- granite: 19 call(s) in the last 5h (cap none), spent $0.0000
+- claude-opus: 25 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-sonnet: 25 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-supervisor: 25 call(s) in the last 5h (cap 180), spent $0.0000
+- codex: 4 call(s) in the last 5h (cap 850), spent $0.0000
 
 ## Current strategy note (read by every lane each round)
 
@@ -313,28 +319,28 @@ Prefer combinations missing from the section's history. A real hit should show s
 
 ## Events
 
-- 2026-11-05 04:45:57 2 running: exhaustive/19, exhaustive/25
-- 2026-11-05 04:45:57 sup3/13: start (uses claude-plan)
-- 2026-11-05 04:45:57 3 running: exhaustive/19, exhaustive/25, sup3/13
-- 2026-11-05 04:45:57 sup2/10 waiting: codex-plan full (2/2: exhaustive/19, exhaustive/25)
-- 2026-11-05 04:49:07 sup3/13: done (exit 0, 3 min)
-- 2026-11-05 04:49:23 published: 74 file(s) to branch results
-- 2026-11-05 04:49:23 sup3/18: start (uses claude-plan)
-- 2026-11-05 04:49:23 3 running: exhaustive/19, exhaustive/25, sup3/18
-- 2026-11-05 04:50:18 exhaustive/19: running 191 min | 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-05 04:50:58 exhaustive/25: running 5 min | 04:46:56 [model] codex (proposer) ok 57.6s, tokens in/out 19466/2624, reply 7679 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-05 04:52:53 sup3/18: done (exit 0, 4 min)
-- 2026-11-05 04:53:09 published: 75 file(s) to branch results
-- 2026-11-05 04:53:09 sup3/24: start (uses claude-plan)
-- 2026-11-05 04:53:09 3 running: exhaustive/19, exhaustive/25, sup3/24
-- 2026-11-05 04:55:19 exhaustive/19: running 196 min | 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-05 04:55:59 exhaustive/25: running 10 min | 04:46:56 [model] codex (proposer) ok 57.6s, tokens in/out 19466/2624, reply 7679 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-05 04:58:09 sup3/24: running 5 min | 04:57:43 [model] claude-sonnet (proposer) ok 19.3s, tokens in/out 8919/2501, reply 3427 chars
-- 2026-11-05 05:00:19 exhaustive/19: running 201 min | 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-05 05:00:59 exhaustive/25: running 15 min | 04:46:56 [model] codex (proposer) ok 57.6s, tokens in/out 19466/2624, reply 7679 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-05 05:01:19 sup3/24: done (exit 0, 8 min)
-- 2026-11-05 05:01:35 published: 76 file(s) to branch results
-- 2026-11-05 05:01:35 sup3/25: start (uses claude-plan)
-- 2026-11-05 05:01:36 3 running: exhaustive/19, exhaustive/25, sup3/25
-- 2026-11-05 05:05:21 exhaustive/19: running 206 min | 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-05 05:05:56 sup3/25: done (exit 0, 4 min)
+- 2026-11-05 05:35:22 exhaustive/19: running 236 min | 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 05:36:17 exhaustive/25: running 50 min | 04:46:56 [model] codex (proposer) ok 57.6s, tokens in/out 19466/2624, reply 7679 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 05:40:22 exhaustive/19: running 241 min | 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 05:41:17 exhaustive/25: running 55 min | 04:46:56 [model] codex (proposer) ok 57.6s, tokens in/out 19466/2624, reply 7679 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 05:45:22 exhaustive/19: running 246 min | 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 05:46:17 exhaustive/25: running 60 min | 04:46:56 [model] codex (proposer) ok 57.6s, tokens in/out 19466/2624, reply 7679 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 05:50:23 exhaustive/19: running 251 min | 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 05:51:18 exhaustive/25: running 65 min | 04:46:56 [model] codex (proposer) ok 57.6s, tokens in/out 19466/2624, reply 7679 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 05:55:23 exhaustive/19: running 256 min | 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 05:56:18 exhaustive/25: running 70 min | 05:53:44 [model] codex (proposer) ok 65.1s, tokens in/out 20746/2318, reply 7913 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 06:00:23 exhaustive/19: running 261 min | 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 06:01:18 exhaustive/25: running 75 min | 05:53:44 [model] codex (proposer) ok 65.1s, tokens in/out 20746/2318, reply 7913 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 06:05:23 exhaustive/19: running 266 min | 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 06:06:18 exhaustive/25: running 80 min | 05:53:44 [model] codex (proposer) ok 65.1s, tokens in/out 20746/2318, reply 7913 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 06:10:23 exhaustive/19: running 271 min | 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 06:11:18 exhaustive/25: running 85 min | 05:53:44 [model] codex (proposer) ok 65.1s, tokens in/out 20746/2318, reply 7913 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 06:15:23 exhaustive/19: running 276 min | 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 06:16:18 exhaustive/25: running 90 min | 05:53:44 [model] codex (proposer) ok 65.1s, tokens in/out 20746/2318, reply 7913 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 06:20:23 exhaustive/19: running 281 min | 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 06:21:18 exhaustive/25: running 95 min | 05:53:44 [model] codex (proposer) ok 65.1s, tokens in/out 20746/2318, reply 7913 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 06:25:23 exhaustive/19: running 286 min | 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 06:26:18 exhaustive/25: running 100 min | 05:53:44 [model] codex (proposer) ok 65.1s, tokens in/out 20746/2318, reply 7913 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 06:30:24 exhaustive/19: running 291 min | 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 06:31:19 exhaustive/25: running 105 min | 05:53:44 [model] codex (proposer) ok 65.1s, tokens in/out 20746/2318, reply 7913 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 06:32:54 exhaustive/25: failed (exit 1, 107 min)
