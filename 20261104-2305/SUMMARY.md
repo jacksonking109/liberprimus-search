@@ -1,6 +1,6 @@
 # Overnight run 20261104-2305
 
-Started 2026-11-04 23:05:16, updated 2026-11-05 02:41:08, status **running**. Jobs: pending 15, running 3, done 61
+Started 2026-11-04 23:05:16, updated 2026-11-05 02:47:34, status **running**. Jobs: pending 14, running 3, done 62
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -70,7 +70,7 @@ Started 2026-11-04 23:05:16, updated 2026-11-05 02:41:08, status **running**. Jo
 | deepseek/16 | done | 2026-11-05 01:28:24 | 2026-11-05 01:29:59 | DeepSeek (volume) |
 | deepseek/17 | done | 2026-11-05 01:30:15 | 2026-11-05 02:06:45 | DeepSeek (volume) |
 | deepseek/18 | done | 2026-11-05 02:07:10 | 2026-11-05 02:41:08 | DeepSeek (volume) |
-| deepseek/19 | pending |  |  | DeepSeek (volume) |
+| deepseek/19 | done | 2026-11-05 02:41:34 | 2026-11-05 02:47:34 | DeepSeek (volume) |
 | deepseek/20 | pending |  |  | DeepSeek (volume) |
 | deepseek/21 | pending |  |  | DeepSeek (volume) |
 | deepseek/22 | pending |  |  | DeepSeek (volume) |
@@ -243,16 +243,18 @@ note: short section (91 runes): many keys give plausible-looking text this short
   - LP2:- - 40.jpg-43.jpg: 60000 attempts, 45 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **deepseek/18** (done)
   - LP2:- - 44.jpg-49.jpg: 60000 attempts, 15 hypotheses, **0 final pass(es)**, stopped: max_attempts
+- **deepseek/19** (done)
+  - LP2:33.jpg - 50.jpg/1: 60000 attempts, 69 hypotheses, **0 final pass(es)**, stopped: max_attempts (caution: short section (91 runes): many keys give plausible-looking text this short; treat any lead with extra caution)
 
 ## Model usage
 
-- deepseek: 20 call(s) in the last 5h (cap none), spent $0.2722
+- deepseek: 24 call(s) in the last 5h (cap none), spent $0.2906
 - qwen-local: 29 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 29 call(s) in the last 5h (cap none), spent $0.0000
 - granite: 45 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 82 call(s) in the last 5h (cap 180), spent $0.0000
-- claude-sonnet: 82 call(s) in the last 5h (cap 180), spent $0.0000
-- claude-supervisor: 82 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-opus: 83 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-sonnet: 83 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-supervisor: 83 call(s) in the last 5h (cap 180), spent $0.0000
 - codex: 55 call(s) in the last 5h (cap 850), spent $0.0000
 
 ## Current strategy note (read by every lane each round)
@@ -282,20 +284,10 @@ Prefer variants that are absent from the section's history. Long sections should
 Prefer combinations missing from the section's history. A real hit should show sustained English word structure across hundreds of runes, so do not chase short fragments.
 - 2026-11-05 01:31:28: 01:31 check-in: about 55 jobs are done and every section still has 0 final passes and 0 near hits. Newly finished with nothing: structure/24 (300k attempts), deepseek/14, deepseek/16 and local/22. Deepseek/15 ended at once because section 15 is too short. Still running: structure/17, deepseek/17 and local/12. Sup1 (sonnet on 14, 16, 22) and sup2 (codex on 10, 12, 17, 20) have not reported yet. I added no jobs and left the strategy note unchanged until those two show whether the combined and transposition programs help. Job budget used: 2 of 5.
 - 2026-11-05 02:07:10: 02:07 check-in: still 0 final passes and 0 near hits on every section. Since the last check-in, local/11 and deepseek/17 finished with nothing. Exhaustive/11, exhaustive/19 and local/25 are running. Sup1 (sonnet on 14, 16 and 22) and sup2 (codex on 10, 12, 17 and 20) have not reported yet. I added no jobs and left the strategy note unchanged while those two are pending. Job budget used: 2 of 5.
+- 2026-11-05 02:41:33: 02:41 check-in: still 0 final passes and 0 near hits on every section. deepseek/18 finished with nothing (60k attempts, 15 hypotheses). Running: exhaustive/11, exhaustive/19 and local/10. The exhaustive jobs' last proposer calls were at 01:32 and 01:40, but they are still reporting, so they look like long scoring runs, not stalls. Sup1 (sonnet on 14, 16 and 22) and sup2 (codex on 10, 12, 17 and 20) have not reported yet. I added no jobs and left the strategy note unchanged until they do. Job budget used: 2 of 5.
 
 ## Events
 
-- 2026-11-05 02:13:42 published: 60 file(s) to branch results
-- 2026-11-05 02:13:42 local/10: start (uses ollama:http://127.0.0.1:11434, ollama:http://127.0.0.1:11435)
-- 2026-11-05 02:13:42 4 running: exhaustive/11, exhaustive/19, deepseek/18, local/10
-- 2026-11-05 02:14:52 exhaustive/19: running 35 min | 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-05 02:16:37 exhaustive/11: running 45 min | 01:32:40 [model] codex (proposer) ok 67.6s, tokens in/out 18877/2766, reply 8967 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-05 02:17:12 deepseek/18: running 10 min | 02:11:04 [model] deepseek (proposer) ok 9.9s, tokens in/out 4330/2500, reply 7121 chars
-- 2026-11-05 02:18:42 local/10: running 5 min | 02:18:28 [model] gemma-local (proposer) calling...
-- 2026-11-05 02:19:52 exhaustive/19: running 40 min | 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-05 02:21:37 exhaustive/11: running 50 min | 01:32:40 [model] codex (proposer) ok 67.6s, tokens in/out 18877/2766, reply 8967 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-05 02:22:13 deepseek/18: running 15 min | 02:11:04 [model] deepseek (proposer) ok 9.9s, tokens in/out 4330/2500, reply 7121 chars
-- 2026-11-05 02:23:43 local/10: running 10 min | 02:19:11 [model] granite (weighting) ok 1.3s, tokens in/out 274/38, reply 69 chars
 - 2026-11-05 02:24:53 exhaustive/19: running 45 min | 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-05 02:26:38 exhaustive/11: running 55 min | 01:32:40 [model] codex (proposer) ok 67.6s, tokens in/out 18877/2766, reply 8967 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-05 02:27:13 deepseek/18: running 20 min | 02:11:04 [model] deepseek (proposer) ok 9.9s, tokens in/out 4330/2500, reply 7121 chars
@@ -310,3 +302,14 @@ Prefer combinations missing from the section's history. A real hit should show s
 - 2026-11-05 02:38:43 local/10: running 25 min | 02:19:11 [model] granite (weighting) ok 1.3s, tokens in/out 274/38, reply 69 chars
 - 2026-11-05 02:39:53 exhaustive/19: running 60 min | 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-05 02:41:08 deepseek/18: done (exit 0, 34 min)
+- 2026-11-05 02:41:24 published: 61 file(s) to branch results
+- 2026-11-05 02:41:33 supervisor: note: 02:41 check-in: still 0 final passes and 0 near hits on every section. deepseek/18 finished with nothing (60k attempts, 15 hypotheses). Running: exhaustive/11, exhaustive/19 and local/10. The exhaustive jobs' last proposer calls were at 01:32 and 01:40, but they are still reporting, so they look ...
+- 2026-11-05 02:41:34 deepseek/19: start (uses api:https://api.deepseek.com)
+- 2026-11-05 02:41:34 4 running: exhaustive/11, exhaustive/19, local/10, deepseek/19
+- 2026-11-05 02:41:34 exhaustive/21 waiting: codex-plan full (2/2: exhaustive/11, exhaustive/19)
+- 2026-11-05 02:41:39 exhaustive/11: running 70 min | 01:32:40 [model] codex (proposer) ok 67.6s, tokens in/out 18877/2766, reply 8967 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 02:43:44 local/10: running 30 min | 02:19:11 [model] granite (weighting) ok 1.3s, tokens in/out 274/38, reply 69 chars
+- 2026-11-05 02:44:54 exhaustive/19: running 65 min | 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 02:46:34 deepseek/19: running 5 min | 02:46:04 [model] deepseek (proposer) ok 9.4s, tokens in/out 6093/2590, reply 7126 chars
+- 2026-11-05 02:46:39 exhaustive/11: running 75 min | 01:32:40 [model] codex (proposer) ok 67.6s, tokens in/out 18877/2766, reply 8967 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 02:47:34 deepseek/19: done (exit 0, 6 min)
