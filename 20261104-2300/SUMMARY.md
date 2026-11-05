@@ -1,10 +1,10 @@
 # Overnight run 20261104-2300
 
-Started 2026-11-04 23:00:52, updated 2026-11-04 23:04:05, status **running**. Jobs: pending 57, running 1, done 3
+Started 2026-11-04 23:00:52, updated 2026-11-04 23:04:07, status **stopped**. Jobs: pending 57, done 3, interrupted 1
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
-| tier-claude | running | 2026-11-04 23:00:52 |  | Claude Code proposers vs the random control |
+| tier-claude | interrupted | 2026-11-04 23:00:52 | 2026-11-04 23:04:07 | STOP file |
 | sonnet/10 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/11 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/12 | pending |  |  | Sonnet, briefed by Opus |
@@ -66,25 +66,9 @@ Started 2026-11-04 23:00:52, updated 2026-11-04 23:04:05, status **running**. Jo
 | deepseek/24 | pending |  |  | DeepSeek (volume) |
 | deepseek/25 | pending |  |  | DeepSeek (volume) |
 
-## Now running
-
-**tier-claude** (since 2026-11-04 23:00:52), latest log lines:
-```
-23:03:03 [model] claude-sonnet (proposer) ok 14.9s, tokens in/out 3202/1853, reply 2565 chars
-[claude-sonnet] 1/6 L=80 recovered=1 attempts=1966 calls=1 usd=0.0000 stopped=pass_found
-23:03:11 [model] claude-sonnet (proposer) calling...
-23:03:18 [model] claude-sonnet (proposer) ok 7.5s, tokens in/out 3205/1009, reply 2173 chars
-[claude-sonnet] 2/6 L=80 recovered=0 attempts=20000 calls=1 usd=0.0000 stopped=max_attempts
-23:03:25 [model] claude-sonnet (proposer) calling...
-23:03:39 [model] claude-sonnet (proposer) ok 13.6s, tokens in/out 3201/1804, reply 2257 chars
-[claude-sonnet] 3/6 L=80 recovered=0 attempts=20000 calls=1 usd=0.0000 stopped=max_attempts
-23:03:46 [model] claude-sonnet (proposer) calling...
-23:03:57 [model] claude-sonnet (proposer) ok 10.8s, tokens in/out 3456/1284, reply 2160 chars
-```
-
 ## Results so far
 
-- **tier-claude** (running)
+- **tier-claude** (interrupted)
   - random_program:40: recall 0.00 (0/6), 192 attempts, 0 model calls, $0.0000
   - claude-opus: recall 0.33 (2/6), 99091 attempts, 6 model calls, $0.0000
   - claude-sonnet: recall 0.33 (1/3), 41966 attempts, 3 model calls, $0.0000
@@ -124,3 +108,6 @@ Started 2026-11-04 23:00:52, updated 2026-11-04 23:04:05, status **running**. Jo
 - 2026-11-04 23:04:03 codex/24: done (exit 0, 3 min)
 - 2026-11-04 23:04:05 published: 8 file(s) to branch results
 - 2026-11-04 23:04:05 codex/22: done (exit 0, 3 min)
+- 2026-11-04 23:04:07 published: 8 file(s) to branch results
+- 2026-11-04 23:04:07 stopping: STOP file
+- 2026-11-04 23:04:07 tier-claude: interrupted (exit 1, 3 min)
