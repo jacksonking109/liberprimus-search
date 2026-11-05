@@ -1,6 +1,6 @@
 # Overnight run 20261104-2305
 
-Started 2026-11-04 23:05:16, updated 2026-11-05 01:28:09, status **running**. Jobs: pending 25, running 3, done 51
+Started 2026-11-04 23:05:16, updated 2026-11-05 01:29:59, status **running**. Jobs: pending 24, running 3, done 52
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -67,7 +67,7 @@ Started 2026-11-04 23:05:16, updated 2026-11-05 01:28:09, status **running**. Jo
 | deepseek/13 | done | 2026-11-05 01:11:35 | 2026-11-05 01:17:00 | DeepSeek (volume) |
 | deepseek/14 | done | 2026-11-05 01:17:16 | 2026-11-05 01:27:48 | DeepSeek (volume) |
 | deepseek/15 | done | 2026-11-05 01:28:03 | 2026-11-05 01:28:09 | DeepSeek (volume) |
-| deepseek/16 | pending |  |  | DeepSeek (volume) |
+| deepseek/16 | done | 2026-11-05 01:28:24 | 2026-11-05 01:29:59 | DeepSeek (volume) |
 | deepseek/17 | pending |  |  | DeepSeek (volume) |
 | deepseek/18 | pending |  |  | DeepSeek (volume) |
 | deepseek/19 | pending |  |  | DeepSeek (volume) |
@@ -88,16 +88,16 @@ Started 2026-11-04 23:05:16, updated 2026-11-05 01:28:09, status **running**. Jo
 
 **local/22** (since 2026-11-05 01:20:37), latest log lines:
 ```
-round 1 [qwen-local] proposals=8 valid=6 attempts=49682 passes=0 near=0 invalid=2
-01:24:53 [model] granite (weighting) calling...
-01:24:53 [model] granite (weighting) ok 0.5s, tokens in/out 222/26, reply 39 chars
-round 1 [gemma-local] proposals=8 valid=6 attempts=3402 passes=0 near=0 invalid=2
-01:24:58 [model] qwen-local (proposer) calling...
-01:25:51 [model] qwen-local (proposer) ok 52.7s, tokens in/out 4608/924, reply 3345 chars
-01:25:51 [model] gemma-local (proposer) calling...
 01:26:29 [model] gemma-local (proposer) ok 37.7s, tokens in/out 4693/582, reply 1758 chars
 01:26:29 [model] granite (weighting) calling...
 01:26:30 [model] granite (weighting) ok 1.2s, tokens in/out 284/22, reply 30 chars
+round 2 [qwen-local] proposals=8 valid=7 attempts=49696 passes=0 near=0 invalid=3
+01:28:42 [model] granite (weighting) calling...
+01:28:43 [model] granite (weighting) ok 0.6s, tokens in/out 230/29, reply 42 chars
+round 2 [gemma-local] proposals=8 valid=7 attempts=4249 passes=0 near=0 invalid=3
+01:28:47 [model] qwen-local (proposer) calling...
+01:29:31 [model] qwen-local (proposer) ok 44.1s, tokens in/out 5292/674, reply 2251 chars
+01:29:31 [model] gemma-local (proposer) calling...
 ```
 **structure/17** (since 2026-11-04 23:39:58), latest log lines:
 ```
@@ -114,7 +114,6 @@ round 4 [codex] proposals=1 valid=1 attempts=242154 passes=0 near=0 invalid=0
 ```
 **structure/24** (since 2026-11-05 01:08:24), latest log lines:
 ```
-===== 2026-11-05 01:08:24 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 24 --gen
 brief for the generators (718 chars): Two-stage programs: a transposition, then a substitution. Use the transpose field: grid widths (try the factors of the section length and their neighbours, e.g. 2
 == LP2:51.jpg/2-53.jpg - 68.jpg/2-70.jpg  (534 symbols)
 01:08:27 [model] codex (proposer) calling...
@@ -122,6 +121,9 @@ brief for the generators (718 chars): Two-stage programs: a transposition, then 
 round 1 [codex] proposals=32 valid=32 attempts=128172 passes=0 near=0 invalid=0
 01:14:11 [model] codex (proposer) calling...
 01:15:12 [model] codex (proposer) ok 61.0s, tokens in/out 21194/2524, reply 9091 chars, model not reported (pin one with model = "..." in the models config)
+round 2 [codex] proposals=32 valid=32 attempts=258453 passes=0 near=0 invalid=0
+01:28:29 [model] codex (proposer) calling...
+01:29:31 [model] codex (proposer) ok 62.2s, tokens in/out 21581/2671, reply 8505 chars, model not reported (pin one with model = "..." in the models config)
 ```
 
 ## Results so far
@@ -230,17 +232,19 @@ round 1 [codex] proposals=32 valid=32 attempts=128172 passes=0 near=0 invalid=0
   - LP2:8.jpg-14.jpg - 25.jpg-31.jpg: 60000 attempts, 62 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **deepseek/15** (done)
   - skip LP2:15.jpg/1 - 32.jpg/1: only 9 symbols (minimum 20, --min-length); too short to judge
+- **deepseek/16** (done)
+  - LP2:15.jpg/2- - 32.jpg/2-39.jpg: 60000 attempts, 5 hypotheses, **0 final pass(es)**, stopped: max_attempts
 
 ## Model usage
 
-- deepseek: 14 call(s) in the last 5h (cap none), spent $0.2459
-- qwen-local: 16 call(s) in the last 5h (cap none), spent $0.0000
+- deepseek: 15 call(s) in the last 5h (cap none), spent $0.2497
+- qwen-local: 17 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 16 call(s) in the last 5h (cap none), spent $0.0000
-- granite: 23 call(s) in the last 5h (cap none), spent $0.0000
+- granite: 24 call(s) in the last 5h (cap none), spent $0.0000
 - claude-opus: 80 call(s) in the last 5h (cap 180), spent $0.0000
 - claude-sonnet: 80 call(s) in the last 5h (cap 180), spent $0.0000
 - claude-supervisor: 80 call(s) in the last 5h (cap 180), spent $0.0000
-- codex: 52 call(s) in the last 5h (cap 850), spent $0.0000
+- codex: 53 call(s) in the last 5h (cap 850), spent $0.0000
 
 ## Current strategy note (read by every lane each round)
 
@@ -270,11 +274,6 @@ Prefer combinations missing from the section's history. A real hit should show s
 
 ## Events
 
-- 2026-11-05 01:15:20 structure/17: running 95 min | 01:03:08 [model] codex (proposer) ok 57.8s, tokens in/out 21895/2716, reply 9254 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-05 01:16:10 local/13: running 10 min | 01:12:46 [model] granite (weighting) ok 1.3s, tokens in/out 261/38, reply 69 chars
-- 2026-11-05 01:16:35 deepseek/13: running 5 min | 01:16:20 [model] deepseek (proposer) ok 16.9s, tokens in/out 5663/2303, reply 7796 chars
-- 2026-11-05 01:17:00 deepseek/13: done (exit 0, 5 min)
-- 2026-11-05 01:17:16 published: 49 file(s) to branch results
 - 2026-11-05 01:17:16 deepseek/14: start (uses api:https://api.deepseek.com)
 - 2026-11-05 01:17:16 4 running: structure/17, local/13, structure/24, deepseek/14
 - 2026-11-05 01:17:16 local/22 waiting: ollama:http://127.0.0.1:11434 in use by local/13
@@ -295,3 +294,8 @@ Prefer combinations missing from the section's history. A real hit should show s
 - 2026-11-05 01:28:04 4 running: structure/17, structure/24, local/22, deepseek/15
 - 2026-11-05 01:28:04 local/12 waiting: ollama:http://127.0.0.1:11434 in use by local/22
 - 2026-11-05 01:28:09 deepseek/15: done (exit 0, 0 min)
+- 2026-11-05 01:28:24 published: 51 file(s) to branch results
+- 2026-11-05 01:28:24 deepseek/16: start (uses api:https://api.deepseek.com)
+- 2026-11-05 01:28:24 4 running: structure/17, structure/24, local/22, deepseek/16
+- 2026-11-05 01:28:29 structure/24: running 20 min | 01:28:29 [model] codex (proposer) calling...
+- 2026-11-05 01:29:59 deepseek/16: done (exit 0, 2 min)
