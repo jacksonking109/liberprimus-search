@@ -260,6 +260,8 @@ STYLE_HINTS = {
 
 
 MAX_BRIEF_CHARS = 2000
+MAX_REFINE_CHARS = 1200      # a refinement written by the proposer model under the supervisor's brief
+MAX_BRIEF_TOTAL = 4500       # supervisor brief + refinement + any job brief, as shown to proposers
 
 
 def known_keywords(manifest: str | None = None, extra_file: str | None = "data/lp/keywords.txt") -> list[str]:
@@ -355,7 +357,7 @@ def build_prompt(ctx: GenContext, max_symbols: int = 300) -> list[dict]:
     if ctx.brief:
         lines.append("Direction from the run supervisor, who has read the results so far "
                      "(use it to choose what to try; the reply format and the rules above still "
-                     "apply):\n" + ctx.brief[:MAX_BRIEF_CHARS])
+                     "apply):\n" + ctx.brief[:MAX_BRIEF_TOTAL])
     lines.append(
         f'Round {ctx.round}. Propose {ctx.k} NEW, diverse hypotheses as JSON: '
         '{"proposals": [{"spec": {...}, "why": "one short sentence"}, ...]}')
@@ -387,6 +389,35 @@ def build_brief_prompt(ctx: GenContext, results_so_far: str = "") -> list[dict]:
         body += "\n\nResults so far on this section across the run (best leads; margin < 0 means " \
                 "below the pass threshold):\n" + results_so_far
     return [{"role": "system", "content": BRIEF_SYSTEM},
+            {"role": "user", "content": body + "\n\n" + ask}]
+
+
+REFINE_SYSTEM = ("You are a cryptanalyst tuning a plan written by the lead cryptanalyst (the "
+                 "supervisor) for one unsolved cipher section. You work under the supervisor: every "
+                 "direction in its brief stays in force and you may not contradict, drop or reorder "
+                 "it. Deterministic code tests every proposal against a null-calibrated English "
+                 "detector. Reply in plain text (no JSON), at most 1000 characters.")
+
+
+def build_refine_prompt(ctx: GenContext, supervisor_brief: str, results_so_far: str = "") -> list[dict]:
+    """Prompt for the proposer model that will act on the brief to tune it (refine-brief): it
+    sharpens the supervisor's directions with concrete parameter choices in its own style and
+    may add a few extra ideas, labelled, but cannot override the supervisor."""
+    base = build_prompt(ctx)[1]["content"]
+    body = base.rsplit("\nRound ", 1)[0]
+    if results_so_far:
+        body += "\n\nResults so far on this section across the run (best leads; margin < 0 means " \
+                "below the pass threshold):\n" + results_so_far
+    body += "\n\nBrief from the supervisor (it takes precedence over anything you add):\n" \
+            + supervisor_brief[:MAX_BRIEF_CHARS]
+    ask = ("Tune this brief for yourself as the proposer. For each numbered direction you can make "
+           "sharper, give concrete program choices in the language above (exact offsets or ranges, "
+           "stream kinds, combine modes, transpositions, sizes) that stay inside that direction, "
+           "refer to it by its number. You may add at most 3 extra ideas, each starting with "
+           "\"EXTRA:\", only where the supervisor's brief leaves a gap, and never repeating what "
+           "was already tried. Do not restate the supervisor's brief and do not present guesses or "
+           "remembered puzzle history as established facts.")
+    return [{"role": "system", "content": REFINE_SYSTEM},
             {"role": "user", "content": body + "\n\n" + ask}]
 
 

@@ -52,12 +52,16 @@ note = "Sonnet, briefed by Opus"
 
 # Codex lane (its own plan quota). Before each section the supervisor (Opus) writes the brief,
 # exactly as for Sonnet, from the digest of every lane's best leads on that section (Codex's own
-# earlier sections included). One extra supervisor call per section; set auto_brief = "codex"
-# instead to have Codex brief itself from the same digest and save the Claude quota.
+# earlier sections included). refine_brief = "codex" then lets Codex tune that brief for itself
+# (concrete parameters, up to 3 labelled extras) without altering or overriding Opus's text.
+# Remove refine_brief to skip that Codex call; set auto_brief = "codex" (and no refine_brief)
+# to have Codex brief itself from the same digest and save the Claude quota.
 [[job]]
 id = "codex"
 kind = "swarm"
 auto_brief = true
+refine_brief = "codex"      # Codex tunes Opus's brief for itself (one extra Codex call per section);
+                            # Opus's directions stay in force and take precedence
 order = "reverse"
 args = ["--manifest", "data/lp/manifest.json", "--alphabet", "data/alphabet/gematria_primus.json",
         "--sections", "unsolved", "--generators", "codex", "--rounds", "6",

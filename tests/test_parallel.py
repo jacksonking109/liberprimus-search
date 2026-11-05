@@ -1196,3 +1196,63 @@ def test_supervisor_brief_for_codex_sees_other_lanes_leads(tmp_path):
     assert cmd[cmd.index("--auto-brief") + 1] == "claude-supervisor"
     ctx = (run.job_dir(cj) / "brief_context.txt").read_text(encoding="utf-8")
     assert "by claude-sonnet: primes sub offset 3" in ctx
+
+
+def test_codex_refines_the_supervisor_brief_without_overriding_it(tmp_path):
+    import json as _json
+    import subprocess as sp
+    models = tmp_path / "m.toml"
+    models.write_text(
+        '[models.sup]\nprovider = "scripted"\nmodel = "x"\nroles = ["supervisor"]\n'
+        'replies = ["1. Try prime streams, combine sub, offsets 0-5."]\n\n'
+        '[models.cdx]\nprovider = "scripted"\nmodel = "x"\nroles = ["proposer"]\n'
+        'replies = ["Direction 1: offsets 0-5 and p-1 as well.\\nEXTRA: totient stream.",'
+        ' \'{"proposals": [{"spec": {"stream": {"kind": "constant", "value": 3}}}]}\']\n',
+        encoding="utf-8")
+    ctx = tmp_path / "ctx.txt"
+    ctx.write_text("job sonnet/11: 40 attempts; near_miss margin -0.10 by sonnet: primes", encoding="utf-8")
+    tr = tmp_path / "t.jsonl"
+    r = sp.run([sys.executable, "-m", "lpswarm", "swarm", "--manifest", str(ROOT / "data/lp/manifest.json"),
+                "--alphabet", str(ROOT / "data/alphabet/gematria_primus.json"), "--sections", "11",
+                "--generators", "cdx", "--models", str(models), "--spend-ledger", str(tmp_path / "s.sqlite"),
+                "--rounds", "1", "--per-round", "1", "--null-samples", "100",
+                "--ledger", str(tmp_path / "l.sqlite"), "--report-dir", str(tmp_path / "r"),
+                "--auto-brief", "sup", "--refine-brief", "cdx", "--brief-context", str(ctx)],
+               capture_output=True, text=True, encoding="utf-8", cwd=ROOT,
+               env={**__import__("os").environ, "LPSWARM_TRANSCRIPT": str(tr)})
+    assert r.returncode == 0, r.stderr[-800:]
+    assert "refinement from cdx" in r.stdout
+    recs = [_json.loads(x) for x in tr.read_text(encoding="utf-8").splitlines()]
+    calls = [x for x in recs if x["model"] == "cdx"]
+    refine, propose = calls[0], calls[1]
+    # the refine call sees the supervisor's brief and the results, and is told it works under it
+    assert "1. Try prime streams" in refine["messages"][1]["content"]
+    assert "near_miss margin -0.10" in refine["messages"][1]["content"]
+    assert "supervisor" in refine["messages"][0]["content"]
+    # the proposer sees the supervisor's text verbatim first, then the labelled tuning
+    p = propose["messages"][1]["content"]
+    assert p.index("1. Try prime streams") < p.index("EXTRA: totient stream")
+    assert "supervisor's directions take precedence" in p
+    assert "Refinement for" in (tmp_path / "r" / "brief.md").read_text(encoding="utf-8")
+
+
+def test_refine_brief_needs_supervisor_brief_and_reaches_the_job_command(tmp_path):
+    import pytest as _pt
+    from lpswarm.overnight import expand_jobs, load_config
+    cfg = load_config(ROOT / "config" / "overnight.example.toml")
+    cfg.manifest = str(ROOT / "data" / "lp" / "manifest.json")
+    cfg.supervisor = "claude-supervisor"
+    jobs = expand_jobs(cfg)
+    cj = next(j for j in jobs if j["id"].startswith("codex/"))
+    assert cj["auto_brief"] is True and cj["refine_brief"] == "codex"
+    run = Overnight(cfg, tmp_path / "run", stop_file=tmp_path / "STOP", progress=False)
+    cmd = run.job_command(cj)
+    assert cmd[cmd.index("--auto-brief") + 1] == "claude-supervisor"
+    assert cmd[cmd.index("--refine-brief") + 1] == "codex"
+    sj = next(j for j in jobs if j["id"].startswith("sonnet/"))
+    assert "--refine-brief" not in run.job_command(sj)           # Sonnet lane unchanged
+    bad = tmp_path / "o.toml"
+    bad.write_text('[overnight]\n[[job]]\nid = "x"\nkind = "swarm"\nrefine_brief = "codex"\n'
+                   'auto_brief = "codex"\n', encoding="utf-8")
+    with _pt.raises(ValueError, match="needs auto_brief = true"):
+        load_config(bad)

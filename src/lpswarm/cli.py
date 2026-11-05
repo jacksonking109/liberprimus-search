@@ -286,6 +286,43 @@ def _auto_brief(args, router, alphabet, ct, label, values) -> str:
     return text
 
 
+def _refine_brief(args, router, alphabet, ct, label, values, base: str, results: str) -> str:
+    """Let the --refine-brief proposer model tune the supervisor's brief for this target. Returns
+    the base brief with the refinement appended under a label, or the base unchanged if the
+    model is unavailable. The supervisor's text is never altered."""
+    import numpy as np
+    from lpswarm.router.adapters import AdapterError
+    from lpswarm.router.limits import RateLimited
+    from lpswarm.router.router import BudgetExceeded
+    from lpswarm.swarm.generators import (GenContext, MAX_REFINE_CHARS, build_refine_prompt,
+                                          known_keywords)
+    ctx = GenContext(label, alphabet, np.asarray(ct), 0, 8, alphabet_values=values, task_id=label,
+                     known_words=known_keywords(getattr(args, "manifest", None)))
+    try:
+        c = router.complete(args.refine_brief, build_refine_prompt(ctx, base, results),
+                            role="proposer", task_id=f"{label}#refine", temperature=0.4,
+                            max_tokens=1200)
+    except (RateLimited, BudgetExceeded, AdapterError, ValueError) as exc:
+        print(f"refine-brief skipped ({args.refine_brief}): {str(exc)[:200]}", flush=True)
+        return base
+    text = c.text.strip()[:MAX_REFINE_CHARS]
+    if not text:
+        return base
+    print(f"refinement from {args.refine_brief} ({len(text)} chars):", flush=True)
+    import textwrap
+    for line in text.splitlines():
+        for part in textwrap.wrap(line, 150) if line.strip() else []:
+            print(f"  | {part}", flush=True)
+    if args.report_dir:
+        d = Path(args.report_dir)
+        d.mkdir(parents=True, exist_ok=True)
+        with (d / "brief.md").open("a", encoding="utf-8") as f:
+            f.write(f"## Refinement for {label} (from {args.refine_brief}, under the supervisor)"
+                    f"\n\n{text}\n\n")
+    return (base + f"\n\nTuning by {args.refine_brief} (proposer), working inside the directions "
+            "above; the supervisor's directions take precedence over anything below:\n" + text)
+
+
 def cmd_swarm(args) -> int:
     from lpswarm.executor import Target
     from lpswarm.ledger import Ledger
@@ -377,8 +414,14 @@ def cmd_swarm(args) -> int:
             print(f"\n== {label}  ({len(ct)} symbols)")
             tgt_brief = brief
             if args.auto_brief and router is not None:
-                tgt_brief = "\n\n".join(x for x in (_auto_brief(args, router, alphabet, ct, label,
-                                                                  values), brief) if x)
+                auto = _auto_brief(args, router, alphabet, ct, label, values)
+                if auto and getattr(args, "refine_brief", None):
+                    results = ""
+                    if args.brief_context and Path(args.brief_context).is_file():
+                        from lpswarm.textio import read_text
+                        results = read_text(args.brief_context).strip()
+                    auto = _refine_brief(args, router, alphabet, ct, label, values, auto, results)
+                tgt_brief = "\n\n".join(x for x in (auto, brief) if x)
             res = run_swarm(Target(alphabet, ct, label, page_range=page_range, is_synthetic=synthetic,
                                    breaks=breaks),
                             led, oracle, gens, sc, ranker=ranker, alphabet_values=values,
@@ -704,6 +747,10 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--auto-brief", metavar="MODEL",
                    help="before each target, ask this supervisor-role model (e.g. "
                         "claude-supervisor) to write a brief for the generators")
+    p.add_argument("--refine-brief", metavar="MODEL",
+                   help="after the --auto-brief supervisor writes a brief, let this proposer model "
+                        "(e.g. codex) tune it for itself; the supervisor's text is kept and takes "
+                        "precedence (needs --auto-brief)")
     p.add_argument("--brief-context", help="text file with results so far on this target, shown "
                    "to the --auto-brief model (written by the overnight runner)")
     p.add_argument("--lean-threshold", type=int, default=None,

@@ -95,6 +95,12 @@ def load_config(path: str | Path) -> OvernightConfig:
             raise ValueError(f"{path}: job {j['id']}: order must be one of {ORDERS}")
         if "auto_brief" in j and not isinstance(j["auto_brief"], (bool, str)):
             raise ValueError(f"{path}: job {j['id']}: auto_brief must be true or a model name")
+        if j.get("refine_brief"):
+            if not isinstance(j["refine_brief"], str):
+                raise ValueError(f"{path}: job {j['id']}: refine_brief must be a model name")
+            if j.get("auto_brief") is not True:
+                raise ValueError(f"{path}: job {j['id']}: refine_brief tunes the supervisor's brief, "
+                                 "so it needs auto_brief = true")
     known = {k for k in OvernightConfig.__dataclass_fields__ if k != "jobs"}
     bad = set(sec) - known
     if bad:
@@ -159,6 +165,8 @@ def expand_jobs(cfg: OvernightConfig) -> list[dict]:
                            "config", j.get("note", ""), j.get("lane"))
                 if j.get("auto_brief"):
                     job["auto_brief"] = j["auto_brief"]
+                    if j.get("refine_brief"):
+                        job["refine_brief"] = j["refine_brief"]
                 if j.get("brief"):
                     job["brief"] = str(j["brief"])[:2000]
                 out.append(job)
@@ -293,7 +301,7 @@ class Overnight:
         return {"started": _now(), "status": "running", "jobs": expand_jobs(self.cfg),
                 "notes": [], "events": [f"{_now()} started"], "added_jobs": 0, "ticks": 0}
 
-    LIVE_JOB_KEYS = ("auto_brief", "lane")
+    LIVE_JOB_KEYS = ("auto_brief", "refine_brief", "lane")
 
     def _refresh_job_options(self, st: dict) -> None:
         """On resume, jobs that have not started take auto_brief / lane from the current
@@ -367,6 +375,8 @@ class Overnight:
                     (d / "brief_context.txt").write_text(ctx, encoding="utf-8")
                     args = _set_arg(args, "--auto-brief", model)
                     args = _set_arg(args, "--brief-context", str(d / "brief_context.txt"))
+                    if ab is True and job.get("refine_brief"):
+                        args = _set_arg(args, "--refine-brief", str(job["refine_brief"]))
             if job["kind"] == "swarm":
                 if Path(models).is_file() and "--models" not in args:
                     args += ["--models", models]

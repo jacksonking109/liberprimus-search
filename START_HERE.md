@@ -295,8 +295,10 @@ powershell -ExecutionPolicy Bypass -File scripts\overnight.ps1
 - The queue is `config\overnight.toml` (created by setup). Default: (1) tier test with Claude Code
   Opus + Sonnet; then the unsolved sections (20+ runes) in three lanes that run side by side,
   each starting on a different section: (2) **Sonnet** and (3) **Codex**, each with a brief Opus writes for
-  each section from what every lane has tried there (Codex's leads included; use `auto_brief = "codex"`
-  on the Codex job to let Codex brief itself and save Claude quota), (4) **qwen/gemma** on the 5060 Ti; (5) DeepSeek,
+  each section from what every lane has tried there (Codex's leads included). Codex then tunes Opus's
+  brief for itself (`refine_brief = "codex"`: one extra Codex call per section; Opus's text is kept as
+  written and takes precedence). Use `auto_brief = "codex"` instead to let Codex brief itself and
+  save Claude quota, (4) **qwen/gemma** on the 5060 Ti; (5) DeepSeek,
   refused until it's set up. One sub-job per section. Edit the file to change jobs.
 - **Side by side:** jobs on different backends run at the same time (up to `max_parallel = 4`):
   the Claude, Codex and local lanes run together, while two jobs on the same GPU or the same
