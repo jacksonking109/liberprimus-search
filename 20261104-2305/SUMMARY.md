@@ -1,6 +1,6 @@
 # Overnight run 20261104-2305
 
-Started 2026-11-04 23:05:16, updated 2026-11-05 02:47:34, status **running**. Jobs: pending 14, running 3, done 62
+Started 2026-11-04 23:05:16, updated 2026-11-05 02:49:00, status **running**. Jobs: pending 13, running 3, done 63
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -49,7 +49,7 @@ Started 2026-11-04 23:05:16, updated 2026-11-05 02:47:34, status **running**. Jo
 | local/24 | done | 2026-11-05 01:37:29 | 2026-11-05 01:42:30 | local models |
 | local/11 | done | 2026-11-05 01:42:46 | 2026-11-05 01:59:28 | local models |
 | local/25 | done | 2026-11-05 01:59:45 | 2026-11-05 02:13:26 | local models |
-| local/10 | running | 2026-11-05 02:13:42 |  | local models |
+| local/10 | done | 2026-11-05 02:13:42 | 2026-11-05 02:49:00 | local models |
 | structure/10 | done | 2026-11-04 23:22:41 | 2026-11-04 23:33:48 | Codex: transposition then substitution |
 | structure/12 | done | 2026-11-04 23:23:01 | 2026-11-04 23:31:06 | Codex: transposition then substitution |
 | structure/13 | done | 2026-11-04 23:31:22 | 2026-11-04 23:40:03 | Codex: transposition then substitution |
@@ -71,7 +71,7 @@ Started 2026-11-04 23:05:16, updated 2026-11-05 02:47:34, status **running**. Jo
 | deepseek/17 | done | 2026-11-05 01:30:15 | 2026-11-05 02:06:45 | DeepSeek (volume) |
 | deepseek/18 | done | 2026-11-05 02:07:10 | 2026-11-05 02:41:08 | DeepSeek (volume) |
 | deepseek/19 | done | 2026-11-05 02:41:34 | 2026-11-05 02:47:34 | DeepSeek (volume) |
-| deepseek/20 | pending |  |  | DeepSeek (volume) |
+| deepseek/20 | running | 2026-11-05 02:47:49 |  | DeepSeek (volume) |
 | deepseek/21 | pending |  |  | DeepSeek (volume) |
 | deepseek/22 | pending |  |  | DeepSeek (volume) |
 | deepseek/24 | pending |  |  | DeepSeek (volume) |
@@ -86,19 +86,6 @@ Started 2026-11-04 23:05:16, updated 2026-11-05 02:47:34, status **running**. Jo
 
 ## Now running
 
-**local/10** (since 2026-11-05 02:13:42), latest log lines:
-```
-round 1 [qwen-local] proposals=8 valid=6 attempts=315 passes=0 near=0 invalid=2
-02:17:20 [model] granite (weighting) calling...
-02:17:21 [model] granite (weighting) ok 0.5s, tokens in/out 234/22, reply 30 chars
-round 1 [gemma-local] proposals=8 valid=7 attempts=30 passes=0 near=0 invalid=1
-02:17:33 [model] qwen-local (proposer) calling...
-02:18:28 [model] qwen-local (proposer) ok 55.0s, tokens in/out 5109/842, reply 3123 chars
-02:18:28 [model] gemma-local (proposer) calling...
-02:19:10 [model] gemma-local (proposer) ok 41.9s, tokens in/out 5174/560, reply 1579 chars
-02:19:10 [model] granite (weighting) calling...
-02:19:11 [model] granite (weighting) ok 1.3s, tokens in/out 274/38, reply 69 chars
-```
 **exhaustive/11** (since 2026-11-05 01:31:28), latest log lines:
 ```
 ===== 2026-11-05 01:31:28 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 11 --gen
@@ -115,6 +102,13 @@ note: short section (91 runes): many keys give plausible-looking text this short
 == LP2:33.jpg - 50.jpg/1  (91 symbols)
 01:39:50 [model] codex (proposer) calling...
 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
+```
+**deepseek/20** (since 2026-11-05 02:47:49), latest log lines:
+```
+===== 2026-11-05 02:47:49 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 20 --gen
+== LP2:50.jpg/2-56.jpg/1  (1468 symbols)
+02:47:58 [model] deepseek (proposer) calling...
+02:48:16 [model] deepseek (proposer) ok 18.0s, tokens in/out 3947/2899, reply 8267 chars
 ```
 
 ## Results so far
@@ -211,6 +205,8 @@ note: short section (91 runes): many keys give plausible-looking text this short
   - LP2:20.jpg/1 - 3.jpg/1: 28321 attempts, 76 hypotheses, **0 final pass(es)**
 - **local/25** (done)
   - LP2:54.jpg-55.jpg - 71.jpg-72.jpg: 60000 attempts, 6 hypotheses, **0 final pass(es)**, stopped: max_attempts
+- **local/10** (done)
+  - LP2:17.jpg, 18.jpg, 19.jpg - 0.jpg-2.jpg: 60000 attempts, 14 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **structure/10** (done)
   - LP2:17.jpg, 18.jpg, 19.jpg - 0.jpg-2.jpg: 300000 attempts, 90 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **structure/12** (done)
@@ -248,7 +244,7 @@ note: short section (91 runes): many keys give plausible-looking text this short
 
 ## Model usage
 
-- deepseek: 24 call(s) in the last 5h (cap none), spent $0.2906
+- deepseek: 25 call(s) in the last 5h (cap none), spent $0.2953
 - qwen-local: 29 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 29 call(s) in the last 5h (cap none), spent $0.0000
 - granite: 45 call(s) in the last 5h (cap none), spent $0.0000
@@ -288,12 +284,6 @@ Prefer combinations missing from the section's history. A real hit should show s
 
 ## Events
 
-- 2026-11-05 02:24:53 exhaustive/19: running 45 min | 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-05 02:26:38 exhaustive/11: running 55 min | 01:32:40 [model] codex (proposer) ok 67.6s, tokens in/out 18877/2766, reply 8967 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-05 02:27:13 deepseek/18: running 20 min | 02:11:04 [model] deepseek (proposer) ok 9.9s, tokens in/out 4330/2500, reply 7121 chars
-- 2026-11-05 02:28:43 local/10: running 15 min | 02:19:11 [model] granite (weighting) ok 1.3s, tokens in/out 274/38, reply 69 chars
-- 2026-11-05 02:29:53 exhaustive/19: running 50 min | 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-05 02:31:38 exhaustive/11: running 60 min | 01:32:40 [model] codex (proposer) ok 67.6s, tokens in/out 18877/2766, reply 8967 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-05 02:32:13 deepseek/18: running 25 min | 02:11:04 [model] deepseek (proposer) ok 9.9s, tokens in/out 4330/2500, reply 7121 chars
 - 2026-11-05 02:33:43 local/10: running 20 min | 02:19:11 [model] granite (weighting) ok 1.3s, tokens in/out 274/38, reply 69 chars
 - 2026-11-05 02:34:53 exhaustive/19: running 55 min | 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
@@ -313,3 +303,9 @@ Prefer combinations missing from the section's history. A real hit should show s
 - 2026-11-05 02:46:34 deepseek/19: running 5 min | 02:46:04 [model] deepseek (proposer) ok 9.4s, tokens in/out 6093/2590, reply 7126 chars
 - 2026-11-05 02:46:39 exhaustive/11: running 75 min | 01:32:40 [model] codex (proposer) ok 67.6s, tokens in/out 18877/2766, reply 8967 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-05 02:47:34 deepseek/19: done (exit 0, 6 min)
+- 2026-11-05 02:47:49 published: 62 file(s) to branch results
+- 2026-11-05 02:47:49 deepseek/20: start (uses api:https://api.deepseek.com)
+- 2026-11-05 02:47:50 4 running: exhaustive/11, exhaustive/19, local/10, deepseek/20
+- 2026-11-05 02:47:50 exhaustive/21 waiting: codex-plan full (2/2: exhaustive/11, exhaustive/19)
+- 2026-11-05 02:48:45 local/10: running 35 min | stopped: max_attempts; final passes: 0
+- 2026-11-05 02:49:00 local/10: done (exit 0, 35 min)
