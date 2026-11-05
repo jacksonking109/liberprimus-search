@@ -1,6 +1,6 @@
 # Overnight run 20261104-1523
 
-Started 2026-11-04 15:23:11, updated 2026-11-04 19:00:32, status **running**. Jobs: pending 3, running 2, done 61
+Started 2026-11-04 15:23:11, updated 2026-11-04 19:06:28, status **running**. Jobs: pending 3, running 1, done 62
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -17,7 +17,7 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 19:00:32, status **running**. Jo
 | sonnet/19 | done | 2026-11-04 16:33:19 | 2026-11-04 16:36:29 | Sonnet, briefed by Opus |
 | sonnet/20 | done | 2026-11-04 16:36:44 | 2026-11-04 17:16:12 | Sonnet, briefed by Opus |
 | sonnet/21 | done | 2026-11-04 17:32:18 | 2026-11-04 17:36:04 | Sonnet, briefed by Opus |
-| sonnet/22 | running | 2026-11-04 17:36:20 | 2026-11-04 17:53:22 | Sonnet, briefed by Opus |
+| sonnet/22 | done | 2026-11-04 17:36:20 | 2026-11-04 19:06:28 | Sonnet, briefed by Opus |
 | sonnet/24 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/25 | pending |  |  | Sonnet, briefed by Opus |
 | codex/25 | done | 2026-11-04 15:23:11 | 2026-11-04 15:35:47 | Codex (exploratory) |
@@ -73,19 +73,6 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 19:00:32, status **running**. Jo
 
 ## Now running
 
-**sonnet/22** (since 2026-11-04 17:36:20), latest log lines:
-```
-18:05:31 [model] claude-sonnet (proposer) ok 11.0s, tokens in/out 8461/1381, reply 2929 chars
-round 3 [claude-sonnet] proposals=12 valid=12 attempts=8193 passes=0 near=0 invalid=6
-18:19:44 [model] claude-sonnet (proposer) calling...
-18:19:56 [model] claude-sonnet (proposer) ok 12.8s, tokens in/out 9109/1745, reply 3319 chars
-round 4 [claude-sonnet] proposals=12 valid=12 attempts=14270 passes=0 near=0 invalid=6
-18:36:04 [model] claude-sonnet (proposer) calling...
-18:36:16 [model] claude-sonnet (proposer) ok 11.7s, tokens in/out 9621/1325, reply 2784 chars
-round 5 [claude-sonnet] proposals=12 valid=12 attempts=18375 passes=0 near=0 invalid=6
-18:49:43 [model] claude-sonnet (proposer) calling...
-18:49:59 [model] claude-sonnet (proposer) ok 15.3s, tokens in/out 9697/2102, reply 3196 chars
-```
 **sup2/14** (since 2026-11-04 18:54:12), latest log lines:
 ```
 ===== 2026-11-04 18:54:12 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 14 --gen
@@ -95,6 +82,7 @@ brief for the generators (1096 chars): Sections and lengths: 10 = 729 (27*27, 9*
 18:54:50 [model] codex (proposer) ok 35.2s, tokens in/out 19231/1550, reply 4359 chars, model not reported (pin one with model = "..." in the models config)
 round 1 [codex] proposals=16 valid=6 attempts=10014 passes=0 near=0 invalid=10
 19:00:29 [model] codex (proposer) calling...
+19:00:59 [model] codex (proposer) ok 29.3s, tokens in/out 20053/1292, reply 4083 chars, model not reported (pin one with model = "..." in the models config)
 ```
 
 ## Results so far
@@ -127,8 +115,8 @@ round 1 [codex] proposals=16 valid=6 attempts=10014 passes=0 near=0 invalid=10
   - LP2:50.jpg/2-56.jpg/1: 29488 attempts, 59 hypotheses, **0 final pass(es)**, stopped: stop_file
 - **sonnet/21** (done)
   - LP2:56.jpg/2: 42296 attempts, 57 hypotheses, **0 final pass(es)**
-- **sonnet/22** (running)
-  - LP2:57.jpg-66.jpg/1: 11514 attempts, 37 hypotheses, **0 final pass(es)**, stopped: stop_file
+- **sonnet/22** (done)
+  - LP2:57.jpg-66.jpg/1: 37994 attempts, 98 hypotheses, **0 final pass(es)**
 - **codex/25** (done)
   - LP2:54.jpg-55.jpg - 71.jpg-72.jpg: 60000 attempts, 57 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **codex/24** (done)
@@ -235,7 +223,7 @@ round 1 [codex] proposals=16 valid=6 attempts=10014 passes=0 near=0 invalid=10
 - claude-opus: 167 call(s) in the last 5h (cap 550), spent $0.0000
 - claude-sonnet: 167 call(s) in the last 5h (cap 550), spent $0.0000
 - claude-supervisor: 167 call(s) in the last 5h (cap 550), spent $0.0000
-- codex: 95 call(s) in the last 5h (cap 850), spent $0.0000
+- codex: 96 call(s) in the last 5h (cap 850), spent $0.0000
 - dry: 4 call(s) in the last 5h (cap none), spent $0.0000
 
 ## Current strategy note (read by every lane each round)
@@ -257,10 +245,6 @@ round 1 [codex] proposals=16 valid=6 attempts=10014 passes=0 near=0 invalid=10
 
 ## Events
 
-- 2026-11-04 18:44:52 deepseek/25: start (uses api:https://api.deepseek.com)
-- 2026-11-04 18:44:52 4 running: sonnet/22, sup2/10, sup2/12, deepseek/25
-- 2026-11-04 18:44:52 sonnet/24 waiting: claude-plan in use by sonnet/22
-- 2026-11-04 18:44:57 sonnet/22: running 50 min | 18:36:16 [model] claude-sonnet (proposer) ok 11.7s, tokens in/out 9621/1325, reply 2784 chars
 - 2026-11-04 18:49:27 sup2/10: running 10 min | 18:48:58 [model] codex (proposer) calling...
 - 2026-11-04 18:49:27 sup2/12: running 10 min | 18:48:35 [model] codex (proposer) ok 35.5s, tokens in/out 22627/1584, reply 4252 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-04 18:49:52 deepseek/25: running 5 min | 18:49:42 [model] deepseek (proposer) ok 12.7s, tokens in/out 5915/1305, reply 3639 chars
@@ -282,3 +266,7 @@ round 1 [codex] proposals=16 valid=6 attempts=10014 passes=0 near=0 invalid=10
 - 2026-11-04 18:59:12 sup2/14: running 5 min | 18:54:50 [model] codex (proposer) ok 35.2s, tokens in/out 19231/1550, reply 4359 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-04 19:00:02 sonnet/22: running 65 min | 18:49:59 [model] claude-sonnet (proposer) ok 15.3s, tokens in/out 9697/2102, reply 3196 chars
 - 2026-11-04 19:00:32 sup2/13: done (exit 0, 7 min)
+- 2026-11-04 19:00:48 published: 62 file(s) to branch results
+- 2026-11-04 19:04:13 sup2/14: running 10 min | 19:00:59 [model] codex (proposer) ok 29.3s, tokens in/out 20053/1292, reply 4083 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-04 19:05:03 sonnet/22: running 70 min | 18:49:59 [model] claude-sonnet (proposer) ok 15.3s, tokens in/out 9697/2102, reply 3196 chars
+- 2026-11-04 19:06:28 sonnet/22: done (exit 0, 72 min)
