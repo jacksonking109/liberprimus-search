@@ -15,8 +15,10 @@ exact targets, counts, caps, stop rule and run command. **Nothing in `packets/` 
 | `exp1_feedback` | neighbour / chain feedback, with and without word reset | 261 |
 | `exp2_two_shear` | determinant-one 2x2 Hill blocks, b = 0 | 33 |
 | `exp2b_all_shifts` | the same with all 29 offsets (separate approval) | 957 |
-| `exp3_progressive` | progressive keys `k_t = d * s(o + t)`: `naturals`, `squares`, `triangular` x scale 1..28 x offset 0..28 x sub/beaufort | 4,873 |
+| `exp3_progressive` | progressive keys `k_t = d * s(o + t)`: `naturals`, `squares`, `triangular` x scale 1..28 x offset 0..28 x (p = c - k, p = k - c) | 4,873 |
 
+`p = k - c` is the reversed-alphabet form (reversed Gematria plus a shift, as the source notes give for
+solved LP1 pages 1, 5 and 6); the interpreter calls it `beaufort`, which is only a sign convention here.
 For `naturals` the exp3 packet is the complete arithmetic family `k_t = d*t + b` (the offset sweep
 covers every b because d is invertible mod 29). `squares` and `triangular` with a scale and offset
 are only a subfamily of quadratic keys; a general polynomial key would need a new stream kind.

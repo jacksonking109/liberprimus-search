@@ -104,6 +104,10 @@ def exp2_replies(all_shifts: bool) -> tuple[list[str], list[dict]]:
 
 
 PROGRESSIVE_SEQUENCES = ("naturals", "squares", "triangular")
+# `beaufort` is the interpreter's keyword for p = k - c. It is the algebraic form of "reversed alphabet
+# plus a shift" (what the manifest source notes give for solved LP1 pages 1, 5 and 6), not a claim
+# about how the unsolved sections work.
+COMBINE_LABELS = {"sub": "p = c - k", "beaufort": "p = k - c (reversed-alphabet form)"}
 
 
 def progressive_spec(seq: str, scale: int, combine: str) -> dict:
@@ -117,9 +121,10 @@ def exp3_replies() -> tuple[list[str], list[dict]]:
     replies, table = [], []
     for seq in PROGRESSIVE_SEQUENCES:
         for combine in ("sub", "beaufort"):
+            label = COMBINE_LABELS[combine]
             replies.append(_reply([progressive_spec(seq, d, combine) for d in range(1, N)],
-                                  f"progressive key: {seq} x scale d, offsets 0-28, {combine}"))
-            table.append({"form": f"{seq}, {combine}, scale 1..28 x offset 0..28",
+                                  f"progressive key: {seq} x scale d, offsets 0-28, {label}"))
+            table.append({"form": f"{seq}, {label}, scale 1..28 x offset 0..28",
                           "proposals": N - 1})
     replies.append(_reply([_spec(0)], "control: identity (no mixing, no shift)"))
     table.append({"form": "identity control", "proposals": 1})
@@ -187,7 +192,9 @@ PACKETS = {
         "timeout": 900, "replies": lambda: exp3_replies(),
         "approved": "NO: review first, then ask",
         "mechanism": (
-            "Decryption `p_t = c_t - k_t` (`sub`) or `k_t - c_t` (`beaufort`) with `k_t = d * s(o + t)` "
+            "Decryption `p_t = c_t - k_t` or `p_t = k_t - c_t` (the reversed-alphabet form: what a reversed "
+            "Gematria plus a shift looks like algebraically, as the source notes give for solved LP1 "
+            "pages 1, 5 and 6; the interpreter's keyword for it is `beaufort`) with `k_t = d * s(o + t)` "
             "mod 29, where `s` is `naturals` (0, 1, 2, ...: an arithmetic progression, so each "
             "rune's shift grows by d), `squares` or `triangular`; d = 1..28 and the start offset "
             "o = 0..28. For `naturals` the offset sweep covers every constant term b, so this is "
@@ -196,7 +203,9 @@ PACKETS = {
             "Single `naturals`, `squares` and `triangular` shifts with small scales may have been "
             "proposed by earlier model lanes (triangular with scale 1 appears in the section 19 "
             "near-miss list). Coverage is unknown until the local ledgers are compared.",
-            "`add` is not generated: `add` with scale d equals `sub` with scale 29-d."],
+            "`add` is not generated: `add` with scale d equals `sub` with scale 29-d.",
+            "`beaufort` is only the interpreter's keyword for `p = k - c`; using it here is a sign "
+            "convention, not a claim about how the unsolved sections were enciphered."],
         "not_implemented": [
             "`squares` and `triangular` with a scale and a start offset are only a subfamily of "
             "quadratic keys (`a*t^2 + b*t + c`): the general quadratic or cubic polynomial key "

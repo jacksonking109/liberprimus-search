@@ -180,3 +180,15 @@ def test_progressive_packet_counts_and_covers_planted_arithmetic_and_triangular_
         k = (d * np.arange(300) + b) % 29
         ct = (pt + k) % 29                                          # p = c - k
         assert any(np.array_equal(decrypt(ct, c, alpha.size), pt) for c in packet), (d, b)
+
+
+def test_exp3_labels_beaufort_as_a_sign_convention_not_a_theory(tmp_path, sections):
+    r = P.render_packet("exp3_progressive", tmp_path, sections)
+    text = (tmp_path / "exp3_progressive" / "packet.md").read_text(encoding="utf-8")
+    assert "reversed-alphabet form" in text and "not a claim about how the unsolved sections" in text
+    assert "naturals, beaufort" not in text                       # round labels use the algebra instead
+    assert "p = k - c (reversed-alphabet form)" in text
+    assert r["per_target"] == 4873                                # specs and counts are unchanged
+    replies = json.loads((tmp_path / "exp3_progressive" / "proposals.json").read_text(encoding="utf-8"))
+    combines = {p["spec"]["combine"] for rr in replies for p in json.loads(rr)["proposals"]}
+    assert combines == {"sub", "beaufort"}                        # the DSL keyword itself is untouched
