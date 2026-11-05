@@ -16,3 +16,6 @@ STOP
 config/models.toml
 config/gpus.json
 .results-worktree/
+
+# page images (fetched on demand, never committed)
+data/lp_images/

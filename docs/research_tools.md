@@ -113,6 +113,35 @@ z >= 8 is a lead for the real oracle, not a result. Planted controls (English th
 F-skip, with and without an extra skipped index) are found at z about 33-40; noise stays at 2-4. English
 bigram model only. The reference run in `docs/diagnostics_sample/diagnostics_windows.md` is primes only; `diagnostics_windows_all.md` repeats it over primes, Fibonacci, naturals, squares, triangular, pi and e digits (`--sequences`, about 6 minutes): no flag on any section, best real stage-2 z 3.7 against 3.4 for noise and 32-38 for the planted stream.
 
+## Page images (`python -m lpswarm.pageimages {fetch,headings}`)
+
+The pages are drawn in one computer typeface, so the same rune is near pixel-identical wherever it appears (the
+stroke distance between two copies is at most 3 px; between different runes at least 15 px). Reading a page is
+therefore cutting glyphs and grouping identical shapes, with no trained model. `fetch` does a partial git clone of
+`iBotPeaches/cicada_3301` into `data/lp_images/` (git-ignored: the images are never committed; their SHA-256 sums are
+in `data/lp_images.sha256`). Needs Pillow and scipy (`pip install -e ".[images]"`).
+
+What the images carry that the text files lose: line breaks, red runes, the large red drop cap (it is the first rune of
+the text), the dotted red square that ends a red passage, and the separator after each glyph.
+
+**Red text is a heading or closing line**, ended by the dotted square. Checked on the plain-substitution pages, where the
+red runs read as written: SOME WISDOM / KNOW THIS (page 05), THE LOSS OF DIVINITY / CONSUMPTION (10), PRESERVATION (11),
+ADHERENCE (12), SOME WISDOM / AN INSTRUCTION (13), AN INSTRUCTION / KNOW THIS (16), PARABLE (74), and A WARNING / FOR ALL
+IS SACRED (page 01, reversed alphabet).
+
+`headings` learns the shapes on all pages, labels them from pages 14-15 and 16 (their glyph counts equal the manifest's;
+agreement 100% on both), re-reads every page, and tabulates the red runs. It then runs a **crib test** on the unsolved pages:
+each red heading is tried against every title of the same length (the list above plus A KOAN, A WARNING, AN END, WELCOME);
+the implied key `c - p` must be a window of one of seven sequences (every scale, offset 0..20,000) or a short repeating key.
+Known-page controls: page 73's five-rune heading AN END recovers the prime stream (scale 1, offset 0) by itself, and page 74's
+gives a constant key. On the unsolved pages: no hit, and 0 false matches in 108 random-plaintext tests.
+
+Limits: agreement with the manifest is 98.8-100% on the pages compared; the early pages have vines that touch glyphs at the
+left margin and page 05 has a grid of numbers and small runes, so those layouts lose or add a few glyphs (the unsolved LP2
+pages mostly have the clean layout). Headings of 13, 19 or 50 runes have no matching title in the list and are only
+tabulated. The crib test assumes the heading is enciphered with the same position-keyed stream as the body, as it is on
+the solved pages.
+
 ## Limits
 
 * The power table uses English plaintext. If the true plaintext is another language, abbreviated or
