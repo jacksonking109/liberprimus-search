@@ -1,6 +1,6 @@
 # Overnight run 20261104-2305
 
-Started 2026-11-04 23:05:16, updated 2026-11-05 04:49:07, status **running**. Jobs: pending 7, running 2, done 74
+Started 2026-11-04 23:05:16, updated 2026-11-05 04:52:53, status **running**. Jobs: pending 6, running 2, done 75
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -84,7 +84,7 @@ Started 2026-11-04 23:05:16, updated 2026-11-05 04:49:07, status **running**. Jo
 | sup2/17 | pending |  |  | added by supervisor. Mid-length sections (693-1468 runes) are long enough to judge, but so far they have only had the ge |
 | sup2/20 | pending |  |  | added by supervisor. Mid-length sections (693-1468 runes) are long enough to judge, but so far they have only had the ge |
 | sup3/13 | done | 2026-11-05 04:45:57 | 2026-11-05 04:49:07 | added by supervisor. No supervisor job has run on these medium and long sections yet. The families that have been tried  |
-| sup3/18 | pending |  |  | added by supervisor. No supervisor job has run on these medium and long sections yet. The families that have been tried  |
+| sup3/18 | done | 2026-11-05 04:49:23 | 2026-11-05 04:52:53 | added by supervisor. No supervisor job has run on these medium and long sections yet. The families that have been tried  |
 | sup3/24 | pending |  |  | added by supervisor. No supervisor job has run on these medium and long sections yet. The families that have been tried  |
 | sup3/25 | pending |  |  | added by supervisor. No supervisor job has run on these medium and long sections yet. The families that have been tried  |
 
@@ -260,6 +260,8 @@ brief for the generators (354 chars): Use exhaustive repeat streams: {"kind": "r
   - LP2:57.jpg-66.jpg/1: 50000 attempts, 28 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **sup3/13** (done)
   - LP2:6.jpg/2-7.jpg - 23.jpg/2-24.jpg: 50000 attempts, 24 hypotheses, **0 final pass(es)**, stopped: max_attempts
+- **sup3/18** (done)
+  - LP2:- - 44.jpg-49.jpg: 50000 attempts, 12 hypotheses, **0 final pass(es)**, stopped: max_attempts
 
 ## Model usage
 
@@ -267,9 +269,9 @@ brief for the generators (354 chars): Use exhaustive repeat streams: {"kind": "r
 - qwen-local: 23 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 23 call(s) in the last 5h (cap none), spent $0.0000
 - granite: 38 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 47 call(s) in the last 5h (cap 180), spent $0.0000
-- claude-sonnet: 47 call(s) in the last 5h (cap 180), spent $0.0000
-- claude-supervisor: 47 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-opus: 48 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-sonnet: 48 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-supervisor: 48 call(s) in the last 5h (cap 180), spent $0.0000
 - codex: 13 call(s) in the last 5h (cap 850), spent $0.0000
 
 ## Current strategy note (read by every lane each round)
@@ -307,12 +309,6 @@ Prefer combinations missing from the section's history. A real hit should show s
 
 ## Events
 
-- 2026-11-05 04:10:14 exhaustive/19: running 150 min | 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-05 04:13:39 exhaustive/21: running 60 min | 03:14:24 [model] codex (proposer) ok 48.6s, tokens in/out 18365/2187, reply 7913 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-05 04:15:14 exhaustive/19: running 155 min | 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-05 04:18:39 exhaustive/21: running 65 min | 03:14:24 [model] codex (proposer) ok 48.6s, tokens in/out 18365/2187, reply 7913 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-05 04:20:14 exhaustive/19: running 160 min | 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-05 04:23:39 exhaustive/21: running 70 min | 03:14:24 [model] codex (proposer) ok 48.6s, tokens in/out 18365/2187, reply 7913 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-05 04:25:14 exhaustive/19: running 165 min | 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-05 04:28:39 exhaustive/21: running 75 min | 03:14:24 [model] codex (proposer) ok 48.6s, tokens in/out 18365/2187, reply 7913 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-05 04:30:14 exhaustive/19: running 170 min | 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
@@ -332,3 +328,9 @@ Prefer combinations missing from the section's history. A real hit should show s
 - 2026-11-05 04:45:57 3 running: exhaustive/19, exhaustive/25, sup3/13
 - 2026-11-05 04:45:57 sup2/10 waiting: codex-plan full (2/2: exhaustive/19, exhaustive/25)
 - 2026-11-05 04:49:07 sup3/13: done (exit 0, 3 min)
+- 2026-11-05 04:49:23 published: 74 file(s) to branch results
+- 2026-11-05 04:49:23 sup3/18: start (uses claude-plan)
+- 2026-11-05 04:49:23 3 running: exhaustive/19, exhaustive/25, sup3/18
+- 2026-11-05 04:50:18 exhaustive/19: running 191 min | 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 04:50:58 exhaustive/25: running 5 min | 04:46:56 [model] codex (proposer) ok 57.6s, tokens in/out 19466/2624, reply 7679 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 04:52:53 sup3/18: done (exit 0, 4 min)
