@@ -142,6 +142,23 @@ pages mostly have the clean layout). Headings of 13, 19 or 50 runes have no matc
 tabulated. The crib test assumes the heading is enciphered with the same position-keyed stream as the body, as it is on
 the solved pages.
 
+## Direct repeat count (`python -m lpswarm.pageimages doubles`)
+
+Counts adjacent identical glyphs straight from the page images, independent of any transcription, to settle whether the
+repeat shortage in the unsolved sections is real or an effect of the text files. A pair is a double only if two tests agree:
+the same learned shape id, and a stroke distance of at most 8 px between the two glyph crops (pairs whose widths differ by
+more than 6 px are never doubles). Pairs touching an unknown or unresolved box are excluded and counted. Expected doubles use
+each page's own shape frequencies; the shuffle null permutes each page's known shapes among its known positions (199
+shuffles). It writes `doubles.md`, `doubles.json` and `doubles_montage.png` (every image-side double on pages 17-72, cropped
+with page and line, for checking by eye; images stay local and are never committed). Gate: at least 99% of the glyph boxes on
+the unsolved pages have a known shape, otherwise report the gap instead of counting.
+
+Reference run (`docs/diagnostics_sample/doubles.md`, counts only): pages 17-72 give 86 doubles in 12,842 pairs (0.67%, ratio
+0.18 to the frequency expectation, 0 disagreements between the two tests, coverage 99.42%), against 84 in 12,605 from the
+scream314 text, 2.4-2.5% on the solved pages and 3.4% for uniformly random text. The shortage is a property of the pages,
+not of the transcription, and it holds across word dots (0.8%), line ends (0.8%) and plain gaps (0.6%). The montage
+was inspected by eye: every tile shows two identical glyphs.
+
 ## Limits
 
 * The power table uses English plaintext. If the true plaintext is another language, abbreviated or

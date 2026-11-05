@@ -446,7 +446,7 @@ def crib_scan(headings: list[dict], alphabet, titles=TITLES, min_len: int = 6, s
 
 
 # ------------------------------------------------------------------------------------------- headings
-def read_all(img_dir, manifest: str = "data/lp/manifest.json") -> dict:
+def read_all(img_dir, manifest: str = "data/lp/manifest.json", keep: bool = False) -> dict:
     """Learn the shapes on every page, label them from the two sections whose glyph count equals the manifest's
     (pages 14-15 = section 8, page 16 = section 9), freeze the labelled set and re-read every page."""
     from lpswarm.alphabet import get_alphabet
@@ -469,9 +469,10 @@ def read_all(img_dir, manifest: str = "data/lp/manifest.json") -> dict:
         raise SystemExit(f"labelling covers {len(set(labels.values()))} of 29 runes; the seed pages did not read cleanly")
     frozen, remap = freeze(shapes, labels.keys())
     lab = {remap[k]: v for k, v in labels.items()}
-    pages_out = {}
+    pages_out, reads = {}, {}
     for p in pages:
         r = read_page(p, frozen, learn=False)
+        reads[p.stem] = r
         gl = sorted(r["glyphs"], key=lambda g: (g["line"], g["x0"]))
         runs = []
         for run in runs_of_red(gl):
@@ -484,7 +485,10 @@ def read_all(img_dir, manifest: str = "data/lp/manifest.json") -> dict:
     for name, seq, sec in (("14-15", seq8, 8), ("16", seq9, 9)):
         ref = [int(v) for v in secs[sec]["ct"]]
         seed_ok[name] = sum(1 for a, b in zip(seq, ref) if labels.get(a) == b) / len(ref)
-    return {"pages": pages_out, "labelled_shapes": len(labels), "seed_agreement": seed_ok, "shapes": len(frozen.reps)}
+    out = {"pages": pages_out, "labelled_shapes": len(labels), "seed_agreement": seed_ok, "shapes": len(frozen.reps)}
+    if keep:
+        out.update({"reads": reads, "frozen": frozen, "lab": lab, "dir": str(img_dir)})
+    return out
 
 
 def headings_report(read: dict, alpha, out_dir) -> dict:
@@ -532,9 +536,152 @@ def headings_report(read: dict, alpha, out_dir) -> dict:
     return rep
 
 
+# ---------------------------------------------------------------------------------- direct repeat count
+UNSOLVED_PAGES = range(17, 73)
+LANGUAGE_PAGES = ("10", "11", "12", "13", "16", "74")          # plain substitution: the language level
+CIPHER_SOLVED_PAGES = ("01", "03", "04", "06", "07", "08", "09", "14", "15", "73")
+SHUFFLES = 199
+
+
+def page_pairs(read: dict, black: np.ndarray, red: np.ndarray) -> dict:
+    """Adjacent glyph pairs of one page in reading order, with two identity tests: same shape, and the stroke
+    distance between the two crops. Pairs that touch an unknown or unresolved box are excluded."""
+    gl = sorted(read["glyphs"], key=lambda g: (g["line"], g["x0"]))
+    rows, excluded = [], 0
+    for i in range(len(gl) - 1):
+        a, b = gl[i], gl[i + 1]
+        if a["shape"] < 0 or b["shape"] < 0 or a.get("unresolved") or b.get("unresolved"):
+            excluded += 1
+            continue
+        pix = None
+        if abs((a["x1"] - a["x0"]) - (b["x1"] - b["x0"])) <= 6 and not (a.get("drop_cap") or b.get("drop_cap")):
+            pix = stroke_dist(bin_aligned(crop_mask(black, red, a)), bin_aligned(crop_mask(black, red, b)))
+        same_shape = a["shape"] == b["shape"]
+        pix_same = pix is not None and pix <= THRESH
+        rows.append({"i": i, "kind": "within" if a["line"] == b["line"] else "line_end", "same_shape": same_shape,
+                     "pix": pix, "double": same_shape and pix_same, "disagree": same_shape != pix_same,
+                     "sep": a.get("sep", "none"), "red": bool(a["red"] and b["red"]), "line": a["line"],
+                     "box": (min(a["x0"], b["x0"]), min(a["y0"], b["y0"]), max(a["x1"], b["x1"]), max(a["y1"], b["y1"]))})
+    shapes = [g["shape"] for g in gl]
+    return {"glyphs": gl, "rows": rows, "excluded": excluded, "shapes": shapes}
+
+
+def expected_doubles(shapes: list[int], rows: list[dict]) -> float:
+    known = [s for s in shapes if s >= 0]
+    if not known:
+        return 0.0
+    f = np.bincount(known) / len(known)
+    return float(len(rows) * (f * f).sum())
+
+
+def shuffle_null(per_page: list[dict], reps: int = SHUFFLES, seed: int = 20261105) -> np.ndarray:
+    """Pooled double counts when each page's known shapes are shuffled among its known positions (pair validity
+    depends only on which positions are known, so it is unchanged)."""
+    rng = np.random.default_rng(seed)
+    out = np.zeros(reps, dtype=int)
+    for pg in per_page:
+        shapes = np.array(pg["shapes"])
+        known = np.nonzero(shapes >= 0)[0]
+        valid = np.array([r["i"] for r in pg["rows"]], dtype=int)
+        if not len(valid):
+            continue
+        for k in range(reps):
+            sh = shapes.copy()
+            sh[known] = rng.permutation(shapes[known])
+            out[k] += int((sh[valid] == sh[valid + 1]).sum())
+    return out
+
+
+def summarise(per_page: list[dict], reps: int = SHUFFLES) -> dict:
+    rows = [r for pg in per_page for r in pg["rows"]]
+    pairs, dbl = len(rows), sum(r["double"] for r in rows)
+    exp = sum(expected_doubles(pg["shapes"], pg["rows"]) for pg in per_page)
+    out = {"pages": len(per_page), "pairs": pairs, "doubles": dbl, "rate": dbl / pairs if pairs else None,
+           "expected": exp, "ratio": dbl / exp if exp else None, "excluded_pairs": sum(pg["excluded"] for pg in per_page),
+           "disagreements": sum(r["disagree"] for r in rows)}
+    strata = {}
+    for key, sel in (("inside a line", lambda r: r["kind"] == "within"), ("across a line end", lambda r: r["kind"] == "line_end"),
+                     ("no separator", lambda r: r["sep"] == "none" and r["kind"] == "within"),
+                     ("word dot", lambda r: r["sep"] == "word" and r["kind"] == "within"),
+                     ("colon pair", lambda r: r["sep"] == "colon" and r["kind"] == "within"),
+                     ("red heading text", lambda r: r["red"]), ("black body text", lambda r: not r["red"])):
+        chosen = [r for r in rows if sel(r)]
+        strata[key] = {"pairs": len(chosen), "doubles": sum(r["double"] for r in chosen)}
+    out["strata"] = strata
+    if reps:
+        null = shuffle_null(per_page, reps)
+        out["shuffle"] = {"mean": float(null.mean()), "sd": float(null.std(ddof=1)),
+                          "z": float((dbl - null.mean()) / max(null.std(ddof=1), 1e-9)),
+                          "p_deficit": (1 + int((null <= dbl).sum())) / (reps + 1), "reps": reps}
+    return out
+
+
+def doubles_report(read: dict, img_dir, out_dir, reps: int = SHUFFLES) -> dict:
+    from PIL import Image, ImageDraw
+    masks, per = {}, {}
+    for pg, r in read["reads"].items():
+        black, red = load_masks(Path(img_dir) / f"{pg}.jpg")
+        per[pg] = {**page_pairs(r, black, red), "page": pg}
+    groups = {"unsolved pages 17-72": [per[f"{n:02d}"] for n in UNSOLVED_PAGES if f"{n:02d}" in per],
+              "solved, plain substitution (language level)": [per[p] for p in LANGUAGE_PAGES if p in per],
+              "solved, enciphered": [per[p] for p in CIPHER_SOLVED_PAGES if p in per]}
+    summary = {k: summarise(v, reps) for k, v in groups.items()}
+    unsolved_boxes = sum(len(per[f"{n:02d}"]["glyphs"]) for n in UNSOLVED_PAGES if f"{n:02d}" in per)
+    unsolved_unknown = sum(sum(1 for g in per[f"{n:02d}"]["glyphs"] if g["shape"] < 0) for n in UNSOLVED_PAGES if f"{n:02d}" in per)
+    cover = 1 - unsolved_unknown / max(unsolved_boxes, 1)
+    found = [(pg["page"], r) for n in UNSOLVED_PAGES for pg in [per.get(f"{n:02d}")] if pg for r in pg["rows"] if r["double"]]
+    disagree = [(pg["page"], r["line"] + 1, r["box"]) for n in UNSOLVED_PAGES for pg in [per.get(f"{n:02d}")] if pg
+                for r in pg["rows"] if r["disagree"]]
+    out = Path(out_dir)
+    out.mkdir(parents=True, exist_ok=True)
+    # montage of every image-side double on the unsolved pages, for the eye
+    tiles = []
+    for pg, r in found:
+        x0, y0, x1, y1 = r["box"]
+        im = Image.open(Path(img_dir) / f"{pg}.jpg").convert("RGB").crop((x0 - 15, y0 - 12, x1 + 15, y1 + 12))
+        tile = Image.new("RGB", (max(im.width, 120) + 4, im.height + 22), "white")
+        tile.paste(im, (2, 20))
+        ImageDraw.Draw(tile).text((3, 3), f"p{pg} L{r['line'] + 1}", fill=(0, 0, 160))
+        tiles.append(tile)
+    montage = None
+    if tiles:
+        cols = 8
+        cw, ch = max(t.width for t in tiles), max(t.height for t in tiles)
+        rows_n = (len(tiles) + cols - 1) // cols
+        m = Image.new("RGB", (cols * (cw + 6), rows_n * (ch + 6)), "white")
+        for k, t in enumerate(tiles):
+            m.paste(t, ((k % cols) * (cw + 6), (k // cols) * (ch + 6)))
+        montage = str(out / "doubles_montage.png")
+        m.save(montage)
+    rep = {"summary": summary, "coverage_unsolved": cover, "unsolved_boxes": unsolved_boxes,
+           "unsolved_unknown_shape": unsolved_unknown, "disagreements": disagree[:50], "montage": montage,
+           "doubles": [{"page": pg, "line": r["line"] + 1, "kind": r["kind"], "sep": r["sep"], "red": r["red"]} for pg, r in found],
+           "text_reference": {"pairs": 12605, "doubles": 84, "note": "scream314 transcription, unsolved sections of 300+ runes"}}
+    (out / "doubles.json").write_text(json.dumps(rep, indent=1, sort_keys=True, default=str) + "\n", encoding="utf-8")
+    L = ["# Adjacent identical glyphs counted directly from the page images", "",
+         "**EXPLORATORY.** A double needs two agreeing tests: the same shape, and a stroke distance of at most 8 px between "
+         "the two crops. Pairs touching an unknown or unresolved box are excluded. Expected = pairs x sum of squared shape "
+         "frequencies on the page; the shuffle keeps each page's shapes and positions.", "",
+         f"Coverage on the unsolved pages: {100 * cover:.2f}% of {unsolved_boxes} glyph boxes have a known shape.", "",
+         "| group | pages | pairs | doubles | rate | expected | ratio | shuffle z | p (deficit) | excluded | test disagreements |",
+         "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |"]
+    for k, v in summary.items():
+        sh = v.get("shuffle", {})
+        L.append(f"| {k} | {v['pages']} | {v['pairs']} | {v['doubles']} | {100 * v['rate']:.2f}% | {v['expected']:.0f} | "
+                 f"{v['ratio']:.2f} | {sh.get('z', float('nan')):.1f} | {sh.get('p_deficit', float('nan')):.3f} | "
+                 f"{v['excluded_pairs']} | {v['disagreements']} |")
+    L += ["", "For comparison: scream314 text of the unsolved sections 84 doubles in 12,605 pairs (0.67%, ratio 0.19); uniformly "
+          "random text 3.4%.", "", "Unsolved pages by stratum (doubles / pairs):", "",
+          "| stratum | doubles | pairs |", "| --- | ---: | ---: |"]
+    for k, v in summary["unsolved pages 17-72"]["strata"].items():
+        L.append(f"| {k} | {v['doubles']} | {v['pairs']} |")
+    (out / "doubles.md").write_text("\n".join(L) + "\n", encoding="utf-8")
+    return rep
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="python -m lpswarm.pageimages", description=__doc__.split("\n")[0])
-    ap.add_argument("command", choices=["fetch", "headings"])
+    ap.add_argument("command", choices=["fetch", "headings", "doubles"])
     ap.add_argument("--dir", default=str(IMG_DIR))
     ap.add_argument("--out", default="reports/diag")
     args = ap.parse_args(argv)
@@ -544,6 +691,11 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     from lpswarm.alphabet import get_alphabet
     from lpswarm.research_packets import ALPHABET
+    if args.command == "doubles":
+        read = read_all(args.dir, keep=True)
+        rep = doubles_report(read, args.dir, args.out)
+        print(Path(args.out, "doubles.md").read_text(encoding="utf-8"))
+        return 0
     read = read_all(args.dir)
     rep = headings_report(read, get_alphabet(ALPHABET), args.out)
     print(Path(args.out, "headings.md").read_text(encoding="utf-8"))

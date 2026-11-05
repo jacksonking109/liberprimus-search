@@ -164,3 +164,92 @@ def test_fetch_copies_images_and_records_hashes(tmp_path):
     n = P.fetch(tmp_path / "imgs", run=fake_run, sha_file=tmp_path / "sums.txt")
     assert n == 3 and sorted(p.name for p in (tmp_path / "imgs").iterdir()) == ["00.jpg", "01.jpg", "02.jpg"]
     assert len((tmp_path / "sums.txt").read_text().splitlines()) == 3
+
+
+# ------------------------------------------------------------------------------------ direct repeat count
+def _rune(j, k):
+    return (5 * j + 3 * k) % 29                         # neighbours differ by 3, and line ends never repeat
+
+
+def _doubles_lines(substitute=None):
+    """6 lines x 14 runes, no accidental repeats, with planted doubles:
+    red heading double (line 0), plain double (line 1, gap 1-2), double after a word dot (line 2, gap 3-4),
+    a double across a line end (line 3 -> line 4), and the two runes that are closest in shape side by side."""
+    lines = [[(_rune(j, k), False) for k in range(14)] for j in range(6)]
+    lines[0] = [(r, True) for r, _ in lines[0][:6]] + lines[0][6:]
+    lines[0][2] = (lines[0][1][0], True)
+    lines[1][2] = (lines[1][1][0], False)
+    lines[2][4] = (lines[2][3][0], False)
+    lines[4][0] = (lines[3][13][0], False)
+    b = [P.bin_aligned(glyph(i)) for i in range(29)]
+    a_, c_ = min(((i, j) for i in range(29) for j in range(i + 1, 29)), key=lambda t: P.stroke_dist(b[t[0]], b[t[1]]))
+    lines[5][8:10] = [(a_, False), (c_, False)]         # different runes, adjacent, as alike as the alphabet allows
+    if substitute:
+        for (j, k), rn in substitute.items():
+            lines[j][k] = (rn, lines[j][k][1])
+    return lines
+
+
+def _read_pairs(tmp_path, lines, learn_lines=None):
+    shapes = P.Shapes()
+    learn = tmp_path / "learn.png"
+    draw(learn_lines or lines, learn, hatch_after=None)
+    P.read_page(learn, shapes, learn=True)
+    page = tmp_path / "page.png"
+    draw(lines, page)
+    r = P.read_page(page, shapes, learn=False)
+    black, red = P.load_masks(page)
+    return P.page_pairs(r, black, red), r
+
+
+def test_doubles_are_counted_from_pixels_and_stratified(tmp_path):
+    lines = _doubles_lines()
+    pg, r = _read_pairs(tmp_path, lines)
+    flat = [rn for l in lines for rn, _ in l]
+    truth = sum(1 for a, b in zip(flat, flat[1:]) if a == b)
+    assert truth == 4 and len(pg["rows"]) == len(flat) - 1 and pg["excluded"] == 0
+    found = [x for x in pg["rows"] if x["double"]]
+    assert len(found) == truth
+    assert sorted((x["line"], x["kind"], x["sep"], x["red"]) for x in found) == sorted([
+        (0, "within", "none", True), (1, "within", "none", False), (2, "within", "word", False),
+        (3, "line_end", "none", False)])
+    near = [x for x in pg["rows"] if x["line"] == 5 and x["i"] >= 5 * 14 + 8][:1]          # the closest pair of different runes
+    assert near and not near[0]["double"] and near[0]["pix"] is not None and near[0]["pix"] > P.THRESH
+
+
+def test_the_two_identity_tests_agree_on_every_pair(tmp_path):
+    pg, _ = _read_pairs(tmp_path, _doubles_lines())
+    assert not any(x["disagree"] for x in pg["rows"])
+    for x in pg["rows"]:
+        if x["pix"] is None:                                  # glyph widths differ by more than 6 px: not the same rune
+            assert not x["double"] and not x["same_shape"]
+        else:
+            assert (x["pix"] <= P.THRESH) == x["double"] == x["same_shape"]
+    assert sum(x["pix"] is not None for x in pg["rows"]) > 40
+
+
+def test_pairs_touching_unknown_glyphs_are_excluded_and_counted(tmp_path):
+    base = _doubles_lines()
+    # learn the shapes on a page that never shows rune 9, then read a page where it appears twice mid-line
+    learn_lines = [[(rn if rn != 9 else 10, red) for rn, red in l] for l in base]
+    page_lines = [list(l) for l in learn_lines]
+    page_lines[1][6], page_lines[3][9] = (9, False), (9, False)
+    pg, r = _read_pairs(tmp_path, page_lines, learn_lines)
+    n = sum(len(l) for l in page_lines)
+    assert pg["excluded"] == 4 and len(pg["rows"]) == n - 1 - 4          # two neighbours of each unknown glyph
+    assert sum(1 for g in pg["glyphs"] if g["shape"] < 0) == 2
+    assert sum(x["double"] for x in pg["rows"]) >= 3                    # planted doubles elsewhere are still found
+    assert 9 not in {rn for l in learn_lines for rn, _ in l}
+
+
+def test_expected_count_and_shuffle_null_use_each_pages_own_shapes():
+    shapes = [0, 0, 1, 1, 2, 2]
+    rows = [{"i": i} for i in range(5)]
+    assert P.expected_doubles(shapes, rows) == pytest.approx(5 / 3)                 # 5 pairs x (3 x (1/3)^2)
+    assert P.expected_doubles([-1, -1], []) == 0.0
+    null = P.shuffle_null([{"shapes": shapes, "rows": rows}], reps=199)
+    assert null.max() <= 3 and 0.6 < null.mean() < 1.4                              # 5 pairs x 0.2 chance
+    s = P.summarise([{"shapes": shapes, "rows": [{**r, "double": shapes[r["i"]] == shapes[r["i"] + 1], "disagree": False,
+                                                    "kind": "within", "sep": "none", "red": False} for r in rows],
+                      "excluded": 0}], reps=199)
+    assert s["pairs"] == 5 and s["doubles"] == 3 and s["shuffle"]["z"] > 1.5 and s["ratio"] == pytest.approx(3 / (5 / 3))
