@@ -22,6 +22,7 @@ from lpswarm.alphabet import Alphabet
 from lpswarm.oracle.signals import index_of_coincidence
 from lpswarm.programs import SEQUENCES
 from lpswarm.programs.sampler import sample_spec
+from lpswarm.programs.spec import GRID_READS
 
 
 @dataclass
@@ -85,7 +86,19 @@ the ciphertext with each proposal and an independent statistical test judges the
 You only learn a coarse verdict per proposal: "fail", "near_miss" or "pass".
 
 Decryption of ciphertext symbols c (integers 0..N-1), in this order:
-  1. "transpose": {"columnar": [order]}  undo a columnar transposition (optional)
+  1. "transpose": undo a transposition of the text (optional), exactly one of
+       {"columnar": [order]}                   a permutation of 0..w-1, w <= 12
+       {"grid": {"width": W, "read": R}}       the plaintext was written row by row into a grid
+                                               of W columns (2..500; the last row may be short)
+                                               and read out by R, one of: rows_reversed, columns,
+                                               columns_reversed, boustrophedon_rows,
+                                               boustrophedon_columns, diagonal, spiral_in,
+                                               spiral_out
+       {"railfence": {"rails": r}}             rail-fence zigzag with r rails (2..64)
+       {"decimate": {"step": k}}               every k-th position, wrapping (k must share no
+                                               factor with the text length; others are skipped)
+     "transpose_range": [lo, hi]             with grid/railfence/decimate: try every width, rail
+                                               count or step in lo..hi in one proposal
   2. "reverse_text": true                 read the text backwards (optional)
   3. "skip": [symbols]                    ciphertext symbols left as plaintext; the key
                                           stream does NOT advance there (optional)
@@ -102,7 +115,11 @@ Decryption of ciphertext symbols c (integers 0..N-1), in this order:
        {"kind": "sequence", "name": NAME, "offset": 0, "scale": 1, "add": 0}
           k_t = (scale * NAME[offset + t] + add) mod N, NAME in: %(sequences)s
   Optional "offset_range": [lo, hi] (at most 2000 values) tries every start offset of a
-  repeat/sequence stream in one proposal.
+  repeat/sequence stream in one proposal. A repeat stream may instead be
+  {"kind": "repeat", "exhaustive": true, "key_length": m} (m = 1..4): EVERY key of that length
+  (29^4 is about 700,000 ciphers; "sub" and "add" try the same set, so use one). One proposal may
+  expand to at most 5000 ciphers (1,000,000 for an exhaustive key space); it cannot combine
+  exhaustive with offset_range. Wide sweeps are preferred over single guesses.
 Symbols may be given as integers or as alphabet tokens (strings); words are spelled with tokens.
 """
 
@@ -116,6 +133,14 @@ EXAMPLES = """Examples of valid proposals (generic illustrations, not hints abou
             "offset_range": [0, 50]}, "why": "Fibonacci key, unknown start"}
   {"spec": {"stream": {"kind": "autokey", "word": "SEED", "source": "plaintext"}, "combine": "sub"},
    "why": "autokey with a short primer"}
+  {"spec": {"stream": {"kind": "constant", "value": 3}, "combine": "sub",
+            "transpose": {"grid": {"width": 9, "read": "columns"}}, "transpose_range": [2, 60]},
+   "why": "Caesar after a column-read grid of unknown width"}
+  {"spec": {"stream": {"kind": "sequence", "name": "primes"}, "offset_range": [0, 200],
+            "combine": "sub", "transpose": {"railfence": {"rails": 3}}, "transpose_range": [2, 12]},
+   "why": "rail fence of unknown depth, then a prime key at unknown offset"}
+  {"spec": {"stream": {"kind": "repeat", "exhaustive": true, "key_length": 3}, "combine": "sub"},
+   "why": "every 3-symbol periodic key"}
 """
 
 
@@ -125,7 +150,10 @@ def _stream_schema() -> dict:
         {"type": "object", "properties": {"kind": {"enum": ["constant"]}, "value": {"type": "integer"}},
          "required": ["kind", "value"], "additionalProperties": False},
         {"type": "object", "properties": {"kind": {"enum": ["repeat"]}, "key": ints,
-                                          "word": {"type": "string"}, "offset": {"type": "integer"}},
+                                          "word": {"type": "string"}, "offset": {"type": "integer"},
+                                          "exhaustive": {"type": "boolean"},
+                                          "key_length": {"type": "integer", "minimum": 1,
+                                                         "maximum": 4}},
          "required": ["kind"], "additionalProperties": False},
         {"type": "object", "properties": {"kind": {"enum": ["autokey"]}, "primer": ints,
                                           "word": {"type": "string"},
@@ -149,9 +177,22 @@ def proposal_schema(max_items: int = 16) -> dict:
                  "maxItems": 8},
         "skip_mode": {"enum": ["all", "resolve"]},
         "reverse_text": {"type": "boolean"},
-        "transpose": {"type": "object", "properties": {
-            "columnar": {"type": "array", "items": {"type": "integer"}, "minItems": 2, "maxItems": 12}},
-            "required": ["columnar"], "additionalProperties": False},
+        "transpose": {"anyOf": [
+            {"type": "object", "properties": {
+                "columnar": {"type": "array", "items": {"type": "integer"}, "minItems": 2,
+                             "maxItems": 12}},
+             "required": ["columnar"], "additionalProperties": False},
+            {"type": "object", "properties": {"grid": {"type": "object", "properties": {
+                "width": {"type": "integer"}, "read": {"enum": list(GRID_READS)}},
+                "required": ["width", "read"], "additionalProperties": False}},
+             "required": ["grid"], "additionalProperties": False},
+            {"type": "object", "properties": {"railfence": {"type": "object", "properties": {
+                "rails": {"type": "integer"}}, "required": ["rails"], "additionalProperties": False}},
+             "required": ["railfence"], "additionalProperties": False},
+            {"type": "object", "properties": {"decimate": {"type": "object", "properties": {
+                "step": {"type": "integer"}}, "required": ["step"], "additionalProperties": False}},
+             "required": ["decimate"], "additionalProperties": False}]},
+        "transpose_range": {"type": "array", "items": {"type": "integer"}, "minItems": 2, "maxItems": 2},
         "offset_range": {"type": "array", "items": {"type": "integer"}, "minItems": 2, "maxItems": 2},
     }, "required": ["stream"], "additionalProperties": False}
     return {"type": "object", "properties": {"proposals": {

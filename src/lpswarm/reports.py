@@ -48,6 +48,18 @@ def _chance(led: Ledger, oracle, target_id: str, row: dict, symbols: int) -> flo
         return None
 
 
+def _confirmable(led: Ledger, oracle, target_id: str, symbols: int) -> bool:
+    """False if, at this many attempts, even a perfect decryption could not clear the
+    end-of-search (Bonferroni) threshold, so a silent miss would not be a negative result."""
+    if oracle is None:
+        return True
+    try:
+        n = max(1, led.attempt_count(target_id))
+        return bool(oracle.final_threshold(symbols, n)[1] < oracle._max_combined)
+    except Exception:  # noqa: BLE001
+        return True
+
+
 def target_entry(led: Ledger, target_id: str, label: str, symbols: int, *, stopped: str | None = None,
                  stats: dict | None = None, top: int = 10, elapsed_s: float | None = None,
                  oracle=None) -> dict:
@@ -56,6 +68,7 @@ def target_entry(led: Ledger, target_id: str, label: str, symbols: int, *, stopp
     tried = led.tried(target_id)
     return {
         "label": label, "symbols": symbols, "short": bool(short_note(symbols)),
+        "confirmable": _confirmable(led, oracle, target_id, symbols),
         "attempts": led.attempt_count(target_id),
         "hypotheses": len(tried), "final_passes": len(finals), "stopped": stopped,
         "elapsed_s": round(elapsed_s, 1) if elapsed_s is not None else None,
@@ -93,6 +106,10 @@ def write_run_report(out_dir: str | Path, title: str, command: str, entries: lis
         lines += ["", f"## {e['label']}", ""]
         if short_note(e["symbols"]):
             lines += [f"**Caution: {short_note(e['symbols'])}.**", ""]
+        if e.get("confirmable") is False:
+            lines += [f"**Search too large to confirm: with {e['attempts']} attempts on a text of "
+                      f"{e['symbols']} symbols, even a perfect decryption could not pass the "
+                      "end-of-search test, so finding nothing here proves nothing.**", ""]
         if e["generators"]:
             lines.append("| generator | proposals | invalid | attempts | passes | near misses | model errors |")
             lines.append("| --- | ---: | ---: | ---: | ---: | ---: | ---: |")

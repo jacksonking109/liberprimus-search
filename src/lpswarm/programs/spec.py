@@ -3,7 +3,8 @@ use to propose ciphers. Models never write code; they write a JSON spec that thi
 module validates, compiles to integers, and interprets deterministically.
 
 Decryption of ciphertext c (integers mod N), in order:
-  1. transpose  : undo a columnar transposition            {"columnar": [order]}
+  1. transpose  : undo a transposition: {"columnar": [order]}, {"grid": {"width": w,
+                  "read": R}}, {"railfence": {"rails": r}} or {"decimate": {"step": k}}
   2. reverse_text: read the text backwards                 true / false
   3. skip       : positions whose ciphertext symbol is in `skip` are literal:
                   plaintext = ciphertext there, and the keystream does NOT advance
@@ -18,7 +19,9 @@ Streams:
   {"kind": "sequence", "name": "primes", "offset": 0, "scale": 1, "add": 0}
 
 A spec may also give "offset_range": [lo, hi] (sequence/repeat start offsets to
-try, at most MAX_OFFSET_SPAN values) which the executor expands into attempts.
+try, at most MAX_OFFSET_SPAN values), "transpose_range": [lo, hi] (the grid width, rail
+count or decimation step to try), or a repeat stream with "exhaustive": true and a
+"key_length" of 1..4 (every key of that length); `expand` turns these into attempts.
 
 Words and symbol names are resolved through the alphabet at compile time, so a
 compiled spec contains integers only and hashes canonically for the ledger.
@@ -26,10 +29,12 @@ compiled spec contains integers only and hashes canonically for the ledger.
 from __future__ import annotations
 
 import copy
+import functools
 import hashlib
+import itertools
 import json
 import math
-from typing import Any
+from typing import Any, Iterator
 
 import numpy as np
 
@@ -41,11 +46,20 @@ MAX_KEY_LEN = 64
 MAX_OFFSET = 1_000_000
 MAX_OFFSET_SPAN = 2000
 MAX_WIDTH = 12
+MAX_GRID_WIDTH = 500
+MAX_RAILS = 64
+MAX_STEP = 1000
+MAX_EXPANSION = 5000          # concrete specs one proposal may expand to (ranges)
+MAX_EXHAUSTIVE = 1_000_000    # ... or with an exhaustive key space
+MAX_EXHAUSTIVE_LEN = 4
+GRID_READS = ("rows_reversed", "columns", "columns_reversed", "boustrophedon_rows",
+              "boustrophedon_columns", "diagonal", "spiral_in", "spiral_out")
+TRANSPOSE_KINDS = ("columnar", "grid", "railfence", "decimate")
 COMBINES = ("sub", "add", "beaufort")
 MAPS = ("identity", "reverse")
 STREAM_KINDS = ("constant", "repeat", "autokey", "sequence")
 _TOP_KEYS = {"v", "stream", "combine", "map", "skip", "skip_mode", "reverse_text", "transpose",
-             "offset_range", "note"}
+             "transpose_range", "offset_range", "note"}
 
 
 class SpecError(ValueError):
@@ -157,24 +171,27 @@ def compile_spec(raw: Any, alphabet: Alphabet) -> dict:
         if not out["skip"]:
             raise SpecError('skip_mode "resolve" needs a skip list')
         out["skip_mode"] = "resolve"
-    tr = raw.get("transpose")
-    if tr is None or tr is False:
-        out["transpose"] = None
-    else:
-        if not isinstance(tr, dict) or set(tr) != {"columnar"} or not isinstance(tr["columnar"], list):
-            raise SpecError('transpose must be {"columnar": [column order]}')
-        if not 2 <= len(tr["columnar"]) <= MAX_WIDTH:
-            raise SpecError(f"columnar width must be 2..{MAX_WIDTH}")
-        order = [_int(v, "columnar order", 0, MAX_WIDTH - 1) for v in tr["columnar"]]
-        if sorted(order) != list(range(len(order))):
-            raise SpecError("columnar order must be a permutation of 0..width-1")
-        out["transpose"] = {"columnar": order}
+    out["transpose"] = _compile_transpose(raw.get("transpose"))
+    trr = raw.get("transpose_range")
+    if trr is not None:
+        kind = next(iter(out["transpose"])) if out["transpose"] else None
+        if kind not in ("grid", "railfence", "decimate"):
+            raise SpecError("transpose_range needs a grid, railfence or decimate transpose "
+                            "(it sweeps the width, rail count or step)")
+        if not (isinstance(trr, list) and len(trr) == 2):
+            raise SpecError("transpose_range must be [lo, hi]")
+        cap = {"grid": MAX_GRID_WIDTH, "railfence": MAX_RAILS, "decimate": MAX_STEP}[kind]
+        lo, hi = _int(trr[0], "transpose_range", 2, cap), _int(trr[1], "transpose_range", 2, cap)
+        if hi < lo or hi - lo + 1 > MAX_OFFSET_SPAN:
+            raise SpecError(f"transpose_range must have lo <= hi and at most {MAX_OFFSET_SPAN} values")
+        out["transpose_range"] = [lo, hi]     # only stored when used (old hashes unchanged)
 
     st = raw.get("stream")
     kind = st.get("kind") if isinstance(st, dict) else None
     if not isinstance(kind, str) or kind not in STREAM_KINDS:
         raise SpecError(f"stream must be an object with kind in {STREAM_KINDS}")
-    allowed = {"constant": {"kind", "value"}, "repeat": {"kind", "key", "word", "offset"},
+    allowed = {"constant": {"kind", "value"},
+               "repeat": {"kind", "key", "word", "offset", "key_length", "exhaustive"},
                "autokey": {"kind", "primer", "word", "source"},
                "sequence": {"kind", "name", "offset", "scale", "add"}}[kind]
     extra = [k for k in st if k not in allowed]
@@ -182,7 +199,17 @@ def compile_spec(raw: Any, alphabet: Alphabet) -> dict:
         raise SpecError(f"unknown stream fields {sorted(map(str, extra))[:5]} for kind {kind}")
     if kind == "constant":
         s: dict[str, Any] = {"kind": kind, "value": _int(st.get("value", 0), "value") % n}
+    elif kind == "repeat" and st.get("exhaustive") is not None and _bool(st["exhaustive"], "exhaustive"):
+        if "key" in st or "word" in st or "offset" in st:
+            raise SpecError("an exhaustive repeat stream takes only key_length (no key, word or offset)")
+        m = _int(st.get("key_length"), "key_length", 1, MAX_EXHAUSTIVE_LEN)
+        if n ** m > MAX_EXHAUSTIVE:
+            raise SpecError(f"{n}^{m} keys is more than the limit of {MAX_EXHAUSTIVE}")
+        # A template: `expand` enumerates the keys. Only stored when used.
+        s = {"kind": kind, "key": [0] * m, "offset": 0, "exhaustive": True, "n": n}
     elif kind == "repeat":
+        if st.get("key_length") is not None:
+            raise SpecError('key_length is only for {"exhaustive": true} repeat streams')
         src = st.get("key", st.get("word"))
         if src is None:
             raise SpecError("repeat stream needs key or word")
@@ -212,6 +239,8 @@ def compile_spec(raw: Any, alphabet: Alphabet) -> dict:
     if rng is not None:
         if kind not in ("repeat", "sequence"):
             raise SpecError("offset_range only applies to repeat and sequence streams")
+        if s.get("exhaustive"):
+            raise SpecError("offset_range does not combine with an exhaustive repeat stream")
         if not (isinstance(rng, list) and len(rng) == 2):
             raise SpecError("offset_range must be [lo, hi]")
         cap = _seq_limit(s["name"]) if kind == "sequence" else MAX_OFFSET
@@ -221,12 +250,116 @@ def compile_spec(raw: Any, alphabet: Alphabet) -> dict:
         out["offset_range"] = [lo, hi]
     else:
         out["offset_range"] = None
+    total = ((out["transpose_range"][1] - out["transpose_range"][0] + 1) if out.get("transpose_range") else 1)
+    total *= (out["offset_range"][1] - out["offset_range"][0] + 1) if out["offset_range"] else 1
+    if s.get("exhaustive"):
+        total *= n ** len(s["key"])
+        if total > MAX_EXHAUSTIVE:
+            raise SpecError(f"proposal expands to {total} ciphers; the limit is {MAX_EXHAUSTIVE}")
+    elif total > MAX_EXPANSION:
+        raise SpecError(f"proposal expands to {total} ciphers; the limit is {MAX_EXPANSION}")
     return _normalise(out)
+
+
+def _compile_transpose(tr: Any) -> dict | None:
+    if tr is None or tr is False:
+        return None
+    if not isinstance(tr, dict) or len(tr) != 1 or next(iter(tr)) not in TRANSPOSE_KINDS:
+        raise SpecError('transpose must have exactly one of {"columnar": [order]}, '
+                        '{"grid": {"width": w, "read": R}}, {"railfence": {"rails": r}}, '
+                        '{"decimate": {"step": k}}')
+    kind, val = next(iter(tr.items()))
+    if kind == "columnar":
+        if not isinstance(val, list):
+            raise SpecError('transpose must be {"columnar": [column order]}')
+        if not 2 <= len(val) <= MAX_WIDTH:
+            raise SpecError(f"columnar width must be 2..{MAX_WIDTH}")
+        order = [_int(v, "columnar order", 0, MAX_WIDTH - 1) for v in val]
+        if sorted(order) != list(range(len(order))):
+            raise SpecError("columnar order must be a permutation of 0..width-1")
+        return {"columnar": order}
+    if not isinstance(val, dict):
+        raise SpecError(f"transpose {kind} must be an object")
+    if kind == "grid":
+        if set(val) != {"width", "read"}:
+            raise SpecError('grid needs exactly {"width": w, "read": R}')
+        read = val["read"]
+        if not isinstance(read, str) or read not in GRID_READS:
+            raise SpecError(f"grid read must be one of {GRID_READS}")
+        return {"grid": {"width": _int(val["width"], "grid width", 2, MAX_GRID_WIDTH), "read": read}}
+    if kind == "railfence":
+        if set(val) != {"rails"}:
+            raise SpecError('railfence needs exactly {"rails": r}')
+        return {"railfence": {"rails": _int(val["rails"], "rails", 2, MAX_RAILS)}}
+    if set(val) != {"step"}:
+        raise SpecError('decimate needs exactly {"step": k}')
+    return {"decimate": {"step": _int(val["step"], "decimate step", 2, MAX_STEP)}}
+
+
+def _spiral(rows: int, cols: int) -> list[tuple[int, int]]:
+    out: list[tuple[int, int]] = []
+    top, bot, left, right = 0, rows - 1, 0, cols - 1
+    while top <= bot and left <= right:
+        out += [(top, c) for c in range(left, right + 1)]
+        out += [(r, right) for r in range(top + 1, bot + 1)]
+        if top < bot:
+            out += [(bot, c) for c in range(right - 1, left - 1, -1)]
+        if left < right:
+            out += [(r, left) for r in range(bot - 1, top, -1)]
+        top, bot, left, right = top + 1, bot - 1, left + 1, right - 1
+    return out
+
+
+@functools.lru_cache(maxsize=512)
+def _perm_cached(kind: str, a: Any, b: Any, length: int) -> np.ndarray:
+    """perm such that ciphertext[j] = plaintext[perm[j]] for a transposition of `length`
+    symbols. Grids are written row by row (the last row may be short) and read by `a`."""
+    if kind == "railfence":
+        period = 2 * (a - 1)
+        m = np.arange(length) % period
+        rails = np.where(m < a, m, period - m)
+        return np.argsort(rails, kind="stable")
+    if kind == "decimate":
+        if math.gcd(a, length) != 1:
+            raise SpecError(f"decimate step {a} must be coprime to the text length {length}")
+        return (np.arange(length) * a) % length
+    width, read = a, b          # grid
+    rows = -(-length // width)
+    if read == "rows_reversed":
+        order = [(r, c) for r in range(rows - 1, -1, -1) for c in range(width)]
+    elif read == "columns":
+        order = [(r, c) for c in range(width) for r in range(rows)]
+    elif read == "columns_reversed":
+        order = [(r, c) for c in range(width - 1, -1, -1) for r in range(rows)]
+    elif read == "boustrophedon_rows":
+        order = [(r, c) for r in range(rows)
+                 for c in (range(width) if r % 2 == 0 else range(width - 1, -1, -1))]
+    elif read == "boustrophedon_columns":
+        order = [(r, c) for c in range(width)
+                 for r in (range(rows) if c % 2 == 0 else range(rows - 1, -1, -1))]
+    elif read == "diagonal":
+        order = [(r, d - r) for d in range(rows + width - 1) for r in range(rows) if 0 <= d - r < width]
+    elif read == "spiral_in":
+        order = _spiral(rows, width)
+    else:                        # spiral_out
+        order = _spiral(rows, width)[::-1]
+    idx = [r * width + c for r, c in order if r * width + c < length]
+    return np.asarray(idx, dtype=np.int64)
+
+
+def _transpose_perm(tr: dict, length: int) -> np.ndarray:
+    if "columnar" in tr:
+        return _columnar_perm(tr["columnar"], length)
+    if "grid" in tr:
+        return _perm_cached("grid", tr["grid"]["width"], tr["grid"]["read"], length)
+    if "railfence" in tr:
+        return _perm_cached("railfence", tr["railfence"]["rails"], None, length)
+    return _perm_cached("decimate", tr["decimate"]["step"], None, length)
 
 
 def _normalise(spec: dict) -> dict:
     st = spec["stream"]
-    if st["kind"] == "repeat" and not spec.get("offset_range"):
+    if st["kind"] == "repeat" and not spec.get("offset_range") and not st.get("exhaustive"):
         if len(st["key"]) == 1:
             spec["stream"] = {"kind": "constant", "value": st["key"][0]}
         else:
@@ -249,20 +382,66 @@ def with_offset(spec: dict, offset: int) -> dict:
     return _normalise(s)
 
 
-def expand(spec: dict) -> list[dict]:
-    """One fixed-offset spec per value of offset_range (deduplicated after
-    normalisation, e.g. repeat offsets mod the key length); [spec] if no range."""
-    if not spec.get("offset_range"):
-        return [spec]
-    lo, hi = spec["offset_range"]
-    out, seen = [], set()
-    for o in range(lo, hi + 1):
-        s = with_offset(spec, o)
-        h = canonical(s)
-        if h not in seen:
-            seen.add(h)
-            out.append(s)
-    return out
+def _with_transpose_param(tr: dict, v: int) -> dict:
+    if "grid" in tr:
+        return {"grid": {"width": v, "read": tr["grid"]["read"]}}
+    if "railfence" in tr:
+        return {"railfence": {"rails": v}}
+    return {"decimate": {"step": v}}
+
+
+def expand_iter(spec: dict, length: int | None = None) -> Iterator[dict]:
+    """Lazily yield one concrete spec per combination of offset_range, transpose_range and
+    (for an exhaustive repeat stream) every key of that length. Duplicates after
+    normalisation are skipped, except for exhaustive keys, which are unique by
+    construction. With `length` (the text length), decimation steps that are not
+    coprime to it are skipped (they are not ciphers for a text of that length)."""
+    st = spec["stream"]
+    exhaustive = bool(st.get("exhaustive"))
+    if not (exhaustive or spec.get("offset_range") or spec.get("transpose_range")):
+        yield spec
+        return
+    trs = [spec["transpose"]]
+    if spec.get("transpose_range"):
+        lo, hi = spec["transpose_range"]
+        trs = [_with_transpose_param(spec["transpose"], v) for v in range(lo, hi + 1)]
+        if length is not None:
+            trs = [t for t in trs if "decimate" not in t or math.gcd(t["decimate"]["step"], length) == 1]
+    offs: list[int | None] = [None]
+    if spec.get("offset_range"):
+        lo, hi = spec["offset_range"]
+        offs = list(range(lo, hi + 1))
+    keys: Any = [None]
+    if exhaustive:
+        keys = itertools.product(range(st["n"]), repeat=len(st["key"]))
+    seen: set[str] = set()
+    for k in keys:
+        for tr in trs:
+            for o in offs:
+                s = dict(spec)
+                s["transpose"] = tr
+                s["offset_range"] = None
+                s.pop("transpose_range", None)
+                stream = dict(st)
+                stream.pop("exhaustive", None)
+                stream.pop("n", None)
+                if k is not None:
+                    stream["key"] = list(k)
+                if o is not None:
+                    stream["offset"] = int(o)
+                s["stream"] = stream
+                s = _normalise(s)
+                if not exhaustive:
+                    h = canonical(s)
+                    if h in seen:
+                        continue
+                    seen.add(h)
+                yield s
+
+
+def expand(spec: dict, length: int | None = None) -> list[dict]:
+    """`expand_iter` as a list ([spec] if the spec has no ranges)."""
+    return list(expand_iter(spec, length))
 
 
 def describe(spec: dict, alphabet: Alphabet | None = None) -> str:
@@ -273,7 +452,10 @@ def describe(spec: dict, alphabet: Alphabet | None = None) -> str:
     elif st["kind"] == "repeat":
         key = st["key"]
         word = alphabet.decode(key) if alphabet else key
-        k = f"repeat key {word}" + (f" @{st['offset']}" if st.get("offset") else "")
+        if st.get("exhaustive"):
+            k = f"repeat EVERY key of length {len(st['key'])}"
+        else:
+            k = f"repeat key {word}" + (f" @{st['offset']}" if st.get("offset") else "")
     elif st["kind"] == "autokey":
         word = alphabet.decode(st["primer"]) if alphabet else st["primer"]
         k = f"autokey({st['source']}) primer {word}"
@@ -288,7 +470,17 @@ def describe(spec: dict, alphabet: Alphabet | None = None) -> str:
     if spec["reverse_text"]:
         parts.append("reverse text")
     if spec["transpose"]:
-        parts.append(f"columnar {spec['transpose']['columnar']}")
+        tr = spec["transpose"]
+        if "columnar" in tr:
+            parts.append(f"columnar {tr['columnar']}")
+        elif "grid" in tr:
+            parts.append(f"grid width {tr['grid']['width']} read {tr['grid']['read']}")
+        elif "railfence" in tr:
+            parts.append(f"railfence {tr['railfence']['rails']} rails")
+        else:
+            parts.append(f"decimate step {tr['decimate']['step']}")
+    if spec.get("transpose_range"):
+        parts.append(f"transpose param {spec['transpose_range'][0]}..{spec['transpose_range'][1]}")
     if spec.get("offset_range"):
         parts.append(f"offsets {spec['offset_range'][0]}..{spec['offset_range'][1]}")
     return "; ".join(parts)
@@ -343,7 +535,7 @@ def _columnar_perm(order: list[int], length: int) -> np.ndarray:
 def decrypt(ct: np.ndarray, spec: dict, n: int) -> np.ndarray:
     c = np.asarray(ct, dtype=np.int64).copy()
     if spec.get("transpose"):
-        perm = _columnar_perm(spec["transpose"]["columnar"], len(c))
+        perm = _transpose_perm(spec["transpose"], len(c))
         tmp = np.empty_like(c)
         tmp[perm] = c
         c = tmp
@@ -403,7 +595,7 @@ def encrypt(pt: np.ndarray, spec: dict, n: int) -> np.ndarray:
     if spec.get("reverse_text"):
         c = c[::-1].copy()
     if spec.get("transpose"):
-        c = c[_columnar_perm(spec["transpose"]["columnar"], len(c))]
+        c = c[_transpose_perm(spec["transpose"], len(c))]
     return c.astype(np.int16)
 
 

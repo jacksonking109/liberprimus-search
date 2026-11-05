@@ -19,8 +19,11 @@ _EXTRAS = {"easy": (0.0, 0.0, 0.0, 0.0), "medium": (0.3, 0.3, 0.1, 0.1),
 
 
 def sample_spec(rng: np.random.Generator, n: int, words: Sequence[np.ndarray] | None = None,
-                difficulty: str = "medium", length: int | None = None) -> dict:
-    """A raw (uncompiled) spec with integer symbols only."""
+                difficulty: str = "medium", length: int | None = None,
+                structure: bool = False) -> dict:
+    """A raw (uncompiled) spec with integer symbols only. `structure=True` also draws the
+    grid / rail-fence / decimation transpositions (off by default so the control's
+    reference numbers stay comparable)."""
     p_skip, p_map, p_rev, p_tr = _EXTRAS[difficulty]
     u = rng.random()
     if u < 0.10:
@@ -53,7 +56,22 @@ def sample_spec(rng: np.random.Generator, n: int, words: Sequence[np.ndarray] | 
     if rng.random() < p_rev:
         spec["reverse_text"] = True
     if rng.random() < p_tr:
-        w = int(rng.integers(3, 6))
-        if length is None or w <= length:
-            spec["transpose"] = {"columnar": [int(x) for x in rng.permutation(w)]}
+        if structure and rng.random() < 0.6:
+            from lpswarm.programs.spec import GRID_READS
+            pick = int(rng.integers(3))
+            if pick == 0:
+                spec["transpose"] = {"grid": {"width": int(rng.integers(2, 40)),
+                                              "read": GRID_READS[int(rng.integers(len(GRID_READS)))]}}
+            elif pick == 1:
+                spec["transpose"] = {"railfence": {"rails": int(rng.integers(2, 9))}}
+            else:   # a step coprime to the text length when it is known
+                import math
+                k = int(rng.integers(2, 60))
+                while length and math.gcd(k, length) != 1:
+                    k += 1
+                spec["transpose"] = {"decimate": {"step": k}}
+        else:
+            w = int(rng.integers(3, 6))
+            if length is None or w <= length:
+                spec["transpose"] = {"columnar": [int(x) for x in rng.permutation(w)]}
     return spec

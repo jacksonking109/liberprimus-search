@@ -157,9 +157,14 @@ def expand_jobs(cfg: OvernightConfig) -> list[dict]:
                            "config", j.get("note", ""), j.get("lane"))
                 if j.get("auto_brief"):
                     job["auto_brief"] = j["auto_brief"]
+                if j.get("brief"):
+                    job["brief"] = str(j["brief"])[:2000]
                 out.append(job)
         else:
-            out.append(_job(j["id"], j["kind"], args, "config", j.get("note", ""), j.get("lane")))
+            job = _job(j["id"], j["kind"], args, "config", j.get("note", ""), j.get("lane"))
+            if j.get("brief"):
+                job["brief"] = str(j["brief"])[:2000]
+            out.append(job)
     return out
 
 

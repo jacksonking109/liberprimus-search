@@ -18,7 +18,7 @@ from typing import Sequence
 from lpswarm.executor import Executor, ExplicitKeys, Target, final_check
 from lpswarm.ledger import Ledger
 from lpswarm.oracle import FullOracle
-from lpswarm.programs import SpecError, compile_spec, describe, expand, spec_hash
+from lpswarm.programs import SpecError, compile_spec, describe, expand_iter, spec_hash
 from lpswarm.router.adapters import AdapterError
 from lpswarm.router.limits import RateLimited
 from lpswarm.router.router import BudgetExceeded, backend_key
@@ -191,7 +191,8 @@ def run_swarm(target: Target, ledger: Ledger, oracle: FullOracle, generators: Se
                                             gen.model, gen.role)
                 try:
                     s = ex.run(target, hyp, "program",
-                               ExplicitKeys(expand(spec), derivation=f"model:{gen.model}"))
+                               ExplicitKeys(expand_iter(spec, len(target.ciphertext)),
+                                            derivation=f"model:{gen.model}"))
                 except (SpecError, ValueError) as exc:
                     gs.invalid += 1
                     errors[gen.model].append(f"{desc} -> could not run: {str(exc)[:160]}")

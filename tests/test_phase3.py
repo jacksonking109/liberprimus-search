@@ -504,10 +504,14 @@ def test_prompt_examples_are_valid_proposals():
     import re
     from lpswarm.swarm.generators import EXAMPLES
     blocks = re.findall(r"\{\"spec\".*?\"why\": \"[^\"]*\"\}", EXAMPLES, re.S)
-    assert len(blocks) == 5
+    assert len(blocks) == 8
+    from lpswarm.alphabet import get_alphabet
+    from lpswarm.programs import compile_spec
+    alpha = get_alphabet("data/alphabet/gematria_primus.json")
     for b in blocks:
         props, errs = parse_proposals(b)
         assert len(props) == 1 and not errs
+        compile_spec(props[0].spec, alpha)      # every example really compiles
         compile_spec(props[0].spec, A)
 
 

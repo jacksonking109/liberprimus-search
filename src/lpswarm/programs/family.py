@@ -24,8 +24,8 @@ class ProgramFamily(CipherFamily):
     def _resolve(self, key: dict, params: dict) -> dict:
         if not isinstance(key, dict) or key.get("v") != S.SPEC_VERSION:
             raise ValueError("program key must be a compiled spec (use programs.compile_spec)")
-        if key.get("offset_range"):
-            raise ValueError("program key has an offset_range; run programs.expand() first")
+        if key.get("offset_range") or key.get("transpose_range") or key["stream"].get("exhaustive"):
+            raise ValueError("program key has a range or exhaustive stream; run programs.expand() first")
         return key
 
     def encrypt(self, pt, key, n, **params):

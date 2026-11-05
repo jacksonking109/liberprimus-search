@@ -680,3 +680,173 @@ def test_pasted_key_is_refused_without_echo_and_never_published(tmp_path):
     out = subprocess.run(["git", "-C", str(tmp_path / "wt"), "show", "HEAD:run1/SUMMARY.md"],
                          capture_output=True, text=True).stdout
     assert fake not in out and "[redacted]" in out
+
+
+# ----------------------------------------------------------- new transpositions
+import numpy as np  # noqa: E402
+
+_NEW_TRANSPOSES = (
+    [{"grid": {"width": w, "read": r}} for w in (2, 3, 7, 9, 27)
+     for r in ("rows_reversed", "columns", "columns_reversed", "boustrophedon_rows",
+               "boustrophedon_columns", "diagonal", "spiral_in", "spiral_out")]
+    + [{"railfence": {"rails": r}} for r in (2, 3, 5, 9)]
+    + [{"decimate": {"step": k}} for k in (2, 3, 7, 13)])
+
+
+def test_new_transpositions_are_permutations_and_round_trip():
+    from lpswarm.alphabet import get_alphabet
+    from lpswarm.programs import compile_spec, decrypt, encrypt
+    from lpswarm.programs import spec as S
+    a = get_alphabet(str(ROOT / "data" / "alphabet" / "gematria_primus.json"))
+    rng = np.random.default_rng(5)
+    for L in (1, 2, 7, 29, 91, 100, 333):
+        pt = rng.integers(0, 29, L)
+        for tr in _NEW_TRANSPOSES:
+            try:
+                perm = S._transpose_perm(tr, L)
+            except S.SpecError:
+                assert "decimate" in tr and np.gcd(tr["decimate"]["step"], L) != 1
+                continue
+            assert sorted(perm.tolist()) == list(range(L)), (tr, L)
+            spec = compile_spec({"stream": {"kind": "constant", "value": 4}, "transpose": tr}, a)
+            assert np.array_equal(decrypt(encrypt(pt, spec, 29), spec, 29), pt), (tr, L)
+
+
+def test_transposition_semantics_small_cases():
+    from lpswarm.programs import spec as S
+    # 7 cells in a width-3 grid: rows 012 / 345 / 6
+    assert S._transpose_perm({"grid": {"width": 3, "read": "columns"}}, 7).tolist() == [0, 3, 6, 1, 4, 2, 5]
+    assert S._transpose_perm({"grid": {"width": 3, "read": "boustrophedon_rows"}}, 7).tolist() == \
+        [0, 1, 2, 5, 4, 3, 6]
+    assert S._transpose_perm({"grid": {"width": 3, "read": "spiral_in"}}, 9).tolist() == \
+        [0, 1, 2, 5, 8, 7, 6, 3, 4]
+    # rail fence, 3 rails, "WEAREDISCOVERED" style positions: rails 0 1 2 1 0 1 2 1 0
+    assert S._transpose_perm({"railfence": {"rails": 3}}, 9).tolist() == [0, 4, 8, 1, 3, 5, 7, 2, 6]
+    assert S._transpose_perm({"decimate": {"step": 3}}, 7).tolist() == [0, 3, 6, 2, 5, 1, 4]
+
+
+def test_old_specs_keep_their_hashes_and_new_fields_are_opt_in():
+    from lpswarm.alphabet import get_alphabet
+    from lpswarm.programs import compile_spec, spec_hash
+    a = get_alphabet(str(ROOT / "data" / "alphabet" / "gematria_primus.json"))
+    s = compile_spec({"stream": {"kind": "sequence", "name": "primes", "offset": 5}, "skip": [0],
+                      "transpose": {"columnar": [2, 0, 1]}}, a)
+    assert set(s) == {"v", "combine", "map", "reverse_text", "skip", "transpose", "stream", "offset_range"}
+    assert "transpose_range" not in s and "exhaustive" not in s["stream"]
+    assert spec_hash(s) == spec_hash(compile_spec(dict(s), a))
+
+
+def test_ranges_and_exhaustive_expansion_and_limits():
+    import pytest
+    from lpswarm.alphabet import get_alphabet
+    from lpswarm.programs import SpecError, compile_spec, expand, expand_iter
+    a = get_alphabet(str(ROOT / "data" / "alphabet" / "gematria_primus.json"))
+    sw = compile_spec({"stream": {"kind": "constant", "value": 3},
+                       "transpose": {"grid": {"width": 5, "read": "columns"}},
+                       "transpose_range": [2, 40]}, a)
+    ex = expand(sw)
+    assert len(ex) == 39 and {e["transpose"]["grid"]["width"] for e in ex} == set(range(2, 41))
+    assert all("transpose_range" not in e and e["offset_range"] is None for e in ex)
+    both = compile_spec({"stream": {"kind": "sequence", "name": "primes"}, "offset_range": [0, 9],
+                         "transpose": {"railfence": {"rails": 3}}, "transpose_range": [2, 6]}, a)
+    assert len(expand(both)) == 50
+    dec = compile_spec({"stream": {"kind": "constant", "value": 1}, "transpose": {"decimate": {"step": 2}},
+                        "transpose_range": [2, 12]}, a)
+    steps = [e["transpose"]["decimate"]["step"] for e in expand(dec, length=30)]
+    assert steps == [7, 11]          # only steps coprime to 30
+    e2 = compile_spec({"stream": {"kind": "repeat", "exhaustive": True, "key_length": 2}}, a)
+    it = expand_iter(e2)
+    assert next(it)["stream"]["key"] == [0, 0]
+    assert len(expand(e2)) == 29 ** 2
+    assert all("exhaustive" not in e["stream"] and e["stream"]["kind"] == "repeat" for e in expand(e2)[40:50])
+    e4 = compile_spec({"stream": {"kind": "repeat", "exhaustive": True, "key_length": 4}}, a)
+    assert e4["stream"]["n"] == 29 and len(e4["stream"]["key"]) == 4        # lazy template only
+    for bad in ({"stream": {"kind": "repeat", "exhaustive": True, "key_length": 5}},
+                {"stream": {"kind": "repeat", "exhaustive": True, "key_length": 2, "word": "AB"}},
+                {"stream": {"kind": "repeat", "exhaustive": True, "key_length": 3},
+                 "offset_range": [0, 5]},
+                {"stream": {"kind": "constant", "value": 1}, "transpose_range": [2, 5]},
+                {"stream": {"kind": "constant", "value": 1}, "transpose": {"grid": {"width": 3}}},
+                {"stream": {"kind": "constant", "value": 1}, "transpose": {"grid": {"width": 3, "read": "x"}}},
+                {"stream": {"kind": "constant", "value": 1}, "transpose": {"railfence": {"rails": 1}}},
+                {"stream": {"kind": "constant", "value": 1}, "transpose": {"columnar": [0, 1], "grid": {}}},
+                {"stream": {"kind": "sequence", "name": "primes"}, "offset_range": [0, 1999],
+                 "transpose": {"grid": {"width": 5, "read": "columns"}}, "transpose_range": [2, 400]}):
+        with pytest.raises(SpecError):
+            compile_spec(bad, a)
+
+
+def test_exhaustive_search_finds_the_key_and_skips_equivalents():
+    from lpswarm.alphabet import get_alphabet
+    from lpswarm.executor import Executor, ExplicitKeys, Target
+    from lpswarm.oracle import FullOracle, OracleConfig
+    from lpswarm.programs import compile_spec, expand_iter
+    from lpswarm.programs import spec as S
+    a = get_alphabet(str(ROOT / "data" / "alphabet" / "gematria_primus.json"))
+    rng = np.random.default_rng(1)
+    pt = rng.integers(0, 29, 200)
+    true = compile_spec({"stream": {"kind": "repeat", "key": [5, 11]}, "combine": "sub"}, a)
+    ct = S.encrypt(pt, true, 29)
+    led = Ledger()
+    o = FullOracle(a, OracleConfig(null_samples=100))
+    h = led.add_hypothesis("program", "all length-2 keys", "t", "proposer")
+    sub = compile_spec({"stream": {"kind": "repeat", "exhaustive": True, "key_length": 2}, "combine": "sub"}, a)
+    add = compile_spec({"stream": {"kind": "repeat", "exhaustive": True, "key_length": 2}, "combine": "add"}, a)
+    ex = Executor(led, o, stop_file=None)
+    tgt = Target(a, ct, "t", is_synthetic=True)
+    s1 = ex.run(tgt, h, "program", ExplicitKeys(expand_iter(sub)))
+    assert s1.new_attempts + s1.skipped == 29 ** 2
+    # the add sweep is the same set of ciphers (keys negate): nothing new is tested
+    s2 = ex.run(tgt, h, "program", ExplicitKeys(expand_iter(add)))
+    assert s2.new_attempts == 0 and s2.equivalent == 29 ** 2
+    assert s1.new_attempts == len({tuple(S.decrypt(ct, e, 29)) for e in expand_iter(sub)})
+
+
+def test_synthetic_recovery_with_a_railfence_plus_stream():
+    from lpswarm.alphabet import Alphabet
+    from lpswarm.executor import Executor, ExplicitKeys, Target
+    from lpswarm.oracle import FullOracle, OracleConfig
+    from lpswarm.programs import compile_spec, expand_iter
+    from lpswarm.programs import spec as S
+    from lpswarm.textgen.synth import generate_case
+    a = Alphabet.latin26()
+    case = generate_case("caesar", 240, seed=4)
+    pt = np.asarray(case.plaintext_ints if hasattr(case, "plaintext_ints") else case.plaintext, dtype=np.int64)
+    if pt.dtype.kind not in "iu" or len(pt) < 100:
+        import pytest
+        pytest.skip("synthetic case has no integer plaintext")
+    true = compile_spec({"stream": {"kind": "sequence", "name": "primes", "offset": 3}, "combine": "sub",
+                         "transpose": {"railfence": {"rails": 4}}}, a)
+    ct = S.encrypt(pt, true, 26)
+    guess = compile_spec({"stream": {"kind": "sequence", "name": "primes", "offset": 3}, "combine": "sub",
+                          "transpose": {"railfence": {"rails": 2}}, "transpose_range": [2, 9]}, a)
+    led = Ledger()
+    h = led.add_hypothesis("program", "rail sweep", "t", "proposer")
+    ex = Executor(led, FullOracle(a, OracleConfig(null_samples=200)), stop_file=None)
+    s = ex.run(Target(a, ct, "t", is_synthetic=True), h, "program", ExplicitKeys(expand_iter(guess)))
+    assert s.passes >= 1
+
+
+def test_report_flags_searches_too_large_to_confirm():
+    from lpswarm.alphabet import Alphabet
+    from lpswarm.oracle import FullOracle, OracleConfig
+    from lpswarm.reports import _confirmable
+    led = Ledger()
+    o = FullOracle(Alphabet.latin26(), OracleConfig(null_samples=300))
+    assert _confirmable(led, o, "none", 200) is True            # tiny search: fine
+    o2 = FullOracle(Alphabet.latin26(), OracleConfig(null_samples=300))
+    o2._max_combined = -100.0                                    # force "unreachable"
+    assert _confirmable(led, o2, "none", 200) is False
+
+
+def test_example_queue_structure_and_exhaustive_jobs_carry_briefs():
+    from lpswarm.overnight import expand_jobs, load_config
+    cfg = load_config(ROOT / "config" / "overnight.example.toml")
+    cfg.manifest = str(ROOT / "data" / "lp" / "manifest.json")
+    jobs = expand_jobs(cfg)
+    st = [j for j in jobs if j["id"].startswith("structure/")]
+    ex = [j for j in jobs if j["id"].startswith("exhaustive/")]
+    assert [j["id"] for j in st] == [f"structure/{i}" for i in (10, 12, 13, 14, 17, 18, 24)]
+    assert [j["id"] for j in ex] == [f"exhaustive/{i}" for i in (11, 19, 21, 25)]
+    assert "transpose_range" in st[0]["brief"] and "key_length" in ex[0]["brief"]
+    assert len(st[0]["brief"]) <= 2000 and len(ex[0]["brief"]) <= 2000

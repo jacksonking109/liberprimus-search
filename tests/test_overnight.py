@@ -35,7 +35,8 @@ def test_config_and_expansion(tmp_path):
     with pytest.raises(ValueError):
         load_config(bad)
     example = load_config(ROOT / "config" / "overnight.example.toml")
-    assert [j["id"] for j in example.jobs] == ["tier-claude", "sonnet", "codex", "local", "deepseek"]
+    assert [j["id"] for j in example.jobs] == ["tier-claude", "sonnet", "codex", "local", "structure",
+                                                "exhaustive", "deepseek"]
 
 
 TIER = {"id": "tier", "kind": "tiertest",

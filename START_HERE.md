@@ -1,5 +1,16 @@
 # Start here: first run at home (Windows)
 
+## New since the last run (Nov 5)
+
+The cipher-program language now also has grid, spiral, boustrophedon, rail-fence and every-k-th
+transpositions (with `transpose_range` sweeps) and exhaustive periodic keys of length 1-4, and the
+example queue has two new Codex jobs that use them: **structure** (a transposition then a
+substitution, on the sections whose lengths factor neatly) and **exhaustive** (every periodic key up
+to length 4 on the short sections; a length-4 sweep is ~700,000 ciphers, a few minutes and
+~700 MB of ledger per section). To use them: `git pull`, then copy the queue again
+(`Copy-Item config\overnight.example.toml config\overnight.toml -Force`, after noting your own
+edits such as `max_parallel` and `capacity`) and start with `-New`.
+
 ## Next time at the PC (changes from Nov 4)
 
 Do these once, in the `liberprimus-search` folder, then delete this section.

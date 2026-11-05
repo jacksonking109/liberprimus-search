@@ -2,6 +2,8 @@
 keys for a given cipher family."""
 from __future__ import annotations
 
+import itertools
+
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any, Iterable, Iterator, Sequence
@@ -77,15 +79,18 @@ class ExplicitKeys(KeySource):
 
     def __init__(self, keys: Sequence[Any], derivation: str = "explicit",
                  labels: Sequence[str] | None = None, families: Sequence[str] | None = None):
-        self.keys = list(keys)
+        # Lists stay lists; any other iterable (e.g. a lazy expansion of 700k keys) is
+        # kept lazy and can be walked once.
+        self.keys = keys if not isinstance(keys, (list, tuple)) else list(keys)
         self.name = derivation
-        self.labels = list(labels) if labels else [""] * len(self.keys)
+        self.labels = list(labels) if labels else None
         self.families = set(families) if families else None
 
     def candidates(self, family, n, length):
         if self.families is not None and family.name not in self.families:
             return
-        for k, lab in zip(self.keys, self.labels):
+        labels = self.labels if self.labels is not None else itertools.repeat("")
+        for k, lab in zip(self.keys, labels):
             yield KeyCandidate(k, self.name, label=lab)
 
 

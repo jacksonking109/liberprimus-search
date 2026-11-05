@@ -29,7 +29,7 @@ def resolve_decrypt(ct: np.ndarray, spec: dict, n: int, bigram: np.ndarray) -> n
         raise S.SpecError("skip_mode 'resolve' does not support autokey streams")
     c = np.asarray(ct, dtype=np.int64).copy()
     if spec.get("transpose"):
-        perm = S._columnar_perm(spec["transpose"]["columnar"], len(c))
+        perm = S._transpose_perm(spec["transpose"], len(c))
         tmp = np.empty_like(c)
         tmp[perm] = c
         c = tmp

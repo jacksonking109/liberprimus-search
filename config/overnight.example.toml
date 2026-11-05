@@ -71,6 +71,31 @@ args = ["--manifest", "data/lp/manifest.json", "--alphabet", "data/alphabet/gema
         "--rounds", "6", "--per-round", "8", "--max-attempts", "60000"]
 note = "local models"
 
+# Structure lane (Codex): two-stage programs, a transposition first and then a substitution, on
+# the sections whose lengths factor neatly (729 = 27x27, 693 = 7x9x11, 333 = 9x37, 1729 = 7x13x19,
+# 1021, 1433, 534). Sweeps the grid width / rail count / step in one proposal.
+[[job]]
+id = "structure"
+kind = "swarm"
+order = "forward"
+brief = """Two-stage programs: a transposition, then a substitution. Use the transpose field: grid widths (try the factors of the section length and their neighbours, e.g. 27 for 729, 7/9/11/63/77/99 for 693, 9/37 for 333, 7/13/19/91/133 for 1729) with every read order (columns, columns_reversed, boustrophedon_rows, boustrophedon_columns, diagonal, spiral_in, spiral_out, rows_reversed), railfence with transpose_range [2, 40], and decimate with transpose_range [2, 400]. Put transpose_range sweeps in the proposal instead of single widths. After the transposition use a short substitution sweep: constant shifts 0-28 with sub/add, and prime or p-1 streams with offset_range. Each proposal should expand to hundreds of ciphers."""
+args = ["--manifest", "data/lp/manifest.json", "--alphabet", "data/alphabet/gematria_primus.json",
+        "--sections", "10,12,13,14,17,18,24", "--generators", "codex", "--rounds", "6",
+        "--per-round", "12", "--max-attempts", "300000"]
+note = "Codex: transposition then substitution"
+
+# Exhaustive lane (Codex): every periodic key of length 1-4 on the short sections, where it is
+# affordable (29^4 is about 700,000 ciphers, a few minutes and ~700 MB of ledger per section).
+[[job]]
+id = "exhaustive"
+kind = "swarm"
+order = "forward"
+brief = """Use exhaustive repeat streams: {"kind": "repeat", "exhaustive": true, "key_length": m}. Propose m = 1, 2, 3 and 4 (one proposal each) with combine "sub" and with "beaufort" (sub and add cover the same keys, so do not send both). Add a second family per length: the same with "reverse_text": true, and with "map": "reverse". No other proposals are needed."""
+args = ["--manifest", "data/lp/manifest.json", "--alphabet", "data/alphabet/gematria_primus.json",
+        "--sections", "11,19,21,25", "--generators", "codex", "--rounds", "2",
+        "--per-round", "12", "--max-attempts", "5000000"]
+note = "Codex: every periodic key up to length 4"
+
 # 5. DeepSeek brute force: refused until its prices and DEEPSEEK_API_KEY are set.
 [[job]]
 id = "deepseek"
