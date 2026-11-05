@@ -1,6 +1,6 @@
 # Overnight run 20261104-2305
 
-Started 2026-11-04 23:05:16, updated 2026-11-05 01:30:35, status **running**. Jobs: pending 23, running 3, done 53
+Started 2026-11-04 23:05:16, updated 2026-11-05 01:30:56, status **running**. Jobs: pending 22, running 3, done 54
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -45,7 +45,7 @@ Started 2026-11-04 23:05:16, updated 2026-11-05 01:30:35, status **running**. Jo
 | local/21 | done | 2026-11-05 01:03:27 | 2026-11-05 01:05:52 | local models |
 | local/13 | done | 2026-11-05 01:06:08 | 2026-11-05 01:20:21 | local models |
 | local/22 | done | 2026-11-05 01:20:37 | 2026-11-05 01:30:35 | local models |
-| local/12 | pending |  |  | local models |
+| local/12 | running | 2026-11-05 01:30:51 |  | local models |
 | local/24 | pending |  |  | local models |
 | local/11 | pending |  |  | local models |
 | local/25 | pending |  |  | local models |
@@ -56,7 +56,7 @@ Started 2026-11-04 23:05:16, updated 2026-11-05 01:30:35, status **running**. Jo
 | structure/14 | done | 2026-11-04 23:34:04 | 2026-11-04 23:39:29 | Codex: transposition then substitution |
 | structure/17 | running | 2026-11-04 23:39:58 |  | Codex: transposition then substitution |
 | structure/18 | done | 2026-11-04 23:40:19 | 2026-11-05 01:08:08 | Codex: transposition then substitution |
-| structure/24 | running | 2026-11-05 01:08:24 |  | Codex: transposition then substitution |
+| structure/24 | done | 2026-11-05 01:08:24 | 2026-11-05 01:30:56 | Codex: transposition then substitution |
 | exhaustive/11 | pending |  |  | Codex: every periodic key up to length 4 |
 | exhaustive/19 | pending |  |  | Codex: every periodic key up to length 4 |
 | exhaustive/21 | pending |  |  | Codex: every periodic key up to length 4 |
@@ -86,6 +86,11 @@ Started 2026-11-04 23:05:16, updated 2026-11-05 01:30:35, status **running**. Jo
 
 ## Now running
 
+**local/12** (since 2026-11-05 01:30:51), latest log lines:
+```
+===== 2026-11-05 01:30:51 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 12 --gen
+== LP2:20.jpg/2-23.jpg/1 - 3.jpg/2-6.jpg/1  (693 symbols)
+```
 **structure/17** (since 2026-11-04 23:39:58), latest log lines:
 ```
 00:02:33 [model] codex (proposer) ok 58.7s, tokens in/out 21588/2719, reply 8973 chars, model not reported (pin one with model = "..." in the models config)
@@ -99,24 +104,12 @@ round 4 [codex] proposals=1 valid=1 attempts=242154 passes=0 near=0 invalid=0
 01:02:11 [model] codex (proposer) calling...
 01:03:08 [model] codex (proposer) ok 57.8s, tokens in/out 21895/2716, reply 9254 chars, model not reported (pin one with model = "..." in the models config)
 ```
-**structure/24** (since 2026-11-05 01:08:24), latest log lines:
-```
-01:08:27 [model] codex (proposer) calling...
-01:09:25 [model] codex (proposer) ok 57.9s, tokens in/out 18803/2610, reply 8637 chars, model not reported (pin one with model = "..." in the models config)
-round 1 [codex] proposals=32 valid=32 attempts=128172 passes=0 near=0 invalid=0
-01:14:11 [model] codex (proposer) calling...
-01:15:12 [model] codex (proposer) ok 61.0s, tokens in/out 21194/2524, reply 9091 chars, model not reported (pin one with model = "..." in the models config)
-round 2 [codex] proposals=32 valid=32 attempts=258453 passes=0 near=0 invalid=0
-01:28:29 [model] codex (proposer) calling...
-01:29:31 [model] codex (proposer) ok 62.2s, tokens in/out 21581/2671, reply 8505 chars, model not reported (pin one with model = "..." in the models config)
-round 3 [codex] proposals=1 valid=1 attempts=300000 passes=0 near=0 invalid=0
-stopped: max_attempts; final passes: 0
-```
 **deepseek/17** (since 2026-11-05 01:30:15), latest log lines:
 ```
 ===== 2026-11-05 01:30:15 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 17 --gen
 == LP2:- - 40.jpg-43.jpg  (1021 symbols)
 01:30:25 [model] deepseek (proposer) calling...
+01:30:43 [model] deepseek (proposer) ok 17.9s, tokens in/out 4235/2463, reply 8320 chars
 ```
 
 ## Results so far
@@ -215,6 +208,8 @@ stopped: max_attempts; final passes: 0
   - LP2:8.jpg-14.jpg - 25.jpg-31.jpg: 300000 attempts, 26 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **structure/18** (done)
   - LP2:- - 44.jpg-49.jpg: 300000 attempts, 81 hypotheses, **0 final pass(es)**, stopped: max_attempts
+- **structure/24** (done)
+  - LP2:51.jpg/2-53.jpg - 68.jpg/2-70.jpg: 300000 attempts, 65 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **deepseek/10** (done)
   - LP2:17.jpg, 18.jpg, 19.jpg - 0.jpg-2.jpg: 60000 attempts, 19 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **deepseek/11** (done)
@@ -232,7 +227,7 @@ stopped: max_attempts; final passes: 0
 
 ## Model usage
 
-- deepseek: 15 call(s) in the last 5h (cap none), spent $0.2497
+- deepseek: 16 call(s) in the last 5h (cap none), spent $0.2539
 - qwen-local: 17 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 17 call(s) in the last 5h (cap none), spent $0.0000
 - granite: 25 call(s) in the last 5h (cap none), spent $0.0000
@@ -269,10 +264,6 @@ Prefer combinations missing from the section's history. A real hit should show s
 
 ## Events
 
-- 2026-11-05 01:20:37 published: 50 file(s) to branch results
-- 2026-11-05 01:20:37 local/22: start (uses ollama:http://127.0.0.1:11434, ollama:http://127.0.0.1:11435)
-- 2026-11-05 01:20:37 4 running: structure/17, structure/24, deepseek/14, local/22
-- 2026-11-05 01:22:17 deepseek/14: running 5 min | 01:17:40 [model] deepseek (proposer) ok 15.8s, tokens in/out 4123/1866, reply 6275 chars
 - 2026-11-05 01:23:28 structure/24: running 15 min | 01:15:12 [model] codex (proposer) ok 61.0s, tokens in/out 21194/2524, reply 9091 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-05 01:25:23 structure/17: running 105 min | 01:03:08 [model] codex (proposer) ok 57.8s, tokens in/out 21895/2716, reply 9254 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-05 01:25:38 local/22: running 5 min | 01:24:58 [model] qwen-local (proposer) calling...
@@ -294,3 +285,7 @@ Prefer combinations missing from the section's history. A real hit should show s
 - 2026-11-05 01:30:15 local/12 waiting: ollama:http://127.0.0.1:11434 in use by local/22
 - 2026-11-05 01:30:25 structure/17: running 110 min | 01:03:08 [model] codex (proposer) ok 57.8s, tokens in/out 21895/2716, reply 9254 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-05 01:30:35 local/22: done (exit 0, 10 min)
+- 2026-11-05 01:30:51 published: 53 file(s) to branch results
+- 2026-11-05 01:30:51 local/12: start (uses ollama:http://127.0.0.1:11434, ollama:http://127.0.0.1:11435)
+- 2026-11-05 01:30:51 4 running: structure/17, structure/24, deepseek/17, local/12
+- 2026-11-05 01:30:56 structure/24: done (exit 0, 23 min)
