@@ -1,6 +1,6 @@
 # Overnight run 20261104-2305
 
-Started 2026-11-04 23:05:16, updated 2026-11-05 00:55:31, status **running**. Jobs: pending 30, running 3, done 42
+Started 2026-11-04 23:05:16, updated 2026-11-05 01:00:47, status **running**. Jobs: pending 29, running 3, done 43
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -62,7 +62,7 @@ Started 2026-11-04 23:05:16, updated 2026-11-05 00:55:31, status **running**. Jo
 | exhaustive/21 | pending |  |  | Codex: every periodic key up to length 4 |
 | exhaustive/25 | pending |  |  | Codex: every periodic key up to length 4 |
 | deepseek/10 | done | 2026-11-05 00:52:56 | 2026-11-05 00:55:31 | DeepSeek (volume) |
-| deepseek/11 | pending |  |  | DeepSeek (volume) |
+| deepseek/11 | done | 2026-11-05 00:55:47 | 2026-11-05 01:00:47 | DeepSeek (volume) |
 | deepseek/12 | pending |  |  | DeepSeek (volume) |
 | deepseek/13 | pending |  |  | DeepSeek (volume) |
 | deepseek/14 | pending |  |  | DeepSeek (volume) |
@@ -97,9 +97,6 @@ round 2 [gemma-local] proposals=8 valid=7 attempts=42108 passes=0 near=0 invalid
 ```
 **structure/17** (since 2026-11-04 23:39:58), latest log lines:
 ```
-brief for the generators (718 chars): Two-stage programs: a transposition, then a substitution. Use the transpose field: grid widths (try the factors of the section length and their neighbours, e.g. 2
-== LP2:- - 40.jpg-43.jpg  (1021 symbols)
-23:40:01 [model] codex (proposer) calling...
 23:41:03 [model] codex (proposer) ok 61.9s, tokens in/out 19153/2539, reply 8548 chars, model not reported (pin one with model = "..." in the models config)
 round 1 [codex] proposals=32 valid=32 attempts=101648 passes=0 near=0 invalid=0
 00:01:34 [model] codex (proposer) calling...
@@ -107,6 +104,9 @@ round 1 [codex] proposals=32 valid=32 attempts=101648 passes=0 near=0 invalid=0
 round 2 [codex] proposals=32 valid=32 attempts=178332 passes=0 near=0 invalid=0
 00:38:31 [model] codex (proposer) calling...
 00:39:30 [model] codex (proposer) ok 59.4s, tokens in/out 21313/2698, reply 8362 chars, model not reported (pin one with model = "..." in the models config)
+round 3 [codex] proposals=32 valid=32 attempts=237441 passes=0 near=0 invalid=0
+00:57:02 [model] codex (proposer) calling...
+00:57:59 [model] codex (proposer) ok 56.5s, tokens in/out 21886/2626, reply 9151 chars, model not reported (pin one with model = "..." in the models config)
 ```
 **structure/18** (since 2026-11-04 23:40:19), latest log lines:
 ```
@@ -208,17 +208,19 @@ round 1 [codex] proposals=32 valid=32 attempts=148195 passes=0 near=0 invalid=0
   - LP2:8.jpg-14.jpg - 25.jpg-31.jpg: 300000 attempts, 26 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **deepseek/10** (done)
   - LP2:17.jpg, 18.jpg, 19.jpg - 0.jpg-2.jpg: 60000 attempts, 19 hypotheses, **0 final pass(es)**, stopped: max_attempts
+- **deepseek/11** (done)
+  - LP2:20.jpg/1 - 3.jpg/1: 60000 attempts, 41 hypotheses, **0 final pass(es)**, stopped: max_attempts
 
 ## Model usage
 
-- deepseek: 2 call(s) in the last 5h (cap none), spent $0.1953
+- deepseek: 7 call(s) in the last 5h (cap none), spent $0.2165
 - qwen-local: 9 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 9 call(s) in the last 5h (cap none), spent $0.0000
 - granite: 12 call(s) in the last 5h (cap none), spent $0.0000
 - claude-opus: 79 call(s) in the last 5h (cap 180), spent $0.0000
 - claude-sonnet: 79 call(s) in the last 5h (cap 180), spent $0.0000
 - claude-supervisor: 79 call(s) in the last 5h (cap 180), spent $0.0000
-- codex: 47 call(s) in the last 5h (cap 850), spent $0.0000
+- codex: 48 call(s) in the last 5h (cap 850), spent $0.0000
 
 ## Current strategy note (read by every lane each round)
 
@@ -240,14 +242,6 @@ Prefer variants that are absent from the section's history. Long sections should
 
 ## Events
 
-- 2026-11-05 00:41:18 sonnet/22: running 10 min | 00:32:15 [model] claude-sonnet (proposer) ok 14.0s, tokens in/out 6269/1919, reply 2773 chars
-- 2026-11-05 00:43:13 local/14: running 5 min | 00:41:43 [model] qwen-local (proposer) calling...
-- 2026-11-05 00:45:08 structure/17: running 65 min | 00:39:30 [model] codex (proposer) ok 59.4s, tokens in/out 21313/2698, reply 8362 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-05 00:45:28 structure/18: running 65 min | 00:28:32 [model] codex (proposer) ok 62.3s, tokens in/out 21212/2563, reply 8529 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-05 00:46:18 sonnet/22: running 15 min | 00:32:15 [model] claude-sonnet (proposer) ok 14.0s, tokens in/out 6269/1919, reply 2773 chars
-- 2026-11-05 00:47:58 sonnet/22: done (exit 0, 17 min)
-- 2026-11-05 00:48:14 published: 40 file(s) to branch results
-- 2026-11-05 00:48:14 local/14: running 10 min | 00:47:59 [model] granite (weighting) ok 0.9s, tokens in/out 213/19, reply 27 chars
 - 2026-11-05 00:48:14 sonnet/24: start (uses claude-plan)
 - 2026-11-05 00:48:15 4 running: structure/17, structure/18, local/14, sonnet/24
 - 2026-11-05 00:49:50 sonnet/24: done (exit 0, 2 min)
@@ -265,3 +259,11 @@ Prefer variants that are absent from the section's history. Long sections should
 - 2026-11-05 00:55:11 structure/17: running 75 min | 00:39:30 [model] codex (proposer) ok 59.4s, tokens in/out 21313/2698, reply 8362 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-05 00:55:31 structure/18: running 75 min | 00:28:32 [model] codex (proposer) ok 62.3s, tokens in/out 21212/2563, reply 8529 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-05 00:55:31 deepseek/10: done (exit 0, 3 min)
+- 2026-11-05 00:55:47 published: 43 file(s) to branch results
+- 2026-11-05 00:55:47 deepseek/11: start (uses api:https://api.deepseek.com)
+- 2026-11-05 00:55:47 4 running: structure/17, structure/18, local/14, deepseek/11
+- 2026-11-05 00:55:47 local/21 waiting: ollama:http://127.0.0.1:11434 in use by local/14
+- 2026-11-05 00:58:17 local/14: running 20 min | 00:47:59 [model] granite (weighting) ok 0.9s, tokens in/out 213/19, reply 27 chars
+- 2026-11-05 01:00:12 structure/17: running 80 min | 00:57:59 [model] codex (proposer) ok 56.5s, tokens in/out 21886/2626, reply 9151 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 01:00:32 structure/18: running 80 min | 00:28:32 [model] codex (proposer) ok 62.3s, tokens in/out 21212/2563, reply 8529 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 01:00:47 deepseek/11: done (exit 0, 5 min)
