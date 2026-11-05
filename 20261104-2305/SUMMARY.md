@@ -1,6 +1,6 @@
 # Overnight run 20261104-2305
 
-Started 2026-11-04 23:05:16, updated 2026-11-04 23:09:35, status **running**. Jobs: pending 66, running 3, done 3
+Started 2026-11-04 23:05:16, updated 2026-11-04 23:09:51, status **running**. Jobs: pending 66, running 2, done 4
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -23,7 +23,7 @@ Started 2026-11-04 23:05:16, updated 2026-11-04 23:09:35, status **running**. Jo
 | codex/25 | done | 2026-11-04 23:05:16 | 2026-11-04 23:07:19 | Codex (exploratory) |
 | codex/24 | done | 2026-11-04 23:05:16 | 2026-11-04 23:07:40 | Codex (exploratory) |
 | codex/22 | done | 2026-11-04 23:07:35 | 2026-11-04 23:09:35 | Codex (exploratory) |
-| codex/21 | running | 2026-11-04 23:07:55 |  | Codex (exploratory) |
+| codex/21 | done | 2026-11-04 23:07:55 | 2026-11-04 23:09:51 | Codex (exploratory) |
 | codex/20 | pending |  |  | Codex (exploratory) |
 | codex/19 | pending |  |  | Codex (exploratory) |
 | codex/18 | pending |  |  | Codex (exploratory) |
@@ -81,29 +81,16 @@ Started 2026-11-04 23:05:16, updated 2026-11-04 23:09:35, status **running**. Jo
 
 **tier-claude** (since 2026-11-04 23:05:16), latest log lines:
 ```
-23:08:31 [model] claude-sonnet (proposer) calling...
-23:08:46 [model] claude-sonnet (proposer) ok 14.5s, tokens in/out 3200/1778, reply 2372 chars
-[claude-sonnet] 3/6 L=80 recovered=0 attempts=20000 calls=1 usd=0.0000 stopped=max_attempts
-23:08:54 [model] claude-sonnet (proposer) calling...
-23:09:05 [model] claude-sonnet (proposer) ok 10.7s, tokens in/out 3458/1271, reply 2173 chars
-[claude-sonnet] 4/6 L=160 recovered=1 attempts=18614 calls=1 usd=0.0000 stopped=pass_found
 23:09:13 [model] claude-sonnet (proposer) calling...
 23:09:22 [model] claude-sonnet (proposer) ok 8.9s, tokens in/out 3449/1123, reply 2475 chars
 [claude-sonnet] 5/6 L=160 recovered=0 attempts=20000 calls=1 usd=0.0000 stopped=max_attempts
 23:09:30 [model] claude-sonnet (proposer) calling...
-```
-**codex/21** (since 2026-11-04 23:07:55), latest log lines:
-```
-brief from codex (1973 chars):
-  | 1. Start with map identity, combine sub, no skips or transposition; repeat exhaustive key_length 1, 2, 3, and 4 in separate proposals. IC 1.059 is close to uniform, favoring a changing key over a 
-  | 2. Test sequence primes and prime_totients, each with offset_range [0,1999], scale 1, add 0. Run sub, add, and beaufort separately, without skips or transposition. These cover arithmetic streams c
-  | 3. Sweep the other sequence names: naturals, squares, triangular, fibonacci, pi_digits, e_digits. Use offset_range [0,1999], scale 1, add 0, initially sub, then add and beaufort in separate propos
-  | 4. For primes and prime_totients, repeat the offset sweeps with skip [F], skip_mode all. F occurs twice, so this specifically tests whether those positions are literal separators that stop key adv
-  | 5. Test pure transposition using constant value 0, combine sub. Sweep grid width [2,121] separately for all eight read modes; also railfence [2,64] and decimate [2,120]. Repeat with reverse_text t
-  | 6. Test layered grid transposition plus primes or prime_totients, sub, no skips: width [2,121], offset_range [0,40], separately for columns, boustrophedon_columns, diagonal, and spiral_in. Each pr
-  | 7. Nothing has been tried yet. Do not duplicate exhaustive sub searches with add or repeat-key offset sweeps: they cover the same keys. Avoid arbitrary word primers and single-offset guesses until
-23:08:28 [model] codex (proposer) calling...
-23:09:07 [model] codex (proposer) ok 39.0s, tokens in/out 17521/1775, reply 6370 chars, model not reported (pin one with model = "..." in the models config)
+23:09:38 [model] claude-sonnet (proposer) ok 7.6s, tokens in/out 3459/1080, reply 2316 chars
+[claude-sonnet] 6/6 L=160 recovered=0 attempts=20000 calls=1 usd=0.0000 stopped=max_attempts
+wrote reports\overnight\20261104-2305\tier-claude\tiertest.md
+  random_program:40    recall 0.00 (0/6)  attempts 192      calls 0     $0.0000
+  claude-opus          recall 0.33 (2/6)  attempts 99088    calls 6     $0.0000
+  claude-sonnet        recall 0.33 (2/6)  attempts 118614   calls 6     $0.0000
 ```
 **local/17** (since 2026-11-04 23:05:16), latest log lines:
 ```
@@ -122,13 +109,15 @@ brief from codex (1973 chars):
 - **tier-claude** (running)
   - random_program:40: recall 0.00 (0/6), 192 attempts, 0 model calls, $0.0000
   - claude-opus: recall 0.33 (2/6), 99088 attempts, 6 model calls, $0.0000
-  - claude-sonnet: recall 0.40 (2/5), 98614 attempts, 5 model calls, $0.0000
+  - claude-sonnet: recall 0.33 (2/6), 118614 attempts, 6 model calls, $0.0000
 - **codex/25** (done)
   - LP2:54.jpg-55.jpg - 71.jpg-72.jpg: 60000 attempts, 2 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **codex/24** (done)
   - LP2:51.jpg/2-53.jpg - 68.jpg/2-70.jpg: 60000 attempts, 2 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **codex/22** (done)
   - LP2:57.jpg-66.jpg/1: 60000 attempts, 4 hypotheses, **0 final pass(es)**, stopped: max_attempts
+- **codex/21** (done)
+  - LP2:56.jpg/2: 60000 attempts, 4 hypotheses, **0 final pass(es)**, stopped: max_attempts
 
 ## Model usage
 
@@ -136,9 +125,9 @@ brief from codex (1973 chars):
 - qwen-local: 1 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 1 call(s) in the last 5h (cap none), spent $0.0000
 - granite: 1 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 42 call(s) in the last 5h (cap 180), spent $0.0000
-- claude-sonnet: 42 call(s) in the last 5h (cap 180), spent $0.0000
-- claude-supervisor: 42 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-opus: 43 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-sonnet: 43 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-supervisor: 43 call(s) in the last 5h (cap 180), spent $0.0000
 - codex: 41 call(s) in the last 5h (cap 850), spent $0.0000
 
 ## Supervisor notes
@@ -167,3 +156,5 @@ brief from codex (1973 chars):
 - 2026-11-04 23:07:55 codex/21: start (uses codex-plan)
 - 2026-11-04 23:07:55 4 running: tier-claude, local/17, codex/22, codex/21
 - 2026-11-04 23:09:35 codex/22: done (exit 0, 2 min)
+- 2026-11-04 23:09:51 published: 8 file(s) to branch results
+- 2026-11-04 23:09:51 codex/21: done (exit 0, 2 min)

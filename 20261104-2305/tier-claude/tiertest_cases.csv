@@ -16,3 +16,4 @@ claude-sonnet,3816107e36b2a62b,program,80,0,20000,,0,0,0,max_attempts,16.65,1,32
 claude-sonnet,58faea5dcfe35cd2,program,80,0,20000,,0,0,0,max_attempts,22.68,1,3200,1778,0.0
 claude-sonnet,d78d9a268b69a356,program,160,1,18614,1,0,0,0,pass_found,19.51,1,3458,1271,0.0
 claude-sonnet,bc8b8091be0dc1a1,program,160,0,20000,,0,0,0,max_attempts,16.58,1,3449,1123,0.0
+claude-sonnet,4a5ab969d2cfed61,program,160,0,20000,,0,0,0,max_attempts,15.26,1,3459,1080,0.0
