@@ -1,6 +1,6 @@
 # Overnight run 20261104-2305
 
-Started 2026-11-04 23:05:16, updated 2026-11-04 23:47:59, status **running**. Jobs: pending 39, running 3, done 30
+Started 2026-11-04 23:05:16, updated 2026-11-04 23:48:20, status **running**. Jobs: pending 38, running 3, done 31
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -10,7 +10,7 @@ Started 2026-11-04 23:05:16, updated 2026-11-04 23:47:59, status **running**. Jo
 | sonnet/12 | done | 2026-11-04 23:15:47 | 2026-11-04 23:17:08 | Sonnet, briefed by Opus |
 | sonnet/13 | done | 2026-11-04 23:17:23 | 2026-11-04 23:23:57 | Sonnet, briefed by Opus |
 | sonnet/14 | done | 2026-11-04 23:24:13 | 2026-11-04 23:47:59 | Sonnet, briefed by Opus |
-| sonnet/15 | pending |  |  | Sonnet, briefed by Opus |
+| sonnet/15 | done | 2026-11-04 23:48:15 | 2026-11-04 23:48:20 | Sonnet, briefed by Opus |
 | sonnet/16 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/17 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/18 | pending |  |  | Sonnet, briefed by Opus |
@@ -123,6 +123,8 @@ brief for the generators (718 chars): Two-stage programs: a transposition, then 
   - LP2:6.jpg/2-7.jpg - 23.jpg/2-24.jpg: 60000 attempts, 34 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **sonnet/14** (done)
   - LP2:8.jpg-14.jpg - 25.jpg-31.jpg: 57382 attempts, 61 hypotheses, **0 final pass(es)**
+- **sonnet/15** (done)
+  - skip LP2:15.jpg/1 - 32.jpg/1: only 9 symbols (minimum 20, --min-length); too short to judge
 - **codex/25** (done)
   - LP2:54.jpg-55.jpg - 71.jpg-72.jpg: 60000 attempts, 2 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **codex/24** (done)
@@ -195,10 +197,6 @@ Night so far: every section shows passes=0 and near=0, including 300k-attempt st
 
 ## Events
 
-- 2026-11-04 23:34:04 structure/14: start (uses codex-plan)
-- 2026-11-04 23:34:04 4 running: sonnet/14, structure/13, local/20, structure/14
-- 2026-11-04 23:34:04 sonnet/15 waiting: claude-plan in use by sonnet/14
-- 2026-11-04 23:34:19 sonnet/14: running 10 min | 23:33:11 [model] claude-sonnet (proposer) ok 22.5s, tokens in/out 7921/2060, reply 2828 chars
 - 2026-11-04 23:36:24 structure/13: running 5 min | 23:36:13 [model] codex (proposer) calling...
 - 2026-11-04 23:37:29 local/20: running 5 min | 23:34:27 [model] granite (weighting) ok 1.8s, tokens in/out 269/38, reply 69 chars
 - 2026-11-04 23:39:04 structure/14: running 5 min | 23:35:02 [model] codex (proposer) ok 52.7s, tokens in/out 19318/2311, reply 7887 chars, model not reported (pin one with model = "..." in the models config)
@@ -220,3 +218,7 @@ Night so far: every section shows passes=0 and near=0, including 300k-attempt st
 - 2026-11-04 23:45:19 structure/18: running 5 min | 23:41:14 [model] codex (proposer) ok 52.6s, tokens in/out 18738/2446, reply 8924 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-04 23:47:34 local/20: running 15 min | 23:34:27 [model] granite (weighting) ok 1.8s, tokens in/out 269/38, reply 69 chars
 - 2026-11-04 23:47:59 sonnet/14: done (exit 0, 24 min)
+- 2026-11-04 23:48:15 published: 32 file(s) to branch results
+- 2026-11-04 23:48:15 sonnet/15: start (uses claude-plan)
+- 2026-11-04 23:48:15 4 running: local/20, structure/17, structure/18, sonnet/15
+- 2026-11-04 23:48:20 sonnet/15: done (exit 0, 0 min)
