@@ -1,6 +1,6 @@
 # Overnight run 20261104-2305
 
-Started 2026-11-04 23:05:16, updated 2026-11-04 23:40:03, status **running**. Jobs: pending 40, running 3, done 29
+Started 2026-11-04 23:05:16, updated 2026-11-04 23:47:59, status **running**. Jobs: pending 39, running 3, done 30
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -9,7 +9,7 @@ Started 2026-11-04 23:05:16, updated 2026-11-04 23:40:03, status **running**. Jo
 | sonnet/11 | done | 2026-11-04 23:14:26 | 2026-11-04 23:15:32 | Sonnet, briefed by Opus |
 | sonnet/12 | done | 2026-11-04 23:15:47 | 2026-11-04 23:17:08 | Sonnet, briefed by Opus |
 | sonnet/13 | done | 2026-11-04 23:17:23 | 2026-11-04 23:23:57 | Sonnet, briefed by Opus |
-| sonnet/14 | running | 2026-11-04 23:24:13 |  | Sonnet, briefed by Opus |
+| sonnet/14 | done | 2026-11-04 23:24:13 | 2026-11-04 23:47:59 | Sonnet, briefed by Opus |
 | sonnet/15 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/16 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/17 | pending |  |  | Sonnet, briefed by Opus |
@@ -55,7 +55,7 @@ Started 2026-11-04 23:05:16, updated 2026-11-04 23:40:03, status **running**. Jo
 | structure/13 | done | 2026-11-04 23:31:22 | 2026-11-04 23:40:03 | Codex: transposition then substitution |
 | structure/14 | done | 2026-11-04 23:34:04 | 2026-11-04 23:39:29 | Codex: transposition then substitution |
 | structure/17 | running | 2026-11-04 23:39:58 |  | Codex: transposition then substitution |
-| structure/18 | pending |  |  | Codex: transposition then substitution |
+| structure/18 | running | 2026-11-04 23:40:19 |  | Codex: transposition then substitution |
 | structure/24 | pending |  |  | Codex: transposition then substitution |
 | exhaustive/11 | pending |  |  | Codex: every periodic key up to length 4 |
 | exhaustive/19 | pending |  |  | Codex: every periodic key up to length 4 |
@@ -79,19 +79,6 @@ Started 2026-11-04 23:05:16, updated 2026-11-04 23:40:03, status **running**. Jo
 
 ## Now running
 
-**sonnet/14** (since 2026-11-04 23:24:13), latest log lines:
-```
-23:26:13 [model] claude-sonnet (proposer) ok 14.1s, tokens in/out 6078/1822, reply 2838 chars
-round 2 [claude-sonnet] proposals=12 valid=12 attempts=16470 passes=0 near=0 invalid=7
-23:29:19 [model] claude-sonnet (proposer) calling...
-23:29:35 [model] claude-sonnet (proposer) ok 16.0s, tokens in/out 6970/1239, reply 2630 chars
-round 3 [claude-sonnet] proposals=12 valid=12 attempts=25217 passes=0 near=0 invalid=7
-23:32:48 [model] claude-sonnet (proposer) calling...
-23:33:11 [model] claude-sonnet (proposer) ok 22.5s, tokens in/out 7921/2060, reply 2828 chars
-round 4 [claude-sonnet] proposals=12 valid=12 attempts=42749 passes=0 near=0 invalid=7
-23:37:20 [model] claude-sonnet (proposer) calling...
-23:37:41 [model] claude-sonnet (proposer) ok 20.3s, tokens in/out 8596/1662, reply 2590 chars
-```
 **local/20** (since 2026-11-04 23:32:28), latest log lines:
 ```
 ===== 2026-11-04 23:32:28 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 20 --gen
@@ -109,6 +96,15 @@ round 4 [claude-sonnet] proposals=12 valid=12 attempts=42749 passes=0 near=0 inv
 brief for the generators (718 chars): Two-stage programs: a transposition, then a substitution. Use the transpose field: grid widths (try the factors of the section length and their neighbours, e.g. 2
 == LP2:- - 40.jpg-43.jpg  (1021 symbols)
 23:40:01 [model] codex (proposer) calling...
+23:41:03 [model] codex (proposer) ok 61.9s, tokens in/out 19153/2539, reply 8548 chars, model not reported (pin one with model = "..." in the models config)
+```
+**structure/18** (since 2026-11-04 23:40:19), latest log lines:
+```
+===== 2026-11-04 23:40:19 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 18 --gen
+brief for the generators (718 chars): Two-stage programs: a transposition, then a substitution. Use the transpose field: grid widths (try the factors of the section length and their neighbours, e.g. 2
+== LP2:- - 44.jpg-49.jpg  (1433 symbols)
+23:40:22 [model] codex (proposer) calling...
+23:41:14 [model] codex (proposer) ok 52.6s, tokens in/out 18738/2446, reply 8924 chars, model not reported (pin one with model = "..." in the models config)
 ```
 
 ## Results so far
@@ -125,6 +121,8 @@ brief for the generators (718 chars): Two-stage programs: a transposition, then 
   - LP2:20.jpg/2-23.jpg/1 - 3.jpg/2-6.jpg/1: 60000 attempts, 2 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **sonnet/13** (done)
   - LP2:6.jpg/2-7.jpg - 23.jpg/2-24.jpg: 60000 attempts, 34 hypotheses, **0 final pass(es)**, stopped: max_attempts
+- **sonnet/14** (done)
+  - LP2:8.jpg-14.jpg - 25.jpg-31.jpg: 57382 attempts, 61 hypotheses, **0 final pass(es)**
 - **codex/25** (done)
   - LP2:54.jpg-55.jpg - 71.jpg-72.jpg: 60000 attempts, 2 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **codex/24** (done)
@@ -176,14 +174,14 @@ brief for the generators (718 chars): Two-stage programs: a transposition, then 
 
 ## Model usage
 
-- deepseek: 10 call(s) in the last 5h (cap none), spent $0.1873
+- deepseek: 3 call(s) in the last 5h (cap none), spent $0.1873
 - qwen-local: 6 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 6 call(s) in the last 5h (cap none), spent $0.0000
 - granite: 7 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 60 call(s) in the last 5h (cap 180), spent $0.0000
-- claude-sonnet: 60 call(s) in the last 5h (cap 180), spent $0.0000
-- claude-supervisor: 60 call(s) in the last 5h (cap 180), spent $0.0000
-- codex: 73 call(s) in the last 5h (cap 850), spent $0.0000
+- claude-opus: 61 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-sonnet: 61 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-supervisor: 61 call(s) in the last 5h (cap 180), spent $0.0000
+- codex: 71 call(s) in the last 5h (cap 850), spent $0.0000
 
 ## Current strategy note (read by every lane each round)
 
@@ -197,15 +195,6 @@ Night so far: every section shows passes=0 and near=0, including 300k-attempt st
 
 ## Events
 
-- 2026-11-04 23:32:07 4 running: structure/10, sonnet/14, structure/13, local/15
-- 2026-11-04 23:32:07 sonnet/15 waiting: claude-plan in use by sonnet/14
-- 2026-11-04 23:32:12 local/15: done (exit 0, 0 min)
-- 2026-11-04 23:32:28 published: 28 file(s) to branch results
-- 2026-11-04 23:32:28 local/20: start (uses ollama:http://127.0.0.1:11434, ollama:http://127.0.0.1:11435)
-- 2026-11-04 23:32:28 4 running: structure/10, sonnet/14, structure/13, local/20
-- 2026-11-04 23:32:48 structure/10: running 10 min | 23:32:09 [model] codex (proposer) ok 53.8s, tokens in/out 20885/2488, reply 8049 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-04 23:33:48 structure/10: done (exit 0, 11 min)
-- 2026-11-04 23:34:04 published: 29 file(s) to branch results
 - 2026-11-04 23:34:04 structure/14: start (uses codex-plan)
 - 2026-11-04 23:34:04 4 running: sonnet/14, structure/13, local/20, structure/14
 - 2026-11-04 23:34:04 sonnet/15 waiting: claude-plan in use by sonnet/14
@@ -222,3 +211,12 @@ Night so far: every section shows passes=0 and near=0, including 300k-attempt st
 - 2026-11-04 23:39:58 4 running: sonnet/14, structure/13, local/20, structure/17
 - 2026-11-04 23:39:58 sonnet/15 waiting: claude-plan in use by sonnet/14
 - 2026-11-04 23:40:03 structure/13: done (exit 0, 9 min)
+- 2026-11-04 23:40:19 published: 31 file(s) to branch results
+- 2026-11-04 23:40:19 structure/18: start (uses codex-plan)
+- 2026-11-04 23:40:19 4 running: sonnet/14, local/20, structure/17, structure/18
+- 2026-11-04 23:42:34 local/20: running 10 min | 23:34:27 [model] granite (weighting) ok 1.8s, tokens in/out 269/38, reply 69 chars
+- 2026-11-04 23:44:24 sonnet/14: running 20 min | 23:42:45 [model] claude-sonnet (proposer) ok 17.0s, tokens in/out 9040/1442, reply 3089 chars
+- 2026-11-04 23:44:59 structure/17: running 5 min | 23:41:03 [model] codex (proposer) ok 61.9s, tokens in/out 19153/2539, reply 8548 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-04 23:45:19 structure/18: running 5 min | 23:41:14 [model] codex (proposer) ok 52.6s, tokens in/out 18738/2446, reply 8924 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-04 23:47:34 local/20: running 15 min | 23:34:27 [model] granite (weighting) ok 1.8s, tokens in/out 269/38, reply 69 chars
+- 2026-11-04 23:47:59 sonnet/14: done (exit 0, 24 min)
