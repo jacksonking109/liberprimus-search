@@ -1,6 +1,6 @@
 # Overnight run 20261104-2300
 
-Started 2026-11-04 23:00:52, updated 2026-11-04 23:03:47, status **running**. Jobs: pending 57, running 3, done 1
+Started 2026-11-04 23:00:52, updated 2026-11-04 23:04:03, status **running**. Jobs: pending 57, running 2, done 2
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -21,7 +21,7 @@ Started 2026-11-04 23:00:52, updated 2026-11-04 23:03:47, status **running**. Jo
 | sonnet/24 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/25 | pending |  |  | Sonnet, briefed by Opus |
 | codex/25 | done | 2026-11-04 23:00:52 | 2026-11-04 23:03:47 | Codex (exploratory) |
-| codex/24 | running | 2026-11-04 23:00:52 |  | Codex (exploratory) |
+| codex/24 | done | 2026-11-04 23:00:52 | 2026-11-04 23:04:03 | Codex (exploratory) |
 | codex/22 | running | 2026-11-04 23:00:52 |  | Codex (exploratory) |
 | codex/21 | pending |  |  | Codex (exploratory) |
 | codex/20 | pending |  |  | Codex (exploratory) |
@@ -70,7 +70,6 @@ Started 2026-11-04 23:00:52, updated 2026-11-04 23:03:47, status **running**. Jo
 
 **tier-claude** (since 2026-11-04 23:00:52), latest log lines:
 ```
-23:02:48 [model] claude-sonnet (proposer) calling...
 23:03:03 [model] claude-sonnet (proposer) ok 14.9s, tokens in/out 3202/1853, reply 2565 chars
 [claude-sonnet] 1/6 L=80 recovered=1 attempts=1966 calls=1 usd=0.0000 stopped=pass_found
 23:03:11 [model] claude-sonnet (proposer) calling...
@@ -80,24 +79,10 @@ Started 2026-11-04 23:00:52, updated 2026-11-04 23:03:47, status **running**. Jo
 23:03:39 [model] claude-sonnet (proposer) ok 13.6s, tokens in/out 3201/1804, reply 2257 chars
 [claude-sonnet] 3/6 L=80 recovered=0 attempts=20000 calls=1 usd=0.0000 stopped=max_attempts
 23:03:46 [model] claude-sonnet (proposer) calling...
-```
-**codex/24** (since 2026-11-04 23:00:52), latest log lines:
-```
-  | 3. Exhaustive periodic keys as a baseline. Use "repeat" with exhaustive true and key_length 1, 2, 3 and 4, with combine "sub", then the same with map "reverse". Run each once with no skip and once
-  | 4. Other sequence streams. Try primes, fibonacci, pi_digits, e_digits, triangular and squares. Use combine sub and beaufort, offset_range [0,1000], and scale 1, then -1 (28). Run each with and wit
-  | 5. Transposition, then a simple key. Use grid with read "columns", "columns_reversed", "diagonal" and "spiral_in", with transpose_range [2,60]. Combine this with a constant shift (each value 0..28
-  | 6. Transposition plus prime_totients. Use railfence over transpose_range [2,12], or grid columns over [2,40]. Add prime_totients with combine sub, skip [0], and offset_range [0,100].
-  | 7. reverse_text true on directions 1 and 2. Some LP pages read backward.
-  | Do NOT: run single word-key guesses without sweeps, or run the add duplic
-23:01:08 [model] codex (proposer) calling...
-23:01:57 [model] codex (proposer) ok 48.9s, tokens in/out 18171/1850, reply 6302 chars, model not reported (pin one with model = "..." in the models config)
-round 1 [codex] proposals=32 valid=32 attempts=3365 passes=0 near=0 invalid=0
-stopped: stop_file; final passes: 0
+23:03:57 [model] claude-sonnet (proposer) ok 10.8s, tokens in/out 3456/1284, reply 2160 chars
 ```
 **codex/22** (since 2026-11-04 23:00:52), latest log lines:
 ```
-  | 2. Other number streams. Try "sequence" primes, pi_digits, e_digits, fibonacci, squares, triangular and naturals. Use scale 1 and scale 28 (that is, -1), add 0, offset_range [0,2000], combine "sub
-  | 3. Short periodic keys. Run exhaustive repeat with key_length 1 to 4, combine "sub", first with map "identity" and then with map "reverse". This covers Caesar, Atbash+shift and Vigenère up to leng
   | 4. Lore keywords. Use repeat words DIVINITY, CIRCUMFERENCE, FIRFUMFERENFE, INSTAR, PARABLE, KOAN, CICADA, WELCOME, PRIMES and EMERGE. Combine with "sub" and "beaufort", each word with offset_range
   | 5. Autokey, which suits the suppressed doubles. Use primers U, F, DIVINITY, INSTAR, KOAN and CIRCUMFERENCE. Try source "ciphertext" and "plaintext" with combine "sub" and "beaufort". Use no skip, 
   | 6. Transposition plus a cheap substitution. Combine grid "columns" or "columns_reversed" with transpose_range [2,170] and a constant stream for values 0 to 28, splitting values across proposals to
@@ -106,6 +91,8 @@ stopped: stop_file; final passes: 0
 23:01:59 [model] codex (proposer) ok 43.7s, tokens in/out 18716/1984, reply 6405 chars, model not reported (pin one with model = "..." in the models config)
 round 1 [codex] proposals=32 valid=31 attempts=6645 passes=0 near=0 invalid=1
 stopped: stop_file; final passes: 0
+report: reports\overnight\20261104-2300\codex_22\report.md
+model spend (reports/model_spend.sqlite): deepseek=$0.1873, qwen-local=$0.0000, gemma-local=$0.0000, granite=$0.0000, claude-opus=$0.0000, claude-sonnet=$0.0000, claude-supervisor=$0.0000, codex=$0.00
 ```
 
 ## Results so far
@@ -116,13 +103,17 @@ stopped: stop_file; final passes: 0
   - claude-sonnet: recall 0.33 (1/3), 41966 attempts, 3 model calls, $0.0000
 - **codex/25** (done)
   - LP2:54.jpg-55.jpg - 71.jpg-72.jpg: 60000 attempts, 21 hypotheses, **0 final pass(es)**, stopped: max_attempts
+- **codex/24** (done)
+  - LP2:51.jpg/2-53.jpg - 68.jpg/2-70.jpg: 3365 attempts, 2 hypotheses, **0 final pass(es)**, stopped: stop_file
+- **codex/22** (running)
+  - LP2:57.jpg-66.jpg/1: 6645 attempts, 4 hypotheses, **0 final pass(es)**, stopped: stop_file
 
 ## Model usage
 
 - deepseek: 13 call(s) in the last 5h (cap none), spent $0.1873
-- claude-opus: 30 call(s) in the last 5h (cap 180), spent $0.0000
-- claude-sonnet: 30 call(s) in the last 5h (cap 180), spent $0.0000
-- claude-supervisor: 30 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-opus: 31 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-sonnet: 31 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-supervisor: 31 call(s) in the last 5h (cap 180), spent $0.0000
 - codex: 34 call(s) in the last 5h (cap 850), spent $0.0000
 
 ## Supervisor notes
@@ -142,3 +133,5 @@ stopped: stop_file; final passes: 0
 - 2026-11-04 23:00:52 sonnet/10 waiting: claude-plan in use by tier-claude
 - 2026-11-04 23:01:01 supervisor: note: 23:00 check-in: run just started, 61 jobs queued covering sections 10-25 across sonnet/codex/local/deepseek lanes. No results yet; holding off on new jobs and strategy until first rounds report.
 - 2026-11-04 23:03:47 codex/25: done (exit 0, 3 min)
+- 2026-11-04 23:04:03 published: 6 file(s) to branch results
+- 2026-11-04 23:04:03 codex/24: done (exit 0, 3 min)
