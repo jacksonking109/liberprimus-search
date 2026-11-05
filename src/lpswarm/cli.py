@@ -11,6 +11,7 @@ Commands:
   tiertest    Phase 3: compare generators against the baselines
   doctor      check that everything needed for a run is in place
   overnight   run a queue of jobs unattended (resumable; SUMMARY.md; optional supervisor)
+  coverage    read-only inventory of what the ledgers record (coverage.json / .md)
   disk        free disk space, size of each overnight run, prune old ledgers
 """
 from __future__ import annotations
@@ -415,6 +416,35 @@ def cmd_doctor(args) -> int:
     return print_report(run_checks(models, ping=args.ping, ledgers=ledgers))
 
 
+def cmd_coverage(args) -> int:
+    """Read-only coverage inventory of job ledgers (see docs/coverage.md). Exit codes: 0 every
+    selected input was read; 3 partial (some inputs missing, locked, corrupt or unsupported);
+    4 nothing readable (the files are still written, with status no_readable_inputs)."""
+    import lpswarm
+    from lpswarm import coverage as C
+    ledgers = list(args.ledger or [])
+    runs_dir = args.runs_dir
+    if not ledgers and runs_dir is None:
+        runs_dir = "reports/overnight"
+    specs, notes = C.discover(ledgers, runs_dir, args.run, args.latest)
+    if not specs and not notes:
+        raise SystemExit("coverage: no ledgers selected")
+    report = C.build(specs, notes, top_leads=args.top_leads, max_hypotheses=args.max_hypotheses,
+                     version=getattr(lpswarm, "__version__", C.UNKNOWN))
+    out = Path(args.out)
+    out.mkdir(parents=True, exist_ok=True)
+    (out / "coverage.json").write_text(C.to_json(report), encoding="utf-8")
+    (out / "coverage.md").write_text(C.to_markdown(report), encoding="utf-8")
+    c = report["inputs"]["counts"]
+    print(f"coverage: {report['status']}; {c['read']} ledger(s) read, {c['failed']} failed or "
+          f"skipped; {len(report['sections'])} target(s)")
+    for s in report["inputs"]["ledgers"]:
+        if s["status"] != "ok":
+            print(f"  {s['status']}: {s['path']}: {s['error']}")
+    print(f"wrote {out / 'coverage.json'} and {out / 'coverage.md'}")
+    return {"complete": 0, "partial": 3, "no_readable_inputs": 4}[report["status"]]
+
+
 def cmd_disk(args) -> int:
     from lpswarm.diskuse import GB, free_gb, largest_ledgers, prune_old_ledgers, run_sizes
     base = args.base
@@ -676,6 +706,23 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--quick", action="store_true")
     p.add_argument("--quiet", action="store_true")
     p.set_defaults(func=cmd_tiertest)
+
+    p = sub.add_parser("coverage", help="read-only inventory of what the job ledgers record "
+                       "(writes coverage.json and coverage.md)")
+    p.add_argument("--ledger", action="append", default=[], metavar="FILE",
+                   help="a ledger file (repeatable); read-only, never created")
+    p.add_argument("--runs-dir", help="folder of overnight runs: reads exactly "
+                   "<runs-dir>/<run>/<job>/ledger.sqlite (default when no --ledger: reports/overnight)")
+    p.add_argument("--run", action="append", metavar="NAME", help="with --runs-dir: only this run "
+                   "folder (repeatable)")
+    p.add_argument("--latest", type=int, help="with --runs-dir: only the newest N run folders")
+    p.add_argument("--out", default="reports/coverage", help="output folder (default reports/coverage, "
+                   "which is git-ignored)")
+    p.add_argument("--top-leads", type=int, default=10, help="best passes/near misses kept per target "
+                   "and ledger")
+    p.add_argument("--max-hypotheses", type=int, default=500, help="hypotheses listed per target and "
+                   "ledger in coverage.json (totals always cover all)")
+    p.set_defaults(func=cmd_coverage)
 
     p = sub.add_parser("disk", help="free disk space, size of each overnight run, and "
                        "(--prune) delete ledgers of old runs")

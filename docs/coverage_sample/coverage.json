@@ -1,0 +1,452 @@
+{
+  "definitions": {
+    "completion": "completed = a finished lean sweep, or a hypothesis recorded as 'ruled_out' (its key source ran out); incomplete = a lean sweep stopped early, or a hypothesis left 'open' with stored attempts (stopped early, reason not in the ledger); interrupted = a hypothesis still marked 'running'. Whether a range was fully enumerated is only evidenced by these flags, never inferred from counts",
+    "evaluator_group": "ledgers are only totalled together when their recorded executor_version set matches; the oracle configuration is unknown for all of them, so groups are comparable only in that limited sense",
+    "final_check": "pass = an in-run pass or near miss; survivor = it also passed the recorded end-of-search check (final_check.passed_final = 1). 'not run' when that table has no row for the attempt",
+    "identity": "a target is identified by its recorded target id (sha256 of alphabet, ciphertext and word breaks); the transcription version is not recorded",
+    "lean_counted": "attempts that failed inside a lean sweep: counted in sweep_summary, not stored individually. A lean sweep's near misses and passes are stored rows",
+    "logical_attempts": "stored_rows + lean_counted (the same total the executor uses for its end-of-search correction). Not a count of distinct ciphers or decryptions",
+    "null_percentile": "as recorded: the fraction of the calibration null scores at or below this score. It is not the probability that the decryption is wrong",
+    "overlap": "there is no cross-job or cross-run deduplication of attempts, so totals summed over ledgers may include the same work more than once; 'same description' lists hypotheses whose description text is identical in several ledgers (a text match, not proof of identical ciphers)",
+    "recorded_margin": "combined - threshold, both exactly as recorded when the attempt was scored (the threshold depends on the attempt count at that moment). It is not a probability, and is not re-scored here",
+    "stored_rows": "attempts stored one row each in the ledger's attempt table"
+  },
+  "inputs": {
+    "counts": {
+      "failed": 0,
+      "read": 3
+    },
+    "discovery_notes": [
+      "searched overnight/<run>/<job>/ledger.sqlite for 2 run folder(s); no other location was searched"
+    ],
+    "ledgers": [
+      {
+        "error": null,
+        "hypotheses_without_attempts": 0,
+        "job": "codex_1",
+        "path": "20260101-0000/codex_1/ledger.sqlite",
+        "run": "20260101-0000",
+        "schema": {
+          "has_final_check": true,
+          "has_null_variant": true,
+          "has_output_hash": true,
+          "has_sweep_complete": true,
+          "has_sweep_summary": true
+        },
+        "sidecars": {
+          "report_json": "present",
+          "state_json_job": {
+            "args": {
+              "--max-attempts": "60000",
+              "--sections": "11"
+            },
+            "job_id": "codex/1",
+            "reason": null,
+            "returncode": 0,
+            "status": "done"
+          }
+        },
+        "size_bytes": 110592,
+        "snapshot": "one read transaction per ledger: committed rows at read time; the executor commits every 2000 attempts, so a running job's newest attempts may be missing",
+        "status": "ok"
+      },
+      {
+        "error": null,
+        "hypotheses_without_attempts": 0,
+        "job": "sonnet_1",
+        "path": "20260101-0000/sonnet_1/ledger.sqlite",
+        "run": "20260101-0000",
+        "schema": {
+          "has_final_check": true,
+          "has_null_variant": true,
+          "has_output_hash": true,
+          "has_sweep_complete": true,
+          "has_sweep_summary": true
+        },
+        "sidecars": {
+          "report_json": "absent",
+          "state_json_job": "absent"
+        },
+        "size_bytes": 94208,
+        "snapshot": "one read transaction per ledger: committed rows at read time; the executor commits every 2000 attempts, so a running job's newest attempts may be missing",
+        "status": "ok"
+      },
+      {
+        "error": null,
+        "hypotheses_without_attempts": 0,
+        "job": "codex_1",
+        "path": "20260102-0000/codex_1/ledger.sqlite",
+        "run": "20260102-0000",
+        "schema": {
+          "has_final_check": true,
+          "has_null_variant": true,
+          "has_output_hash": true,
+          "has_sweep_complete": true,
+          "has_sweep_summary": true
+        },
+        "sidecars": {
+          "report_json": "absent",
+          "state_json_job": "absent"
+        },
+        "size_bytes": 110592,
+        "snapshot": "one read transaction per ledger: committed rows at read time; the executor commits every 2000 attempts, so a running job's newest attempts may be missing",
+        "status": "ok"
+      }
+    ]
+  },
+  "limitations": [
+    "The oracle configuration (alpha, null samples, near-miss rule) is not recorded in the ledgers: evaluator_config is unknown for every attempt.",
+    "Lean-sweep summaries record a count, a completion flag and the proposal's description, not its spec; the completed subset of an incomplete sweep is unknown.",
+    "Why an unfinished job stopped is recorded only in report.json beside the ledger, when present; invalid proposals never reach a ledger.",
+    "No cross-job or cross-run deduplication exists, so summed totals may overlap.",
+    "Transcription version is not recorded; identity is the target id only.",
+    "History is not rescored: recorded thresholds and margins are shown as they were."
+  ],
+  "schema": "lpswarm-coverage/1",
+  "sections": [
+    {
+      "alphabet": "latin26",
+      "evaluator_groups": [
+        {
+          "executor_versions": [
+            "phase1-0.1.0"
+          ],
+          "lean_counted": 675,
+          "ledgers": [
+            "20260101-0000/codex_1/ledger.sqlite",
+            "20260101-0000/sonnet_1/ledger.sqlite",
+            "20260102-0000/codex_1/ledger.sqlite"
+          ],
+          "logical_attempts_summed_over_ledgers": 728,
+          "note": "summed over ledgers; may include overlapping work",
+          "oracle_config": "unknown",
+          "stored_rows": 53
+        }
+      ],
+      "final_check": {
+        "ledgers_without_final_check_table": 0,
+        "rechecked": 0,
+        "survivors": 0
+      },
+      "is_synthetic": true,
+      "labels": [
+        "section X"
+      ],
+      "leads_best_first": [
+        {
+          "alpha_eff": 0.01,
+          "attempt_count_at_scoring": 1,
+          "attempt_id": 1,
+          "combined": -1.0818799035267301,
+          "family": "program",
+          "final_check": "not run",
+          "hypothesis_id": 1,
+          "ledger": "20260101-0000/codex_1/ledger.sqlite",
+          "null_percentile": 1.0,
+          "null_variant": null,
+          "plaintext_preview": "OUNDTHEPOLARSEACHARLESLAMBSTRIUMPHOFTHEWHALEINTHEYEARSOMEPERSONSWEREONAHIGHHILLO",
+          "recorded_margin": 2.016109196160761,
+          "stage": "full",
+          "threshold_at_scoring": -3.0979890996874913,
+          "unreachable": false,
+          "verdict": "pass"
+        },
+        {
+          "alpha_eff": 0.01,
+          "attempt_count_at_scoring": 1,
+          "attempt_id": 1,
+          "combined": -1.0818799035267301,
+          "family": "program",
+          "final_check": "not run",
+          "hypothesis_id": 1,
+          "ledger": "20260102-0000/codex_1/ledger.sqlite",
+          "null_percentile": 1.0,
+          "null_variant": null,
+          "plaintext_preview": "OUNDTHEPOLARSEACHARLESLAMBSTRIUMPHOFTHEWHALEINTHEYEARSOMEPERSONSWEREONAHIGHHILLO",
+          "recorded_margin": 2.016109196160761,
+          "stage": "full",
+          "threshold_at_scoring": -3.0979890996874913,
+          "unreachable": false,
+          "verdict": "pass"
+        },
+        {
+          "alpha_eff": 7.042253521126761e-05,
+          "attempt_count_at_scoring": 142,
+          "attempt_id": 1,
+          "combined": -1.0818799035267301,
+          "family": "program",
+          "final_check": "not run",
+          "hypothesis_id": 1,
+          "ledger": "20260101-0000/sonnet_1/ledger.sqlite",
+          "null_percentile": 1.0,
+          "null_variant": null,
+          "plaintext_preview": "OUNDTHEPOLARSEACHARLESLAMBSTRIUMPHOFTHEWHALEINTHEYEARSOMEPERSONSWEREONAHIGHHILLO",
+          "recorded_margin": 1.8406175260205382,
+          "stage": "full",
+          "threshold_at_scoring": -2.9224974295472683,
+          "unreachable": false,
+          "verdict": "pass"
+        }
+      ],
+      "ledger_count": 3,
+      "length": 240,
+      "page_ranges": [],
+      "same_description_in_several_ledgers": [],
+      "sources": [
+        {
+          "attempts_without_result_row": 0,
+          "executor_versions": [
+            "phase1-0.1.0"
+          ],
+          "final_check_summary": {
+            "rechecked": 0,
+            "survivors": 0
+          },
+          "hypotheses": [
+            {
+              "completion": "has a recorded pass; whether the enumeration finished is not recorded",
+              "description": "constant shifts",
+              "executor_versions": [
+                "phase1-0.1.0"
+              ],
+              "family": "program",
+              "first_attempt": "2026-11-05 15:27:01",
+              "hypothesis_id": 1,
+              "last_attempt": "2026-11-05 15:27:01",
+              "lean": null,
+              "null_variants": [],
+              "proposer": "codex",
+              "recorded_status": "lead",
+              "role": "proposer",
+              "stored_near_misses": 0,
+              "stored_passes": 1,
+              "stored_rows": 26
+            }
+          ],
+          "hypotheses_truncated": false,
+          "hypothesis_count": 1,
+          "job": "codex_1",
+          "job_state": {
+            "args": {
+              "--max-attempts": "60000",
+              "--sections": "11"
+            },
+            "job_id": "codex/1",
+            "reason": null,
+            "returncode": 0,
+            "status": "done"
+          },
+          "leads": [
+            {
+              "alpha_eff": 0.01,
+              "attempt_count_at_scoring": 1,
+              "attempt_id": 1,
+              "combined": -1.0818799035267301,
+              "family": "program",
+              "final_check": "not run",
+              "hypothesis_id": 1,
+              "null_percentile": 1.0,
+              "null_variant": null,
+              "plaintext_preview": "OUNDTHEPOLARSEACHARLESLAMBSTRIUMPHOFTHEWHALEINTHEYEARSOMEPERSONSWEREONAHIGHHILLO",
+              "recorded_margin": 2.016109196160761,
+              "stage": "full",
+              "threshold_at_scoring": -3.0979890996874913,
+              "unreachable": false,
+              "verdict": "pass"
+            }
+          ],
+          "lean_counted": 0,
+          "lean_counted_by_completion": {
+            "complete": 0,
+            "incomplete": 0
+          },
+          "lean_sweeps": 0,
+          "ledger": "20260101-0000/codex_1/ledger.sqlite",
+          "logical_attempts": 26,
+          "proposal_counts_from_report_json": {
+            "codex": {
+              "attempts": 26,
+              "duplicates": 1,
+              "invalid": 3,
+              "model_errors": 0,
+              "proposals": 12
+            }
+          },
+          "run": "20260101-0000",
+          "stopped_reason_from_report_json": "max_attempts",
+          "stored_by_stage": {
+            "full": 1,
+            "screen": 25
+          },
+          "stored_by_verdict": {
+            "fail": 25,
+            "pass": 1
+          },
+          "stored_rows": 26
+        },
+        {
+          "attempts_without_result_row": 0,
+          "executor_versions": [
+            "phase1-0.1.0"
+          ],
+          "final_check_summary": {
+            "rechecked": 0,
+            "survivors": 0
+          },
+          "hypotheses": [
+            {
+              "completion": "completed (finished lean sweep)",
+              "description": "all 2-keys",
+              "executor_versions": [
+                "phase1-0.1.0"
+              ],
+              "family": "program",
+              "first_attempt": "2026-11-05 15:27:01",
+              "hypothesis_id": 1,
+              "last_attempt": "2026-11-05 15:27:01",
+              "lean": {
+                "best_recorded_margin_of_counted": null,
+                "complete": true,
+                "counted_attempts": 675,
+                "screened_out": 675,
+                "sweep_id": "275ee4a5eb781252a6f283ea50d7859761bc85bc377c3d3c40f5313516695aa7"
+              },
+              "null_variants": [],
+              "proposer": "sonnet",
+              "recorded_status": "lead",
+              "role": "proposer",
+              "stored_near_misses": 0,
+              "stored_passes": 1,
+              "stored_rows": 1
+            }
+          ],
+          "hypotheses_truncated": false,
+          "hypothesis_count": 1,
+          "job": "sonnet_1",
+          "job_state": "unknown",
+          "leads": [
+            {
+              "alpha_eff": 7.042253521126761e-05,
+              "attempt_count_at_scoring": 142,
+              "attempt_id": 1,
+              "combined": -1.0818799035267301,
+              "family": "program",
+              "final_check": "not run",
+              "hypothesis_id": 1,
+              "null_percentile": 1.0,
+              "null_variant": null,
+              "plaintext_preview": "OUNDTHEPOLARSEACHARLESLAMBSTRIUMPHOFTHEWHALEINTHEYEARSOMEPERSONSWEREONAHIGHHILLO",
+              "recorded_margin": 1.8406175260205382,
+              "stage": "full",
+              "threshold_at_scoring": -2.9224974295472683,
+              "unreachable": false,
+              "verdict": "pass"
+            }
+          ],
+          "lean_counted": 675,
+          "lean_counted_by_completion": {
+            "complete": 675,
+            "incomplete": 0
+          },
+          "lean_sweeps": 1,
+          "ledger": "20260101-0000/sonnet_1/ledger.sqlite",
+          "logical_attempts": 676,
+          "proposal_counts_from_report_json": "unknown",
+          "run": "20260101-0000",
+          "stopped_reason_from_report_json": "unknown",
+          "stored_by_stage": {
+            "full": 1
+          },
+          "stored_by_verdict": {
+            "pass": 1
+          },
+          "stored_rows": 1
+        },
+        {
+          "attempts_without_result_row": 0,
+          "executor_versions": [
+            "phase1-0.1.0"
+          ],
+          "final_check_summary": {
+            "rechecked": 0,
+            "survivors": 0
+          },
+          "hypotheses": [
+            {
+              "completion": "has a recorded pass; whether the enumeration finished is not recorded",
+              "description": "again",
+              "executor_versions": [
+                "phase1-0.1.0"
+              ],
+              "family": "program",
+              "first_attempt": "2026-11-05 15:27:01",
+              "hypothesis_id": 1,
+              "last_attempt": "2026-11-05 15:27:01",
+              "lean": null,
+              "null_variants": [],
+              "proposer": "codex",
+              "recorded_status": "lead",
+              "role": "proposer",
+              "stored_near_misses": 0,
+              "stored_passes": 1,
+              "stored_rows": 26
+            }
+          ],
+          "hypotheses_truncated": false,
+          "hypothesis_count": 1,
+          "job": "codex_1",
+          "job_state": "unknown",
+          "leads": [
+            {
+              "alpha_eff": 0.01,
+              "attempt_count_at_scoring": 1,
+              "attempt_id": 1,
+              "combined": -1.0818799035267301,
+              "family": "program",
+              "final_check": "not run",
+              "hypothesis_id": 1,
+              "null_percentile": 1.0,
+              "null_variant": null,
+              "plaintext_preview": "OUNDTHEPOLARSEACHARLESLAMBSTRIUMPHOFTHEWHALEINTHEYEARSOMEPERSONSWEREONAHIGHHILLO",
+              "recorded_margin": 2.016109196160761,
+              "stage": "full",
+              "threshold_at_scoring": -3.0979890996874913,
+              "unreachable": false,
+              "verdict": "pass"
+            }
+          ],
+          "lean_counted": 0,
+          "lean_counted_by_completion": {
+            "complete": 0,
+            "incomplete": 0
+          },
+          "lean_sweeps": 0,
+          "ledger": "20260102-0000/codex_1/ledger.sqlite",
+          "logical_attempts": 26,
+          "proposal_counts_from_report_json": "unknown",
+          "run": "20260102-0000",
+          "stopped_reason_from_report_json": "unknown",
+          "stored_by_stage": {
+            "full": 1,
+            "screen": 25
+          },
+          "stored_by_verdict": {
+            "fail": 25,
+            "pass": 1
+          },
+          "stored_rows": 26
+        }
+      ],
+      "target_id": "820874ee9ac227737d6b767a0adca1a5a360a7c5f29bc99085516b742a5cd4b1",
+      "transcription_version": "unknown",
+      "word_breaks": {
+        "present": false
+      }
+    }
+  ],
+  "status": "complete",
+  "tool": {
+    "name": "lpswarm",
+    "version": "0.1.0"
+  }
+}
