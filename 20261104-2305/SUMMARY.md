@@ -1,6 +1,6 @@
 # Overnight run 20261104-2305
 
-Started 2026-11-04 23:05:16, updated 2026-11-04 23:22:46, status **running**. Jobs: pending 50, running 3, done 19
+Started 2026-11-04 23:05:16, updated 2026-11-04 23:23:57, status **running**. Jobs: pending 49, running 3, done 20
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -8,7 +8,7 @@ Started 2026-11-04 23:05:16, updated 2026-11-04 23:22:46, status **running**. Jo
 | sonnet/10 | done | 2026-11-04 23:10:14 | 2026-11-04 23:14:10 | Sonnet, briefed by Opus |
 | sonnet/11 | done | 2026-11-04 23:14:26 | 2026-11-04 23:15:32 | Sonnet, briefed by Opus |
 | sonnet/12 | done | 2026-11-04 23:15:47 | 2026-11-04 23:17:08 | Sonnet, briefed by Opus |
-| sonnet/13 | running | 2026-11-04 23:17:23 |  | Sonnet, briefed by Opus |
+| sonnet/13 | done | 2026-11-04 23:17:23 | 2026-11-04 23:23:57 | Sonnet, briefed by Opus |
 | sonnet/14 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/15 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/16 | pending |  |  | Sonnet, briefed by Opus |
@@ -51,7 +51,7 @@ Started 2026-11-04 23:05:16, updated 2026-11-04 23:22:46, status **running**. Jo
 | local/25 | pending |  |  | local models |
 | local/10 | pending |  |  | local models |
 | structure/10 | running | 2026-11-04 23:22:41 |  | Codex: transposition then substitution |
-| structure/12 | pending |  |  | Codex: transposition then substitution |
+| structure/12 | running | 2026-11-04 23:23:01 |  | Codex: transposition then substitution |
 | structure/13 | pending |  |  | Codex: transposition then substitution |
 | structure/14 | pending |  |  | Codex: transposition then substitution |
 | structure/17 | pending |  |  | Codex: transposition then substitution |
@@ -79,31 +79,18 @@ Started 2026-11-04 23:05:16, updated 2026-11-04 23:22:46, status **running**. Jo
 
 ## Now running
 
-**sonnet/13** (since 2026-11-04 23:17:23), latest log lines:
-```
-23:17:52 [model] claude-sonnet (proposer) calling...
-23:18:01 [model] claude-sonnet (proposer) ok 8.8s, tokens in/out 5042/1328, reply 2800 chars
-round 1 [claude-sonnet] proposals=12 valid=3 attempts=201 passes=0 near=0 invalid=9
-23:18:08 [model] claude-sonnet (proposer) calling...
-23:18:20 [model] claude-sonnet (proposer) ok 12.1s, tokens in/out 6061/1733, reply 2944 chars
-round 2 [claude-sonnet] proposals=12 valid=12 attempts=18774 passes=0 near=0 invalid=9
-23:21:11 [model] claude-sonnet (proposer) calling...
-23:21:20 [model] claude-sonnet (proposer) ok 9.2s, tokens in/out 7064/1261, reply 2726 chars
-round 3 [claude-sonnet] proposals=12 valid=11 attempts=27045 passes=0 near=0 invalid=10
-23:22:44 [model] claude-sonnet (proposer) calling...
-```
 **local/17** (since 2026-11-04 23:05:16), latest log lines:
 ```
-23:06:40 [model] gemma-local (proposer) ok 33.8s, tokens in/out 3001/510, reply 1666 chars
-23:06:40 [model] granite (weighting) calling...
-23:07:14 [model] granite (weighting) ok 34.4s, tokens in/out 252/38, reply 69 chars
-round 1 [qwen-local] proposals=8 valid=8 attempts=24712 passes=0 near=0 invalid=0
-23:21:27 [model] granite (weighting) calling...
 23:21:40 [model] granite (weighting) ok 12.7s, tokens in/out 206/39, reply 67 chars
 round 1 [gemma-local] proposals=8 valid=7 attempts=853 passes=0 near=0 invalid=1
 23:21:41 [model] qwen-local (proposer) calling...
 23:22:25 [model] qwen-local (proposer) ok 44.5s, tokens in/out 3476/713, reply 2372 chars
 23:22:25 [model] gemma-local (proposer) calling...
+23:23:36 [model] gemma-local (proposer) ok 35.0s, tokens in/out 3561/538, reply 1599 chars
+23:23:36 [model] granite (weighting) calling...
+23:23:38 [model] granite (weighting) ok 1.2s, tokens in/out 257/38, reply 69 chars
+round 2 [qwen-local] proposals=8 valid=8 attempts=59147 passes=0 near=0 invalid=0
+stopped: max_attempts; final passes: 0
 ```
 **structure/10** (since 2026-11-04 23:22:41), latest log lines:
 ```
@@ -111,6 +98,15 @@ round 1 [gemma-local] proposals=8 valid=7 attempts=853 passes=0 near=0 invalid=1
 brief for the generators (718 chars): Two-stage programs: a transposition, then a substitution. Use the transpose field: grid widths (try the factors of the section length and their neighbours, e.g. 2
 == LP2:17.jpg, 18.jpg, 19.jpg - 0.jpg-2.jpg  (729 symbols)
 23:22:44 [model] codex (proposer) calling...
+23:23:35 [model] codex (proposer) ok 51.3s, tokens in/out 18910/2300, reply 8023 chars, model not reported (pin one with model = "..." in the models config)
+```
+**structure/12** (since 2026-11-04 23:23:01), latest log lines:
+```
+===== 2026-11-04 23:23:01 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 12 --gen
+brief for the generators (718 chars): Two-stage programs: a transposition, then a substitution. Use the transpose field: grid widths (try the factors of the section length and their neighbours, e.g. 2
+== LP2:20.jpg/2-23.jpg/1 - 3.jpg/2-6.jpg/1  (693 symbols)
+23:23:04 [model] codex (proposer) calling...
+23:23:56 [model] codex (proposer) ok 51.3s, tokens in/out 18719/2252, reply 7890 chars, model not reported (pin one with model = "..." in the models config)
 ```
 
 ## Results so far
@@ -125,6 +121,8 @@ brief for the generators (718 chars): Two-stage programs: a transposition, then 
   - LP2:20.jpg/1 - 3.jpg/1: 60000 attempts, 3 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **sonnet/12** (done)
   - LP2:20.jpg/2-23.jpg/1 - 3.jpg/2-6.jpg/1: 60000 attempts, 2 hypotheses, **0 final pass(es)**, stopped: max_attempts
+- **sonnet/13** (done)
+  - LP2:6.jpg/2-7.jpg - 23.jpg/2-24.jpg: 60000 attempts, 34 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **codex/25** (done)
   - LP2:54.jpg-55.jpg - 71.jpg-72.jpg: 60000 attempts, 2 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **codex/24** (done)
@@ -160,12 +158,12 @@ brief for the generators (718 chars): Two-stage programs: a transposition, then 
 
 - deepseek: 12 call(s) in the last 5h (cap none), spent $0.1873
 - qwen-local: 2 call(s) in the last 5h (cap none), spent $0.0000
-- gemma-local: 1 call(s) in the last 5h (cap none), spent $0.0000
-- granite: 2 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 53 call(s) in the last 5h (cap 180), spent $0.0000
-- claude-sonnet: 53 call(s) in the last 5h (cap 180), spent $0.0000
-- claude-supervisor: 53 call(s) in the last 5h (cap 180), spent $0.0000
-- codex: 63 call(s) in the last 5h (cap 850), spent $0.0000
+- gemma-local: 2 call(s) in the last 5h (cap none), spent $0.0000
+- granite: 3 call(s) in the last 5h (cap none), spent $0.0000
+- claude-opus: 55 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-sonnet: 55 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-supervisor: 55 call(s) in the last 5h (cap 180), spent $0.0000
+- codex: 65 call(s) in the last 5h (cap 850), spent $0.0000
 
 ## Supervisor notes
 
@@ -173,10 +171,6 @@ brief for the generators (718 chars): Two-stage programs: a transposition, then 
 
 ## Events
 
-- 2026-11-04 23:17:23 sonnet/13: start (uses claude-plan)
-- 2026-11-04 23:17:23 4 running: local/17, codex/14, codex/13, sonnet/13
-- 2026-11-04 23:17:28 codex/14: done (exit 0, 2 min)
-- 2026-11-04 23:17:44 published: 18 file(s) to branch results
 - 2026-11-04 23:17:44 codex/12: start (uses codex-plan)
 - 2026-11-04 23:17:44 4 running: local/17, codex/13, sonnet/13, codex/12
 - 2026-11-04 23:17:44 sonnet/14 waiting: claude-plan in use by sonnet/13
@@ -198,3 +192,7 @@ brief for the generators (718 chars): Two-stage programs: a transposition, then 
 - 2026-11-04 23:22:41 4 running: local/17, sonnet/13, codex/12, structure/10
 - 2026-11-04 23:22:41 sonnet/14 waiting: claude-plan in use by sonnet/13
 - 2026-11-04 23:22:46 codex/12: done (exit 0, 5 min)
+- 2026-11-04 23:23:01 published: 22 file(s) to branch results
+- 2026-11-04 23:23:01 structure/12: start (uses codex-plan)
+- 2026-11-04 23:23:01 4 running: local/17, sonnet/13, structure/10, structure/12
+- 2026-11-04 23:23:57 sonnet/13: done (exit 0, 7 min)
