@@ -1002,3 +1002,168 @@ def test_disk_command_and_prune(tmp_path):
     prune_old_ledgers(base, keep_runs=3, apply=True)
     assert not (base / "r1" / "job" / "ledger.sqlite").exists()
     assert (base / "r1" / "job" / "report.md").exists() and (base / "r5" / "job" / "ledger.sqlite").exists()
+
+
+# ----------------------------------------------------------------- mix stages
+def _alpha(n):
+    from lpswarm.programs.family import _IntAlphabet
+    return _IntAlphabet(n)
+
+
+def test_mix_round_trips_and_semantics():
+    from lpswarm.programs import compile_spec, decrypt, encrypt
+    from lpswarm.programs import mixers as M
+    rng = np.random.default_rng(3)
+    a = _alpha(29)
+    for L in (1, 2, 5, 31, 100):
+        pt = rng.integers(0, 29, L)
+        cases = []
+        for op in ("add", "sub", "rsub"):
+            for d in ("next", "prev"):
+                for lag in (1, 3):
+                    cases += [{"kind": "neighbor", "op": op, "lag": lag, "dir": d, "times": 2},
+                              {"kind": "chain", "op": op, "lag": lag, "dir": d},
+                              {"kind": "neighbor", "op": op, "lag": lag, "dir": d,
+                               "reset": {"every": 7}}]
+        cases += [{"kind": "hill", "size": 2, "matrix": [1, 2, 3, 7]},
+                  {"kind": "hill", "size": 3, "matrix": [1, 0, 0, 2, 1, 0, 3, 4, 1]},
+                  {"kind": "block_perm", "size": 4, "perm": [2, 0, 3, 1]}]
+        for mx in cases:
+            for at in ("before", "after"):
+                spec = compile_spec({"stream": {"kind": "constant", "value": 4}, "mix": {**mx, "at": at}}, a)
+                assert np.array_equal(decrypt(encrypt(pt, spec, 29), spec, 29), pt), (mx, at, L)
+
+
+def test_mix_semantics_small_cases():
+    from lpswarm.programs import mixers as M
+    c = {"kind": "neighbor", "op": "add", "lag": 1, "dir": "next", "times": 1, "reset": None, "at": "before"}
+    x = np.array([1, 2, 3, 4])
+    assert M.apply_mix(c, x, 29).tolist() == [3, 5, 7, 4]                    # x_i + x_(i+1); last unchanged
+    assert M.apply_mix({**c, "dir": "prev"}, x, 29).tolist() == [1, 3, 5, 7]
+    assert M.apply_mix({**c, "op": "mul"}, x, 29).tolist() == [2, 6, 12, 4]
+    d = M.apply_mix({**c, "op": "div"}, np.array([6, 3, 5]), 29).tolist()
+    assert d[0] == (6 * pow(3, -1, 29)) % 29 and d[1] == (3 * pow(5, -1, 29)) % 29 and d[2] == 5
+    # zero divisor leaves the symbol alone
+    assert M.apply_mix({**c, "op": "div"}, np.array([6, 0]), 29).tolist() == [6, 0]
+    # window sum, size 3
+    w = {"kind": "window", "size": 3, "reset": None, "at": "before", "count": 1}
+    assert M.apply_mix(w, np.array([1, 2, 3, 4, 5]), 29).tolist() == [1, 3, 6, 9, 12]
+    # reset every 2: pairs are independent
+    r = {**c, "reset": {"every": 2}}
+    assert M.apply_mix(r, np.array([1, 2, 3, 4]), 29).tolist() == [3, 2, 7, 4]
+    # word reset uses the breaks: words [0:2] and [2:4]
+    wr = {**c, "reset": "word"}
+    assert M.apply_mix(wr, np.array([1, 2, 3, 4]), 29, breaks=[2]).tolist() == [3, 2, 7, 4]
+    # block permutation and hill on 2 full blocks plus a partial one
+    bp = {"kind": "block_perm", "size": 2, "perm": [1, 0], "at": "before", "count": 1}
+    assert M.apply_mix(bp, np.array([1, 2, 3, 4, 5]), 29).tolist() == [2, 1, 4, 3, 5]
+    h = {"kind": "hill", "size": 2, "matrix": [1, 1, 0, 1], "at": "before", "count": 1}
+    assert M.apply_mix(h, np.array([1, 2, 3, 4, 5]), 29).tolist() == [3, 2, 7, 4, 5]
+
+
+def test_chain_matches_the_existing_autokey_and_ciphertext_autokey():
+    from lpswarm.programs import compile_spec, decrypt
+    a = _alpha(29)
+    rng = np.random.default_rng(8)
+    ct = rng.integers(0, 29, 150)
+    chain = compile_spec({"stream": {"kind": "constant", "value": 0}, "combine": "sub",
+                          "mix": {"kind": "chain", "op": "sub", "lag": 1, "dir": "prev"}}, a)
+    auto = compile_spec({"stream": {"kind": "autokey", "primer": [0], "source": "plaintext"},
+                         "combine": "sub"}, a)
+    assert np.array_equal(decrypt(ct, chain, 29), decrypt(ct, auto, 29))     # vectorised == loop
+    cauto = compile_spec({"stream": {"kind": "autokey", "primer": [0], "source": "ciphertext"},
+                          "combine": "sub"}, a)
+    nb = compile_spec({"stream": {"kind": "constant", "value": 0}, "combine": "sub",
+                       "mix": {"kind": "neighbor", "op": "sub", "lag": 1, "dir": "prev"}}, a)
+    assert np.array_equal(decrypt(ct, nb, 29), decrypt(ct, cauto, 29))
+
+
+def test_hill_and_block_perm_exhaustive_counts_and_limits():
+    import pytest
+    from lpswarm.programs import SpecError, compile_spec, expand, expansion_size
+    a5 = _alpha(5)
+    full = compile_spec({"stream": {"kind": "constant", "value": 1},
+                         "mix": {"kind": "hill", "size": 2, "exhaustive": True}}, a5)
+    assert expansion_size(full) == 5 ** 4
+    assert len(expand(full)) == (5 ** 2 - 1) * (5 ** 2 - 5)                  # |GL(2, F5)| = 480
+    a7 = _alpha(7)
+    circ = compile_spec({"stream": {"kind": "constant", "value": 1},
+                         "mix": {"kind": "hill", "size": 3, "family": "circulant", "exhaustive": True}}, a7)
+    assert 0 < len(expand(circ)) <= 7 ** 3
+    tri = compile_spec({"stream": {"kind": "constant", "value": 1},
+                        "mix": {"kind": "hill", "size": 3, "family": "upper_triangular",
+                                "exhaustive": True}}, a7)
+    assert len(expand(tri)) == 7 ** 3
+    bp = compile_spec({"stream": {"kind": "constant", "value": 1},
+                       "mix": {"kind": "block_perm", "size": 5, "exhaustive": True}}, a7)
+    assert len(expand(bp)) == 120
+    a29 = _alpha(29)
+    big = compile_spec({"stream": {"kind": "constant", "value": 1},
+                        "mix": {"kind": "hill", "size": 2, "exhaustive": True}}, a29)
+    assert expansion_size(big) == 29 ** 4                                      # lean territory
+    for bad in ({"kind": "hill", "size": 3, "exhaustive": True},               # 29^9: too many
+                {"kind": "hill", "size": 2, "matrix": [2, 4, 1, 2]},           # det 0
+                {"kind": "hill", "size": 2, "matrix": [1, 2, 3]},
+                {"kind": "neighbor", "op": "pow"}, {"kind": "neighbor", "op": "add", "lag": 99},
+                {"kind": "block_perm", "size": 3, "perm": [0, 0, 1]},
+                {"kind": "window", "size": 1}, {"kind": "chain", "op": "rdiv"},
+                {"kind": "neighbor", "op": "add", "reset": "sentence"}):
+        with pytest.raises(SpecError):
+            compile_spec({"stream": {"kind": "constant", "value": 1}, "mix": bad}, a29)
+    with pytest.raises(SpecError):                                             # two exhaustive sources
+        compile_spec({"stream": {"kind": "repeat", "exhaustive": True, "key_length": 1},
+                      "mix": {"kind": "hill", "size": 2, "exhaustive": True}}, a29)
+    with pytest.raises(SpecError):                                             # word reset + transpose
+        compile_spec({"stream": {"kind": "constant", "value": 1}, "transpose": {"columnar": [1, 0]},
+                      "mix": {"kind": "neighbor", "op": "add", "reset": "word"}}, a29)
+
+
+def test_old_specs_unchanged_and_mix_specs_hash_distinctly():
+    from lpswarm.programs import compile_spec, spec_hash
+    a = _alpha(29)
+    plain = compile_spec({"stream": {"kind": "constant", "value": 3}}, a)
+    assert "mix" not in plain
+    mixed = compile_spec({"stream": {"kind": "constant", "value": 3},
+                          "mix": {"kind": "window", "size": 3}}, a)
+    assert spec_hash(plain) != spec_hash(mixed)
+
+
+def test_mix_recovers_a_synthetic_neighbor_cipher_end_to_end():
+    from lpswarm.alphabet import Alphabet
+    from lpswarm.executor import Executor, ExplicitKeys, Target
+    from lpswarm.oracle import FullOracle, OracleConfig
+    from lpswarm.programs import compile_spec, expand_iter
+    from lpswarm.programs import spec as S
+    from lpswarm.textgen.synth import generate_case
+    a = Alphabet.latin26()
+    pt = np.asarray(generate_case("caesar", 300, seed=6).plaintext, dtype=np.int64)
+    true = compile_spec({"stream": {"kind": "constant", "value": 0}, "combine": "sub",
+                         "mix": {"kind": "neighbor", "op": "sub", "lag": 2, "dir": "next"}}, a)
+    ct = S.encrypt(pt, true, 26)
+    guess = compile_spec({"stream": {"kind": "constant", "value": 0}, "combine": "sub",
+                          "mix": {"kind": "block_perm", "size": 3, "exhaustive": True}}, a)
+    # a sweep that does NOT contain the truth finds nothing; one that does, finds it
+    led = Ledger()
+    h = led.add_hypothesis("program", "x", "t", "proposer")
+    ex = Executor(led, FullOracle(a, OracleConfig(null_samples=200)), stop_file=None)
+    s0 = ex.run(Target(a, ct, "t", is_synthetic=True), h, "program", ExplicitKeys(expand_iter(guess)))
+    assert s0.passes == 0
+    s1 = ex.run(Target(a, ct, "t", is_synthetic=True), h, "program", ExplicitKeys([true]))
+    assert s1.passes == 1
+
+
+def test_word_reset_receives_the_targets_breaks_through_the_executor():
+    from lpswarm.executor import Executor, ExplicitKeys, Target
+    from lpswarm.oracle import FullOracle, OracleConfig
+    from lpswarm.programs import compile_spec
+    from lpswarm.alphabet import Alphabet
+    from lpswarm.ciphers import get_family
+    a = Alphabet.latin26()
+    spec = compile_spec({"stream": {"kind": "constant", "value": 0},
+                         "mix": {"kind": "neighbor", "op": "add", "reset": "word"}}, a)
+    fam = get_family("program")
+    ct = np.arange(10)
+    with_breaks = fam.decrypt(ct, spec, 26, breaks=[5])
+    no_breaks = fam.decrypt(ct, spec, 26)
+    assert with_breaks.tolist() != no_breaks.tolist()
+    assert with_breaks[4] == 4 and no_breaks[4] == 9          # the word ends at index 4: no partner

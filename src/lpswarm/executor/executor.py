@@ -158,6 +158,8 @@ class Executor:
                     variant = fam.null_variant(kc.key) if hasattr(fam, "null_variant") else None
                     if variant:   # search-optimised decryption: needs the LM, own nulls
                         pt = fam.decrypt(ct, kc.key, n, lm=self.oracle.bigram_table(), **params)
+                    elif getattr(fam, "uses_breaks", False):
+                        pt = fam.decrypt(ct, kc.key, n, breaks=target.breaks, **params)
                     else:
                         pt = fam.decrypt(ct, kc.key, n, **params)
                     # A different key (or family) that decrypts to exactly the same text is

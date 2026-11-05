@@ -504,7 +504,7 @@ def test_prompt_examples_are_valid_proposals():
     import re
     from lpswarm.swarm.generators import EXAMPLES
     blocks = re.findall(r"\{\"spec\".*?\"why\": \"[^\"]*\"\}", EXAMPLES, re.S)
-    assert len(blocks) == 8
+    assert len(blocks) == 10
     from lpswarm.alphabet import get_alphabet
     from lpswarm.programs import compile_spec
     alpha = get_alphabet("data/alphabet/gematria_primus.json")

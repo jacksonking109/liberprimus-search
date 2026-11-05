@@ -11,6 +11,17 @@ to length 4 on the short sections; a length-4 sweep is ~700,000 ciphers, a few m
 (`Copy-Item config\overnight.example.toml config\overnight.toml -Force`, after noting your own
 edits such as `max_parallel` and `capacity`) and start with `-New`.
 
+## Neighbour and block mixes (new)
+
+The cipher-program language has a new `mix` stage for ciphers where a rune is combined with the
+next runes, or small groups of runes are transformed: neighbour sums/differences/products/quotients
+at any lag (and the recursive "running" forms), window sums, Hill-style block matrices (every
+invertible 2x2 matrix is ~680,000 ciphers, 1.5-2.5 minutes, runs lean), and block re-orderings
+(every order up to size 8). Word-boundary resets are supported. The example queue has a
+**transmute** lane for it. Not included, and why: arithmetic on raw gematria prime values (they
+stop being distinct runes mod 29, so the result cannot be decrypted) and a general digraph
+substitution table.
+
 ## Disk space (new)
 
 Ledgers use about 1 KB per stored attempt, and the exhaustive lane filled a disk once. Now:

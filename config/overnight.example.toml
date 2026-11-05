@@ -98,6 +98,19 @@ args = ["--manifest", "data/lp/manifest.json", "--alphabet", "data/alphabet/gema
         "--per-round", "12", "--max-attempts", "5000000"]
 note = "Codex: every periodic key up to length 4"
 
+# Transmute lane (Codex): neighbour sums/products, running sums, Hill blocks and block orders.
+# Cheap in code (the 2x2 Hill sweep is ~680,000 ciphers, a couple of minutes, and runs lean so it
+# leaves almost no ledger). Every unsolved section.
+[[job]]
+id = "transmute"
+kind = "swarm"
+order = "reverse"
+brief = """Use the mix stage (a transformation that combines a rune with its neighbours, or works on small groups). One proposal each, in this order: (1) {"kind": "hill", "size": 2, "exhaustive": true} with a constant 0 stream and combine sub; then the same with reverse_text true. (2) {"kind": "block_perm", "size": g, "exhaustive": true} for g = 2, 3, 4, 5, 6 (constant 0 stream). (3) neighbor mixes with a constant 0 stream: op add, sub, rsub, mul, div, rdiv; lag 1 to 8; dir next and prev; once with reset "none" and once with reset "word"; also "times": 2. (4) chain mixes: op add, sub, rsub, mul, div; lag 1 to 4; dir prev and next; reset none and word. (5) window sums of size 2 to 8. (6) the best families again with "at": "after" and with a prime or p-1 stream (offset_range [0, 200]) as the key. Keep each proposal small enough that it expands to a few thousand ciphers, except the exhaustive ones. Do not send equivalent proposals (neighbor sub lag 1 prev equals a ciphertext autokey; chain sub lag 1 prev equals a plaintext autokey)."""
+args = ["--manifest", "data/lp/manifest.json", "--alphabet", "data/alphabet/gematria_primus.json",
+        "--sections", "unsolved", "--generators", "codex", "--rounds", "6",
+        "--per-round", "12", "--max-attempts", "5000000"]
+note = "Codex: neighbour mixes, running sums, Hill blocks, block orders"
+
 # 5. DeepSeek brute force: refused until its prices and DEEPSEEK_API_KEY are set.
 [[job]]
 id = "deepseek"

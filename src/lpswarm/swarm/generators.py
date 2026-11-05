@@ -103,6 +103,26 @@ Decryption of ciphertext symbols c (integers 0..N-1), in this order:
                                                a bound outside the allowed range makes the whole
                                                proposal invalid)
   2. "reverse_text": true                 read the text backwards (optional)
+  2b. "mix": a transformation that combines a rune with its neighbours or works on small groups
+     (optional); {"kind": ..., "at": "before"|"after"} runs it before (default) or after the
+     skip/map/combine/stream steps below. Kinds:
+       {"kind": "neighbor", "op": OP, "lag": 1..16, "dir": "next"|"prev", "times": 1..3}
+            out_i = x_i OP x_(i+lag) (or x_(i-lag)); OP: add sub rsub mul div rdiv
+       {"kind": "chain", "op": OP, "lag": 1..16, "dir": "prev"|"next"}  OP: add sub rsub mul div
+            out_i = x_i OP out_(i-lag): the recursive form (running sums and differences)
+       {"kind": "window", "size": 2..16}       out_i = sum of the last `size` symbols
+       {"kind": "hill", "size": 2..4, "matrix": [row-major entries]}
+            blocks of `size` symbols are multiplied by an invertible matrix mod N;
+            {"kind": "hill", "size": 2, "exhaustive": true} tries EVERY invertible 2x2 matrix
+            (about 680,000, a few minutes); for size 3 or 4 add "family": "circulant" |
+            "upper_triangular" | "diagonal" with "exhaustive": true
+       {"kind": "block_perm", "size": 2..8, "perm": [..]}  reorders symbols inside each block;
+            "exhaustive": true tries every order
+     neighbor/chain/window accept "reset": "word" (do not cross word boundaries; not with a
+     transposition) or {"every": k}. Edges, partial blocks and segment starts are unchanged.
+     Zero (and any non-invertible symbol) is absorbing for mul; div leaves it unchanged.
+     A mix does not combine with skip_mode "resolve". With "chain" op "sub", lag 1 equals a
+     plaintext autokey; neighbor op "sub", lag 1, dir "prev" equals a ciphertext autokey.
   3. "skip": [symbols]                    ciphertext symbols left as plaintext; the key
                                           stream does NOT advance there (optional)
      "skip_mode": "all" | "resolve"       "all": every occurrence is a literal (default);
@@ -147,6 +167,13 @@ EXAMPLES = """Examples of valid proposals (generic illustrations, not hints abou
    "why": "rail fence of unknown depth, then a prime key at unknown offset"}
   {"spec": {"stream": {"kind": "repeat", "exhaustive": true, "key_length": 3}, "combine": "sub"},
    "why": "every 3-symbol periodic key"}
+  {"spec": {"stream": {"kind": "constant", "value": 0}, "combine": "sub",
+            "mix": {"kind": "hill", "size": 2, "exhaustive": true}},
+   "why": "pairs of runes mixed by an unknown 2x2 matrix"}
+  {"spec": {"stream": {"kind": "sequence", "name": "primes", "offset": 0}, "combine": "sub",
+            "mix": {"kind": "neighbor", "op": "add", "lag": 1, "dir": "next", "reset": "word"},
+            "offset_range": [0, 200]},
+   "why": "each rune summed with the next one inside its word, then a prime key"}
 """
 
 
@@ -199,6 +226,19 @@ def proposal_schema(max_items: int = 16) -> dict:
                 "step": {"type": "integer"}}, "required": ["step"], "additionalProperties": False}},
              "required": ["decimate"], "additionalProperties": False}]},
         "transpose_range": {"type": "array", "items": {"type": "integer"}, "minItems": 2, "maxItems": 2},
+        "mix": {"type": "object", "properties": {
+            "kind": {"enum": ["neighbor", "chain", "window", "hill", "block_perm"]},
+            "at": {"enum": ["before", "after"]},
+            "op": {"enum": ["add", "sub", "rsub", "mul", "div", "rdiv"]},
+            "lag": {"type": "integer"}, "dir": {"enum": ["next", "prev"]},
+            "times": {"type": "integer"}, "size": {"type": "integer"},
+            "matrix": {"type": "array", "items": {"type": "integer"}, "maxItems": 16},
+            "perm": {"type": "array", "items": {"type": "integer"}, "maxItems": 8},
+            "exhaustive": {"type": "boolean"},
+            "family": {"enum": ["full", "circulant", "upper_triangular", "diagonal"]},
+            "reset": {"anyOf": [{"enum": ["none", "word"]}, {"type": "object", "properties": {
+                "every": {"type": "integer"}}, "required": ["every"], "additionalProperties": False}]}},
+            "required": ["kind"], "additionalProperties": False},
         "offset_range": {"type": "array", "items": {"type": "integer"}, "minItems": 2, "maxItems": 2},
     }, "required": ["stream"], "additionalProperties": False}
     return {"type": "object", "properties": {"proposals": {

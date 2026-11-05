@@ -59,7 +59,7 @@ COMBINES = ("sub", "add", "beaufort")
 MAPS = ("identity", "reverse")
 STREAM_KINDS = ("constant", "repeat", "autokey", "sequence")
 _TOP_KEYS = {"v", "stream", "combine", "map", "skip", "skip_mode", "reverse_text", "transpose",
-             "transpose_range", "offset_range", "note"}
+             "transpose_range", "offset_range", "mix", "note"}
 
 
 class SpecError(ValueError):
@@ -172,6 +172,15 @@ def compile_spec(raw: Any, alphabet: Alphabet) -> dict:
             raise SpecError('skip_mode "resolve" needs a skip list')
         out["skip_mode"] = "resolve"
     out["transpose"] = _compile_transpose(raw.get("transpose"))
+    if raw.get("mix") is not None and raw.get("mix") is not False:
+        from lpswarm.programs import mixers as _M
+        mx = _M.compile_mix(raw.get("mix"), n)
+        if out.get("skip_mode") == "resolve":
+            raise SpecError('a mix does not combine with skip_mode "resolve"')
+        if mx.get("reset") == "word" and out["transpose"]:
+            raise SpecError('mix reset "word" does not combine with a transposition (the word '
+                            "breaks no longer line up)")
+        out["mix"] = mx           # only stored when used (old hashes unchanged)
     trr = raw.get("transpose_range")
     if trr is not None:
         kind = next(iter(out["transpose"])) if out["transpose"] else None
@@ -252,11 +261,18 @@ def compile_spec(raw: Any, alphabet: Alphabet) -> dict:
         out["offset_range"] = None
     total = ((out["transpose_range"][1] - out["transpose_range"][0] + 1) if out.get("transpose_range") else 1)
     total *= (out["offset_range"][1] - out["offset_range"][0] + 1) if out["offset_range"] else 1
+    if out.get("mix"):
+        from lpswarm.programs import mixers as _M
+        if out["mix"].get("exhaustive") and s.get("exhaustive"):
+            raise SpecError("an exhaustive stream and an exhaustive mix cannot be combined")
+        total *= _M.mix_count(out["mix"])
+        if out["mix"].get("exhaustive") and total > MAX_EXHAUSTIVE:
+            raise SpecError(f"proposal expands to {total} ciphers; the limit is {MAX_EXHAUSTIVE}")
     if s.get("exhaustive"):
         total *= n ** len(s["key"])
         if total > MAX_EXHAUSTIVE:
             raise SpecError(f"proposal expands to {total} ciphers; the limit is {MAX_EXHAUSTIVE}")
-    elif total > MAX_EXPANSION:
+    elif total > MAX_EXPANSION and not (out.get("mix") or {}).get("exhaustive"):
         raise SpecError(f"proposal expands to {total} ciphers; the limit is {MAX_EXPANSION}")
     return _normalise(out)
 
@@ -393,6 +409,8 @@ def expansion_size(spec: dict) -> int:
         total *= spec["offset_range"][1] - spec["offset_range"][0] + 1
     if st.get("exhaustive"):
         total *= st["n"] ** len(st["key"])
+    if spec.get("mix"):
+        total *= int(spec["mix"].get("count", 1))
     return total
 
 
@@ -412,7 +430,8 @@ def expand_iter(spec: dict, length: int | None = None) -> Iterator[dict]:
     coprime to it are skipped (they are not ciphers for a text of that length)."""
     st = spec["stream"]
     exhaustive = bool(st.get("exhaustive"))
-    if not (exhaustive or spec.get("offset_range") or spec.get("transpose_range")):
+    mix_exh = bool((spec.get("mix") or {}).get("exhaustive"))
+    if not (exhaustive or mix_exh or spec.get("offset_range") or spec.get("transpose_range")):
         yield spec
         return
     trs = [spec["transpose"]]
@@ -429,28 +448,33 @@ def expand_iter(spec: dict, length: int | None = None) -> Iterator[dict]:
     if exhaustive:
         keys = itertools.product(range(st["n"]), repeat=len(st["key"]))
     seen: set[str] = set()
+    if mix_exh:
+        from lpswarm.programs import mixers as _M
     for k in keys:
-        for tr in trs:
-            for o in offs:
-                s = dict(spec)
-                s["transpose"] = tr
-                s["offset_range"] = None
-                s.pop("transpose_range", None)
-                stream = dict(st)
-                stream.pop("exhaustive", None)
-                stream.pop("n", None)
-                if k is not None:
-                    stream["key"] = list(k)
-                if o is not None:
-                    stream["offset"] = int(o)
-                s["stream"] = stream
-                s = _normalise(s)
-                if not exhaustive:
-                    h = canonical(s)
-                    if h in seen:
-                        continue
-                    seen.add(h)
-                yield s
+        for mx in (_M.expand_mix(spec["mix"]) if mix_exh else [None]):
+            for tr in trs:
+                for o in offs:
+                    s = dict(spec)
+                    if mx is not None:
+                        s["mix"] = mx
+                    s["transpose"] = tr
+                    s["offset_range"] = None
+                    s.pop("transpose_range", None)
+                    stream = dict(st)
+                    stream.pop("exhaustive", None)
+                    stream.pop("n", None)
+                    if k is not None:
+                        stream["key"] = list(k)
+                    if o is not None:
+                        stream["offset"] = int(o)
+                    s["stream"] = stream
+                    s = _normalise(s)
+                    if not (exhaustive or mix_exh):
+                        h = canonical(s)
+                        if h in seen:
+                            continue
+                        seen.add(h)
+                    yield s
 
 
 def expand(spec: dict, length: int | None = None) -> list[dict]:
@@ -495,6 +519,9 @@ def describe(spec: dict, alphabet: Alphabet | None = None) -> str:
             parts.append(f"decimate step {tr['decimate']['step']}")
     if spec.get("transpose_range"):
         parts.append(f"transpose param {spec['transpose_range'][0]}..{spec['transpose_range'][1]}")
+    if spec.get("mix"):
+        from lpswarm.programs import mixers as _M
+        parts.append(_M.describe_mix(spec["mix"]))
     if spec.get("offset_range"):
         parts.append(f"offsets {spec['offset_range'][0]}..{spec['offset_range'][1]}")
     return "; ".join(parts)
@@ -546,7 +573,16 @@ def _columnar_perm(order: list[int], length: int) -> np.ndarray:
     return np.concatenate(idx) if idx else np.arange(0)
 
 
-def decrypt(ct: np.ndarray, spec: dict, n: int) -> np.ndarray:
+def _mix_breaks(spec: dict, length: int, breaks) -> list[int] | None:
+    """Word boundaries as seen after the transposition/reversal stages of a decryption."""
+    if not breaks or spec.get("transpose"):
+        return None
+    b = sorted({int(x) for x in breaks if 0 < int(x) < length})
+    return sorted({length - x for x in b}) if spec.get("reverse_text") else b
+
+
+def decrypt(ct: np.ndarray, spec: dict, n: int, breaks=None) -> np.ndarray:
+    """`breaks`: word-boundary indices of the ciphertext (only used by a mix with a word reset)."""
     c = np.asarray(ct, dtype=np.int64).copy()
     if spec.get("transpose"):
         perm = _transpose_perm(spec["transpose"], len(c))
@@ -555,6 +591,12 @@ def decrypt(ct: np.ndarray, spec: dict, n: int) -> np.ndarray:
         c = tmp
     if spec.get("reverse_text"):
         c = c[::-1].copy()
+    mix = spec.get("mix")
+    if mix:
+        from lpswarm.programs import mixers as _M
+        bk = _mix_breaks(spec, len(c), breaks)
+        if mix["at"] == "before":
+            c = _M.apply_mix(mix, c, n, bk)
     lit = np.isin(c, spec["skip"]) if spec["skip"] else np.zeros(len(c), dtype=bool)
     work = c[~lit]
     if spec["map"] == "reverse":
@@ -566,6 +608,8 @@ def decrypt(ct: np.ndarray, spec: dict, n: int) -> np.ndarray:
         p = _combine_dec(work, _stream_values(st, len(work), n), n, spec["combine"])
     out = c.copy()
     out[~lit] = p
+    if mix and mix["at"] == "after":
+        out = _M.apply_mix(mix, out, n, bk)
     return out.astype(np.int16)
 
 
@@ -582,11 +626,17 @@ def _autokey_dec(c: np.ndarray, st: dict, n: int, how: str) -> np.ndarray:
     return p
 
 
-def encrypt(pt: np.ndarray, spec: dict, n: int) -> np.ndarray:
+def encrypt(pt: np.ndarray, spec: dict, n: int, breaks=None) -> np.ndarray:
     """Inverse of decrypt (used for synthetic data). Plaintext symbols in `skip`
     are written literally. Round trips only if no other position encrypts to a
     skip symbol; `roundtrips` checks that."""
     p = np.asarray(pt, dtype=np.int64)
+    mix = spec.get("mix")
+    if mix:
+        from lpswarm.programs import mixers as _M
+        bk = _mix_breaks(spec, len(p), breaks)
+        if mix["at"] == "after":
+            p = _M.invert_mix(mix, p, n, bk)
     lit = np.isin(p, spec["skip"]) if spec["skip"] else np.zeros(len(p), dtype=bool)
     work = p[~lit]
     st = spec["stream"]
@@ -606,6 +656,8 @@ def encrypt(pt: np.ndarray, spec: dict, n: int) -> np.ndarray:
         cw = (n - 1) - cw
     c = p.copy()
     c[~lit] = cw
+    if mix and mix["at"] == "before":
+        c = _M.invert_mix(mix, c, n, bk)
     if spec.get("reverse_text"):
         c = c[::-1].copy()
     if spec.get("transpose"):
@@ -613,5 +665,5 @@ def encrypt(pt: np.ndarray, spec: dict, n: int) -> np.ndarray:
     return c.astype(np.int16)
 
 
-def roundtrips(pt: np.ndarray, spec: dict, n: int) -> bool:
-    return bool(np.array_equal(decrypt(encrypt(pt, spec, n), spec, n), np.asarray(pt)))
+def roundtrips(pt: np.ndarray, spec: dict, n: int, breaks=None) -> bool:
+    return bool(np.array_equal(decrypt(encrypt(pt, spec, n, breaks), spec, n, breaks), np.asarray(pt)))

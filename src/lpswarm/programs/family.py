@@ -20,25 +20,27 @@ class ProgramFamily(CipherFamily):
     """
     name = "program"
     word_keys = False
+    uses_breaks = True       # decrypt() accepts the target's word breaks (mix with a word reset)
 
     def _resolve(self, key: dict, params: dict) -> dict:
         if not isinstance(key, dict) or key.get("v") != S.SPEC_VERSION:
             raise ValueError("program key must be a compiled spec (use programs.compile_spec)")
-        if key.get("offset_range") or key.get("transpose_range") or key["stream"].get("exhaustive"):
+        if (key.get("offset_range") or key.get("transpose_range") or key["stream"].get("exhaustive")
+                or (key.get("mix") or {}).get("exhaustive")):
             raise ValueError("program key has a range or exhaustive stream; run programs.expand() first")
         return key
 
     def encrypt(self, pt, key, n, **params):
-        return S.encrypt(pt, self._resolve(key, params), n)
+        return S.encrypt(pt, self._resolve(key, params), n, breaks=params.get("breaks"))
 
-    def decrypt(self, ct, key, n, lm=None, **params):
+    def decrypt(self, ct, key, n, lm=None, breaks=None, **params):
         spec = self._resolve(key, params)
         if spec.get("skip_mode") == "resolve":
             if lm is None:
                 raise ValueError('skip_mode "resolve" needs a language model (lm=bigram table)')
             from lpswarm.programs.resolve import resolve_decrypt
             return resolve_decrypt(ct, spec, n, lm)
-        return S.decrypt(ct, spec, n)
+        return S.decrypt(ct, spec, n, breaks=breaks)
 
     def null_variant(self, key) -> str | None:
         """Attempts whose decryption is optimised for English (skip resolution) must be
