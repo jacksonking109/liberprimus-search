@@ -1344,7 +1344,7 @@
     }
    }
   ],
-  "seconds": 20.58,
+  "seconds": 20.51,
   "seed": 20261105,
   "shuffles": 99,
   "tests": [
@@ -1356,6 +1356,350 @@
    "transform scan",
    "dependence, repeats excluded",
    "transform, repeats excluded"
+  ]
+ },
+ "repeats": {
+  "by_gap": [
+   {
+    "equal": 62,
+    "expected": 344.6621364337798,
+    "gap": "none (inside a word)",
+    "pairs": 9792,
+    "ratio": 0.17988631023272297
+   },
+   {
+    "equal": 21,
+    "expected": 93.10011972279196,
+    "gap": "word dot",
+    "pairs": 2645,
+    "ratio": 0.2255636197088473
+   },
+   {
+    "equal": 1,
+    "expected": 5.061962551988085,
+    "gap": "newline",
+    "pairs": 144,
+    "ratio": 0.197551836808285
+   },
+   {
+    "equal": 0,
+    "expected": 0.8458041331632363,
+    "gap": "other (fewer than 20 pairs each)",
+    "pairs": 24,
+    "ratio": 0.0
+   }
+  ],
+  "by_rune": [
+   {
+    "equal": 4,
+    "expected": 16.69887995591473,
+    "rune": 0
+   },
+   {
+    "equal": 2,
+    "expected": 15.594281363044706,
+    "rune": 1
+   },
+   {
+    "equal": 4,
+    "expected": 15.626145879046081,
+    "rune": 2
+   },
+   {
+    "equal": 4,
+    "expected": 16.53777934603718,
+    "rune": 3
+   },
+   {
+    "equal": 2,
+    "expected": 13.980596292347617,
+    "rune": 4
+   },
+   {
+    "equal": 1,
+    "expected": 15.098558683893694,
+    "rune": 5
+   },
+   {
+    "equal": 5,
+    "expected": 15.004549694119582,
+    "rune": 6
+   },
+   {
+    "equal": 5,
+    "expected": 11.621874333248378,
+    "rune": 7
+   },
+   {
+    "equal": 2,
+    "expected": 13.099233822027731,
+    "rune": 8
+   },
+   {
+    "equal": 4,
+    "expected": 15.025142364750968,
+    "rune": 9
+   },
+   {
+    "equal": 2,
+    "expected": 16.896001680138856,
+    "rune": 10
+   },
+   {
+    "equal": 4,
+    "expected": 15.512421994826866,
+    "rune": 11
+   },
+   {
+    "equal": 2,
+    "expected": 12.48377571230697,
+    "rune": 12
+   },
+   {
+    "equal": 1,
+    "expected": 15.079239854552096,
+    "rune": 13
+   },
+   {
+    "equal": 6,
+    "expected": 16.633562394526635,
+    "rune": 14
+   },
+   {
+    "equal": 3,
+    "expected": 14.043290015299355,
+    "rune": 15
+   },
+   {
+    "equal": 2,
+    "expected": 14.491079702012838,
+    "rune": 16
+   },
+   {
+    "equal": 0,
+    "expected": 15.066499855882997,
+    "rune": 17
+   },
+   {
+    "equal": 4,
+    "expected": 15.002406647532261,
+    "rune": 18
+   },
+   {
+    "equal": 2,
+    "expected": 14.569242701483379,
+    "rune": 19
+   },
+   {
+    "equal": 2,
+    "expected": 15.749382286637601,
+    "rune": 20
+   },
+   {
+    "equal": 2,
+    "expected": 15.811884253147769,
+    "rune": 21
+   },
+   {
+    "equal": 4,
+    "expected": 18.252930276404,
+    "rune": 22
+   },
+   {
+    "equal": 2,
+    "expected": 14.878990401095145,
+    "rune": 23
+   },
+   {
+    "equal": 1,
+    "expected": 17.68261310430431,
+    "rune": 24
+   },
+   {
+    "equal": 7,
+    "expected": 15.364503503274024,
+    "rune": 25
+   },
+   {
+    "equal": 2,
+    "expected": 15.372449194315081,
+    "rune": 26
+   },
+   {
+    "equal": 2,
+    "expected": 16.509290070078123,
+    "rune": 27
+   },
+   {
+    "equal": 3,
+    "expected": 15.98341745944006,
+    "rune": 28
+   }
+  ],
+  "deciles": [
+   13,
+   10,
+   9,
+   7,
+   14,
+   11,
+   5,
+   5,
+   6,
+   4
+  ],
+  "expected": 443.67002284172304,
+  "kind": "repeats",
+  "label": "EXPLORATORY: units chosen after inspecting the data; a p-value here is not confirmation",
+  "pairs": 12605,
+  "per_section": [
+   {
+    "expected": 25.776663825335266,
+    "mean_relative_position": 0.49314128943758573,
+    "repeats": 4,
+    "runes": 729,
+    "section": 10
+   },
+   {
+    "expected": 24.831360398459964,
+    "mean_relative_position": 0.1681096681096681,
+    "repeats": 4,
+    "runes": 693,
+    "section": 12
+   },
+   {
+    "expected": 12.308272236200164,
+    "mean_relative_position": 0.15015015015015015,
+    "repeats": 1,
+    "runes": 333,
+    "section": 13
+   },
+   {
+    "expected": 60.51269652085456,
+    "mean_relative_position": 0.2824368613842298,
+    "repeats": 9,
+    "runes": 1729,
+    "section": 14
+   },
+   {
+    "expected": 66.2638337706245,
+    "mean_relative_position": 0.5955121436114044,
+    "repeats": 10,
+    "runes": 1894,
+    "section": 16
+   },
+   {
+    "expected": 35.94614947032973,
+    "mean_relative_position": 0.46843558009082015,
+    "repeats": 11,
+    "runes": 1021,
+    "section": 17
+   },
+   {
+    "expected": 49.91978043223023,
+    "mean_relative_position": 0.4160717161414998,
+    "repeats": 13,
+    "runes": 1433,
+    "section": 18
+   },
+   {
+    "expected": 51.3015418853804,
+    "mean_relative_position": 0.3088927421352489,
+    "repeats": 11,
+    "runes": 1468,
+    "section": 20
+   },
+   {
+    "expected": 86.62624847320785,
+    "mean_relative_position": 0.49813055780113175,
+    "repeats": 16,
+    "runes": 2474,
+    "section": 22
+   },
+   {
+    "expected": 18.83731711764788,
+    "mean_relative_position": 0.24438202247191013,
+    "repeats": 2,
+    "runes": 534,
+    "section": 24
+   },
+   {
+    "expected": 11.34615871141845,
+    "mean_relative_position": 0.5054112554112554,
+    "repeats": 3,
+    "runes": 308,
+    "section": 25
+   }
+  ],
+  "position": {
+   "first_half": 53,
+   "mean_relative_position": 0.41936711618134803,
+   "note": "one summary statistic, chosen after looking at deciles of the same data: a weak lead at most, not a confirmed trend",
+   "p_two_sided": 0.010198980101989802,
+   "permutations": 10000,
+   "second_half": 31,
+   "uniform": 0.5
+  },
+  "random_rate": 0.034482758620689655,
+  "rate": 0.006664022213407378,
+  "ratio_to_expected": 0.18932989761619878,
+  "reference_sections": {
+   "27": {
+    "rate": 0.010752688172043012,
+    "ratio_to_expected": 0.14527638025714396,
+    "repeats": 1,
+    "runes": 94
+   },
+   "3": {
+    "rate": 0.04487179487179487,
+    "ratio_to_expected": 0.7664898626437071,
+    "repeats": 7,
+    "runes": 157
+   },
+   "4": {
+    "rate": 0.0311284046692607,
+    "ratio_to_expected": 0.7349800701864725,
+    "repeats": 16,
+    "runes": 515
+   },
+   "5": {
+    "rate": 0.018893387314439947,
+    "ratio_to_expected": 0.2761060384718209,
+    "repeats": 14,
+    "runes": 742
+   },
+   "7": {
+    "rate": 0.02388535031847134,
+    "ratio_to_expected": 0.3696180187487923,
+    "repeats": 15,
+    "runes": 629
+   },
+   "8": {
+    "rate": 0.02830188679245283,
+    "ratio_to_expected": 0.6740061553678435,
+    "repeats": 9,
+    "runes": 319
+   },
+   "9": {
+    "rate": 0.03409090909090909,
+    "ratio_to_expected": 0.5009908922246591,
+    "repeats": 3,
+    "runes": 89
+   }
+  },
+  "repeats": 84,
+  "sections": [
+   10,
+   12,
+   13,
+   14,
+   16,
+   17,
+   18,
+   20,
+   22,
+   24,
+   25
   ]
  },
  "scans": {
@@ -1467,7 +1811,7 @@
   "label": "EXPLORATORY: units chosen after inspecting the data; a p-value here is not confirmation",
   "mi_lags": 64,
   "note": "mutual information is the plug-in estimate (nats); z is against the shuffle null; transforms use r = b/a, which covers every a*c[i-k] + b*c[i] up to relabelling",
-  "seconds": 7.01,
+  "seconds": 7.05,
   "sections": [
    10,
    12,
@@ -1714,7 +2058,7 @@
   "label": "EXPLORATORY: units chosen after inspecting the data; a p-value here is not confirmation",
   "mi_lags": 64,
   "note": "mutual information is the plug-in estimate (nats); z is against the shuffle null; transforms use r = b/a, which covers every a*c[i-k] + b*c[i] up to relabelling",
-  "seconds": 7.17,
+  "seconds": 7.23,
   "sections": [
    10,
    12,

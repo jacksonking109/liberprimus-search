@@ -7,6 +7,7 @@ diagnostic can and cannot see.
 
     python -m lpswarm.research_structure diffs  --out reports/diag
     python -m lpswarm.research_structure scans  --out reports/diag
+    python -m lpswarm.research_structure repeats --out reports/diag
     python -m lpswarm.research_structure power  --out reports/diag
     python -m lpswarm.research_structure all    --out reports/diag
 
@@ -14,6 +15,7 @@ diffs   differences d = c[i]-c[i-1] and sums s = c[i]+c[i-1] (mod 29), the 29x29
         whether the sections share one statistical process
 scans   mutual information between c[i] and c[i-k] (k = 1..64) and the index of coincidence of
         c[i] + r*c[i-k] (r = 1..28, k = 1..16)
+repeats where the adjacent equal runes fall (separator, rune, position in the section)
 power   what each of those can see (synthetic data only)
 
 Everything is deterministic (fixed seeds), bounded (a wall-clock cap; partial results are marked)
@@ -165,7 +167,7 @@ def diffs(secs: dict, ids, reps: int = REPS, seed: int = SEED, cap_s: float = CA
     n_dsh, n_trans, n_w, n_a, n_hf, n_hd, n_cf, n_cd = [], [], [], [], [], [], [], []
     complete = True
     for _ in range(reps):
-        if time.monotonic() - t0 > cap_s:
+        if time.monotonic() - t0 >= cap_s:
             complete = False
             break
         sh = {i: rngs[i].permutation(X[i]) for i in ids}
@@ -309,7 +311,7 @@ def scans(secs: dict, ids, reps: int = REPS, seed: int = SEED, cap_s: float = CA
     null_mi, null_tr = [], []
     complete = True
     for _ in range(reps):
-        if time.monotonic() - t0 > cap_s:
+        if time.monotonic() - t0 >= cap_s:
             complete = False
             break
         mi, tr = compute({i: rngs[i].permutation(X[i]) for i in use})
@@ -438,7 +440,7 @@ def power(reps: int = POWER_REPS, seed: int = SEED, cap_s: float = CAP_SECONDS,
     complete = True
     for mi_, name in enumerate(mechanisms):
         for li, L in enumerate(lengths):
-            if time.monotonic() - t0 > cap_s:
+            if time.monotonic() - t0 >= cap_s:
                 complete = False
                 break
             rng = np.random.default_rng(seed + 1000 * mi_ + L)
@@ -469,6 +471,133 @@ def power(reps: int = POWER_REPS, seed: int = SEED, cap_s: float = CAP_SECONDS,
                       "transitions", "dependence (MI)", "transform scan", "dependence, repeats excluded",
                       "transform, repeats excluded"],
             "seconds": round(time.monotonic() - t0, 2)}
+
+
+# ---------------------------------------------------------------------------- repeats
+REFERENCE_ALL = (3, 5, 7, 9, 27, 4, 8)      # readable / shift pages and the two Vigenere pages
+POSITION_PERMUTATIONS = 10000
+RARE_GAP = 20
+
+
+def _gap_kind(gap: str) -> str:
+    k = []
+    if "\u2022" in gap:
+        k.append("word dot")
+    if "\n" in gap:
+        k.append("newline")
+    if " " in gap:
+        k.append("space")
+    if '"' in gap:
+        k.append("quote")
+    if any(c not in "\u2022\n \"" for c in gap):
+        k.append("other")
+    return " + ".join(k) if k else "none (inside a word)"
+
+
+def repeat_profile(texts: dict, alpha, seed: int = SEED, permutations: int = POSITION_PERMUTATIONS) -> dict:
+    """Where the adjacent equal runes (c[i] == c[i-1]) fall in the raw text: by what separates the
+    two runes (nothing, a word dot, a line end, a quote ...), by rune, by position in the section.
+
+    `texts` maps a section id to its raw rune text (separators, line ends and quotes included).
+    Expected counts use each section's own symbol frequencies (pairs x sum of f^2). The position test
+    is ONE summary statistic, the mean relative position of the repeats, against permutations that keep
+    each section's repeat count (permutations = 0 skips it)."""
+    by_gap: dict = {}
+    rune_obs, rune_exp = np.zeros(N), np.zeros(N)
+    deciles = np.zeros(10, dtype=int)
+    rel_all, rel_rep, per_section = [], [], []
+    for i, raw in texts.items():
+        syms, gaps, gap = [], [], ""
+        for ch in raw:
+            a = alpha.encode(ch, glyphs_only=True)
+            if len(a) == 1:
+                gaps.append(_gap_kind(gap) if syms else "start")
+                syms.append(int(a[0]))
+                gap = ""
+            else:
+                gap += ch
+        x = np.asarray(syms, dtype=np.int64)
+        n = len(x)
+        if n < 2:
+            continue
+        f = np.bincount(x, minlength=N) / n
+        p_eq = float((f * f).sum())
+        rep = x[1:] == x[:-1]
+        for a in range(1, n):
+            slot = by_gap.setdefault(gaps[a], [0, 0, 0.0])
+            slot[0] += 1
+            slot[1] += int(rep[a - 1])
+            slot[2] += p_eq
+        rune_obs += np.bincount(x[1:][rep], minlength=N)
+        rune_exp += (n - 1) * f * f
+        rel = np.arange(1, n) / n
+        rel_all.append(rel)
+        rel_rep.append(rel[rep])
+        deciles += np.bincount(np.minimum((rel[rep] * 10).astype(int), 9), minlength=10)
+        per_section.append({"section": i, "runes": n, "repeats": int(rep.sum()),
+                            "expected": float((n - 1) * p_eq),
+                            "mean_relative_position": float(rel[rep].mean()) if rep.any() else None})
+    pairs = sum(v[0] for v in by_gap.values())
+    reps_n = sum(v[1] for v in by_gap.values())
+    exp_n = sum(v[2] for v in by_gap.values())
+    rare = [0, 0, 0.0]
+    rows = []
+    for k, (pr, eq, ex) in sorted(by_gap.items(), key=lambda kv: -kv[1][0]):
+        if pr < RARE_GAP:
+            rare = [rare[0] + pr, rare[1] + eq, rare[2] + ex]
+        else:
+            rows.append({"gap": k, "pairs": pr, "equal": eq, "expected": ex, "ratio": eq / ex if ex else None})
+    if rare[0]:
+        rows.append({"gap": "other (fewer than %d pairs each)" % RARE_GAP, "pairs": rare[0], "equal": rare[1],
+                     "expected": rare[2], "ratio": rare[1] / rare[2] if rare[2] else None})
+    out = {"kind": "repeats", "label": LABEL, "sections": list(texts), "pairs": pairs, "repeats": reps_n,
+           "expected": exp_n, "rate": reps_n / pairs if pairs else None,
+           "ratio_to_expected": reps_n / exp_n if exp_n else None,
+           "by_gap": rows,
+           "by_rune": [{"rune": r, "equal": int(rune_obs[r]), "expected": float(rune_exp[r])} for r in range(N)],
+           "deciles": deciles.tolist(), "per_section": per_section}
+    if permutations and rel_rep and reps_n:
+        rng = np.random.default_rng(seed + 424242)
+        counts = [len(r) for r in rel_rep]
+        obs = float(np.concatenate(rel_rep).mean())
+        null = np.empty(permutations)
+        for j in range(permutations):
+            null[j] = np.concatenate([rng.choice(rel_all[k], size=c, replace=False)
+                                      for k, c in enumerate(counts) if c]).mean()
+        out["position"] = {
+            "mean_relative_position": obs, "uniform": 0.5,
+            "p_two_sided": (1 + int((np.abs(null - 0.5) >= abs(obs - 0.5)).sum())) / (permutations + 1),
+            "permutations": permutations,
+            "first_half": int((np.concatenate(rel_rep) < 0.5).sum()),
+            "second_half": int((np.concatenate(rel_rep) >= 0.5).sum()),
+            "note": "one summary statistic, chosen after looking at deciles of the same data: a weak lead "
+                    "at most, not a confirmed trend"}
+    return out
+
+
+def repeats(ids, reference_ids=REFERENCE_ALL, manifest: str = None, seed: int = SEED,
+            permutations: int = POSITION_PERMUTATIONS) -> dict:
+    """repeat_profile on the unsolved sections plus plain totals for the reference sections."""
+    import json as _json
+    from lpswarm.alphabet import get_alphabet
+    from lpswarm.research_packets import MANIFEST
+    from lpswarm.textio import read_text
+    manifest = manifest or MANIFEST
+    alpha = get_alphabet(ALPHABET)
+    mpath = Path(manifest)
+    man = _json.loads(read_text(mpath))
+    files = {sec["index"]: (mpath.parent / sec["file"]) for sec in man["sections"]}
+    texts = {i: read_text(files[i]) for i in ids}
+    main_ = repeat_profile(texts, alpha, seed, permutations)
+    ref = {}
+    for i in reference_ids:
+        if i in files:
+            r = repeat_profile({i: read_text(files[i])}, alpha, seed, 0)
+            ref[str(i)] = {"runes": r["pairs"] + 1, "repeats": r["repeats"], "rate": r["rate"],
+                           "ratio_to_expected": r["ratio_to_expected"]}
+    main_["reference_sections"] = ref
+    main_["random_rate"] = 1 / N
+    return main_
 
 
 # ------------------------------------------------------------------------------ output
@@ -542,6 +671,34 @@ def to_markdown(rep: dict) -> str:
                           f"p (max over units) {_fmt(u['p_max_over_units'])}. Top units:", "",
                           "```", *[json.dumps(_jsonable(t), sort_keys=True) for t in u["top"][:5]], "```", ""]
             L += [s["note"], ""]
+    rp = rep.get("repeats")
+    if rp:
+        L += ["## Where the adjacent repeats fall", "",
+              f"Sections {rp['sections']}: {rp['repeats']} adjacent equal runes in {rp['pairs']} pairs "
+              f"({100 * rp['rate']:.2f}%; uniform random text would give {100 * rp['random_rate']:.1f}%; "
+              f"{rp['expected']:.0f} expected from each section's own frequencies, ratio "
+              f"{rp['ratio_to_expected']:.2f}).", "",
+              "| what separates the two runes | pairs | equal | expected | ratio |",
+              "| --- | ---: | ---: | ---: | ---: |"]
+        for r in rp["by_gap"]:
+            L.append(f"| {r['gap']} | {r['pairs']} | {r['equal']} | {r['expected']:.1f} | "
+                     f"{'n/a' if r['ratio'] is None else format(r['ratio'], '.2f')} |")
+        L += ["", "By rune (equal / expected): " + ", ".join(f"{r['rune']}: {r['equal']}/{r['expected']:.0f}"
+                                                        for r in rp["by_rune"]) + ".", "",
+              "By decile of the section: " + str(rp["deciles"]) + ".", ""]
+        pos = rp.get("position")
+        if pos:
+            L += [f"Mean relative position of the repeats {pos['mean_relative_position']:.3f} (uniform 0.5), "
+                  f"permutation p {_fmt(pos['p_two_sided'])} ({pos['permutations']} permutations); first half "
+                  f"{pos['first_half']}, second half {pos['second_half']}. {pos['note']}.", ""]
+        ref = rp.get("reference_sections")
+        if ref:
+            L += ["Absolute rates in other sections of the manifest (their ciphers are as the source notes "
+                  "claim; used only to put the rate in context):", "",
+                  "| section | runes | repeats | rate |", "| ---: | ---: | ---: | ---: |"]
+            for k, v in ref.items():
+                L.append(f"| {k} | {v['runes']} | {v['repeats']} | {100 * v['rate']:.2f}% |")
+            L.append("")
     pw = rep.get("power")
     if pw:
         L += ["## What each diagnostic can see (synthetic)", "", f"{pw['label']}. {pw['shuffles']} shuffles per case, "
@@ -559,7 +716,7 @@ def to_markdown(rep: dict) -> str:
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="python -m lpswarm.research_structure", description=__doc__.split("\n")[0])
-    ap.add_argument("command", choices=["diffs", "scans", "power", "all"])
+    ap.add_argument("command", choices=["diffs", "scans", "repeats", "power", "all"])
     ap.add_argument("--sections", help="comma-separated manifest ids (default: unsolved sections of 300+ runes)")
     ap.add_argument("--reps", type=int, default=REPS)
     ap.add_argument("--seed", type=int, default=SEED)
@@ -575,6 +732,8 @@ def main(argv: list[str] | None = None) -> int:
         if args.command in ("scans", "all"):
             rep["scans"] = scans(secs, ids, args.reps, args.seed, args.cap)
             rep["scans_no_repeats"] = scans(secs, ids, args.reps, args.seed, args.cap, exclude_equal=True)
+    if args.command in ("repeats", "all"):
+        rep["repeats"] = repeats(ids, seed=args.seed)
     if args.command in ("power", "all"):
         rep["power"] = power(min(args.reps, POWER_REPS), args.seed, args.cap)
     out = Path(args.out)

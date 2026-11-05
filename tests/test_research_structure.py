@@ -114,11 +114,12 @@ def test_homogeneity_flags_a_section_with_a_different_distribution():
 def test_output_is_deterministic_and_the_time_cap_returns_partial_results():
     rng = np.random.default_rng(6)
     sec = _sec(rng.integers(0, 29, size=500))
-    a = json.dumps(R._jsonable(R.scans(sec, [0], reps=REPS)), sort_keys=True)
-    b = json.dumps(R._jsonable(R.scans(sec, [0], reps=REPS)), sort_keys=True)
-    a = a.replace(a[a.index('"seconds"'):a.index('"seconds"') + 20], "")
-    b = b.replace(b[b.index('"seconds"'):b.index('"seconds"') + 20], "")
-    assert a == b
+    def stable(r):                       # everything except the wall-clock time
+        r = dict(r)
+        r.pop("seconds")
+        return json.dumps(R._jsonable(r), sort_keys=True)
+
+    assert stable(R.scans(sec, [0], reps=REPS)) == stable(R.scans(sec, [0], reps=REPS))
     capped = R.scans(sec, [0], reps=REPS, cap_s=0)
     assert capped["complete"] is False and "error" in capped
     capped_d = R.diffs(sec, [0], reps=REPS, cap_s=0)
@@ -149,3 +150,62 @@ def test_the_module_does_not_import_any_model_or_network_code():
     out = subprocess.run([sys.executable, "-I", "-c", code], capture_output=True, text=True,
                          env={**__import__("os").environ, "PYTHONPATH": "src"}, check=True)
     assert out.stdout.strip() == "[]"
+
+
+def _raw(alpha, x, word=6, words_per_line=8):
+    """Rune text with word dots and line ends, from symbol indexes."""
+    out, wi = [], 0
+    for i, v in enumerate(x):
+        out.append(alpha.glyphs[int(v)])
+        if (i + 1) % word == 0 and i + 1 < len(x):
+            wi += 1
+            out.append("\n" if wi % words_per_line == 0 else "•")
+    return "".join(out)
+
+
+def _planted_repeats(n, seed, allow):
+    """Uniform symbols; a repeat is only allowed at positions where allow(i) is true (and then forced)."""
+    rng = np.random.default_rng(seed)
+    x = np.empty(n, dtype=np.int64)
+    x[0] = rng.integers(0, 29)
+    for i in range(1, n):
+        if allow(i):
+            x[i] = x[i - 1] if rng.random() < 0.5 else rng.integers(0, 29)
+        else:
+            x[i] = (x[i - 1] + 1 + rng.integers(0, 28)) % 29
+    return x
+
+
+def test_repeat_profile_attributes_repeats_to_the_separator_between_the_runes():
+    alpha = get_alphabet(ALPHABET)
+    n, w, wpl = 6000, 6, 8
+    line_start = lambda i: i % (w * wpl) == 0                          # noqa: E731  first rune of a line
+    x = _planted_repeats(n, 21, line_start)
+    p = R.repeat_profile({1: _raw(alpha, x, w, wpl)}, alpha, permutations=0)
+    rows = {r["gap"]: r for r in p["by_gap"]}
+    assert rows["newline"]["equal"] >= 20                                # repeats only across line ends
+    assert rows["none (inside a word)"]["equal"] == 0
+    assert rows["word dot"]["equal"] == 0
+    assert p["pairs"] == n - 1 and p["repeats"] == rows["newline"]["equal"]
+
+
+def test_repeat_profile_position_test_sees_early_repeats_and_not_uniform_ones():
+    alpha = get_alphabet(ALPHABET)
+    n = 6000
+    early = _planted_repeats(n, 22, lambda i: i < n // 3)                # repeats allowed in the first third only
+    uniform = np.random.default_rng(23).integers(0, 29, size=n)
+    pe = R.repeat_profile({1: _raw(alpha, early)}, alpha, permutations=2000)["position"]
+    pu = R.repeat_profile({1: _raw(alpha, uniform)}, alpha, permutations=2000)["position"]
+    assert pe["mean_relative_position"] < 0.25 and pe["p_two_sided"] < 0.01
+    assert pu["p_two_sided"] > 0.01 and abs(pu["mean_relative_position"] - 0.5) < 0.05
+    assert "weak lead" in pe["note"]
+
+
+def test_repeats_on_the_bundled_transcription_and_cli_output(tmp_path):
+    rp = R.repeats(list(R.UNSOLVED), permutations=200)
+    assert rp["pairs"] == 12605 and rp["repeats"] == 84               # same counts as the diffs table
+    assert {"none (inside a word)", "word dot"} <= {r["gap"] for r in rp["by_gap"]}
+    assert rp["random_rate"] == pytest.approx(1 / 29) and "4" in rp["reference_sections"]
+    assert R.main(["repeats", "--out", str(tmp_path)]) == 0
+    md = (tmp_path / "diagnostics_structure.md").read_text(encoding="utf-8")
+    assert "Where the adjacent repeats fall" in md and "word dot" in md

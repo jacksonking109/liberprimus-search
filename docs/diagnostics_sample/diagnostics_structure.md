@@ -158,6 +158,35 @@ Sections [10, 12, 13, 14, 16, 17, 18, 20, 22, 24, 25]; 199 shuffles.
 
 mutual information is the plug-in estimate (nats); z is against the shuffle null; transforms use r = b/a, which covers every a*c[i-k] + b*c[i] up to relabelling
 
+## Where the adjacent repeats fall
+
+Sections [10, 12, 13, 14, 16, 17, 18, 20, 22, 24, 25]: 84 adjacent equal runes in 12605 pairs (0.67%; uniform random text would give 3.4%; 444 expected from each section's own frequencies, ratio 0.19).
+
+| what separates the two runes | pairs | equal | expected | ratio |
+| --- | ---: | ---: | ---: | ---: |
+| none (inside a word) | 9792 | 62 | 344.7 | 0.18 |
+| word dot | 2645 | 21 | 93.1 | 0.23 |
+| newline | 144 | 1 | 5.1 | 0.20 |
+| other (fewer than 20 pairs each) | 24 | 0 | 0.8 | 0.00 |
+
+By rune (equal / expected): 0: 4/17, 1: 2/16, 2: 4/16, 3: 4/17, 4: 2/14, 5: 1/15, 6: 5/15, 7: 5/12, 8: 2/13, 9: 4/15, 10: 2/17, 11: 4/16, 12: 2/12, 13: 1/15, 14: 6/17, 15: 3/14, 16: 2/14, 17: 0/15, 18: 4/15, 19: 2/15, 20: 2/16, 21: 2/16, 22: 4/18, 23: 2/15, 24: 1/18, 25: 7/15, 26: 2/15, 27: 2/17, 28: 3/16.
+
+By decile of the section: [13, 10, 9, 7, 14, 11, 5, 5, 6, 4].
+
+Mean relative position of the repeats 0.419 (uniform 0.5), permutation p 0.010 (10000 permutations); first half 53, second half 31. one summary statistic, chosen after looking at deciles of the same data: a weak lead at most, not a confirmed trend.
+
+Absolute rates in other sections of the manifest (their ciphers are as the source notes claim; used only to put the rate in context):
+
+| section | runes | repeats | rate |
+| ---: | ---: | ---: | ---: |
+| 3 | 157 | 7 | 4.49% |
+| 5 | 742 | 14 | 1.89% |
+| 7 | 629 | 15 | 2.39% |
+| 9 | 89 | 3 | 3.41% |
+| 27 | 94 | 1 | 1.08% |
+| 4 | 515 | 16 | 3.11% |
+| 8 | 319 | 9 | 2.83% |
+
 ## What each diagnostic can see (synthetic)
 
 SYNTHETIC: English plaintext (training split) through known mechanisms; says what each diagnostic can see, not what the real sections are. 99 shuffles per case, alpha 0.05; no multiplicity correction across the eight columns.

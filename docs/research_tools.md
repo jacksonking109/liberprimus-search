@@ -21,7 +21,7 @@ For `naturals` the exp3 packet is the complete arithmetic family `k_t = d*t + b`
 covers every b because d is invertible mod 29). `squares` and `triangular` with a scale and offset
 are only a subfamily of quadratic keys; a general polynomial key would need a new stream kind.
 
-## Structure diagnostics (`python -m lpswarm.research_structure {diffs,scans,power,all}`)
+## Structure diagnostics (`python -m lpswarm.research_structure {diffs,scans,repeats,power,all}`)
 
 Deterministic (fixed seeds), bounded (wall-clock cap, partial results marked) and exploratory: the
 units were chosen after looking at the data and p-values calibrate a maximum over the inspected
@@ -40,6 +40,11 @@ with 199 shuffles is 0.005.
   so r = b/a covers every `a*c[i-k] + b*c[i]`). Run twice: on all pairs, and with equal pairs
   (`c[i] == c[i-k]`) excluded, which removes the known repeat shortage so that what is left is
   dependence beyond it.
+* `repeats`: where the adjacent equal runes fall in the raw text: by what separates the two runes
+  (nothing, a word dot, a line end, a quote), by rune, and by position in the section (deciles, and one
+  permutation test of the mean relative position, which is a weak lead at most because it was chosen
+  after looking at the same data). Also prints absolute repeat rates for other sections of the
+  manifest (3, 4, 5, 7, 8, 9, 27) for context; uniform random text gives 3.4%.
 * `power`: English plaintext (training split) put through neighbour feedback, chain autokey,
   a progressive key, a prime stream, 2x2 Hill blocks, a length-37 periodic key, plus plaintext and
   iid noise, at several lengths, with every test above run on each. It says what a diagnostic can see.
@@ -58,4 +63,8 @@ Outputs: `diagnostics_structure.json` and `diagnostics_structure.md` in `--out` 
   dependence says nothing for or against those.
 * Mutual information is the plug-in estimate (bias about 784 / 2m nats); only z against the shuffle
   null is used for decisions.
-* Word breaks are those of the transcription (the bullet separators). Line breaks are not used.
+* Word breaks are those of the transcription (the bullet separators). `diffs` and `scans` ignore line
+  breaks; `repeats` reports them as a separate kind of gap.
+* The dependence scan did NOT recover the key length on the two Vigenere pages in the manifest
+  (sections 4 and 8, 300-500 runes, with the F-skip): short periodic keys are not reliably visible to
+  it. Do not read a flat scan as ruling out a periodic key.
