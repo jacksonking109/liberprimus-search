@@ -1,6 +1,6 @@
 # Overnight run 20261104-2305
 
-Started 2026-11-04 23:05:16, updated 2026-11-05 00:29:19, status **running**. Jobs: pending 33, running 3, done 36
+Started 2026-11-04 23:05:16, updated 2026-11-05 00:31:01, status **running**. Jobs: pending 35, running 3, done 37
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -16,7 +16,7 @@ Started 2026-11-04 23:05:16, updated 2026-11-05 00:29:19, status **running**. Jo
 | sonnet/18 | done | 2026-11-05 00:04:37 | 2026-11-05 00:06:07 | Sonnet, briefed by Opus |
 | sonnet/19 | done | 2026-11-05 00:06:23 | 2026-11-05 00:09:13 | Sonnet, briefed by Opus |
 | sonnet/20 | done | 2026-11-05 00:09:28 | 2026-11-05 00:29:19 | Sonnet, briefed by Opus |
-| sonnet/21 | pending |  |  | Sonnet, briefed by Opus |
+| sonnet/21 | done | 2026-11-05 00:29:51 | 2026-11-05 00:31:01 | Sonnet, briefed by Opus |
 | sonnet/22 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/24 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/25 | pending |  |  | Sonnet, briefed by Opus |
@@ -76,6 +76,9 @@ Started 2026-11-04 23:05:16, updated 2026-11-05 00:29:19, status **running**. Jo
 | deepseek/22 | pending |  |  | DeepSeek (volume) |
 | deepseek/24 | pending |  |  | DeepSeek (volume) |
 | deepseek/25 | pending |  |  | DeepSeek (volume) |
+| sup1/14 | pending |  |  | added by supervisor. Long sections (1729, 1894 and 2474 runes) give the most reliable scoring. After about 45 jobs, ever |
+| sup1/16 | pending |  |  | added by supervisor. Long sections (1729, 1894 and 2474 runes) give the most reliable scoring. After about 45 jobs, ever |
+| sup1/22 | pending |  |  | added by supervisor. Long sections (1729, 1894 and 2474 runes) give the most reliable scoring. After about 45 jobs, ever |
 
 ## Now running
 
@@ -141,6 +144,8 @@ round 1 [codex] proposals=32 valid=32 attempts=148195 passes=0 near=0 invalid=0
   - LP2:33.jpg - 50.jpg/1: 60000 attempts, 38 hypotheses, **0 final pass(es)**, stopped: max_attempts (caution: short section (91 runes): many keys give plausible-looking text this short; treat any lead with extra caution)
 - **sonnet/20** (done)
   - LP2:50.jpg/2-56.jpg/1: 60000 attempts, 32 hypotheses, **0 final pass(es)**, stopped: max_attempts
+- **sonnet/21** (done)
+  - LP2:56.jpg/2: 60000 attempts, 4 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **codex/25** (done)
   - LP2:54.jpg-55.jpg - 71.jpg-72.jpg: 60000 attempts, 2 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **codex/24** (done)
@@ -196,9 +201,9 @@ round 1 [codex] proposals=32 valid=32 attempts=148195 passes=0 near=0 invalid=0
 - qwen-local: 6 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 6 call(s) in the last 5h (cap none), spent $0.0000
 - granite: 7 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 67 call(s) in the last 5h (cap 180), spent $0.0000
-- claude-sonnet: 67 call(s) in the last 5h (cap 180), spent $0.0000
-- claude-supervisor: 67 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-opus: 70 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-sonnet: 70 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-supervisor: 70 call(s) in the last 5h (cap 180), spent $0.0000
 - codex: 46 call(s) in the last 5h (cap 850), spent $0.0000
 
 ## Current strategy note (read by every lane each round)
@@ -210,17 +215,17 @@ Night so far: every section shows passes=0 and near=0, including 300k-attempt st
 - 2026-11-04 23:05:27: 23:05 check-in: run just started, 4 jobs running and 68 pending across sections 10-25 (sonnet, codex, local, structure, exhaustive, deepseek). No results yet, so I added no jobs and set no strategy note. I'll reassess when the first results come in.
 - 2026-11-04 23:39:58: 23:39 check-in: about 28 jobs done across sections 10-25. There are 0 final passes and 0 near hits anywhere, including the 300k-attempt structure runs on sections 10, 12, 13 and 14. Section 15 (9 runes) was skipped as too short. No leads to read yet. Plenty of jobs are still pending, so I added none and saved the job budget for when results suggest a direction.
 - 2026-11-04 23:39:58: strategy note set: Night so far: every section shows passes=0 and near=0, including 300k-attempt structure runs on 10/12/13/14. Simple single-stream shifts are not even coming close, so don't spend rounds on near-variants of what your section's history already shows. Favour combined programs, preferring ones not yet in your section's history: (1) a stream (prime, totient(prime), Fibonacci, or a running key from solved LP1 pages) combined with an interrupter/skip rule (skip F-rune positions, or reset per word/line); (2) a transposition (columnar or reversed lines/pages) before the stream; (3) atbash or reverse-alphabet followed by a shift; (4) a key offset tied to the page or section boundary. Be extra cautious on short sections (19: 91 runes; 11/21: about 120 runes).
+- 2026-11-05 00:29:51: 00:29 check-in: about 45 jobs are done across sections 10-25, with 0 final passes and 0 near hits everywhere. Sonnet has now finished sections 18, 19 and 20, also with nothing. Section 15 was skipped as too short. Structure jobs 17 and 18 and local/20 are still running. I queued one sonnet job on the three longest sections (14, 16, 22), where statistics are most reliable, to try the combined programs the strategy note asks for. I left the strategy note unchanged.
+- 2026-11-05 00:29:51: brief for sup1 (claude-sonnet): Sections 14, 16 and 22 are the longest in LP2 (1729, 1894 and 2474 runes). Across all sections tonight there are 0 passes and 0 near hits, including 300k-attempt structure runs. Plain prime, totient(prime) and Fibonacci shifts, simple Vigenere-style keys, and plain atbash have all failed, so do not propose bare single-stream programs or small offset tweaks of them. Spend every proposal on combined programs in which at least two components interact:
+1. A totient(prime) or prime stream with an interrupter. Skip key advance at F-rune positions, or at a chosen rune. Also try resetting the stream index at each word, line or page boundary, and starting it at an offset tied to the section's first rune index or the page number.
+2. Atbash or reverse-alphabet followed by a stream shift, and the reverse order: stream first, then atbash.
+3. A running key from solved LP1 plaintext (e.g. the 'Instruction'/'Welcome' pages and the Parable), mod 29, applied forward and reversed. Try with and without the F-skip.
+4. A transposition before the stream: reversed rune order across the section, reversed lines, columnar transposition with widths that divide the section length, or reading pages in reverse.
+5. An autokey (ciphertext- or plaintext-feedback) seeded with a short key such as DIVINITY, FIRFUMFERENFE or CIRCUMFERENCE, or a prime.
+Prefer variants that are absent from the section's history. Long sections should score honestly, so a real hit should show clear English (or Old English-style) word structure across hundreds of runes, not just fragments.
 
 ## Events
 
-- 2026-11-05 00:06:07 sonnet/18: done (exit 0, 2 min)
-- 2026-11-05 00:06:23 published: 35 file(s) to branch results
-- 2026-11-05 00:06:23 sonnet/19: start (uses claude-plan)
-- 2026-11-05 00:06:23 4 running: local/20, structure/17, structure/18, sonnet/19
-- 2026-11-05 00:07:38 local/20: running 35 min | 23:34:27 [model] granite (weighting) ok 1.8s, tokens in/out 269/38, reply 69 chars
-- 2026-11-05 00:09:13 sonnet/19: done (exit 0, 3 min)
-- 2026-11-05 00:09:28 published: 36 file(s) to branch results
-- 2026-11-05 00:09:28 sonnet/20: start (uses claude-plan)
 - 2026-11-05 00:09:28 4 running: local/20, structure/17, structure/18, sonnet/20
 - 2026-11-05 00:10:03 structure/17: running 30 min | 00:02:33 [model] codex (proposer) ok 58.7s, tokens in/out 21588/2719, reply 8973 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-05 00:10:23 structure/18: running 30 min | 23:41:14 [model] codex (proposer) ok 52.6s, tokens in/out 18738/2446, reply 8924 chars, model not reported (pin one with model = "..." in the models config)
@@ -238,3 +243,11 @@ Night so far: every section shows passes=0 and near=0, including 300k-attempt st
 - 2026-11-05 00:25:24 structure/18: running 45 min | 23:41:14 [model] codex (proposer) ok 52.6s, tokens in/out 18738/2446, reply 8924 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-05 00:27:39 local/20: running 55 min | 23:34:27 [model] granite (weighting) ok 1.8s, tokens in/out 269/38, reply 69 chars
 - 2026-11-05 00:29:19 sonnet/20: done (exit 0, 20 min)
+- 2026-11-05 00:29:34 published: 37 file(s) to branch results
+- 2026-11-05 00:29:51 supervisor: note: 00:29 check-in: about 45 jobs are done across sections 10-25, with 0 final passes and 0 near hits everywhere. Sonnet has now finished sections 18, 19 and 20, also with nothing. Section 15 was skipped as too short. Structure jobs 17 and 18 and local/20 are still running. I queued one sonnet job on...
+- 2026-11-05 00:29:51 supervisor: added sup1: swarm on 3 section(s) with claude-sonnet; brief: Sections 14, 16 and 22 are the longest in LP2 (1729, 1894 and 2474 runes). Across all sections tonight there are 0 passes and 0 near hits, including 300k-attempt structure runs. Plain prime, totient(p...
+- 2026-11-05 00:29:51 sonnet/21: start (uses claude-plan)
+- 2026-11-05 00:29:51 4 running: local/20, structure/17, structure/18, sonnet/21
+- 2026-11-05 00:30:06 structure/17: running 50 min | 00:02:33 [model] codex (proposer) ok 58.7s, tokens in/out 21588/2719, reply 8973 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 00:30:26 structure/18: running 50 min | 00:28:32 [model] codex (proposer) ok 62.3s, tokens in/out 21212/2563, reply 8529 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 00:31:01 sonnet/21: done (exit 0, 1 min)
