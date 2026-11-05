@@ -18,7 +18,8 @@ from typing import Sequence
 from lpswarm.executor import Executor, ExplicitKeys, Target, final_check
 from lpswarm.ledger import Ledger
 from lpswarm.oracle import FullOracle
-from lpswarm.programs import SpecError, compile_spec, describe, expand_iter, spec_hash
+from lpswarm.programs import (SpecError, compile_spec, describe, expand_iter, expansion_size,
+                              spec_hash)
 from lpswarm.router.adapters import AdapterError
 from lpswarm.router.limits import RateLimited
 from lpswarm.router.router import BudgetExceeded, backend_key
@@ -37,6 +38,9 @@ class SwarmConfig:
     # Call generators on different backends (GPU / plan / API, see backend_key) at the
     # same time; results are still processed one generator at a time, in order.
     parallel: bool = True
+    # A proposal that expands to more ciphers than this runs as a lean sweep: failed attempts
+    # are counted but not stored (see Executor.run). 0 disables, 1 forces lean for everything.
+    lean_threshold: int = 50_000
 
     def __post_init__(self) -> None:
         if self.rounds < 1 or self.per_round < 1:
@@ -192,9 +196,11 @@ def run_swarm(target: Target, ledger: Ledger, oracle: FullOracle, generators: Se
                 hyp = ledger.add_hypothesis("program", desc + (f" | why: {why}" if why else ""),
                                             gen.model, gen.role)
                 try:
+                    lean_id = (spec_hash(spec) if cfg.lean_threshold and
+                               expansion_size(spec) >= cfg.lean_threshold else None)
                     s = ex.run(target, hyp, "program",
                                ExplicitKeys(expand_iter(spec, len(target.ciphertext)),
-                                            derivation=f"model:{gen.model}"))
+                                            derivation=f"model:{gen.model}"), lean_id=lean_id)
                 except (SpecError, ValueError) as exc:
                     gs.invalid += 1
                     errors[gen.model].append(f"{desc} -> could not run: {str(exc)[:160]}")

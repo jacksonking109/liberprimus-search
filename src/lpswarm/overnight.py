@@ -61,6 +61,8 @@ class OvernightConfig:
     # How many jobs may use one backend at the same time (default 1), e.g.
     # {"codex-plan": 2} runs two Codex section jobs side by side.
     capacity: dict = field(default_factory=dict)
+    min_free_gb: float = 15.0           # do not start jobs below this much free disk; stop the run
+                                        # (cleanly, resumable) below a third of it (at least 3 GB)
     min_checkin_minutes: float = 30.0   # after-job supervisor check-ins at least this far apart
     # Models the supervisor may put in jobs it adds (None: every proposer). Keeps the
     # expensive planner (Opus) planning, and the volume on cheaper models.
@@ -492,7 +494,15 @@ class Overnight:
         subprocess.run(["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", str(script)],
                        capture_output=True, timeout=300)
 
+    def disk_critical(self) -> bool:
+        floor = max(3.0, float(self.cfg.min_free_gb) / 3) if self.cfg.min_free_gb else 0.0
+        return bool(floor) and self.disk_free() < floor
+
     def should_stop(self) -> str | None:
+        if self.running and time.monotonic() - getattr(self, "_disk_checked", 0.0) > 30:
+            self._disk_checked = time.monotonic()
+            if self.disk_critical() and not self.state.get("stop_requested"):
+                self.state["stop_requested"] = f"disk space critically low ({self.disk_free():.1f} GB free)"
         if self.stop_file.exists():
             return "STOP file"
         if self.until is not None and time.time() >= self.until:
@@ -536,8 +546,25 @@ class Overnight:
             self.publish()
         return self.state
 
+    def disk_free(self) -> float:
+        from lpswarm.diskuse import free_gb
+        return free_gb(self.dir)
+
+    def disk_low(self) -> bool:
+        return self.disk_free() < float(self.cfg.min_free_gb)
+
     def start_ready_jobs(self) -> None:
         """Start queued jobs, in order, whose backends have room, up to max_parallel."""
+        if self.cfg.min_free_gb and self.disk_low():
+            msg = (f"disk low: {self.disk_free():.1f} GB free, need {self.cfg.min_free_gb:g}; "
+                   "not starting jobs (delete old ledgers: lpswarm disk --prune)")
+            if msg != self._last_wait:
+                self.log(msg)
+            self._last_wait = msg
+            if not self.running and any(j["status"] in ("pending", "interrupted")
+                                        for j in self.state["jobs"]):
+                self.state["stop_requested"] = f"disk space low ({self.disk_free():.1f} GB free)"
+            return
         users: dict[str, list[str]] = {}          # resource -> running job ids
         for r in self.running.values():
             for res in self.job_resources(r.job):
@@ -654,7 +681,8 @@ class Overnight:
                 r.last_beat = time.monotonic()
                 mins = (r.last_beat - r.t_start) / 60
                 tail = _log_tail(r.log_path, 1)
-                self.log(f"{jid}: running {mins:.0f} min | {tail[-1] if tail else 'no output yet'}")
+                self.log(f"{jid}: running {mins:.0f} min, {self.disk_free():.0f} GB free | "
+                         f"{tail[-1] if tail else 'no output yet'}")
                 self.save()
                 self.write_summary()
             if done:
@@ -775,9 +803,14 @@ class Overnight:
     def write_summary(self) -> Path:
         st = self.state
         counts = {s: sum(1 for j in st["jobs"] if j["status"] == s) for s in STATUSES}
+        try:
+            disk = f" Disk free: {self.disk_free():.1f} GB."
+        except OSError:
+            disk = ""
         lines = [f"# Overnight run {self.dir.name}", "",
                  f"Started {st['started']}, updated {st.get('updated', _now())}, status "
-                 f"**{st['status']}**. Jobs: " + ", ".join(f"{k} {v}" for k, v in counts.items() if v),
+                 f"**{st['status']}**. Jobs: " + ", ".join(f"{k} {v}" for k, v in counts.items() if v)
+                 + disk,
                  "", "| job | status | started | ended | note |", "| --- | --- | --- | --- | --- |"]
         for j in st["jobs"]:
             note = j.get("reason") or j.get("note") or ""

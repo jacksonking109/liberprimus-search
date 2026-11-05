@@ -80,6 +80,13 @@ def peer_tried(path: str | Path, target_id: str, limit: int = 400) -> list[dict]
                 " FROM attempt a JOIN hypothesis h ON h.id=a.hypothesis_id WHERE a.target_id=?"
                 " GROUP BY a.cipher_family, h.id ORDER BY h.id DESC LIMIT ?",
                 (target_id, limit)).fetchall()
+            try:
+                rows += con.execute(
+                    "SELECT s.family, h.description, h.proposer_model, s.attempts"
+                    " FROM sweep_summary s JOIN hypothesis h ON h.id=s.hypothesis_id"
+                    " WHERE s.target_id=? ORDER BY h.id DESC LIMIT ?", (target_id, limit)).fetchall()
+            except sqlite3.Error:
+                pass     # a ledger from before lean sweeps existed
         finally:
             con.close()
     except sqlite3.Error:
@@ -246,8 +253,28 @@ class Ledger:
             (target_id,))}
 
     def attempt_count(self, target_id: str) -> int:
-        return int(self.conn.execute("SELECT COUNT(*) FROM attempt WHERE target_id=?",
+        """Every attempt on the target: stored rows plus lean-sweep failures (counted only)."""
+        rows = int(self.conn.execute("SELECT COUNT(*) FROM attempt WHERE target_id=?",
                                      (target_id,)).fetchone()[0])
+        return rows + self.lean_count(target_id)
+
+    def lean_count(self, target_id: str) -> int:
+        return int(self.conn.execute("SELECT COALESCE(SUM(attempts), 0) FROM sweep_summary"
+                                     " WHERE target_id=?", (target_id,)).fetchone()[0])
+
+    def sweep_done(self, target_id: str, sweep_id: str) -> int | None:
+        """Attempts of a finished lean sweep of this proposal on this target, else None."""
+        row = self.conn.execute("SELECT attempts FROM sweep_summary WHERE target_id=? AND sweep_id=?"
+                                " AND complete=1", (target_id, sweep_id)).fetchone()
+        return int(row[0]) if row else None
+
+    def record_sweep(self, target_id: str, hypothesis_id: int, family: str, sweep_id: str,
+                     attempts: int, screened: int, best_margin: float | None, complete: bool) -> None:
+        self.conn.execute(
+            "INSERT OR REPLACE INTO sweep_summary (target_id, hypothesis_id, family, sweep_id,"
+            " attempts, screened, best_margin, complete) VALUES (?,?,?,?,?,?,?,?)",
+            (target_id, hypothesis_id, family, sweep_id, attempts, screened, best_margin,
+             int(complete)))
 
     def record_attempt(self, *, hypothesis_id: int, key_candidate_id: int, target_id: str,
                        cipher_family: str, params: dict, dedupe: str, executor_version: str,
@@ -363,7 +390,11 @@ class Ledger:
             "SELECT a.cipher_family, h.description, h.proposer_model, COUNT(*) AS attempts"
             " FROM attempt a JOIN hypothesis h ON h.id=a.hypothesis_id WHERE a.target_id=?"
             " GROUP BY a.cipher_family, h.id ORDER BY h.id", (target_id,)).fetchall()
-        return [dict(r) for r in rows]
+        lean = self.conn.execute(
+            "SELECT s.family AS cipher_family, h.description, h.proposer_model, s.attempts"
+            " FROM sweep_summary s JOIN hypothesis h ON h.id=s.hypothesis_id WHERE s.target_id=?"
+            " ORDER BY h.id", (target_id,)).fetchall()
+        return [dict(r) for r in rows] + [dict(r) for r in lean]
 
     def leads(self, target_id: str | None = None, include_near_miss: bool = False,
               limit: int = 50, final_only: bool = False) -> list[dict]:

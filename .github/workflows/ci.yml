@@ -84,6 +84,7 @@ jobs:
           models = "config/ci_models.toml"
           supervisor = "sup"
           publish = false
+          min_free_gb = 0
           [[job]]
           id = "sw"
           kind = "swarm"

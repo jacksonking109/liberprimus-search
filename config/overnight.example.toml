@@ -14,6 +14,8 @@ supervisor_generators = ["codex", "claude-sonnet", "qwen-local", "gemma-local"]
 publish = true                                # push report files to the `results` branch
 results_branch = "results"
 max_added_jobs = 5                            # cap on jobs the supervisor may add per run
+min_free_gb = 15                              # no new jobs below this much free disk; the run stops
+                                              # cleanly (resumable) below a third of it. See: lpswarm disk
 max_parallel = 4                              # jobs at once; only jobs on different backends
                                               # (Claude plan, Codex plan, each GPU, an API) run
                                               # side by side, others wait in queue order

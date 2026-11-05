@@ -41,6 +41,16 @@ def run_checks(models_config: str | None = None, ping: bool = False,
         out.append(Check(FAIL, "lpswarm package", str(exc)))
         return out
 
+    try:
+        from lpswarm.diskuse import dir_size, free_gb
+        free = free_gb(".")
+        rep = dir_size(Path("reports")) / 1024 ** 3 if Path("reports").is_dir() else 0.0
+        out.append(Check(OK if free >= 15 else WARN, "disk",
+                         f"{free:.0f} GB free; reports\\ uses {rep:.1f} GB"
+                         + ("" if free >= 15 else " (low: unattended runs pause below 15 GB; "
+                            "lpswarm disk --prune frees old ledgers)")))
+    except OSError:
+        pass
     root = Path(data_root)
     for rel in ("data/alphabet/gematria_primus.json", "data/lp/manifest.json"):
         p = root / rel

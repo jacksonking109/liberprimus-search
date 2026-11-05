@@ -382,6 +382,20 @@ def with_offset(spec: dict, offset: int) -> dict:
     return _normalise(s)
 
 
+def expansion_size(spec: dict) -> int:
+    """How many concrete ciphers `expand` would produce for a compiled spec (an upper bound:
+    decimation steps that do not suit the text length are dropped at expansion time)."""
+    st = spec["stream"]
+    total = 1
+    if spec.get("transpose_range"):
+        total *= spec["transpose_range"][1] - spec["transpose_range"][0] + 1
+    if spec.get("offset_range"):
+        total *= spec["offset_range"][1] - spec["offset_range"][0] + 1
+    if st.get("exhaustive"):
+        total *= st["n"] ** len(st["key"])
+    return total
+
+
 def _with_transpose_param(tr: dict, v: int) -> dict:
     if "grid" in tr:
         return {"grid": {"width": v, "read": tr["grid"]["read"]}}

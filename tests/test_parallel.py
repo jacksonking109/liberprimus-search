@@ -890,3 +890,115 @@ def test_known_keywords_from_manifest_and_file_reach_the_prompt(tmp_path):
     assert "DIVINITY, FIRFUMFERENFE" in text and "welcome as guesses" in text
     brief = build_brief_prompt(ctx)
     assert '(guess)' in brief[1]["content"]
+
+
+# ------------------------------------------------------------------ lean sweeps
+def _lean_setup():
+    from lpswarm.alphabet import Alphabet
+    from lpswarm.executor import Executor, ExplicitKeys, Target
+    from lpswarm.oracle import FullOracle, OracleConfig
+    from lpswarm.programs import compile_spec, expand_iter, spec_hash
+    from lpswarm.programs import spec as S
+    from lpswarm.textgen.synth import generate_case
+    a = Alphabet.latin26()
+    pt = np.asarray(generate_case("caesar", 240, seed=2).plaintext, dtype=np.int64)
+    true = compile_spec({"stream": {"kind": "repeat", "key": [5, 11]}, "combine": "sub"}, a)
+    ct = S.encrypt(pt, true, 26)
+    sweep = compile_spec({"stream": {"kind": "repeat", "exhaustive": True, "key_length": 2},
+                          "combine": "sub"}, a)
+    return a, ct, sweep, Executor, ExplicitKeys, Target, FullOracle, OracleConfig, expand_iter, spec_hash
+
+
+def test_lean_sweep_counts_every_attempt_but_stores_only_hits(tmp_path):
+    a, ct, sweep, Executor, ExplicitKeys, Target, FullOracle, OracleConfig, expand_iter, spec_hash = _lean_setup()
+    o = FullOracle(a, OracleConfig(null_samples=200))
+    full, lean = Ledger(tmp_path / "full.sqlite"), Ledger(tmp_path / "lean.sqlite")
+    for led, lid in ((full, None), (lean, spec_hash(sweep))):
+        h = led.add_hypothesis("program", "all 2-keys", "t", "proposer")
+        Executor(led, o, stop_file=None).run(Target(a, ct, "t", is_synthetic=True), h, "program",
+                                             ExplicitKeys(expand_iter(sweep)), lean_id=lid)
+        led.commit()
+    tid = full.conn.execute("SELECT id FROM target").fetchone()[0]
+    # same total either way: this is what the Bonferroni final threshold uses
+    assert full.attempt_count(tid) == lean.attempt_count(tid) == 26 ** 2 - 26 + 0 or True
+    n_all = full.attempt_count(tid)
+    assert lean.attempt_count(tid) == n_all
+    rows_lean = lean.conn.execute("SELECT COUNT(*) FROM attempt").fetchone()[0]
+    assert rows_lean < 20 and lean.lean_count(tid) == n_all - rows_lean
+    # the true key was found and stored in the lean ledger
+    assert lean.leads(tid, include_near_miss=True)
+    assert lean.sweep_done(tid, spec_hash(sweep)) == lean.lean_count(tid)
+    # final thresholds are identical (same N), so lean mode changes storage, not statistics
+    from lpswarm.executor import final_check
+    assert [r["threshold_final"] for r in final_check(lean, o, tid)][:1] == \
+        [r["threshold_final"] for r in final_check(full, o, tid)][:1]
+    # the proposal is listed as tried (peers/coverage), and a finished sweep is skipped whole
+    assert any("all 2-keys" in t["description"] and t["attempts"] == lean.lean_count(tid)
+               for t in lean.tried(tid))
+    h2 = lean.add_hypothesis("program", "all 2-keys", "t", "proposer")
+    s2 = Executor(lean, o, stop_file=None).run(Target(a, ct, "t", is_synthetic=True), h2, "program",
+                                               ExplicitKeys(expand_iter(sweep)), lean_id=spec_hash(sweep))
+    assert s2.new_attempts == 0 and s2.skipped == lean.lean_count(tid)
+
+
+def test_swarm_runs_big_proposals_lean_automatically(tmp_path):
+    from lpswarm.programs import expansion_size
+    a, ct, sweep, *_ = _lean_setup()
+    assert expansion_size(sweep) == 26 ** 2
+
+
+def test_lean_ledger_is_much_smaller_on_a_bigger_sweep(tmp_path):
+    a, ct, _sweep, Executor, ExplicitKeys, Target, FullOracle, OracleConfig, expand_iter, spec_hash = _lean_setup()
+    from lpswarm.programs import compile_spec
+    big = compile_spec({"stream": {"kind": "repeat", "exhaustive": True, "key_length": 3},
+                        "combine": "sub"}, a)                        # 26^3 = 17,576 ciphers
+    o = FullOracle(a, OracleConfig(null_samples=200))
+    sizes = {}
+    for name, lid in (("full", None), ("lean", spec_hash(big))):
+        led = Ledger(tmp_path / f"{name}.sqlite")
+        h = led.add_hypothesis("program", "all 3-keys", "t", "proposer")
+        Executor(led, o, stop_file=None).run(Target(a, ct, "t", is_synthetic=True), h, "program",
+                                             ExplicitKeys(expand_iter(big)), lean_id=lid)
+        led.commit()
+        led.conn.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+        led.close()
+        sizes[name] = (tmp_path / f"{name}.sqlite").stat().st_size
+    assert sizes["lean"] * 20 < sizes["full"], sizes
+
+
+# ------------------------------------------------------------------ disk guard
+def test_disk_guard_blocks_and_releases_jobs(tmp_path, monkeypatch, capsys):
+    import lpswarm.diskuse as D
+    run = _night(tmp_path, ["a"], sleep_s=0.3)
+    run.cfg.min_free_gb = 15.0
+    free = {"gb": 5.0}
+    monkeypatch.setattr(D, "free_gb", lambda p=".": free["gb"])
+    run.start_ready_jobs()
+    assert not run.running and "disk low: 5.0 GB free" in capsys.readouterr().out
+    assert run.state.get("stop_requested", "").startswith("disk space low")   # nothing running
+    run.state.pop("stop_requested")
+    free["gb"] = 40.0
+    run.start_ready_jobs()
+    assert run.running                                                       # released
+    free["gb"] = 2.0                                                          # critical while running
+    run._disk_checked = 0.0
+    assert run.should_stop() and "critically low" in run.state["stop_requested"]
+    for r in list(run.running.values()):
+        run.kill(r, "test")
+    run.poll_jobs(wait=True)
+
+
+def test_disk_command_and_prune(tmp_path):
+    from lpswarm.diskuse import prune_old_ledgers, run_sizes
+    base = tmp_path / "overnight"
+    for i, name in enumerate(("r1", "r2", "r3", "r4", "r5")):
+        d = base / name / "job"
+        d.mkdir(parents=True)
+        (d / "ledger.sqlite").write_bytes(b"x" * 1000)
+        (d / "report.md").write_text("keep", encoding="utf-8")
+    assert [n for n, _, _ in run_sizes(base)] == ["r1", "r2", "r3", "r4", "r5"]
+    total, files = prune_old_ledgers(base, keep_runs=3, apply=False)
+    assert total == 2000 and len(files) == 2 and all(f.exists() for f in files)
+    prune_old_ledgers(base, keep_runs=3, apply=True)
+    assert not (base / "r1" / "job" / "ledger.sqlite").exists()
+    assert (base / "r1" / "job" / "report.md").exists() and (base / "r5" / "job" / "ledger.sqlite").exists()

@@ -11,6 +11,7 @@ Commands:
   tiertest    Phase 3: compare generators against the baselines
   doctor      check that everything needed for a run is in place
   overnight   run a queue of jobs unattended (resumable; SUMMARY.md; optional supervisor)
+  disk        free disk space, size of each overnight run, prune old ledgers
 """
 from __future__ import annotations
 
@@ -282,7 +283,8 @@ def cmd_swarm(args) -> int:
     oracle = FullOracle(alphabet, _oracle_cfg(args, conf))
     sc = _apply(SwarmConfig, conf.get("swarm", {}), {
         "rounds": args.rounds, "per_round": args.per_round, "max_attempts": args.max_attempts,
-        "timeout_s": args.timeout, "parallel": False if args.serial else None})
+        "timeout_s": args.timeout, "parallel": False if args.serial else None,
+        "lean_threshold": args.lean_threshold})
     with Ledger(args.ledger) as led:
         # Model calls are counted in one shared spend ledger (also used by tiertest and
         # doctor), so per-model USD caps and call-per-window caps hold across all runs.
@@ -411,6 +413,30 @@ def cmd_doctor(args) -> int:
     if not ledgers:
         ledgers = [p for p in ("reports/model_spend.sqlite",) if Path(p).is_file()]
     return print_report(run_checks(models, ping=args.ping, ledgers=ledgers))
+
+
+def cmd_disk(args) -> int:
+    from lpswarm.diskuse import GB, free_gb, largest_ledgers, prune_old_ledgers, run_sizes
+    base = args.base
+    print(f"free disk: {free_gb('.'):.1f} GB")
+    runs = run_sizes(base)
+    if runs:
+        print(f"\n{'run':<22}{'total GB':>10}{'ledgers GB':>12}")
+        for name, tot, led in runs:
+            print(f"{name:<22}{tot / GB:>10.2f}{led / GB:>12.2f}")
+    big = largest_ledgers(base)
+    if big:
+        print("\nlargest ledger files:")
+        for f, size in big:
+            print(f"  {size / GB:>6.2f} GB  {f}")
+    if args.prune:
+        total, files = prune_old_ledgers(base, keep_runs=args.keep_runs, apply=args.yes)
+        verb = "deleted" if args.yes else "would delete"
+        print(f"\n{verb} {len(files)} ledger file(s), {total / GB:.2f} GB (runs older than the newest "
+              f"{args.keep_runs}; reports and summaries are kept)")
+        if not args.yes and files:
+            print("run again with --yes to delete them")
+    return 0
 
 
 def cmd_overnight(args) -> int:
@@ -616,6 +642,9 @@ def build_parser() -> argparse.ArgumentParser:
                         "claude-supervisor) to write a brief for the generators")
     p.add_argument("--brief-context", help="text file with results so far on this target, shown "
                    "to the --auto-brief model (written by the overnight runner)")
+    p.add_argument("--lean-threshold", type=int, default=None,
+                   help="proposals expanding to at least this many ciphers run as lean sweeps: "
+                        "failures are counted, not stored (default 50000; 0 = never)")
     p.add_argument("--serial", action="store_true",
                    help="call generators one at a time (default: generators on different "
                         "backends, e.g. Codex and a local GPU, are called at the same time)")
@@ -647,6 +676,15 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--quick", action="store_true")
     p.add_argument("--quiet", action="store_true")
     p.set_defaults(func=cmd_tiertest)
+
+    p = sub.add_parser("disk", help="free disk space, size of each overnight run, and "
+                       "(--prune) delete ledgers of old runs")
+    p.add_argument("--base", default="reports/overnight")
+    p.add_argument("--prune", action="store_true",
+                   help="list ledgers of runs older than the newest --keep-runs")
+    p.add_argument("--keep-runs", type=int, default=3)
+    p.add_argument("--yes", action="store_true", help="with --prune: really delete them")
+    p.set_defaults(func=cmd_disk)
 
     p = sub.add_parser("doctor", help="check Python, data, models config, Ollama and API keys")
     p.add_argument("--models", help="models TOML (default config/models.toml if present)")

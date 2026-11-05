@@ -64,6 +64,7 @@ class RunSummary:
     passes: int = 0
     near_misses: int = 0
     prior_passes: int = 0            # skipped attempts that had already passed
+    lean: int = 0                    # failed attempts counted but not stored (lean sweeps)
     equivalent: int = 0              # skipped: same decryption as an earlier, different key
     unreachable: int = 0             # attempts whose threshold exceeded the best possible score
     stopped: str | None = None       # reason if a budget or kill switch stopped the run
@@ -97,7 +98,11 @@ class Executor:
         return None
 
     def run(self, target: Target, hypothesis_id: int, family_name: str, keys: KeySource,
-            param_limits: dict[str, Any] | None = None) -> RunSummary:
+            param_limits: dict[str, Any] | None = None, lean_id: str | None = None) -> RunSummary:
+        """Run every key of `keys` on the target. With `lean_id` (a hash of the proposal) the
+        run is a *lean sweep*, for expansions too large to store row by row: attempts that fail
+        are only counted (they still count towards the Bonferroni total), passes and near misses
+        are stored in full, and a finished sweep of the same proposal is skipped whole."""
         fam = get_family(family_name)
         alpha = target.alphabet
         n = alpha.size
@@ -118,8 +123,17 @@ class Executor:
         self.ledger.set_hypothesis_status(hypothesis_id, "running")
         self.ledger.commit()
         summary = RunSummary(tid, family_name, hypothesis_id)
+        if lean_id is not None:
+            done = self.ledger.sweep_done(tid, lean_id)
+            if done is not None:
+                summary.skipped += done
+                summary.stopped = None
+                self.ledger.set_hypothesis_status(hypothesis_id, "ruled_out")
+                self.ledger.commit()
+                return summary
         count = self.ledger.attempt_count(tid)
         seen_outputs = self.ledger.output_hashes(tid)
+        lean_screened, lean_best = 0, None
         t0 = time.monotonic()
         since_commit = 0
         exhausted = True
@@ -157,14 +171,29 @@ class Executor:
                         if prior == "pass":
                             summary.prior_passes += 1
                         continue
+                    rep = self.oracle.score(pt, attempt_count=count + 1, breaks=breaks,
+                                            variant=variant)
+                    if lean_id is not None and rep.verdict == "fail":
+                        # Counted, not stored: one aggregate row per sweep is written at the end.
+                        seen_outputs.add(oh)
+                        count += 1
+                        summary.new_attempts += 1
+                        summary.lean += 1
+                        if rep.stage == "screen":
+                            summary.screened_out += 1
+                            lean_screened += 1
+                        elif rep.threshold is not None and rep.combined is not None:
+                            m = float(rep.combined - rep.threshold)
+                            lean_best = m if lean_best is None else max(lean_best, m)
+                        if rep.unreachable:
+                            summary.unreachable += 1
+                        continue
                     if kid is None:
                         preview = kc.label or fam.key_preview(kc.key)
                         kj = json.dumps(fam.key_json(kc.key), sort_keys=True, separators=(",", ":"))
                         kid = self.ledger.key_candidate_id(khash, kc.derivation, preview,
                                                            kc.corpus_item_id, kc.edition_id,
                                                            kj if len(kj) <= MAX_KEY_JSON else None)
-                    rep = self.oracle.score(pt, attempt_count=count + 1, breaks=breaks,
-                                            variant=variant)
                     ms = (time.perf_counter() - ts) * 1000.0
                     aid = self.ledger.record_attempt(
                         hypothesis_id=hypothesis_id, key_candidate_id=kid, target_id=tid,
@@ -194,6 +223,9 @@ class Executor:
             self.ledger.set_hypothesis_status(hypothesis_id, "open")
             self.ledger.commit()
             raise
+        if lean_id is not None:
+            self.ledger.record_sweep(tid, hypothesis_id, family_name, lean_id, summary.lean,
+                                     lean_screened, lean_best, complete=exhausted)
         self.ledger.commit()
         tried = summary.new_attempts + summary.skipped
         if summary.passes or summary.prior_passes or self.ledger.hypothesis_has_pass(hypothesis_id):

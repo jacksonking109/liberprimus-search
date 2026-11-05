@@ -11,6 +11,23 @@ to length 4 on the short sections; a length-4 sweep is ~700,000 ciphers, a few m
 (`Copy-Item config\overnight.example.toml config\overnight.toml -Force`, after noting your own
 edits such as `max_parallel` and `capacity`) and start with `-New`.
 
+## Disk space (new)
+
+Ledgers use about 1 KB per stored attempt, and the exhaustive lane filled a disk once. Now:
+huge sweeps (50,000+ ciphers in one proposal) are **lean**: failures are counted (they still count
+toward the statistics) but not stored, so a 700,000-cipher sweep leaves kilobytes; the runner
+won't start jobs below `min_free_gb` (15) and stops cleanly below a third of that; `doctor` shows
+free space; and `lpswarm disk` lists sizes per run. To free space from old runs (dry run first;
+reports and summaries are kept):
+
+```powershell
+.\.venv\Scripts\lpswarm.exe disk --prune
+```
+
+```powershell
+.\.venv\Scripts\lpswarm.exe disk --prune --yes
+```
+
 ## Next time at the PC (changes from Nov 4)
 
 Do these once, in the `liberprimus-search` folder, then delete this section.

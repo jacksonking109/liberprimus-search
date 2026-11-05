@@ -103,6 +103,24 @@ CREATE TABLE IF NOT EXISTS final_check (
     checked_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
+-- Lean sweeps (huge expansions): failed attempts are only counted, not stored row by row.
+-- Passes and near misses of such a sweep are stored as ordinary attempts. The counts below are
+-- part of the target's attempt total (Bonferroni N), and `sweep_id` lets a finished sweep be
+-- skipped whole when the same proposal comes up again.
+CREATE TABLE IF NOT EXISTS sweep_summary (
+    id INTEGER PRIMARY KEY,
+    target_id TEXT NOT NULL REFERENCES target(id),
+    hypothesis_id INTEGER NOT NULL REFERENCES hypothesis(id),
+    family TEXT NOT NULL,
+    sweep_id TEXT NOT NULL,            -- hash of the proposal (spec) that was swept
+    attempts INTEGER NOT NULL,         -- attempts counted but not stored (failures)
+    screened INTEGER NOT NULL DEFAULT 0,
+    best_margin REAL,                  -- best (combined - threshold) among them
+    complete INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    UNIQUE (target_id, sweep_id)
+);
+
 -- Usage limits hit by subscription CLIs; a model is paused until resume_at.
 CREATE TABLE IF NOT EXISTS rate_limit_event (
     id INTEGER PRIMARY KEY,
