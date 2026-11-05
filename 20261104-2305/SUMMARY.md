@@ -1,6 +1,6 @@
 # Overnight run 20261104-2305
 
-Started 2026-11-04 23:05:16, updated 2026-11-05 03:04:38, status **running**. Jobs: pending 10, running 3, done 66
+Started 2026-11-04 23:05:16, updated 2026-11-05 03:10:24, status **running**. Jobs: pending 9, running 3, done 67
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -77,7 +77,7 @@ Started 2026-11-04 23:05:16, updated 2026-11-05 03:04:38, status **running**. Jo
 | deepseek/24 | pending |  |  | DeepSeek (volume) |
 | deepseek/25 | pending |  |  | DeepSeek (volume) |
 | sup1/14 | done | 2026-11-05 02:49:15 | 2026-11-05 03:04:38 | added by supervisor. Long sections (1729, 1894 and 2474 runes) give the most reliable scoring. After about 45 jobs, ever |
-| sup1/16 | pending |  |  | added by supervisor. Long sections (1729, 1894 and 2474 runes) give the most reliable scoring. After about 45 jobs, ever |
+| sup1/16 | done | 2026-11-05 03:04:53 | 2026-11-05 03:10:24 | added by supervisor. Long sections (1729, 1894 and 2474 runes) give the most reliable scoring. After about 45 jobs, ever |
 | sup1/22 | pending |  |  | added by supervisor. Long sections (1729, 1894 and 2474 runes) give the most reliable scoring. After about 45 jobs, ever |
 | sup2/10 | pending |  |  | added by supervisor. Mid-length sections (693-1468 runes) are long enough to judge, but so far they have only had the ge |
 | sup2/12 | pending |  |  | added by supervisor. Mid-length sections (693-1468 runes) are long enough to judge, but so far they have only had the ge |
@@ -250,6 +250,8 @@ round 1 [deepseek] proposals=1 valid=1 attempts=2000 passes=0 near=0 invalid=0
   - LP2:56.jpg/2: 60000 attempts, 59 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **sup1/14** (done)
   - LP2:8.jpg-14.jpg - 25.jpg-31.jpg: 37873 attempts, 44 hypotheses, **0 final pass(es)**
+- **sup1/16** (done)
+  - LP2:15.jpg/2- - 32.jpg/2-39.jpg: 50000 attempts, 22 hypotheses, **0 final pass(es)**, stopped: max_attempts
 
 ## Model usage
 
@@ -257,9 +259,9 @@ round 1 [deepseek] proposals=1 valid=1 attempts=2000 passes=0 near=0 invalid=0
 - qwen-local: 29 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 29 call(s) in the last 5h (cap none), spent $0.0000
 - granite: 45 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 87 call(s) in the last 5h (cap 180), spent $0.0000
-- claude-sonnet: 87 call(s) in the last 5h (cap 180), spent $0.0000
-- claude-supervisor: 87 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-opus: 89 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-sonnet: 89 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-supervisor: 89 call(s) in the last 5h (cap 180), spent $0.0000
 - codex: 55 call(s) in the last 5h (cap 850), spent $0.0000
 
 ## Current strategy note (read by every lane each round)
@@ -293,16 +295,6 @@ Prefer combinations missing from the section's history. A real hit should show s
 
 ## Events
 
-- 2026-11-05 02:49:15 sup1/14: start (uses claude-plan)
-- 2026-11-05 02:49:15 4 running: exhaustive/11, exhaustive/19, deepseek/20, sup1/14
-- 2026-11-05 02:49:15 exhaustive/21 waiting: codex-plan full (2/2: exhaustive/11, exhaustive/19)
-- 2026-11-05 02:49:55 exhaustive/19: running 70 min | 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-05 02:51:40 exhaustive/11: running 80 min | 01:32:40 [model] codex (proposer) ok 67.6s, tokens in/out 18877/2766, reply 8967 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-05 02:52:50 deepseek/20: running 5 min | 02:52:09 [model] deepseek (proposer) ok 16.4s, tokens in/out 5275/2373, reply 6762 chars
-- 2026-11-05 02:54:16 sup1/14: running 5 min | 02:53:18 [model] claude-sonnet (proposer) ok 20.7s, tokens in/out 7842/2334, reply 3077 chars
-- 2026-11-05 02:54:36 deepseek/20: done (exit 0, 7 min)
-- 2026-11-05 02:54:51 published: 64 file(s) to branch results
-- 2026-11-05 02:54:51 deepseek/21: start (uses api:https://api.deepseek.com)
 - 2026-11-05 02:54:51 4 running: exhaustive/11, exhaustive/19, sup1/14, deepseek/21
 - 2026-11-05 02:54:51 exhaustive/21 waiting: codex-plan full (2/2: exhaustive/11, exhaustive/19)
 - 2026-11-05 02:54:56 exhaustive/19: running 75 min | 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
@@ -318,3 +310,13 @@ Prefer combinations missing from the section's history. A real hit should show s
 - 2026-11-05 03:01:43 exhaustive/11: running 90 min | 01:32:40 [model] codex (proposer) ok 67.6s, tokens in/out 18877/2766, reply 8967 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-05 03:04:18 sup1/14: running 15 min | 03:00:40 [model] claude-sonnet (proposer) ok 22.7s, tokens in/out 9823/2357, reply 2882 chars
 - 2026-11-05 03:04:38 sup1/14: done (exit 0, 15 min)
+- 2026-11-05 03:04:53 published: 66 file(s) to branch results
+- 2026-11-05 03:04:53 sup1/16: start (uses claude-plan)
+- 2026-11-05 03:04:53 4 running: exhaustive/11, exhaustive/19, deepseek/22, sup1/16
+- 2026-11-05 03:04:53 exhaustive/21 waiting: codex-plan full (2/2: exhaustive/11, exhaustive/19)
+- 2026-11-05 03:04:58 exhaustive/19: running 85 min | 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 03:06:28 deepseek/22: running 5 min | 03:02:17 [model] deepseek (proposer) ok 9.7s, tokens in/out 3988/2388, reply 7116 chars
+- 2026-11-05 03:06:43 exhaustive/11: running 95 min | 01:32:40 [model] codex (proposer) ok 67.6s, tokens in/out 18877/2766, reply 8967 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 03:09:54 sup1/16: running 5 min | 03:09:43 [model] claude-sonnet (proposer) ok 28.6s, tokens in/out 7456/2849, reply 3439 chars
+- 2026-11-05 03:09:59 exhaustive/19: running 90 min | 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 03:10:24 sup1/16: done (exit 0, 6 min)
