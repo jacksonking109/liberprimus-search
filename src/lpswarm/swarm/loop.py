@@ -9,6 +9,7 @@ target closes the run.
 """
 from __future__ import annotations
 
+import re
 import time
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
@@ -47,6 +48,18 @@ class SwarmConfig:
             raise ValueError("SwarmConfig: rounds and per_round must be >= 1")
 
 
+MAX_REASON_KEYS = 40
+REASON_CHARS = 100
+
+
+def normalise_reason(text: str) -> str:
+    """Group invalid-proposal messages: numbers, quoted fragments and bracketed lists collapsed."""
+    t = re.sub(r"\[[^\]]*\]", "[...]", str(text))
+    t = re.sub(r"'[^']*'|\"[^\"]*\"", "'...'", t)
+    t = re.sub(r"-?\d+", "#", t)
+    return t.strip()[:REASON_CHARS] or "(empty)"
+
+
 @dataclass
 class GeneratorStats:
     name: str
@@ -58,6 +71,16 @@ class GeneratorStats:
     near_misses: int = 0
     model_errors: int = 0
     first_pass_attempt: int | None = None   # attempts on target when this generator first passed
+    # Why proposals were invalid: normalised reason -> [count, one short example]. Kept in
+    # report.json (the errors fed back into prompts are not stored anywhere else).
+    invalid_reasons: dict = field(default_factory=dict)
+
+    def note_invalid(self, text: str) -> None:
+        key = normalise_reason(text)
+        if key not in self.invalid_reasons and len(self.invalid_reasons) >= MAX_REASON_KEYS:
+            key = "(other reasons)"
+        slot = self.invalid_reasons.setdefault(key, [0, str(text)[:REASON_CHARS]])
+        slot[0] += 1
 
 
 @dataclass
@@ -171,10 +194,12 @@ def run_swarm(target: Target, ledger: Ledger, oracle: FullOracle, generators: Se
                     spec = compile_spec(rp.spec, alpha)
                 except SpecError as exc:
                     gs.invalid += 1
+                    gs.note_invalid(str(exc))
                     errors[gen.model].append(f"{str(rp.spec)[:100]} -> {str(exc)[:160]}")
                     continue
                 except Exception as exc:  # noqa: BLE001 - malformed input must never crash a run
                     gs.invalid += 1
+                    gs.note_invalid(f"invalid ({type(exc).__name__})")
                     errors[gen.model].append(f"{str(rp.spec)[:100]} -> invalid ({type(exc).__name__})")
                     continue
                 h = spec_hash(spec)
@@ -210,6 +235,7 @@ def run_swarm(target: Target, ledger: Ledger, oracle: FullOracle, generators: Se
                                lean_spec=lean_spec)
                 except (SpecError, ValueError) as exc:
                     gs.invalid += 1
+                    gs.note_invalid(f"could not run: {exc}")
                     errors[gen.model].append(f"{desc} -> could not run: {str(exc)[:160]}")
                     continue
                 used += s.new_attempts

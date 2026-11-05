@@ -512,7 +512,8 @@ def build(ledger_specs: list[dict], notes: list[str], top_leads: int = 10,
                 "Lean-sweep summaries written before checkpoints record a count, a completion flag and "
                 "the proposal's description, not its spec; their completed subset is unknown.",
                 "Why an unfinished job stopped is recorded only in report.json beside the ledger, "
-                "when present; invalid proposals never reach a ledger.",
+                "when present; invalid proposals never reach a ledger (their counts and grouped reasons are in "
+                "report.json as invalid_reasons).",
                 "No cross-job or cross-run deduplication exists, so summed totals may overlap.",
                 "Transcription version is not recorded; identity is the target id only.",
                 "History is not rescored: recorded thresholds and margins are shown as they were."]}

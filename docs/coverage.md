@@ -108,7 +108,8 @@ used to skip work, and logical attempt counts and the end-of-search threshold ar
 2. Lean summaries written before checkpoints do not store the spec, cursor or stop reason; their
    completed subset is unknown.
 3. For hypotheses that are not lean sweeps, why an unfinished job stopped is recorded only in
-   `report.json` (when present); invalid proposals never reach a ledger.
+   `report.json` (when present); invalid proposals never reach a ledger (their counts and grouped
+   reasons are in `report.json` as `invalid_reasons`).
 4. Hypotheses with no attempts cannot be tied to a target; they are counted per ledger
    (`hypotheses_without_attempts`).
 5. No cross-job or cross-run deduplication, so totals may overlap.

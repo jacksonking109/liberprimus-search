@@ -17,6 +17,11 @@ MIN_TARGET_SYMBOLS = 20     # shorter sections are skipped by swarm/baseline (--
 SHORT_TARGET_SYMBOLS = 100  # below this a lead says little: flagged in reports and SUMMARY
 
 
+def _cell(text) -> str:
+    """A table cell: no pipes or newlines."""
+    return str(text).replace("|", "/").replace("\n", " ")
+
+
 def short_note(symbols: int) -> str:
     """'' for a normal-length target, else a caution for reports."""
     if symbols >= SHORT_TARGET_SYMBOLS:
@@ -118,6 +123,15 @@ def write_run_report(out_dir: str | Path, title: str, command: str, entries: lis
                              f"{g.get('attempts', 0)} | {g.get('passes', 0)} | "
                              f"{g.get('near_misses', 0)} | {g.get('model_errors', 0)} |")
             lines.append("")
+            for name, g in e["generators"].items():
+                rs = g.get("invalid_reasons") or {}
+                if not rs:
+                    continue
+                lines += [f"Invalid proposals by reason ({name}; reasons are grouped, the example is "
+                          "the first one seen):", "", "| count | reason | example |", "| ---: | --- | --- |"]
+                for reason, (cnt, ex) in sorted(rs.items(), key=lambda kv: -kv[1][0])[:8]:
+                    lines.append(f"| {cnt} | {_cell(reason)} | {_cell(ex)} |")
+                lines.append("")
         if not e["leads"]:
             lines.append("No passes or near misses: everything tried is recorded as ruled out.")
             continue
