@@ -1,6 +1,6 @@
 # Overnight run 20261104-2305
 
-Started 2026-11-04 23:05:16, updated 2026-11-05 01:27:48, status **running**. Jobs: pending 26, running 3, done 50
+Started 2026-11-04 23:05:16, updated 2026-11-05 01:28:09, status **running**. Jobs: pending 25, running 3, done 51
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -66,7 +66,7 @@ Started 2026-11-04 23:05:16, updated 2026-11-05 01:27:48, status **running**. Jo
 | deepseek/12 | done | 2026-11-05 01:01:26 | 2026-11-05 01:11:19 | DeepSeek (volume) |
 | deepseek/13 | done | 2026-11-05 01:11:35 | 2026-11-05 01:17:00 | DeepSeek (volume) |
 | deepseek/14 | done | 2026-11-05 01:17:16 | 2026-11-05 01:27:48 | DeepSeek (volume) |
-| deepseek/15 | pending |  |  | DeepSeek (volume) |
+| deepseek/15 | done | 2026-11-05 01:28:03 | 2026-11-05 01:28:09 | DeepSeek (volume) |
 | deepseek/16 | pending |  |  | DeepSeek (volume) |
 | deepseek/17 | pending |  |  | DeepSeek (volume) |
 | deepseek/18 | pending |  |  | DeepSeek (volume) |
@@ -228,6 +228,8 @@ round 1 [codex] proposals=32 valid=32 attempts=128172 passes=0 near=0 invalid=0
   - LP2:6.jpg/2-7.jpg - 23.jpg/2-24.jpg: 60000 attempts, 34 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **deepseek/14** (done)
   - LP2:8.jpg-14.jpg - 25.jpg-31.jpg: 60000 attempts, 62 hypotheses, **0 final pass(es)**, stopped: max_attempts
+- **deepseek/15** (done)
+  - skip LP2:15.jpg/1 - 32.jpg/1: only 9 symbols (minimum 20, --min-length); too short to judge
 
 ## Model usage
 
@@ -268,11 +270,6 @@ Prefer combinations missing from the section's history. A real hit should show s
 
 ## Events
 
-- 2026-11-05 01:11:35 published: 48 file(s) to branch results
-- 2026-11-05 01:11:35 deepseek/13: start (uses api:https://api.deepseek.com)
-- 2026-11-05 01:11:35 4 running: structure/17, local/13, structure/24, deepseek/13
-- 2026-11-05 01:11:35 local/22 waiting: ollama:http://127.0.0.1:11434 in use by local/13
-- 2026-11-05 01:13:25 structure/24: running 5 min | 01:09:25 [model] codex (proposer) ok 57.9s, tokens in/out 18803/2610, reply 8637 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-05 01:15:20 structure/17: running 95 min | 01:03:08 [model] codex (proposer) ok 57.8s, tokens in/out 21895/2716, reply 9254 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-05 01:16:10 local/13: running 10 min | 01:12:46 [model] granite (weighting) ok 1.3s, tokens in/out 261/38, reply 69 chars
 - 2026-11-05 01:16:35 deepseek/13: running 5 min | 01:16:20 [model] deepseek (proposer) ok 16.9s, tokens in/out 5663/2303, reply 7796 chars
@@ -293,3 +290,8 @@ Prefer combinations missing from the section's history. A real hit should show s
 - 2026-11-05 01:25:38 local/22: running 5 min | 01:24:58 [model] qwen-local (proposer) calling...
 - 2026-11-05 01:27:18 deepseek/14: running 10 min | 01:27:05 [model] deepseek (proposer) ok 15.7s, tokens in/out 6489/1864, reply 6221 chars
 - 2026-11-05 01:27:48 deepseek/14: done (exit 0, 11 min)
+- 2026-11-05 01:28:03 published: 51 file(s) to branch results
+- 2026-11-05 01:28:03 deepseek/15: start (uses api:https://api.deepseek.com)
+- 2026-11-05 01:28:04 4 running: structure/17, structure/24, local/22, deepseek/15
+- 2026-11-05 01:28:04 local/12 waiting: ollama:http://127.0.0.1:11434 in use by local/22
+- 2026-11-05 01:28:09 deepseek/15: done (exit 0, 0 min)
