@@ -1,0 +1,1856 @@
+{
+ "diffs": {
+  "bigrams": 12605,
+  "complete": true,
+  "descriptive": [
+   {
+    "adjacent_equal": 4,
+    "adjacent_expected": 25.776663825335266,
+    "equal_across_boundary": 2,
+    "equal_within_word": 2,
+    "ic29": 1.026817652382861,
+    "ic29_if_uniform": 1.0384087791495198,
+    "label": "LP2:17.jpg, 18.jpg, 19.jpg - 0.jpg-2.jpg",
+    "runes": 729,
+    "section": 10
+   },
+   {
+    "adjacent_equal": 4,
+    "adjacent_expected": 24.831360398459964,
+    "equal_across_boundary": 2,
+    "equal_within_word": 2,
+    "ic29": 1.0406205947331488,
+    "ic29_if_uniform": 1.0404040404040404,
+    "label": "LP2:20.jpg/2-23.jpg/1 - 3.jpg/2-6.jpg/1",
+    "runes": 693,
+    "section": 12
+   },
+   {
+    "adjacent_equal": 1,
+    "adjacent_expected": 12.308272236200164,
+    "equal_across_boundary": 0,
+    "equal_within_word": 1,
+    "ic29": 1.075120165210255,
+    "ic29_if_uniform": 1.0840840840840842,
+    "label": "LP2:6.jpg/2-7.jpg - 23.jpg/2-24.jpg",
+    "runes": 333,
+    "section": 13
+   },
+   {
+    "adjacent_equal": 9,
+    "adjacent_expected": 60.51269652085456,
+    "equal_across_boundary": 2,
+    "equal_within_word": 7,
+    "ic29": 1.0155487263337861,
+    "ic29_if_uniform": 1.0161943319838056,
+    "label": "LP2:8.jpg-14.jpg - 25.jpg-31.jpg",
+    "runes": 1729,
+    "section": 14
+   },
+   {
+    "adjacent_equal": 10,
+    "adjacent_expected": 66.2638337706245,
+    "equal_across_boundary": 0,
+    "equal_within_word": 10,
+    "ic29": 1.0151353298193928,
+    "ic29_if_uniform": 1.0147835269271384,
+    "label": "LP2:15.jpg/2- - 32.jpg/2-39.jpg",
+    "runes": 1894,
+    "section": 16
+   },
+   {
+    "adjacent_equal": 11,
+    "adjacent_expected": 35.94614947032973,
+    "equal_across_boundary": 2,
+    "equal_within_word": 9,
+    "ic29": 1.0219983672936885,
+    "ic29_if_uniform": 1.0274240940254653,
+    "label": "LP2:- - 40.jpg-43.jpg",
+    "runes": 1021,
+    "section": 17
+   },
+   {
+    "adjacent_equal": 13,
+    "adjacent_expected": 49.91978043223023,
+    "equal_across_boundary": 5,
+    "equal_within_word": 8,
+    "ic29": 1.0109452741163945,
+    "ic29_if_uniform": 1.019539427773901,
+    "label": "LP2:- - 44.jpg-49.jpg",
+    "runes": 1433,
+    "section": 18
+   },
+   {
+    "adjacent_equal": 11,
+    "adjacent_expected": 51.3015418853804,
+    "equal_across_boundary": 3,
+    "equal_within_word": 8,
+    "ic29": 1.0141409097996126,
+    "ic29_if_uniform": 1.0190735694822888,
+    "label": "LP2:50.jpg/2-56.jpg/1",
+    "runes": 1468,
+    "section": 20
+   },
+   {
+    "adjacent_equal": 16,
+    "adjacent_expected": 86.62624847320785,
+    "equal_across_boundary": 4,
+    "equal_within_word": 12,
+    "ic29": 1.0158355057513253,
+    "ic29_if_uniform": 1.011317704122878,
+    "label": "LP2:57.jpg-66.jpg/1",
+    "runes": 2474,
+    "section": 22
+   },
+   {
+    "adjacent_equal": 2,
+    "adjacent_expected": 18.83731711764788,
+    "equal_across_boundary": 0,
+    "equal_within_word": 2,
+    "ic29": 1.0249196930802789,
+    "ic29_if_uniform": 1.0524344569288389,
+    "label": "LP2:51.jpg/2-53.jpg - 68.jpg/2-70.jpg",
+    "runes": 534,
+    "section": 24
+   },
+   {
+    "adjacent_equal": 3,
+    "adjacent_expected": 11.34615871141845,
+    "equal_across_boundary": 2,
+    "equal_within_word": 1,
+    "ic29": 1.0717869792545116,
+    "ic29_if_uniform": 1.0909090909090908,
+    "label": "LP2:54.jpg-55.jpg - 71.jpg-72.jpg",
+    "runes": 308,
+    "section": 25
+   },
+   {
+    "adjacent_equal": 7,
+    "adjacent_expected": 9.132540873869123,
+    "equal_across_boundary": 5,
+    "equal_within_word": 2,
+    "ic29": 1.6977159316807986,
+    "ic29_if_uniform": 1.178343949044586,
+    "label": "LP1:05.jpg",
+    "runes": 157,
+    "section": 3
+   },
+   {
+    "adjacent_equal": 15,
+    "adjacent_expected": 40.58243710838867,
+    "equal_across_boundary": 3,
+    "equal_within_word": 12,
+    "ic29": 1.8740297390816423,
+    "ic29_if_uniform": 1.0445151033386328,
+    "label": "LP1:10.jpg-13.jpg - index.1.jpg-index.4.jpg",
+    "runes": 629,
+    "section": 7
+   },
+   {
+    "adjacent_equal": 3,
+    "adjacent_expected": 5.9881328115136965,
+    "equal_across_boundary": 1,
+    "equal_within_word": 2,
+    "ic29": 1.9733619492488317,
+    "ic29_if_uniform": 1.3146067415730336,
+    "label": "LP1:16.jpg - 229.jpg",
+    "runes": 89,
+    "section": 9
+   },
+   {
+    "adjacent_equal": 1,
+    "adjacent_expected": 6.883431416930738,
+    "equal_across_boundary": 0,
+    "equal_within_word": 1,
+    "ic29": 2.146446355817112,
+    "ic29_if_uniform": 1.297872340425532,
+    "label": "LP2:57.jpg - 74.jpg",
+    "runes": 94,
+    "section": 27
+   }
+  ],
+  "differences": {
+   "chi2_d_excluding_zero": 42.510239428484496,
+   "max_abs_z_non_zero_d_given_repeats": 2.7216088049234606,
+   "max_abs_z_over_58_bins": 10.885118792616847,
+   "near_zero_enrichment_z": 1.3287924825736293,
+   "p_chi2_d_excluding_zero": 0.06,
+   "p_formula": "(1 + shuffles with statistic >= observed) / (shuffles + 1); max |z| is calibrated over all 58 bins; the non-zero-d statistics hold the number of repeats fixed (shuffled counts rescaled to the observed non-zero total)",
+   "p_max_abs_z": 0.005,
+   "p_max_abs_z_non_zero_d_given_repeats": 0.155,
+   "p_near_zero_enrichment": 0.23,
+   "sum_table": [
+    {
+     "observed": 427,
+     "s": 0,
+     "shuffle_mean": 432.93467336683415,
+     "z": -0.2790676851996575
+    },
+    {
+     "observed": 396,
+     "s": 1,
+     "shuffle_mean": 432.6030150753769,
+     "z": -1.7181151021115673
+    },
+    {
+     "observed": 448,
+     "s": 2,
+     "shuffle_mean": 433.3819095477387,
+     "z": 0.7034904179519432
+    },
+    {
+     "observed": 446,
+     "s": 3,
+     "shuffle_mean": 433.43718592964825,
+     "z": 0.5872784312478614
+    },
+    {
+     "observed": 423,
+     "s": 4,
+     "shuffle_mean": 436.713567839196,
+     "z": -0.6528460106558808
+    },
+    {
+     "observed": 463,
+     "s": 5,
+     "shuffle_mean": 432.286432160804,
+     "z": 1.4323088985891255
+    },
+    {
+     "observed": 438,
+     "s": 6,
+     "shuffle_mean": 434.11557788944725,
+     "z": 0.17785053883869475
+    },
+    {
+     "observed": 442,
+     "s": 7,
+     "shuffle_mean": 432.46231155778895,
+     "z": 0.4891741473934844
+    },
+    {
+     "observed": 411,
+     "s": 8,
+     "shuffle_mean": 434.0603015075377,
+     "z": -1.134115638598891
+    },
+    {
+     "observed": 449,
+     "s": 9,
+     "shuffle_mean": 435.0251256281407,
+     "z": 0.6462054421511806
+    },
+    {
+     "observed": 421,
+     "s": 10,
+     "shuffle_mean": 433.70854271356785,
+     "z": -0.6231424468393578
+    },
+    {
+     "observed": 450,
+     "s": 11,
+     "shuffle_mean": 434.8241206030151,
+     "z": 0.687048772635074
+    },
+    {
+     "observed": 451,
+     "s": 12,
+     "shuffle_mean": 434.964824120603,
+     "z": 0.8212231467146989
+    },
+    {
+     "observed": 411,
+     "s": 13,
+     "shuffle_mean": 436.50251256281405,
+     "z": -1.266042078798085
+    },
+    {
+     "observed": 415,
+     "s": 14,
+     "shuffle_mean": 431.2964824120603,
+     "z": -0.7997939387399323
+    },
+    {
+     "observed": 476,
+     "s": 15,
+     "shuffle_mean": 436.10552763819095,
+     "z": 1.960704000277592
+    },
+    {
+     "observed": 457,
+     "s": 16,
+     "shuffle_mean": 435.5326633165829,
+     "z": 1.0577506732059627
+    },
+    {
+     "observed": 438,
+     "s": 17,
+     "shuffle_mean": 434.50251256281405,
+     "z": 0.1751681024251233
+    },
+    {
+     "observed": 456,
+     "s": 18,
+     "shuffle_mean": 434.286432160804,
+     "z": 0.9622010941497706
+    },
+    {
+     "observed": 421,
+     "s": 19,
+     "shuffle_mean": 438.04522613065325,
+     "z": -0.7806402947270802
+    },
+    {
+     "observed": 427,
+     "s": 20,
+     "shuffle_mean": 438.03015075376885,
+     "z": -0.5350296854206423
+    },
+    {
+     "observed": 434,
+     "s": 21,
+     "shuffle_mean": 433.83417085427135,
+     "z": 0.00819644728684787
+    },
+    {
+     "observed": 465,
+     "s": 22,
+     "shuffle_mean": 430.08040201005025,
+     "z": 1.6540433135683579
+    },
+    {
+     "observed": 433,
+     "s": 23,
+     "shuffle_mean": 435.8492462311558,
+     "z": -0.13739384084386597
+    },
+    {
+     "observed": 418,
+     "s": 24,
+     "shuffle_mean": 433.321608040201,
+     "z": -0.6934983948836013
+    },
+    {
+     "observed": 431,
+     "s": 25,
+     "shuffle_mean": 438.3718592964824,
+     "z": -0.3589898662798346
+    },
+    {
+     "observed": 413,
+     "s": 26,
+     "shuffle_mean": 435.77386934673365,
+     "z": -1.0954482690146226
+    },
+    {
+     "observed": 412,
+     "s": 27,
+     "shuffle_mean": 436.86934673366835,
+     "z": -1.3160790046522366
+    },
+    {
+     "observed": 433,
+     "s": 28,
+     "shuffle_mean": 436.08040201005025,
+     "z": -0.15720815487438725
+    }
+   ],
+   "table": [
+    {
+     "d": 0,
+     "observed": 84,
+     "shuffle_mean": 432.0150753768844,
+     "z": -10.885118792616847,
+     "z_given_repeats": null
+    },
+    {
+     "d": 1,
+     "observed": 448,
+     "shuffle_mean": 434.64824120603015,
+     "z": 0.6809086964379083,
+     "z_given_repeats": 0.04617404347744343
+    },
+    {
+     "d": 2,
+     "observed": 493,
+     "shuffle_mean": 434.94472361809045,
+     "z": 2.7506366343500677,
+     "z_given_repeats": 2.1253904217919635
+    },
+    {
+     "d": 3,
+     "observed": 434,
+     "shuffle_mean": 432.78391959798995,
+     "z": 0.05729865332687657,
+     "z_given_repeats": -0.5111814965747283
+    },
+    {
+     "d": 4,
+     "observed": 429,
+     "shuffle_mean": 437.49748743718595,
+     "z": -0.3956766415168078,
+     "z_given_repeats": -0.9492812887948788
+    },
+    {
+     "d": 5,
+     "observed": 430,
+     "shuffle_mean": 433.64824120603015,
+     "z": -0.1874930752594783,
+     "z_given_repeats": -0.8008809241397835
+    },
+    {
+     "d": 6,
+     "observed": 417,
+     "shuffle_mean": 433.0150753768844,
+     "z": -0.7559586806908778,
+     "z_given_repeats": -1.3045490516120153
+    },
+    {
+     "d": 7,
+     "observed": 454,
+     "shuffle_mean": 435.8643216080402,
+     "z": 0.8815052198171522,
+     "z_given_repeats": 0.2684415088249433
+    },
+    {
+     "d": 8,
+     "observed": 409,
+     "shuffle_mean": 435.42713567839195,
+     "z": -1.2462872730874124,
+     "z_given_repeats": -1.7729080202961243
+    },
+    {
+     "d": 9,
+     "observed": 497,
+     "shuffle_mean": 434.24120603015075,
+     "z": 3.450343890428267,
+     "z_given_repeats": 2.7216088049234606
+    },
+    {
+     "d": 10,
+     "observed": 480,
+     "shuffle_mean": 434.35175879396985,
+     "z": 2.113006456793695,
+     "z_given_repeats": 1.5024947754119686
+    },
+    {
+     "d": 11,
+     "observed": 440,
+     "shuffle_mean": 435.678391959799,
+     "z": 0.2007320861742131,
+     "z_given_repeats": -0.3670806529387774
+    },
+    {
+     "d": 12,
+     "observed": 433,
+     "shuffle_mean": 435.0753768844221,
+     "z": -0.09962847024649756,
+     "z_given_repeats": -0.6781245244478665
+    },
+    {
+     "d": 13,
+     "observed": 492,
+     "shuffle_mean": 434.33668341708545,
+     "z": 2.674672144276537,
+     "z_given_repeats": 2.0570398348395575
+    },
+    {
+     "d": 14,
+     "observed": 461,
+     "shuffle_mean": 435.8994974874372,
+     "z": 1.2042686371214024,
+     "z_given_repeats": 0.592909106350486
+    },
+    {
+     "d": 15,
+     "observed": 460,
+     "shuffle_mean": 435.0603015075377,
+     "z": 1.1865634574929742,
+     "z_given_repeats": 0.5803656913774914
+    },
+    {
+     "d": 16,
+     "observed": 435,
+     "shuffle_mean": 434.3969849246231,
+     "z": 0.02995937913435013,
+     "z_given_repeats": -0.571391902409911
+    },
+    {
+     "d": 17,
+     "observed": 395,
+     "shuffle_mean": 433.43718592964825,
+     "z": -1.8739952486816769,
+     "z_given_repeats": -2.3962270896525215
+    },
+    {
+     "d": 18,
+     "observed": 425,
+     "shuffle_mean": 435.2110552763819,
+     "z": -0.5330850631967433,
+     "z_given_repeats": -1.140661171267024
+    },
+    {
+     "d": 19,
+     "observed": 467,
+     "shuffle_mean": 433.7035175879397,
+     "z": 1.6019763377703866,
+     "z_given_repeats": 0.9819951537324955
+    },
+    {
+     "d": 20,
+     "observed": 454,
+     "shuffle_mean": 436.41206030150755,
+     "z": 0.820888761729095,
+     "z_given_repeats": 0.2332387731249272
+    },
+    {
+     "d": 21,
+     "observed": 455,
+     "shuffle_mean": 435.3969849246231,
+     "z": 0.9708448756199617,
+     "z_given_repeats": 0.34569886766891056
+    },
+    {
+     "d": 22,
+     "observed": 407,
+     "shuffle_mean": 438.1758793969849,
+     "z": -1.4932851456678151,
+     "z_given_repeats": -2.0224451632620353
+    },
+    {
+     "d": 23,
+     "observed": 476,
+     "shuffle_mean": 432.7638190954774,
+     "z": 1.9768133491486792,
+     "z_given_repeats": 1.3836744601451976
+    },
+    {
+     "d": 24,
+     "observed": 457,
+     "shuffle_mean": 434.85929648241205,
+     "z": 1.054998110991493,
+     "z_given_repeats": 0.4515567192032261
+    },
+    {
+     "d": 25,
+     "observed": 456,
+     "shuffle_mean": 436.0100502512563,
+     "z": 1.124207939202021,
+     "z_given_repeats": 0.41207518085707756
+    },
+    {
+     "d": 26,
+     "observed": 443,
+     "shuffle_mean": 431.26633165829145,
+     "z": 0.5786265591042685,
+     "z_given_repeats": -0.0286726653507549
+    },
+    {
+     "d": 27,
+     "observed": 455,
+     "shuffle_mean": 433.643216080402,
+     "z": 1.055197871153141,
+     "z_given_repeats": 0.431019023213177
+    },
+    {
+     "d": 28,
+     "observed": 419,
+     "shuffle_mean": 435.2361809045226,
+     "z": -0.7440688282649006,
+     "z_given_repeats": -1.273791005908955
+    }
+   ]
+  },
+  "homogeneity": {
+   "difference_histograms": {
+    "chi2": 307.0507321986884,
+    "p": 0.115,
+    "shuffle_mean": 277.93079708168364
+   },
+   "frequencies": {
+    "chi2": 234.58515001885488,
+    "p": 0.98,
+    "shuffle_mean": 282.70114991709426
+   },
+   "null": "symbols permuted across all sections, section lengths fixed",
+   "per_section_z": [
+    {
+     "difference_z": 0.2645235819421666,
+     "frequency_z": -1.0799330292965725,
+     "section": 10
+    },
+    {
+     "difference_z": 0.8503460187284085,
+     "frequency_z": 0.2646130091653174,
+     "section": 12
+    },
+    {
+     "difference_z": 0.5375712957239888,
+     "frequency_z": -0.36036678058213256,
+     "section": 13
+    },
+    {
+     "difference_z": 1.035964211242096,
+     "frequency_z": -0.4457391319072425,
+     "section": 14
+    },
+    {
+     "difference_z": -0.3175585218172997,
+     "frequency_z": -0.9888115353337726,
+     "section": 16
+    },
+    {
+     "difference_z": -0.5488963359846528,
+     "frequency_z": -0.8182124247128727,
+     "section": 17
+    },
+    {
+     "difference_z": 1.8403185012599146,
+     "frequency_z": -1.2294538011674532,
+     "section": 18
+    },
+    {
+     "difference_z": -0.27895661174342873,
+     "frequency_z": -0.8456912469674813,
+     "section": 20
+    },
+    {
+     "difference_z": 0.09022094614211854,
+     "frequency_z": 0.9948916536375185,
+     "section": 22
+    },
+    {
+     "difference_z": -1.277620851127691,
+     "frequency_z": -1.6735455538867834,
+     "section": 24
+    },
+    {
+     "difference_z": 2.278885295651754,
+     "frequency_z": -0.5547590523607139,
+     "section": 25
+    }
+   ]
+  },
+  "kind": "diffs",
+  "label": "EXPLORATORY: units chosen after inspecting the data; a p-value here is not confirmation",
+  "repeats_by_stratum": {
+   "across_boundary": {
+    "observed": 22,
+    "shuffle_mean": 96.34673366834171,
+    "z": -8.270790989869269
+   },
+   "within_word": {
+    "observed": 62,
+    "shuffle_mean": 335.6683417085427,
+    "z": -15.641207854308213
+   }
+  },
+  "seconds": 0.17,
+  "sections": [
+   10,
+   12,
+   13,
+   14,
+   16,
+   17,
+   18,
+   20,
+   22,
+   24,
+   25
+  ],
+  "seed": 20261105,
+  "shuffles": 199,
+  "transitions": {
+   "cells_le_1_off_diagonal": 0,
+   "cells_le_1_shuffle_mean": 0.005025125628140704,
+   "cells_with_count_le_1": 4,
+   "chi2_excluding_diagonal": 795.0390062945211,
+   "chi2_vs_independence": 1110.9598583029524,
+   "diagonal_observed": 84,
+   "diagonal_share_of_chi2": 0.2553703242494584,
+   "diagonal_shuffle_mean": 430.2749999999999,
+   "low_cells": [
+    [
+     5,
+     5,
+     1
+    ],
+    [
+     13,
+     13,
+     1
+    ],
+    [
+     17,
+     17,
+     0
+    ],
+    [
+     24,
+     24,
+     1
+    ]
+   ],
+   "note": "expected counts are the shuffle mean per cell; the null chi-square uses the same expectation, so it is slightly conservative",
+   "p_cells_le_1": 0.005,
+   "p_chi2": 0.005,
+   "p_chi2_excluding_diagonal": 0.34
+  }
+ },
+ "label": "EXPLORATORY: units chosen after inspecting the data; a p-value here is not confirmation",
+ "power": {
+  "alpha": 0.05,
+  "complete": true,
+  "kind": "power",
+  "label": "SYNTHETIC: English plaintext (training split) through known mechanisms; says what each diagnostic can see, not what the real sections are",
+  "rows": [
+   {
+    "detected_by": [
+     "differences: non-zero d",
+     "transitions",
+     "dependence (MI)",
+     "transform scan",
+     "dependence, repeats excluded",
+     "transform, repeats excluded"
+    ],
+    "length": 334,
+    "mechanism": "plaintext (no cipher)",
+    "p": {
+     "dependence (MI)": 0.01,
+     "dependence, repeats excluded": 0.01,
+     "differences: any bin": 0.09,
+     "differences: near-zero d": 0.05,
+     "differences: non-zero d": 0.01,
+     "transform scan": 0.01,
+     "transform, repeats excluded": 0.01,
+     "transitions": 0.01
+    }
+   },
+   {
+    "detected_by": [
+     "differences: any bin",
+     "differences: non-zero d",
+     "differences: near-zero d",
+     "transitions",
+     "dependence (MI)",
+     "transform scan",
+     "dependence, repeats excluded",
+     "transform, repeats excluded"
+    ],
+    "length": 534,
+    "mechanism": "plaintext (no cipher)",
+    "p": {
+     "dependence (MI)": 0.01,
+     "dependence, repeats excluded": 0.01,
+     "differences: any bin": 0.01,
+     "differences: near-zero d": 0.01,
+     "differences: non-zero d": 0.01,
+     "transform scan": 0.01,
+     "transform, repeats excluded": 0.01,
+     "transitions": 0.01
+    }
+   },
+   {
+    "detected_by": [
+     "differences: any bin",
+     "differences: non-zero d",
+     "differences: near-zero d",
+     "transitions",
+     "dependence (MI)",
+     "transform scan",
+     "dependence, repeats excluded",
+     "transform, repeats excluded"
+    ],
+    "length": 1022,
+    "mechanism": "plaintext (no cipher)",
+    "p": {
+     "dependence (MI)": 0.01,
+     "dependence, repeats excluded": 0.01,
+     "differences: any bin": 0.01,
+     "differences: near-zero d": 0.03,
+     "differences: non-zero d": 0.01,
+     "transform scan": 0.01,
+     "transform, repeats excluded": 0.01,
+     "transitions": 0.01
+    }
+   },
+   {
+    "detected_by": [
+     "differences: any bin",
+     "differences: non-zero d",
+     "transitions",
+     "dependence (MI)",
+     "transform scan",
+     "dependence, repeats excluded",
+     "transform, repeats excluded"
+    ],
+    "length": 1434,
+    "mechanism": "plaintext (no cipher)",
+    "p": {
+     "dependence (MI)": 0.01,
+     "dependence, repeats excluded": 0.01,
+     "differences: any bin": 0.01,
+     "differences: near-zero d": 0.08,
+     "differences: non-zero d": 0.01,
+     "transform scan": 0.01,
+     "transform, repeats excluded": 0.01,
+     "transitions": 0.01
+    }
+   },
+   {
+    "detected_by": [],
+    "length": 334,
+    "mechanism": "iid noise",
+    "p": {
+     "dependence (MI)": 0.17,
+     "dependence, repeats excluded": 0.25,
+     "differences: any bin": 0.67,
+     "differences: near-zero d": 0.61,
+     "differences: non-zero d": 0.4,
+     "transform scan": 0.94,
+     "transform, repeats excluded": 0.89,
+     "transitions": 0.19
+    }
+   },
+   {
+    "detected_by": [],
+    "length": 534,
+    "mechanism": "iid noise",
+    "p": {
+     "dependence (MI)": 0.08,
+     "dependence, repeats excluded": 0.28,
+     "differences: any bin": 0.27,
+     "differences: near-zero d": 0.1,
+     "differences: non-zero d": 0.59,
+     "transform scan": 0.08,
+     "transform, repeats excluded": 0.31,
+     "transitions": 0.59
+    }
+   },
+   {
+    "detected_by": [],
+    "length": 1022,
+    "mechanism": "iid noise",
+    "p": {
+     "dependence (MI)": 0.73,
+     "dependence, repeats excluded": 0.97,
+     "differences: any bin": 0.21,
+     "differences: near-zero d": 0.67,
+     "differences: non-zero d": 0.34,
+     "transform scan": 0.85,
+     "transform, repeats excluded": 0.54,
+     "transitions": 0.3
+    }
+   },
+   {
+    "detected_by": [],
+    "length": 1434,
+    "mechanism": "iid noise",
+    "p": {
+     "dependence (MI)": 0.99,
+     "dependence, repeats excluded": 1.0,
+     "differences: any bin": 0.54,
+     "differences: near-zero d": 0.57,
+     "differences: non-zero d": 0.93,
+     "transform scan": 0.14,
+     "transform, repeats excluded": 0.45,
+     "transitions": 0.16
+    }
+   },
+   {
+    "detected_by": [
+     "differences: any bin",
+     "transitions",
+     "dependence (MI)",
+     "transform scan",
+     "dependence, repeats excluded",
+     "transform, repeats excluded"
+    ],
+    "length": 334,
+    "mechanism": "neighbour feedback (add)",
+    "p": {
+     "dependence (MI)": 0.01,
+     "dependence, repeats excluded": 0.01,
+     "differences: any bin": 0.01,
+     "differences: near-zero d": 0.65,
+     "differences: non-zero d": 0.44,
+     "transform scan": 0.01,
+     "transform, repeats excluded": 0.01,
+     "transitions": 0.01
+    }
+   },
+   {
+    "detected_by": [
+     "differences: any bin",
+     "transitions",
+     "dependence (MI)",
+     "transform scan",
+     "dependence, repeats excluded",
+     "transform, repeats excluded"
+    ],
+    "length": 534,
+    "mechanism": "neighbour feedback (add)",
+    "p": {
+     "dependence (MI)": 0.01,
+     "dependence, repeats excluded": 0.01,
+     "differences: any bin": 0.01,
+     "differences: near-zero d": 0.29,
+     "differences: non-zero d": 0.94,
+     "transform scan": 0.01,
+     "transform, repeats excluded": 0.01,
+     "transitions": 0.01
+    }
+   },
+   {
+    "detected_by": [
+     "differences: any bin",
+     "transitions",
+     "dependence (MI)",
+     "transform scan",
+     "dependence, repeats excluded",
+     "transform, repeats excluded"
+    ],
+    "length": 1022,
+    "mechanism": "neighbour feedback (add)",
+    "p": {
+     "dependence (MI)": 0.01,
+     "dependence, repeats excluded": 0.01,
+     "differences: any bin": 0.01,
+     "differences: near-zero d": 0.99,
+     "differences: non-zero d": 0.26,
+     "transform scan": 0.01,
+     "transform, repeats excluded": 0.01,
+     "transitions": 0.01
+    }
+   },
+   {
+    "detected_by": [
+     "differences: any bin",
+     "transitions",
+     "dependence (MI)",
+     "transform scan",
+     "dependence, repeats excluded",
+     "transform, repeats excluded"
+    ],
+    "length": 1434,
+    "mechanism": "neighbour feedback (add)",
+    "p": {
+     "dependence (MI)": 0.01,
+     "dependence, repeats excluded": 0.01,
+     "differences: any bin": 0.01,
+     "differences: near-zero d": 0.6,
+     "differences: non-zero d": 0.47,
+     "transform scan": 0.01,
+     "transform, repeats excluded": 0.01,
+     "transitions": 0.01
+    }
+   },
+   {
+    "detected_by": [
+     "transitions",
+     "dependence, repeats excluded"
+    ],
+    "length": 334,
+    "mechanism": "chain / plaintext autokey",
+    "p": {
+     "dependence (MI)": 0.1,
+     "dependence, repeats excluded": 0.02,
+     "differences: any bin": 0.33,
+     "differences: near-zero d": 0.2,
+     "differences: non-zero d": 0.58,
+     "transform scan": 0.57,
+     "transform, repeats excluded": 0.2,
+     "transitions": 0.01
+    }
+   },
+   {
+    "detected_by": [
+     "transitions",
+     "dependence (MI)",
+     "transform scan",
+     "dependence, repeats excluded"
+    ],
+    "length": 534,
+    "mechanism": "chain / plaintext autokey",
+    "p": {
+     "dependence (MI)": 0.01,
+     "dependence, repeats excluded": 0.01,
+     "differences: any bin": 0.35,
+     "differences: near-zero d": 0.36,
+     "differences: non-zero d": 0.29,
+     "transform scan": 0.04,
+     "transform, repeats excluded": 0.08,
+     "transitions": 0.01
+    }
+   },
+   {
+    "detected_by": [
+     "differences: any bin",
+     "differences: non-zero d",
+     "differences: near-zero d",
+     "transitions",
+     "dependence (MI)",
+     "transform scan",
+     "dependence, repeats excluded",
+     "transform, repeats excluded"
+    ],
+    "length": 1022,
+    "mechanism": "chain / plaintext autokey",
+    "p": {
+     "dependence (MI)": 0.01,
+     "dependence, repeats excluded": 0.01,
+     "differences: any bin": 0.01,
+     "differences: near-zero d": 0.01,
+     "differences: non-zero d": 0.01,
+     "transform scan": 0.01,
+     "transform, repeats excluded": 0.01,
+     "transitions": 0.01
+    }
+   },
+   {
+    "detected_by": [
+     "differences: any bin",
+     "differences: non-zero d",
+     "transitions",
+     "dependence (MI)",
+     "transform scan",
+     "dependence, repeats excluded",
+     "transform, repeats excluded"
+    ],
+    "length": 1434,
+    "mechanism": "chain / plaintext autokey",
+    "p": {
+     "dependence (MI)": 0.01,
+     "dependence, repeats excluded": 0.01,
+     "differences: any bin": 0.01,
+     "differences: near-zero d": 0.09,
+     "differences: non-zero d": 0.01,
+     "transform scan": 0.01,
+     "transform, repeats excluded": 0.01,
+     "transitions": 0.01
+    }
+   },
+   {
+    "detected_by": [
+     "differences: non-zero d",
+     "transitions",
+     "transform scan",
+     "transform, repeats excluded"
+    ],
+    "length": 334,
+    "mechanism": "progressive key (arithmetic)",
+    "p": {
+     "dependence (MI)": 0.13,
+     "dependence, repeats excluded": 0.1,
+     "differences: any bin": 0.07,
+     "differences: near-zero d": 0.87,
+     "differences: non-zero d": 0.01,
+     "transform scan": 0.02,
+     "transform, repeats excluded": 0.02,
+     "transitions": 0.02
+    }
+   },
+   {
+    "detected_by": [
+     "differences: any bin",
+     "differences: non-zero d",
+     "transitions",
+     "dependence (MI)",
+     "transform scan",
+     "dependence, repeats excluded",
+     "transform, repeats excluded"
+    ],
+    "length": 534,
+    "mechanism": "progressive key (arithmetic)",
+    "p": {
+     "dependence (MI)": 0.01,
+     "dependence, repeats excluded": 0.01,
+     "differences: any bin": 0.01,
+     "differences: near-zero d": 1.0,
+     "differences: non-zero d": 0.01,
+     "transform scan": 0.01,
+     "transform, repeats excluded": 0.01,
+     "transitions": 0.03
+    }
+   },
+   {
+    "detected_by": [
+     "differences: any bin",
+     "differences: non-zero d",
+     "dependence (MI)",
+     "transform scan",
+     "dependence, repeats excluded",
+     "transform, repeats excluded"
+    ],
+    "length": 1022,
+    "mechanism": "progressive key (arithmetic)",
+    "p": {
+     "dependence (MI)": 0.01,
+     "dependence, repeats excluded": 0.01,
+     "differences: any bin": 0.01,
+     "differences: near-zero d": 1.0,
+     "differences: non-zero d": 0.01,
+     "transform scan": 0.01,
+     "transform, repeats excluded": 0.01,
+     "transitions": 0.05
+    }
+   },
+   {
+    "detected_by": [
+     "differences: any bin",
+     "differences: non-zero d",
+     "transitions",
+     "dependence (MI)",
+     "transform scan",
+     "dependence, repeats excluded",
+     "transform, repeats excluded"
+    ],
+    "length": 1434,
+    "mechanism": "progressive key (arithmetic)",
+    "p": {
+     "dependence (MI)": 0.01,
+     "dependence, repeats excluded": 0.01,
+     "differences: any bin": 0.01,
+     "differences: near-zero d": 1.0,
+     "differences: non-zero d": 0.01,
+     "transform scan": 0.01,
+     "transform, repeats excluded": 0.01,
+     "transitions": 0.01
+    }
+   },
+   {
+    "detected_by": [],
+    "length": 334,
+    "mechanism": "prime stream",
+    "p": {
+     "dependence (MI)": 0.45,
+     "dependence, repeats excluded": 0.7,
+     "differences: any bin": 0.44,
+     "differences: near-zero d": 1.0,
+     "differences: non-zero d": 0.36,
+     "transform scan": 1.0,
+     "transform, repeats excluded": 0.99,
+     "transitions": 0.85
+    }
+   },
+   {
+    "detected_by": [],
+    "length": 534,
+    "mechanism": "prime stream",
+    "p": {
+     "dependence (MI)": 0.26,
+     "dependence, repeats excluded": 0.8,
+     "differences: any bin": 0.09,
+     "differences: near-zero d": 0.98,
+     "differences: non-zero d": 0.35,
+     "transform scan": 0.83,
+     "transform, repeats excluded": 0.53,
+     "transitions": 0.51
+    }
+   },
+   {
+    "detected_by": [
+     "differences: non-zero d"
+    ],
+    "length": 1022,
+    "mechanism": "prime stream",
+    "p": {
+     "dependence (MI)": 0.11,
+     "dependence, repeats excluded": 0.23,
+     "differences: any bin": 0.11,
+     "differences: near-zero d": 0.62,
+     "differences: non-zero d": 0.03,
+     "transform scan": 0.28,
+     "transform, repeats excluded": 0.43,
+     "transitions": 0.89
+    }
+   },
+   {
+    "detected_by": [],
+    "length": 1434,
+    "mechanism": "prime stream",
+    "p": {
+     "dependence (MI)": 0.26,
+     "dependence, repeats excluded": 0.23,
+     "differences: any bin": 0.15,
+     "differences: near-zero d": 0.36,
+     "differences: non-zero d": 0.75,
+     "transform scan": 0.67,
+     "transform, repeats excluded": 0.15,
+     "transitions": 0.08
+    }
+   },
+   {
+    "detected_by": [
+     "differences: any bin",
+     "transitions",
+     "dependence (MI)",
+     "transform scan",
+     "dependence, repeats excluded",
+     "transform, repeats excluded"
+    ],
+    "length": 334,
+    "mechanism": "Hill 2x2 blocks",
+    "p": {
+     "dependence (MI)": 0.01,
+     "dependence, repeats excluded": 0.01,
+     "differences: any bin": 0.01,
+     "differences: near-zero d": 0.08,
+     "differences: non-zero d": 0.16,
+     "transform scan": 0.01,
+     "transform, repeats excluded": 0.01,
+     "transitions": 0.01
+    }
+   },
+   {
+    "detected_by": [
+     "differences: any bin",
+     "differences: non-zero d",
+     "differences: near-zero d",
+     "transitions",
+     "dependence (MI)",
+     "transform scan",
+     "dependence, repeats excluded",
+     "transform, repeats excluded"
+    ],
+    "length": 534,
+    "mechanism": "Hill 2x2 blocks",
+    "p": {
+     "dependence (MI)": 0.01,
+     "dependence, repeats excluded": 0.01,
+     "differences: any bin": 0.01,
+     "differences: near-zero d": 0.02,
+     "differences: non-zero d": 0.02,
+     "transform scan": 0.01,
+     "transform, repeats excluded": 0.01,
+     "transitions": 0.01
+    }
+   },
+   {
+    "detected_by": [
+     "differences: any bin",
+     "differences: non-zero d",
+     "transitions",
+     "dependence (MI)",
+     "transform scan",
+     "dependence, repeats excluded",
+     "transform, repeats excluded"
+    ],
+    "length": 1022,
+    "mechanism": "Hill 2x2 blocks",
+    "p": {
+     "dependence (MI)": 0.01,
+     "dependence, repeats excluded": 0.01,
+     "differences: any bin": 0.01,
+     "differences: near-zero d": 0.57,
+     "differences: non-zero d": 0.03,
+     "transform scan": 0.01,
+     "transform, repeats excluded": 0.01,
+     "transitions": 0.01
+    }
+   },
+   {
+    "detected_by": [
+     "differences: any bin",
+     "differences: non-zero d",
+     "transitions",
+     "dependence (MI)",
+     "transform scan",
+     "dependence, repeats excluded",
+     "transform, repeats excluded"
+    ],
+    "length": 1434,
+    "mechanism": "Hill 2x2 blocks",
+    "p": {
+     "dependence (MI)": 0.01,
+     "dependence, repeats excluded": 0.01,
+     "differences: any bin": 0.01,
+     "differences: near-zero d": 0.23,
+     "differences: non-zero d": 0.01,
+     "transform scan": 0.01,
+     "transform, repeats excluded": 0.01,
+     "transitions": 0.01
+    }
+   },
+   {
+    "detected_by": [],
+    "length": 334,
+    "mechanism": "periodic key, length 37",
+    "p": {
+     "dependence (MI)": 0.66,
+     "dependence, repeats excluded": 0.36,
+     "differences: any bin": 0.13,
+     "differences: near-zero d": 0.68,
+     "differences: non-zero d": 0.6,
+     "transform scan": 0.27,
+     "transform, repeats excluded": 0.27,
+     "transitions": 0.56
+    }
+   },
+   {
+    "detected_by": [
+     "dependence (MI)",
+     "transform scan",
+     "dependence, repeats excluded",
+     "transform, repeats excluded"
+    ],
+    "length": 534,
+    "mechanism": "periodic key, length 37",
+    "p": {
+     "dependence (MI)": 0.02,
+     "dependence, repeats excluded": 0.02,
+     "differences: any bin": 0.59,
+     "differences: near-zero d": 0.31,
+     "differences: non-zero d": 0.17,
+     "transform scan": 0.01,
+     "transform, repeats excluded": 0.01,
+     "transitions": 0.49
+    }
+   },
+   {
+    "detected_by": [
+     "transitions"
+    ],
+    "length": 1022,
+    "mechanism": "periodic key, length 37",
+    "p": {
+     "dependence (MI)": 0.06,
+     "dependence, repeats excluded": 0.06,
+     "differences: any bin": 0.38,
+     "differences: near-zero d": 0.73,
+     "differences: non-zero d": 0.09,
+     "transform scan": 0.47,
+     "transform, repeats excluded": 0.57,
+     "transitions": 0.01
+    }
+   },
+   {
+    "detected_by": [
+     "differences: any bin",
+     "transitions"
+    ],
+    "length": 1434,
+    "mechanism": "periodic key, length 37",
+    "p": {
+     "dependence (MI)": 0.18,
+     "dependence, repeats excluded": 0.45,
+     "differences: any bin": 0.01,
+     "differences: near-zero d": 0.99,
+     "differences: non-zero d": 0.08,
+     "transform scan": 0.1,
+     "transform, repeats excluded": 0.22,
+     "transitions": 0.01
+    }
+   }
+  ],
+  "seconds": 20.58,
+  "seed": 20261105,
+  "shuffles": 99,
+  "tests": [
+   "differences: any bin",
+   "differences: non-zero d",
+   "differences: near-zero d",
+   "transitions",
+   "dependence (MI)",
+   "transform scan",
+   "dependence, repeats excluded",
+   "transform, repeats excluded"
+  ]
+ },
+ "scans": {
+  "complete": true,
+  "dependence_per_section": {
+   "max_z": 3.3633752836982937,
+   "p_max_over_units": 0.29,
+   "top": [
+    {
+     "lag": 4,
+     "observed": -0.031523675383136496,
+     "section": 25,
+     "z": 3.3633752836982937
+    },
+    {
+     "lag": 61,
+     "observed": -0.18011260947014418,
+     "section": 25,
+     "z": 3.247285548192255
+    },
+    {
+     "lag": 32,
+     "observed": 0.12919849230331337,
+     "section": 12,
+     "z": 2.607945327713157
+    },
+    {
+     "lag": 14,
+     "observed": -0.07768766782399417,
+     "section": 25,
+     "z": 2.5069602786059626
+    },
+    {
+     "lag": 47,
+     "observed": 0.05903952898117895,
+     "section": 16,
+     "z": 2.498397572655527
+    },
+    {
+     "lag": 63,
+     "observed": 0.0655157759341356,
+     "section": 14,
+     "z": 2.4173195809546737
+    },
+    {
+     "lag": 48,
+     "observed": 0.06498581170359019,
+     "section": 14,
+     "z": 2.3088305279029564
+    },
+    {
+     "lag": 26,
+     "observed": 0.03737909931409447,
+     "section": 22,
+     "z": 2.261650148609409
+    }
+   ],
+   "units": 704
+  },
+  "dependence_pooled": {
+   "max_z": 9.057386618504308,
+   "p_max_over_units": 0.005,
+   "top": [
+    {
+     "lag": 1,
+     "mutual_information_nats": 0.050494306997932975,
+     "z": 9.057386618504308
+    },
+    {
+     "lag": 7,
+     "mutual_information_nats": 0.0352925426447272,
+     "z": 2.1641327129171644
+    },
+    {
+     "lag": 57,
+     "mutual_information_nats": 0.036366977066657896,
+     "z": 1.8965997964689578
+    },
+    {
+     "lag": 41,
+     "mutual_information_nats": 0.035661134995667296,
+     "z": 1.7348004323440103
+    },
+    {
+     "lag": 15,
+     "mutual_information_nats": 0.0344443179984777,
+     "z": 1.6267648206304763
+    },
+    {
+     "lag": 4,
+     "mutual_information_nats": 0.03363026744850159,
+     "z": 1.3702083431904477
+    },
+    {
+     "lag": 16,
+     "mutual_information_nats": 0.034135050341165124,
+     "z": 1.3572487643293292
+    },
+    {
+     "lag": 37,
+     "mutual_information_nats": 0.034568714175163946,
+     "z": 1.2905466551350917
+    }
+   ],
+   "units": 64
+  },
+  "exclude_equal_pairs": false,
+  "kind": "scans",
+  "label": "EXPLORATORY: units chosen after inspecting the data; a p-value here is not confirmation",
+  "mi_lags": 64,
+  "note": "mutual information is the plug-in estimate (nats); z is against the shuffle null; transforms use r = b/a, which covers every a*c[i-k] + b*c[i] up to relabelling",
+  "seconds": 7.01,
+  "sections": [
+   10,
+   12,
+   13,
+   14,
+   16,
+   17,
+   18,
+   20,
+   22,
+   24,
+   25
+  ],
+  "seed": 20261105,
+  "shuffles": 199,
+  "skipped_too_short": [],
+  "transform_lags": 16,
+  "transform_per_section": {
+   "max_z": 7.071438568755985,
+   "p_max_over_units": 0.005,
+   "top": [
+    {
+     "lag": 1,
+     "observed": 1.0360182735369732,
+     "r": 28,
+     "section": 22,
+     "z": 7.071438568755985
+    },
+    {
+     "lag": 1,
+     "observed": 1.044238683127572,
+     "r": 28,
+     "section": 14,
+     "z": 6.116924916883162
+    },
+    {
+     "lag": 1,
+     "observed": 1.0405268778765933,
+     "r": 28,
+     "section": 16,
+     "z": 5.718042999712547
+    },
+    {
+     "lag": 1,
+     "observed": 1.0445901633250299,
+     "r": 28,
+     "section": 20,
+     "z": 4.404346782273513
+    },
+    {
+     "lag": 8,
+     "observed": 1.0323913774432134,
+     "r": 20,
+     "section": 16,
+     "z": 4.333702872586704
+    },
+    {
+     "lag": 1,
+     "observed": 1.0448136762273337,
+     "r": 28,
+     "section": 18,
+     "z": 4.084379789821821
+    },
+    {
+     "lag": 9,
+     "observed": 1.0324290156841536,
+     "r": 23,
+     "section": 14,
+     "z": 3.6926383042711883
+    },
+    {
+     "lag": 1,
+     "observed": 1.0837816164923653,
+     "r": 28,
+     "section": 12,
+     "z": 3.5401416739991385
+    }
+   ],
+   "units": 4928
+  },
+  "transform_pooled": {
+   "max_z": 13.340437074023198,
+   "p_max_over_units": 0.005,
+   "top": [
+    {
+     "ic29": 1.0266839075368648,
+     "lag": 1,
+     "r": 28,
+     "z": 13.340437074023198
+    },
+    {
+     "ic29": 1.0043438135558345,
+     "lag": 11,
+     "r": 28,
+     "z": 3.6136061590986652
+    },
+    {
+     "ic29": 1.0042741296532804,
+     "lag": 8,
+     "r": 7,
+     "z": 2.9831803210407237
+    },
+    {
+     "ic29": 1.00397268774146,
+     "lag": 9,
+     "r": 17,
+     "z": 2.9341228481232675
+    },
+    {
+     "ic29": 1.0040467814642116,
+     "lag": 16,
+     "r": 7,
+     "z": 2.853365254041338
+    },
+    {
+     "ic29": 1.0038300482483649,
+     "lag": 12,
+     "r": 2,
+     "z": 2.6839259252651626
+    },
+    {
+     "ic29": 1.0037858984683616,
+     "lag": 15,
+     "r": 15,
+     "z": 2.4511544603798305
+    },
+    {
+     "ic29": 1.0038463401491469,
+     "lag": 4,
+     "r": 21,
+     "z": 2.440648818473833
+    }
+   ],
+   "units": 448
+  },
+  "transforms_per_lag": 28
+ },
+ "scans_no_repeats": {
+  "complete": true,
+  "dependence_per_section": {
+   "max_z": 3.2770156471094234,
+   "p_max_over_units": 0.345,
+   "top": [
+    {
+     "lag": 4,
+     "observed": 0.005473488857200115,
+     "section": 25,
+     "z": 3.2770156471094234
+    },
+    {
+     "lag": 31,
+     "observed": -0.022848301351028777,
+     "section": 13,
+     "z": 2.9828564295042463
+    },
+    {
+     "lag": 61,
+     "observed": -0.1566088736741349,
+     "section": 25,
+     "z": 2.626253950762974
+    },
+    {
+     "lag": 32,
+     "observed": 0.16380175386437168,
+     "section": 12,
+     "z": 2.4746666763498704
+    },
+    {
+     "lag": 26,
+     "observed": 0.07285182377818339,
+     "section": 22,
+     "z": 2.2786193179864394
+    },
+    {
+     "lag": 47,
+     "observed": 0.0900194582674679,
+     "section": 16,
+     "z": 2.122220407320006
+    },
+    {
+     "lag": 63,
+     "observed": 0.0972782827296878,
+     "section": 14,
+     "z": 2.11426558953268
+    },
+    {
+     "lag": 9,
+     "observed": 0.10916456702691424,
+     "section": 18,
+     "z": 2.0953790998282993
+    }
+   ],
+   "units": 704
+  },
+  "dependence_pooled": {
+   "max_z": 2.1221724364687096,
+   "p_max_over_units": 0.655,
+   "top": [
+    {
+     "lag": 7,
+     "mutual_information_nats": 0.07034529333440018,
+     "z": 2.1221724364687096
+    },
+    {
+     "lag": 41,
+     "mutual_information_nats": 0.07094450960904608,
+     "z": 1.8561993263872991
+    },
+    {
+     "lag": 57,
+     "mutual_information_nats": 0.0712921937603787,
+     "z": 1.7849880337430253
+    },
+    {
+     "lag": 16,
+     "mutual_information_nats": 0.06978592407649875,
+     "z": 1.6281549992665807
+    },
+    {
+     "lag": 4,
+     "mutual_information_nats": 0.06916556853475728,
+     "z": 1.6218712729915312
+    },
+    {
+     "lag": 32,
+     "mutual_information_nats": 0.0699722412156861,
+     "z": 1.3833546004480282
+    },
+    {
+     "lag": 62,
+     "mutual_information_nats": 0.07114107805657846,
+     "z": 1.376643418987357
+    },
+    {
+     "lag": 58,
+     "mutual_information_nats": 0.07046519553600507,
+     "z": 1.3412670452341533
+    }
+   ],
+   "units": 64
+  },
+  "exclude_equal_pairs": true,
+  "kind": "scans",
+  "label": "EXPLORATORY: units chosen after inspecting the data; a p-value here is not confirmation",
+  "mi_lags": 64,
+  "note": "mutual information is the plug-in estimate (nats); z is against the shuffle null; transforms use r = b/a, which covers every a*c[i-k] + b*c[i] up to relabelling",
+  "seconds": 7.17,
+  "sections": [
+   10,
+   12,
+   13,
+   14,
+   16,
+   17,
+   18,
+   20,
+   22,
+   24,
+   25
+  ],
+  "seed": 20261105,
+  "shuffles": 199,
+  "skipped_too_short": [],
+  "transform_lags": 16,
+  "transform_per_section": {
+   "max_z": 4.086198033191312,
+   "p_max_over_units": 0.905,
+   "top": [
+    {
+     "lag": 8,
+     "observed": 1.032558036691929,
+     "r": 20,
+     "section": 16,
+     "z": 4.086198033191312
+    },
+    {
+     "lag": 9,
+     "observed": 1.0345171173803092,
+     "r": 23,
+     "section": 14,
+     "z": 3.9160472802594435
+    },
+    {
+     "lag": 16,
+     "observed": 1.0411582274202271,
+     "r": 6,
+     "section": 18,
+     "z": 3.8696054468729333
+    },
+    {
+     "lag": 6,
+     "observed": 1.1146697998046875,
+     "r": 10,
+     "section": 24,
+     "z": 3.759096030307274
+    },
+    {
+     "lag": 8,
+     "observed": 1.177106576331697,
+     "r": 17,
+     "section": 13,
+     "z": 3.660454014068271
+    },
+    {
+     "lag": 6,
+     "observed": 1.0381300343006898,
+     "r": 13,
+     "section": 20,
+     "z": 3.547578638645399
+    },
+    {
+     "lag": 9,
+     "observed": 1.0511073041840708,
+     "r": 9,
+     "section": 17,
+     "z": 3.4543397840236048
+    },
+    {
+     "lag": 8,
+     "observed": 1.177106576331697,
+     "r": 3,
+     "section": 13,
+     "z": 3.378100301734644
+    }
+   ],
+   "units": 4928
+  },
+  "transform_pooled": {
+   "max_z": 3.1488749357220676,
+   "p_max_over_units": 0.85,
+   "top": [
+    {
+     "ic29": 1.0042206788155479,
+     "lag": 12,
+     "r": 2,
+     "z": 3.1488749357220676
+    },
+    {
+     "ic29": 1.0042340027589303,
+     "lag": 16,
+     "r": 7,
+     "z": 2.863657263640396
+    },
+    {
+     "ic29": 1.0042491102662612,
+     "lag": 4,
+     "r": 21,
+     "z": 2.7859662216533247
+    },
+    {
+     "ic29": 1.004251830347433,
+     "lag": 8,
+     "r": 7,
+     "z": 2.7216723001477825
+    },
+    {
+     "ic29": 1.0037066880186745,
+     "lag": 16,
+     "r": 10,
+     "z": 2.622754491899533
+    },
+    {
+     "ic29": 1.0037997907734229,
+     "lag": 16,
+     "r": 9,
+     "z": 2.5304383440550744
+    },
+    {
+     "ic29": 1.0039367459742807,
+     "lag": 15,
+     "r": 15,
+     "z": 2.4904344421668716
+    },
+    {
+     "ic29": 1.0039203837300517,
+     "lag": 9,
+     "r": 17,
+     "z": 2.4866327085236355
+    }
+   ],
+   "units": 448
+  },
+  "transforms_per_lag": 28
+ },
+ "seed": 20261105
+}

@@ -428,3 +428,5 @@ and the `tiertest.md` from the run's `--out` folder (reports are not committed t
 
 More detail: `docs\phase3_runbook.md` (full runbook), `README.md` (what everything is),
 `TODO_USER.md` (open decisions).
+Research packets (review-first fixed experiments) and the structure diagnostics:
+`docs\research_tools.md`.
