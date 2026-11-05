@@ -108,8 +108,8 @@ powershell -ExecutionPolicy Bypass -File scripts\overnight.ps1 -New
 ```
 
 **8.** What to expect:
-- The tier test runs first. Then three lanes run side by side: Sonnet (with a brief from Opus
-  before each section), Codex, and the local models.
+- The tier test runs first. Then three lanes run side by side: Sonnet and Codex (each with a brief
+  from Opus before each section), and the local models.
 - Every lead has a **chance** number: how many attempts at least this good pure noise would
   produce on that section. About 1 or more is noise. A real find needs below 0.01, and would
   also be marked FINAL.
@@ -294,8 +294,9 @@ powershell -ExecutionPolicy Bypass -File scripts\overnight.ps1
 
 - The queue is `config\overnight.toml` (created by setup). Default: (1) tier test with Claude Code
   Opus + Sonnet; then the unsolved sections (20+ runes) in three lanes that run side by side,
-  each starting on a different section: (2) **Sonnet**, with a brief Opus writes for each section
-  from what's been tried there, (3) **Codex**, (4) **qwen/gemma** on the 5060 Ti; (5) DeepSeek,
+  each starting on a different section: (2) **Sonnet** and (3) **Codex**, each with a brief Opus writes for
+  each section from what every lane has tried there (Codex's leads included; use `auto_brief = "codex"`
+  on the Codex job to let Codex brief itself and save Claude quota), (4) **qwen/gemma** on the 5060 Ti; (5) DeepSeek,
   refused until it's set up. One sub-job per section. Edit the file to change jobs.
 - **Side by side:** jobs on different backends run at the same time (up to `max_parallel = 4`):
   the Claude, Codex and local lanes run together, while two jobs on the same GPU or the same
@@ -321,7 +322,8 @@ powershell -ExecutionPolicy Bypass -File scripts\overnight.ps1
   suggestion. Nothing to configure.
 - **Usage limits:** Opus, Sonnet and the supervisor share one Claude quota (250 calls / 5 h by
   default, `max_calls_per_window`), with per-model shares (`model_max_calls_per_window`): Opus
-  60, supervisor 100 (check-ins and briefs), Sonnet the rest. Codex has its own (90 / 5 h). At a cap or a usage-limit message the affected models
+  60, supervisor 100 (check-ins and one brief per Sonnet section and per Codex section; raise it if the
+  supervisor hits its cap), Sonnet the rest. Codex has its own (90 / 5 h). At a cap or a usage-limit message the affected models
   pause until the reset and the run keeps going with whatever else it can do. The message says
   which kind it is: `local cap 120/120` is lpswarm's own counter (raise `max_calls_per_window`
   in `config\models.toml`; it takes effect at once), while `usage limit reported by

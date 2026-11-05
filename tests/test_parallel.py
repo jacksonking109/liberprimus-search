@@ -1167,3 +1167,32 @@ def test_word_reset_receives_the_targets_breaks_through_the_executor():
     no_breaks = fam.decrypt(ct, spec, 26)
     assert with_breaks.tolist() != no_breaks.tolist()
     assert with_breaks[4] == 4 and no_breaks[4] == 9          # the word ends at index 4: no partner
+
+
+def test_supervisor_brief_for_codex_sees_other_lanes_leads(tmp_path):
+    """The Codex job is briefed by the supervisor like Sonnet, from a digest that includes the
+    leads of every lane on that section (here: a Sonnet job's report)."""
+    import json as _json
+    from lpswarm.overnight import expand_jobs, load_config
+    cfg = load_config(ROOT / "config" / "overnight.example.toml")
+    cfg.manifest = str(ROOT / "data" / "lp" / "manifest.json")
+    cfg.supervisor = "claude-supervisor"
+    jobs = expand_jobs(cfg)
+    cj = next(j for j in jobs if j["id"].startswith("codex/"))
+    assert cj["auto_brief"] is True                          # supervisor, not Codex briefing itself
+    sec = cj["id"].split("/")[1]
+    sj = next(j for j in jobs if j["id"] == f"sonnet/{sec}")
+    run = Overnight(cfg, tmp_path / "run", stop_file=tmp_path / "STOP", progress=False)
+    for j in run.state["jobs"]:
+        if j["id"] == sj["id"]:
+            j["status"] = "done"
+    d = run.job_dir(sj)
+    d.mkdir(parents=True, exist_ok=True)
+    (d / "report.json").write_text(_json.dumps({"targets": [{
+        "label": f"LP:{sec}", "symbols": 100, "attempts": 40, "hypotheses": 5, "final_passes": 0,
+        "leads": [{"final": False, "verdict": "near_miss", "margin": -0.1, "chance": 0.2,
+                   "by": "claude-sonnet", "key": "primes sub offset 3"}]}]}), encoding="utf-8")
+    cmd = run.job_command(cj)
+    assert cmd[cmd.index("--auto-brief") + 1] == "claude-supervisor"
+    ctx = (run.job_dir(cj) / "brief_context.txt").read_text(encoding="utf-8")
+    assert "by claude-sonnet: primes sub offset 3" in ctx

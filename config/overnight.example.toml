@@ -50,12 +50,14 @@ args = ["--manifest", "data/lp/manifest.json", "--alphabet", "data/alphabet/gema
         "--per-round", "8", "--max-attempts", "60000"]
 note = "Sonnet, briefed by Opus"
 
-# Codex lane (its own plan quota). Codex writes its own brief per section first, from what
-# every lane has tried there (one extra Codex call per section; saves the Claude quota).
+# Codex lane (its own plan quota). Before each section the supervisor (Opus) writes the brief,
+# exactly as for Sonnet, from the digest of every lane's best leads on that section (Codex's own
+# earlier sections included). One extra supervisor call per section; set auto_brief = "codex"
+# instead to have Codex brief itself from the same digest and save the Claude quota.
 [[job]]
 id = "codex"
 kind = "swarm"
-auto_brief = "codex"
+auto_brief = true
 order = "reverse"
 args = ["--manifest", "data/lp/manifest.json", "--alphabet", "data/alphabet/gematria_primus.json",
         "--sections", "unsolved", "--generators", "codex", "--rounds", "6",
