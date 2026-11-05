@@ -1,6 +1,6 @@
 # Overnight run 20261104-2305
 
-Started 2026-11-04 23:05:16, updated 2026-11-04 23:17:08, status **running**. Jobs: pending 55, running 3, done 14
+Started 2026-11-04 23:05:16, updated 2026-11-04 23:17:28, status **running**. Jobs: pending 54, running 3, done 15
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -8,7 +8,7 @@ Started 2026-11-04 23:05:16, updated 2026-11-04 23:17:08, status **running**. Jo
 | sonnet/10 | done | 2026-11-04 23:10:14 | 2026-11-04 23:14:10 | Sonnet, briefed by Opus |
 | sonnet/11 | done | 2026-11-04 23:14:26 | 2026-11-04 23:15:32 | Sonnet, briefed by Opus |
 | sonnet/12 | done | 2026-11-04 23:15:47 | 2026-11-04 23:17:08 | Sonnet, briefed by Opus |
-| sonnet/13 | pending |  |  | Sonnet, briefed by Opus |
+| sonnet/13 | running | 2026-11-04 23:17:23 |  | Sonnet, briefed by Opus |
 | sonnet/14 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/15 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/16 | pending |  |  | Sonnet, briefed by Opus |
@@ -30,7 +30,7 @@ Started 2026-11-04 23:05:16, updated 2026-11-04 23:17:08, status **running**. Jo
 | codex/17 | done | 2026-11-04 23:12:45 | 2026-11-04 23:14:51 | Codex (exploratory) |
 | codex/16 | done | 2026-11-04 23:14:05 | 2026-11-04 23:16:12 | Codex (exploratory) |
 | codex/15 | done | 2026-11-04 23:15:06 | 2026-11-04 23:15:11 | Codex (exploratory) |
-| codex/14 | running | 2026-11-04 23:15:27 |  | Codex (exploratory) |
+| codex/14 | done | 2026-11-04 23:15:27 | 2026-11-04 23:17:28 | Codex (exploratory) |
 | codex/13 | running | 2026-11-04 23:16:28 |  | Codex (exploratory) |
 | codex/12 | pending |  |  | Codex (exploratory) |
 | codex/11 | pending |  |  | Codex (exploratory) |
@@ -79,18 +79,11 @@ Started 2026-11-04 23:05:16, updated 2026-11-04 23:17:08, status **running**. Jo
 
 ## Now running
 
-**codex/14** (since 2026-11-04 23:15:27), latest log lines:
+**sonnet/13** (since 2026-11-04 23:17:23), latest log lines:
 ```
-23:15:59 [model] codex (proposer) ok 30.7s, tokens in/out 18195/672, reply 1862 chars, model not reported (pin one with model = "..." in the models config)
-brief from codex (1862 chars):
-  | 1. Start with map identity, combine sub, stream repeat exhaustive at key_length 1, 2, 3, then 4, each in a separate proposal; also test beaufort. IC 0.999 gives no simple substitution signal, but 
-  | 2. Prioritize stream autokey, source ciphertext, one-token primers covering 0..28, combine sub and beaufort, no skip or transpose. Only 9 adjacent doubles versus 59.6 expected makes lag-one feedba
-  | 3. Test stream sequence primes and prime_totients, combine sub and beaufort, offset_range [0,1999], scale 1, add 0. Repeat with scale -1. The alphabet explicitly supplies prime values, motivating 
-  | 4. Test sequence fibonacci, naturals, squares, triangular, pi_digits and e_digits separately, combine sub, offset_range [0,1999], no skip. Use beaufort as a second pass. These provide distinct str
-  | 5. Repeat the strongest arithmetic families with skip [0], first skip_mode all, then resolve; compare no skip. F is a plausible literal rune, but its count of 66 is ordinary, so treat skipping as 
-  | 6. Test pure transposition using constant value 0, combine sub: grid read modes individually over transpose_range [2,500], railfence [2,64], and decimate [2,1728]; repeat with reverse_text true se
-23:15:59 [model] codex (proposer) calling...
-23:16:38 [model] codex (proposer) ok 39.2s, tokens in/out 18038/1756, reply 5551 chars, model not reported (pin one with model = "..." in the models config)
+===== 2026-11-04 23:17:23 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 13 --gen
+== LP2:6.jpg/2-7.jpg - 23.jpg/2-24.jpg  (333 symbols)
+23:17:25 [model] claude-supervisor (supervisor) calling...
 ```
 **codex/13** (since 2026-11-04 23:16:28), latest log lines:
 ```
@@ -149,6 +142,8 @@ brief from codex (1893 chars):
   - LP2:15.jpg/2- - 32.jpg/2-39.jpg: 60000 attempts, 10 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **codex/15** (done)
   - skip LP2:15.jpg/1 - 32.jpg/1: only 9 symbols (minimum 20, --min-length); too short to judge
+- **codex/14** (done)
+  - LP2:8.jpg-14.jpg - 25.jpg-31.jpg: 60000 attempts, 4 hypotheses, **0 final pass(es)**, stopped: max_attempts
 
 ## Model usage
 
@@ -167,10 +162,6 @@ brief from codex (1893 chars):
 
 ## Events
 
-- 2026-11-04 23:14:05 sonnet/11 waiting: claude-plan in use by sonnet/10
-- 2026-11-04 23:14:10 sonnet/10: done (exit 0, 4 min)
-- 2026-11-04 23:14:26 published: 13 file(s) to branch results
-- 2026-11-04 23:14:26 sonnet/11: start (uses claude-plan)
 - 2026-11-04 23:14:26 4 running: local/17, codex/17, codex/16, sonnet/11
 - 2026-11-04 23:14:51 codex/17: done (exit 0, 2 min)
 - 2026-11-04 23:15:06 published: 14 file(s) to branch results
@@ -192,3 +183,7 @@ brief from codex (1893 chars):
 - 2026-11-04 23:16:28 4 running: local/17, codex/14, sonnet/12, codex/13
 - 2026-11-04 23:16:28 sonnet/13 waiting: claude-plan in use by sonnet/12
 - 2026-11-04 23:17:08 sonnet/12: done (exit 0, 1 min)
+- 2026-11-04 23:17:23 published: 17 file(s) to branch results
+- 2026-11-04 23:17:23 sonnet/13: start (uses claude-plan)
+- 2026-11-04 23:17:23 4 running: local/17, codex/14, codex/13, sonnet/13
+- 2026-11-04 23:17:28 codex/14: done (exit 0, 2 min)
