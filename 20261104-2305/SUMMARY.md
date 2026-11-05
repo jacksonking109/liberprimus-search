@@ -1,6 +1,6 @@
 # Overnight run 20261104-2305
 
-Started 2026-11-04 23:05:16, updated 2026-11-04 23:23:57, status **running**. Jobs: pending 49, running 3, done 20
+Started 2026-11-04 23:05:16, updated 2026-11-04 23:24:18, status **running**. Jobs: pending 48, running 3, done 21
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -9,7 +9,7 @@ Started 2026-11-04 23:05:16, updated 2026-11-04 23:23:57, status **running**. Jo
 | sonnet/11 | done | 2026-11-04 23:14:26 | 2026-11-04 23:15:32 | Sonnet, briefed by Opus |
 | sonnet/12 | done | 2026-11-04 23:15:47 | 2026-11-04 23:17:08 | Sonnet, briefed by Opus |
 | sonnet/13 | done | 2026-11-04 23:17:23 | 2026-11-04 23:23:57 | Sonnet, briefed by Opus |
-| sonnet/14 | pending |  |  | Sonnet, briefed by Opus |
+| sonnet/14 | running | 2026-11-04 23:24:13 |  | Sonnet, briefed by Opus |
 | sonnet/15 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/16 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/17 | pending |  |  | Sonnet, briefed by Opus |
@@ -35,7 +35,7 @@ Started 2026-11-04 23:05:16, updated 2026-11-04 23:23:57, status **running**. Jo
 | codex/12 | done | 2026-11-04 23:17:44 | 2026-11-04 23:22:46 | Codex (exploratory) |
 | codex/11 | done | 2026-11-04 23:18:34 | 2026-11-04 23:20:09 | Codex (exploratory) |
 | codex/10 | done | 2026-11-04 23:20:25 | 2026-11-04 23:22:25 | Codex (exploratory) |
-| local/17 | running | 2026-11-04 23:05:16 |  | local models |
+| local/17 | done | 2026-11-04 23:05:16 | 2026-11-04 23:24:18 | local models |
 | local/18 | pending |  |  | local models |
 | local/16 | pending |  |  | local models |
 | local/19 | pending |  |  | local models |
@@ -79,18 +79,11 @@ Started 2026-11-04 23:05:16, updated 2026-11-04 23:23:57, status **running**. Jo
 
 ## Now running
 
-**local/17** (since 2026-11-04 23:05:16), latest log lines:
+**sonnet/14** (since 2026-11-04 23:24:13), latest log lines:
 ```
-23:21:40 [model] granite (weighting) ok 12.7s, tokens in/out 206/39, reply 67 chars
-round 1 [gemma-local] proposals=8 valid=7 attempts=853 passes=0 near=0 invalid=1
-23:21:41 [model] qwen-local (proposer) calling...
-23:22:25 [model] qwen-local (proposer) ok 44.5s, tokens in/out 3476/713, reply 2372 chars
-23:22:25 [model] gemma-local (proposer) calling...
-23:23:36 [model] gemma-local (proposer) ok 35.0s, tokens in/out 3561/538, reply 1599 chars
-23:23:36 [model] granite (weighting) calling...
-23:23:38 [model] granite (weighting) ok 1.2s, tokens in/out 257/38, reply 69 chars
-round 2 [qwen-local] proposals=8 valid=8 attempts=59147 passes=0 near=0 invalid=0
-stopped: max_attempts; final passes: 0
+===== 2026-11-04 23:24:13 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 14 --gen
+== LP2:8.jpg-14.jpg - 25.jpg-31.jpg  (1729 symbols)
+23:24:15 [model] claude-supervisor (supervisor) calling...
 ```
 **structure/10** (since 2026-11-04 23:22:41), latest log lines:
 ```
@@ -153,6 +146,8 @@ brief for the generators (718 chars): Two-stage programs: a transposition, then 
   - LP2:20.jpg/1 - 3.jpg/1: 60000 attempts, 4 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **codex/10** (done)
   - LP2:17.jpg, 18.jpg, 19.jpg - 0.jpg-2.jpg: 60000 attempts, 4 hypotheses, **0 final pass(es)**, stopped: max_attempts
+- **local/17** (done)
+  - LP2:- - 40.jpg-43.jpg: 60000 attempts, 17 hypotheses, **0 final pass(es)**, stopped: max_attempts
 
 ## Model usage
 
@@ -171,10 +166,6 @@ brief for the generators (718 chars): Two-stage programs: a transposition, then 
 
 ## Events
 
-- 2026-11-04 23:17:44 codex/12: start (uses codex-plan)
-- 2026-11-04 23:17:44 4 running: local/17, codex/13, sonnet/13, codex/12
-- 2026-11-04 23:17:44 sonnet/14 waiting: claude-plan in use by sonnet/13
-- 2026-11-04 23:18:19 codex/13: done (exit 0, 2 min)
 - 2026-11-04 23:18:34 published: 19 file(s) to branch results
 - 2026-11-04 23:18:34 codex/11: start (uses codex-plan)
 - 2026-11-04 23:18:34 4 running: local/17, sonnet/13, codex/12, codex/11
@@ -196,3 +187,7 @@ brief for the generators (718 chars): Two-stage programs: a transposition, then 
 - 2026-11-04 23:23:01 structure/12: start (uses codex-plan)
 - 2026-11-04 23:23:01 4 running: local/17, sonnet/13, structure/10, structure/12
 - 2026-11-04 23:23:57 sonnet/13: done (exit 0, 7 min)
+- 2026-11-04 23:24:13 published: 23 file(s) to branch results
+- 2026-11-04 23:24:13 sonnet/14: start (uses claude-plan)
+- 2026-11-04 23:24:13 4 running: local/17, structure/10, structure/12, sonnet/14
+- 2026-11-04 23:24:18 local/17: done (exit 0, 19 min)
