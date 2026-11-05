@@ -16,16 +16,18 @@ ROOT = Path(__file__).resolve().parent.parent
 
 @pytest.fixture(scope="module")
 def sections():
-    return P.load_sections(indexes=[13, 24, 25, 16])
+    return P.load_sections(indexes=[10, 12, 13, 24, 25, 16])
 
 
 def test_packets_compile_have_exact_counts_and_are_stable(tmp_path, sections):
     a, b = tmp_path / "a", tmp_path / "b"
     res = {n: P.render_packet(n, a, sections) for n in P.PACKETS}
     res2 = {n: P.render_packet(n, b, sections) for n in P.PACKETS}
+    words = P.wordkey_words()
     assert {n: r["per_target"] for n, r in res.items()} == {"exp1_feedback": 261, "exp2_two_shear": 33,
                                                            "exp2b_all_shifts": 957,
-                                                           "exp3_progressive": 4873}
+                                                           "exp3_progressive": 4873,
+                                                           "exp4_wordkeys_reversed": 4 * len(words) + 2}
     assert res["exp3_progressive"]["total"] == 4 * 4873            # 3 sequences x 2 combines x 28 x 29 + control
     assert res["exp1_feedback"]["total"] == 696 + 87            # Astra's 696 candidates + 87 controls
     assert res["exp2_two_shear"]["total"] == 96 + 3
@@ -35,7 +37,8 @@ def test_packets_compile_have_exact_counts_and_are_stable(tmp_path, sections):
         assert (a / n / "proposals.json").read_bytes() == (b / n / "proposals.json").read_bytes()
         replies = json.loads((a / n / "proposals.json").read_text(encoding="utf-8"))
         assert all(len(json.loads(r)["proposals"]) <= P.PACKETS[n]["per_round"] for r in replies)
-        assert len(replies) <= P.PACKETS[n]["rounds"]
+        assert len(replies) <= (P.PACKETS[n]["rounds"] or len(replies))
+        assert len(replies) == res[n]["rounds"]
         text = (a / n / "packet.md").read_text(encoding="utf-8")
         assert "Nothing has been run" in text and "Stop rule (literal)" in text
         assert "novelty is unknown" in text and res[n]["sha256"] in text
@@ -192,3 +195,33 @@ def test_exp3_labels_beaufort_as_a_sign_convention_not_a_theory(tmp_path, sectio
     replies = json.loads((tmp_path / "exp3_progressive" / "proposals.json").read_text(encoding="utf-8"))
     combines = {p["spec"]["combine"] for rr in replies for p in json.loads(rr)["proposals"]}
     assert combines == {"sub", "beaufort"}                        # the DSL keyword itself is untouched
+
+
+def test_wordkey_packet_words_are_distinct_keys_and_cover_planted_reversed_word_keys(sections):
+    from lpswarm.alphabet import get_alphabet
+    from lpswarm.programs import compile_spec, decrypt, encrypt, expand
+    from lpswarm.textgen.synth import encoded_text
+    words = P.wordkey_words()
+    assert len(words) > 4000 and words[0][0] == "DIVINITY"             # verified keywords first
+    keys = [tuple(e) for _w, e in words]
+    assert len(set(keys)) == len(keys) and all(3 <= len(k) <= 64 for k in keys)
+    replies, table = P.exp4_replies()
+    assert [t["proposals"] for t in table][:4] == [len(words)] * 4 and table[-1]["proposals"] == 2
+    assert all(len(json.loads(r)["proposals"]) <= P.WORDKEY_PER_ROUND for r in replies)
+    alpha = get_alphabet(P.ALPHABET)
+    plain_arm = [c for r in replies for p in json.loads(r)["proposals"]
+                 for c in expand(compile_spec(p["spec"], alpha), None) if c.get("skip_mode") != "resolve"]
+    pt = encoded_text(alpha, "english", "train")[:600]
+    for w, enc in (words[0], words[250], words[3000]):
+        for combine in ("sub", "add"):
+            planted = compile_spec({"stream": {"kind": "repeat", "key": enc}, "combine": combine,
+                                    "map": "reverse"}, alpha)
+            ct = encrypt(pt, planted, alpha.size)
+            assert any(np.array_equal(decrypt(ct, c, alpha.size), pt) for c in plain_arm), (w, combine)
+
+
+def test_wordkey_packet_slice_runs_through_the_real_swarm(tmp_path, monkeypatch, sections):
+    monkeypatch.setitem(P.PACKETS["exp4_wordkeys_reversed"], "replies", lambda: P.exp4_replies(limit=12))
+    n = len(P.wordkey_words(12))
+    run = _run_packet(tmp_path, monkeypatch, sections, "exp4_wordkeys_reversed", 13, 4 * n + 2)
+    assert (run / "report.json").is_file()

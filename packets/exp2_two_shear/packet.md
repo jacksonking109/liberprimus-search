@@ -23,7 +23,7 @@ Per target: **33** candidate ciphers from 33 proposals in 2 rounds (of which con
 | 1 | 32 matrices, b=0 | 32 |
 | 2 | identity control | 1 |
 
-Duplicate check (apply every candidate to each target, count distinct decryptions):
+Duplicate check (apply every candidate to each target, count distinct decryptions; specs with a resolved F-skip are left out because their decryption needs a language model):
 
 - section 24: 33 distinct decryptions from 33 candidates
 - section 25: 33 distinct decryptions from 33 candidates

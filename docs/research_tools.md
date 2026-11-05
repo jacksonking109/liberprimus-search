@@ -15,6 +15,7 @@ exact targets, counts, caps, stop rule and run command. **Nothing in `packets/` 
 | `exp1_feedback` | neighbour / chain feedback, with and without word reset | 261 |
 | `exp2_two_shear` | determinant-one 2x2 Hill blocks, b = 0 | 33 |
 | `exp2b_all_shifts` | the same with all 29 offsets (separate approval) | 957 |
+| `exp4_wordkeys_reversed` | repeating word keys (verified keywords + 5,000 commonest corpus words) under the reversed alphabet, `p = (28 - c) -/+ key`, with and without the resolved F-skip; sections 10, 12, 13, 24, 25 | 19,882 |
 | `exp3_progressive` | progressive keys `k_t = d * s(o + t)`: `naturals`, `squares`, `triangular` x scale 1..28 x offset 0..28 x (p = c - k, p = k - c) | 4,873 |
 
 `p = k - c` is the reversed-alphabet form (reversed Gematria plus a shift, as the source notes give for

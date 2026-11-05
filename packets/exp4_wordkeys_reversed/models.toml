@@ -1,0 +1,6 @@
+# Scripted proposer: replays proposals.json, one reply per round. No keys, no model calls.
+[models.packet-exp4_wordkeys_reversed]
+provider = "scripted"
+model = "exp4_wordkeys_reversed"
+roles = ["proposer"]
+replies_file = "packets/exp4_wordkeys_reversed/proposals.json"

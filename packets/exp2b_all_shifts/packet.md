@@ -51,7 +51,7 @@ Per target: **957** candidate ciphers from 957 proposals in 30 rounds (of which 
 | 29 | 32 matrices, b=28 | 32 |
 | 30 | control: constant shifts only | 29 |
 
-Duplicate check (apply every candidate to each target, count distinct decryptions):
+Duplicate check (apply every candidate to each target, count distinct decryptions; specs with a resolved F-skip are left out because their decryption needs a language model):
 
 - section 24: 957 distinct decryptions from 957 candidates
 - section 25: 957 distinct decryptions from 957 candidates

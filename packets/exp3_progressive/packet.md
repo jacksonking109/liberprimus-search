@@ -29,7 +29,7 @@ Per target: **4873** candidate ciphers from 169 proposals in 7 rounds (of which 
 | 6 | triangular, p = k - c (reversed-alphabet form), scale 1..28 x offset 0..28 | 28 |
 | 7 | identity control | 1 |
 
-Duplicate check (apply every candidate to each target, count distinct decryptions):
+Duplicate check (apply every candidate to each target, count distinct decryptions; specs with a resolved F-skip are left out because their decryption needs a language model):
 
 - section 13: 4873 distinct decryptions from 4873 candidates
 - section 24: 4873 distinct decryptions from 4873 candidates

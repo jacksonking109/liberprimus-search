@@ -30,7 +30,7 @@ Per target: **261** candidate ciphers from 261 proposals in 9 rounds (of which c
 | 8 | chain - reset=word | 29 |
 | 9 | control: constant shifts only | 29 |
 
-Duplicate check (apply every candidate to each target, count distinct decryptions):
+Duplicate check (apply every candidate to each target, count distinct decryptions; specs with a resolved F-skip are left out because their decryption needs a language model):
 
 - section 13: 261 distinct decryptions from 261 candidates
 - section 24: 261 distinct decryptions from 261 candidates

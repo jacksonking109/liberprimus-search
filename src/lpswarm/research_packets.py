@@ -12,6 +12,7 @@ Packets (from the Astra research note, development SHA f822be5):
   exp2_two_shear    determinant-one 2x2 Hill blocks (two shears), offset 0
   exp2b_all_shifts  the same with all 29 constant offsets (needs its own approval)
   exp3_progressive  progressive (arithmetic) keys: shift grows by a fixed step per rune
+  exp4_wordkeys_reversed  repeating word keys under the reversed alphabet, with and without the F-skip
 """
 from __future__ import annotations
 
@@ -131,6 +132,63 @@ def exp3_replies() -> tuple[list[str], list[dict]]:
     return replies, table
 
 
+WORDKEY_TARGETS = [10, 12, 13, 24, 25]      # where the period scan has little power (308-729 runes)
+WORDKEY_LIMIT = 5000
+WORDKEY_PER_ROUND = 60
+
+
+def wordkey_words(limit: int = WORDKEY_LIMIT) -> list[tuple[str, list[int]]]:
+    """(word, encoded key) for the verified keywords plus the commonest corpus words (the same source
+    the Phase 1 baseline used), deduplicated by encoded key, dropping keys that merely repeat a
+    shorter key."""
+    from lpswarm.swarm.generators import known_keywords
+    from lpswarm.textgen import corpus
+    alpha = get_alphabet(ALPHABET)
+    out, seen = [], set()
+    for w in known_keywords(MANIFEST) + corpus.wordlist("english", min_len=3, limit=limit):
+        enc = tuple(int(v) for v in alpha.encode(w))
+        if len(enc) < 3 or len(enc) > 64 or enc in seen:
+            continue
+        if any(len(enc) % q == 0 and enc == enc[:q] * (len(enc) // q) for q in range(1, len(enc))):
+            continue
+        seen.add(enc)
+        out.append((w.upper(), list(enc)))
+    return out
+
+
+def exp4_replies(limit: int = WORDKEY_LIMIT, per_round: int = WORDKEY_PER_ROUND) -> tuple[list[str], list[dict]]:
+    words = wordkey_words(limit)
+    replies, table = [], []
+
+    def spec(enc: list[int], combine: str, skip: bool) -> dict:
+        s = {"stream": {"kind": "repeat", "key": enc}, "combine": combine, "map": "reverse"}
+        if skip:
+            s.update({"skip": ["F"], "skip_mode": "resolve"})
+        return s
+
+    for skip in (False, True):
+        for combine in ("sub", "add"):
+            start = len(replies)
+            for i in range(0, len(words), per_round):
+                chunk = words[i:i + per_round]
+                replies.append(_reply([spec(e, combine, skip) for _w, e in chunk],
+                                      f"word key under the reversed alphabet, {COMBINE_LABELS_REV[combine]}"
+                                      + (", F skipped (resolved)" if skip else "")))
+            table.append({"form": f"reversed alphabet, {COMBINE_LABELS_REV[combine]}, "
+                                  + ("F skipped (resolved)" if skip else "no skip")
+                                  + f", {len(words)} word keys",
+                          "proposals": len(words), "rounds": f"{start + 1}-{len(replies)}"})
+    replies.append(_reply([_spec(0), {"stream": {"kind": "constant", "value": 0}, "combine": "sub", "map": "reverse"}],
+                          "controls: identity; the reversed alphabet alone"))
+    table.append({"form": "controls: identity, reversed alphabet alone", "proposals": 2,
+                  "rounds": str(len(replies))})
+    return replies, table
+
+
+# `map: reverse` sends rune i to 28 - i; these are the two ways a key then combines with it.
+COMBINE_LABELS_REV = {"sub": "p = (28 - c) - key", "add": "p = (28 - c) + key"}
+
+
 # -------------------------------------------------------------------- packets
 PACKETS = {
     "exp1_feedback": {
@@ -186,6 +244,36 @@ PACKETS = {
         "not_implemented": ["Do not expand to all a, t in 1..28 (136,416 candidates across these "
                             "targets with all shifts); that is a different envelope."],
     },
+    "exp4_wordkeys_reversed": {
+        "title": "Repeating word keys under the reversed alphabet, with and without the F-skip",
+        "sections": WORDKEY_TARGETS, "rounds": None, "per_round": WORDKEY_PER_ROUND, "max_attempts": None,
+        "timeout": 10800, "replies": lambda: exp4_replies(),
+        "approved": "NO: review first, then ask",
+        "mechanism": (
+            "Decryption under the reversed alphabet (`map: reverse`, rune i becomes 28 - i, the reversed "
+            "Gematria the source notes give for solved LP1 pages 1, 5 and 6): `p = (28 - c) - key` or "
+            "`p = (28 - c) + key`, with `key` a repeating word. Words are the verified keywords "
+            "(DIVINITY, FIRFUMFERENFE) plus the 5,000 commonest corpus words of three or more letters "
+            "(the same source as the Phase 1 baseline), deduplicated by encoded key. Each is run twice: "
+            "with no skip, and with the F-skip resolved per occurrence (`skip F`, `skip_mode resolve`: "
+            "each ciphertext F may be a literal that does not advance the key, or an encrypted rune). "
+            "Targets are the five unsolved sections of 308-729 runes, where the period scan has little "
+            "power; on the 1,000+ rune sections it found no repeating key of period up to about 60 "
+            "whatever the alphabet orientation, which already argues against this family there."),
+        "overlap": [
+            "The Phase 1 baseline ran Vigenere / Beaufort / variant Beaufort with the same word source "
+            "on every section, but not under `map: reverse` with `sub` or `add`. Beaufort (`p = k - c`) "
+            "equals the reversed alphabet with the key shifted by one letter, so those key words with "
+            "that shift are not tested by the baseline either; this packet tests the unshifted words.",
+            "The exhaustive Codex jobs covered every key of length up to 4 with `map: reverse` on sections "
+            "11, 19, 21 and 25 (19 never finished, 25 failed). Coverage is unknown until the local "
+            "ledgers are compared."],
+        "not_implemented": [
+            "Keys that are not words (random keys of length 5 or more), a key phase other than 0, "
+            "autokey keys, and keys combined with a transposition.",
+            "Constant shifts other than the reversal itself (a constant is absorbed by the key letters, "
+            "so shifted variants are different words, not different families)."],
+    },
     "exp3_progressive": {
         "title": "Progressive keys: a shift that grows by a fixed step per rune",
         "sections": [13, 24, 25, 16], "rounds": 7, "per_round": 28, "max_attempts": 5200,
@@ -239,7 +327,7 @@ def distinct_decryptions(replies: list[str], sections: dict[int, dict]) -> dict[
     """Per target: how many of the packet's candidate decryptions are identical (read-only)."""
     alpha = get_alphabet(ALPHABET)
     specs = [c for r in replies for p in json.loads(r)["proposals"]
-             for c in expand(compile_spec(p["spec"], alpha), None)]
+             for c in expand(compile_spec(p["spec"], alpha), None) if c.get("skip_mode") != "resolve"]
     out = {}
     for idx, sec in sections.items():
         seen: dict[str, int] = {}
@@ -273,8 +361,10 @@ def render_packet(name: str, out_dir: Path, sections: dict[int, dict]) -> dict:
             raise ValueError(f"sections {odd} have an odd length: not valid for the 2x2 Hill packet")
     proposals = len(specs)
     per_target = sum(expansion_size(s) for s in specs)      # concrete ciphers (= attempts)
-    if per_target > cfg["max_attempts"]:
-        raise ValueError(f"{name}: {per_target} ciphers exceed max_attempts {cfg['max_attempts']}")
+    rounds = cfg["rounds"] or len(replies)
+    max_attempts = cfg["max_attempts"] or per_target + 100
+    if per_target > max_attempts:
+        raise ValueError(f"{name}: {per_target} ciphers exceed max_attempts {max_attempts}")
     unique = len({spec_hash(s) for s in specs})
     pdir = out_dir / name
     pdir.mkdir(parents=True, exist_ok=True)
@@ -289,8 +379,8 @@ def render_packet(name: str, out_dir: Path, sections: dict[int, dict]) -> dict:
     ids = ",".join(str(i) for i in cfg["sections"])
     cmd = (f"lpswarm swarm --manifest {MANIFEST} --alphabet {ALPHABET} --sections {ids} "
            f"--generators packet-{name} --models {rel}/models.toml "
-           f"--spend-ledger {rel}/run/spend.sqlite --rounds {cfg['rounds']} "
-           f"--per-round {cfg['per_round']} --max-attempts {cfg['max_attempts']} "
+           f"--spend-ledger {rel}/run/spend.sqlite --rounds {rounds} "
+           f"--per-round {cfg['per_round']} --max-attempts {max_attempts} "
            f"--timeout {cfg['timeout']} --ledger {rel}/run/ledger.sqlite --report-dir {rel}/run")
     dup = distinct_decryptions(replies, {i: sections[i] for i in cfg["sections"]})
     L = [f"# Packet {name}: {cfg['title']}", "",
@@ -310,15 +400,16 @@ def render_packet(name: str, out_dir: Path, sections: dict[int, dict]) -> dict:
           f"**{per_target * len(cfg['sections'])}** over {len(cfg['sections'])} targets. "
           f"Distinct proposal specs: {unique} of {proposals}.", "",
           "| round | content | proposals |", "| ---: | --- | ---: |"]
-    L += [f"| {k + 1} | {t['form']} | {t['proposals']} |" for k, t in enumerate(table)]
-    L += ["", "Duplicate check (apply every candidate to each target, count distinct decryptions):", ""]
+    L += [f"| {t.get('rounds', k + 1)} | {t['form']} | {t['proposals']} |" for k, t in enumerate(table)]
+    L += ["", "Duplicate check (apply every candidate to each target, count distinct decryptions; "
+          "specs with a resolved F-skip are left out because their decryption needs a language model):", ""]
     L += [f"- section {i}: {d['distinct_decryptions']} distinct decryptions from {d['candidates']} "
           f"candidates" for i, d in dup.items()]
     L += ["", "## Run (only after review)", "",
           "First compare against recorded history (novelty is unknown until this is done):", "",
           "```powershell", "lpswarm coverage --latest 3 --out reports\\coverage", "```", "",
           "Then, from the repository folder:", "", "```powershell", cmd, "```", "",
-          f"Caps: at most {cfg['max_attempts']} attempts and {cfg['timeout']} s per target. "
+          f"Caps: at most {max_attempts} attempts and {cfg['timeout']} s per target. "
           "**Stop rule (literal):** stop at the first cap reached, on any invalid proposal, "
           "or on a section/transcription mismatch; report partial work as partial and do not raise "
           "a cap to finish. The swarm also stops a target after the round in which an in-run "
@@ -338,7 +429,8 @@ def render_packet(name: str, out_dir: Path, sections: dict[int, dict]) -> dict:
           f"`lpswarm coverage --ledger {rel}/run/ledger.sqlite`.", "",
           f"`proposals.json` sha256: `{digest}`", ""]
     (pdir / "packet.md").write_text("\n".join(L), encoding="utf-8")
-    return {"name": name, "per_target": per_target, "targets": cfg["sections"],
+    return {"name": name, "per_target": per_target, "rounds": rounds, "max_attempts": max_attempts,
+            "targets": cfg["sections"],
             "total": per_target * len(cfg["sections"]), "sha256": digest, "command": cmd,
             "distinct": dup}
 
