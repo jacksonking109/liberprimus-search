@@ -68,7 +68,8 @@ class SwarmResult:
 
 def run_swarm(target: Target, ledger: Ledger, oracle: FullOracle, generators: Sequence,
               cfg: SwarmConfig | None = None, ranker=None, alphabet_values=None,
-              progress: bool = True, brief: str = "", shared_fn=None) -> SwarmResult:
+              progress: bool = True, brief: str = "", shared_fn=None,
+              known_words=None) -> SwarmResult:
     cfg = cfg or SwarmConfig()
     alpha = target.alphabet
     tid = ledger.add_target(alpha, target.ciphertext, target.label, target.page_range,
@@ -119,7 +120,8 @@ def run_swarm(target: Target, ledger: Ledger, oracle: FullOracle, generators: Se
             ctxs[gen.model] = GenContext(shown_label, alpha, target.ciphertext, rnd, k,
                                          history[gen.model], errors[gen.model], tried_now,
                                          alphabet_values, task_id=target.label, brief=brief,
-                                         shared=shared)
+                                         shared=shared,
+                                         known_words=[] if target.is_synthetic else list(known_words or []))
         fetched = _fetch_proposals(generators, ctxs, cfg.parallel, rnd, progress)
         for gen in generators:
             stopped = _pre_check(stop_path, time_left, budget_left)

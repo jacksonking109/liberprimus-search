@@ -236,7 +236,9 @@ def _auto_brief(args, router, alphabet, ct, label, values) -> str:
     if args.brief_context and Path(args.brief_context).is_file():
         from lpswarm.textio import read_text
         context = read_text(args.brief_context).strip()
-    ctx = GenContext(label, alphabet, np.asarray(ct), 0, 8, alphabet_values=values, task_id=label)
+    from lpswarm.swarm.generators import known_keywords
+    ctx = GenContext(label, alphabet, np.asarray(ct), 0, 8, alphabet_values=values, task_id=label,
+                     known_words=known_keywords(getattr(args, "manifest", None)))
     from lpswarm.router.base import Role
     try:
         # A supervisor-role model (Opus) or any proposer (e.g. Codex briefing itself).
@@ -301,6 +303,7 @@ def cmd_swarm(args) -> int:
             brief = read_text(args.brief_file).strip()
             print(f"brief for the generators ({len(brief)} chars): {brief[:200]}"
                   + ("..." if len(brief) > 200 else ""))
+        from lpswarm.swarm.generators import known_keywords
         shared_fn = None
         if args.peer_ledger or args.strategy_file:
             from lpswarm.ledger.db import peer_tried
@@ -349,7 +352,8 @@ def cmd_swarm(args) -> int:
             res = run_swarm(Target(alphabet, ct, label, page_range=page_range, is_synthetic=synthetic,
                                    breaks=breaks),
                             led, oracle, gens, sc, ranker=ranker, alphabet_values=values,
-                            progress=not args.quiet, brief=tgt_brief, shared_fn=shared_fn)
+                            progress=not args.quiet, brief=tgt_brief, shared_fn=shared_fn,
+                            known_words=known_keywords(args.manifest))
             n_final = sum(1 for r in res.final if r["passed_final"])
             print(f"stopped: {res.stopped or 'rounds done'}; final passes: {n_final}")
             entries.append(target_entry(led, res.target_id, label, len(ct), oracle=oracle, stopped=res.stopped,

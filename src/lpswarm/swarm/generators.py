@@ -46,6 +46,7 @@ class GenContext:
     style: str = ""        # per-model role hint: "exploratory" | "volume" | ""
     brief: str = ""        # direction written by the run supervisor for this job (optional)
     shared: str = ""       # cross-lane context: what other jobs tried here + the strategy note
+    known_words: list = field(default_factory=list)   # verified keywords (solved-page notes + file)
 
     def stats(self) -> dict:
         c = self.ciphertext
@@ -219,6 +220,26 @@ STYLE_HINTS = {
 
 
 MAX_BRIEF_CHARS = 2000
+
+
+def known_keywords(manifest: str | None = None, extra_file: str | None = "data/lp/keywords.txt") -> list[str]:
+    """Keywords with evidence: words named in the solved sections' notes in the manifest
+    (e.g. '... (DIVINITY)'), plus any the owner verified in data/lp/keywords.txt (one per line)."""
+    import json as _json
+    from pathlib import Path as _P
+    out: list[str] = []
+    try:
+        if manifest and _P(manifest).is_file():
+            from lpswarm.textio import read_text
+            for s in _json.loads(read_text(manifest)).get("sections", []):
+                out += re.findall(r"\(([A-Z][A-Z]{3,})\)", str(s.get("source_note", "")))
+        if extra_file and _P(extra_file).is_file():
+            from lpswarm.textio import read_text
+            out += [w.strip().upper() for w in read_text(extra_file).splitlines()
+                    if w.strip() and not w.lstrip().startswith("#")]
+    except Exception:  # noqa: BLE001 - best effort
+        pass
+    return list(dict.fromkeys(out))
 MAX_SHARED_CHARS = 5000
 MAX_STRATEGY_CHARS = 800
 
@@ -284,6 +305,11 @@ def build_prompt(ctx: GenContext, max_symbols: int = 300) -> list[dict]:
         lines += [f"  - {e}" for e in ctx.errors[-10:]]
     if ctx.style in STYLE_HINTS:
         lines.append(STYLE_HINTS[ctx.style])
+    if ctx.known_words:
+        lines.append("Keywords verified from solved pages of this puzzle: " + ", ".join(ctx.known_words)
+                     + ". Try these first for word keys. Other words are welcome as guesses: say so in "
+                     "'why' and where the idea came from (e.g. \"guess: a word from the puzzle text\"), "
+                     "and do not call a word a known keyword unless it is in this list.")
     if ctx.shared:
         lines.append(ctx.shared[:MAX_SHARED_CHARS])
     if ctx.brief:
@@ -309,7 +335,10 @@ def build_brief_prompt(ctx: GenContext, results_so_far: str = "") -> list[dict]:
     # Reuse the proposer's view (language, examples, ciphertext, statistics), minus the
     # final instruction line, then ask for a plan instead of proposals.
     body = base.rsplit("\nRound ", 1)[0]
-    ask = ("Write the brief for the proposer: 4-8 numbered directions, each naming concrete "
+    ask = ("Word keys beyond the verified keyword list (if one is given above) are welcome as "
+           "guesses, but mark each one \"(guess)\" with where the idea comes from, and do not "
+           "present guesses or remembered puzzle history as established facts. "
+           "Write the brief for the proposer: 4-8 numbered directions, each naming concrete "
            "program choices in the language above (stream kind and sequence, combine mode, "
            "offsets or ranges, skip rules, transpositions) and the reason (a statistic of this "
            "text, or a near miss below). Say what NOT to repeat. Prefer ideas that differ from "

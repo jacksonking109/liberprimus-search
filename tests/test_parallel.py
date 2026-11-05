@@ -875,3 +875,18 @@ def test_new_run_sees_earlier_runs_ledgers_and_brief_is_saved(tmp_path):
 def test_autokey_primer_note_in_the_language_doc():
     from lpswarm.swarm.generators import LANGUAGE_DOC
     assert "ONE proposal covers all primers" in LANGUAGE_DOC
+
+
+def test_known_keywords_from_manifest_and_file_reach_the_prompt(tmp_path):
+    from lpswarm.alphabet import Alphabet
+    from lpswarm.swarm.generators import GenContext, build_brief_prompt, build_prompt, known_keywords
+    extra = tmp_path / "k.txt"
+    extra.write_text("# verified\nsomeword\n\n", encoding="utf-8")
+    words = known_keywords(str(ROOT / "data" / "lp" / "manifest.json"), str(extra))
+    assert words[:2] == ["DIVINITY", "FIRFUMFERENFE"] and "SOMEWORD" in words
+    assert "YAHEOOPYJ" not in words
+    ctx = GenContext("t", Alphabet.latin26(), np.arange(20) % 26, 1, 4, known_words=words)
+    text = build_prompt(ctx)[1]["content"]
+    assert "DIVINITY, FIRFUMFERENFE" in text and "welcome as guesses" in text
+    brief = build_brief_prompt(ctx)
+    assert '(guess)' in brief[1]["content"]
