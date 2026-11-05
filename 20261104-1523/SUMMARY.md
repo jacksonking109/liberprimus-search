@@ -1,6 +1,6 @@
 # Overnight run 20261104-1523
 
-Started 2026-11-04 15:23:11, updated 2026-11-04 19:15:55, status **running**. Jobs: pending 3, running 1, done 65
+Started 2026-11-04 15:23:11, updated 2026-11-04 19:15:57, status **stopped**. Jobs: pending 3, done 65, interrupted 1
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -19,7 +19,7 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 19:15:55, status **running**. Jo
 | sonnet/21 | done | 2026-11-04 17:32:18 | 2026-11-04 17:36:04 | Sonnet, briefed by Opus |
 | sonnet/22 | done | 2026-11-04 17:36:20 | 2026-11-04 19:06:28 | Sonnet, briefed by Opus |
 | sonnet/24 | done | 2026-11-04 19:06:44 | 2026-11-04 19:12:59 | Sonnet, briefed by Opus |
-| sonnet/25 | running | 2026-11-04 19:13:29 |  | Sonnet, briefed by Opus |
+| sonnet/25 | interrupted | 2026-11-04 19:13:29 | 2026-11-04 19:15:57 | STOP file |
 | codex/25 | done | 2026-11-04 15:23:11 | 2026-11-04 15:35:47 | Codex (exploratory) |
 | codex/24 | done | 2026-11-04 15:23:11 | 2026-11-04 15:40:48 | Codex (exploratory) |
 | codex/22 | done | 2026-11-04 15:36:02 | 2026-11-04 15:48:59 | Codex (exploratory) |
@@ -73,22 +73,6 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 19:15:55, status **running**. Jo
 | sup3/11 | done | 2026-11-04 19:13:29 | 2026-11-04 19:15:55 | added by supervisor. Short sections allow exhaustive sweeps of key spaces too large to test on long sections. Every pass |
 | sup3/19 | pending |  |  | added by supervisor. Short sections allow exhaustive sweeps of key spaces too large to test on long sections. Every pass |
 | sup3/21 | pending |  |  | added by supervisor. Short sections allow exhaustive sweeps of key spaces too large to test on long sections. Every pass |
-
-## Now running
-
-**sonnet/25** (since 2026-11-04 19:13:29), latest log lines:
-```
-  | Do NOT repeat:
-  | - constant shifts or Atbash alone. The flat
-19:14:00 [model] claude-sonnet (proposer) calling...
-19:14:08 [model] claude-sonnet (proposer) ok 9.0s, tokens in/out 6136/1241, reply 2658 chars
-round 1 [claude-sonnet] proposals=12 valid=6 attempts=34 passes=0 near=0 invalid=6
-19:14:19 [model] claude-sonnet (proposer) calling...
-19:14:28 [model] claude-sonnet (proposer) ok 9.3s, tokens in/out 7132/1199, reply 2558 chars
-round 2 [claude-sonnet] proposals=12 valid=11 attempts=3614 passes=0 near=0 invalid=7
-19:15:23 [model] claude-sonnet (proposer) calling...
-19:15:33 [model] claude-sonnet (proposer) ok 10.1s, tokens in/out 8065/1325, reply 2819 chars
-```
 
 ## Results so far
 
@@ -258,9 +242,6 @@ round 2 [claude-sonnet] proposals=12 valid=11 attempts=3614 passes=0 near=0 inva
 
 ## Events
 
-- 2026-11-04 19:00:02 sonnet/22: running 65 min | 18:49:59 [model] claude-sonnet (proposer) ok 15.3s, tokens in/out 9697/2102, reply 3196 chars
-- 2026-11-04 19:00:32 sup2/13: done (exit 0, 7 min)
-- 2026-11-04 19:00:48 published: 62 file(s) to branch results
 - 2026-11-04 19:04:13 sup2/14: running 10 min | 19:00:59 [model] codex (proposer) ok 29.3s, tokens in/out 20053/1292, reply 4083 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-04 19:05:03 sonnet/22: running 70 min | 18:49:59 [model] claude-sonnet (proposer) ok 15.3s, tokens in/out 9697/2102, reply 3196 chars
 - 2026-11-04 19:06:28 sonnet/22: done (exit 0, 72 min)
@@ -283,3 +264,6 @@ round 2 [claude-sonnet] proposals=12 valid=11 attempts=3614 passes=0 near=0 inva
 - 2026-11-04 19:15:39 sup2/14: done (exit 0, 21 min)
 - 2026-11-04 19:15:55 published: 64 file(s) to branch results
 - 2026-11-04 19:15:55 sup3/11: done (exit 0, 2 min)
+- 2026-11-04 19:15:57 published: 65 file(s) to branch results
+- 2026-11-04 19:15:57 stopping: STOP file
+- 2026-11-04 19:15:57 sonnet/25: interrupted (exit 1, 2 min)
