@@ -111,7 +111,7 @@ decrypts the 800 runes with the resolved F-skip at every global offset consisten
 only the runes OUTSIDE the stretch (text the selection never saw) against 40 random candidates. A stage-2
 z >= 8 is a lead for the real oracle, not a result. Planted controls (English through prime-minus-one with the
 F-skip, with and without an extra skipped index) are found at z about 33-40; noise stays at 2-4. English
-bigram model only; one sequence family (primes) unless widened with `--sequences`.
+bigram model only. The reference run in `docs/diagnostics_sample/diagnostics_windows.md` is primes only; `diagnostics_windows_all.md` repeats it over primes, Fibonacci, naturals, squares, triangular, pi and e digits (`--sequences`, about 6 minutes): no flag on any section, best real stage-2 z 3.7 against 3.4 for noise and 32-38 for the planted stream.
 
 ## Limits
 
