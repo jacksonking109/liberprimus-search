@@ -1,6 +1,6 @@
 # Overnight run 20261104-2305
 
-Started 2026-11-04 23:05:16, updated 2026-11-04 23:31:52, status **running**. Jobs: pending 44, running 3, done 25
+Started 2026-11-04 23:05:16, updated 2026-11-04 23:32:12, status **running**. Jobs: pending 43, running 3, done 26
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -39,7 +39,7 @@ Started 2026-11-04 23:05:16, updated 2026-11-04 23:31:52, status **running**. Jo
 | local/18 | done | 2026-11-04 23:24:34 | 2026-11-04 23:26:54 | local models |
 | local/16 | done | 2026-11-04 23:27:10 | 2026-11-04 23:29:30 | local models |
 | local/19 | done | 2026-11-04 23:29:46 | 2026-11-04 23:31:52 | local models |
-| local/15 | pending |  |  | local models |
+| local/15 | done | 2026-11-04 23:32:07 | 2026-11-04 23:32:12 | local models |
 | local/20 | pending |  |  | local models |
 | local/14 | pending |  |  | local models |
 | local/21 | pending |  |  | local models |
@@ -94,7 +94,6 @@ round 2 [claude-sonnet] proposals=12 valid=12 attempts=16470 passes=0 near=0 inv
 ```
 **structure/10** (since 2026-11-04 23:22:41), latest log lines:
 ```
-===== 2026-11-04 23:22:41 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 10 --gen
 brief for the generators (718 chars): Two-stage programs: a transposition, then a substitution. Use the transpose field: grid widths (try the factors of the section length and their neighbours, e.g. 2
 == LP2:17.jpg, 18.jpg, 19.jpg - 0.jpg-2.jpg  (729 symbols)
 23:22:44 [model] codex (proposer) calling...
@@ -104,6 +103,7 @@ round 1 [codex] proposals=32 valid=32 attempts=116216 passes=0 near=0 invalid=0
 23:28:17 [model] codex (proposer) ok 64.1s, tokens in/out 21188/2567, reply 8158 chars, model not reported (pin one with model = "..." in the models config)
 round 2 [codex] proposals=32 valid=32 attempts=217234 passes=0 near=0 invalid=0
 23:31:15 [model] codex (proposer) calling...
+23:32:09 [model] codex (proposer) ok 53.8s, tokens in/out 20885/2488, reply 8049 chars, model not reported (pin one with model = "..." in the models config)
 ```
 **structure/13** (since 2026-11-04 23:31:22), latest log lines:
 ```
@@ -165,6 +165,8 @@ brief for the generators (718 chars): Two-stage programs: a transposition, then 
   - LP2:15.jpg/2- - 32.jpg/2-39.jpg: 60000 attempts, 1 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **local/19** (done)
   - LP2:33.jpg - 50.jpg/1: 60000 attempts, 3 hypotheses, **0 final pass(es)**, stopped: max_attempts (caution: short section (91 runes): many keys give plausible-looking text this short; treat any lead with extra caution)
+- **local/15** (done)
+  - skip LP2:15.jpg/1 - 32.jpg/1: only 9 symbols (minimum 20, --min-length); too short to judge
 - **structure/12** (done)
   - LP2:20.jpg/2-23.jpg/1 - 3.jpg/2-6.jpg/1: 300000 attempts, 77 hypotheses, **0 final pass(es)**, stopped: max_attempts
 
@@ -177,7 +179,7 @@ brief for the generators (718 chars): Two-stage programs: a transposition, then 
 - claude-opus: 59 call(s) in the last 5h (cap 180), spent $0.0000
 - claude-sonnet: 59 call(s) in the last 5h (cap 180), spent $0.0000
 - claude-supervisor: 59 call(s) in the last 5h (cap 180), spent $0.0000
-- codex: 68 call(s) in the last 5h (cap 850), spent $0.0000
+- codex: 69 call(s) in the last 5h (cap 850), spent $0.0000
 
 ## Supervisor notes
 
@@ -185,11 +187,6 @@ brief for the generators (718 chars): Two-stage programs: a transposition, then 
 
 ## Events
 
-- 2026-11-04 23:24:13 4 running: local/17, structure/10, structure/12, sonnet/14
-- 2026-11-04 23:24:18 local/17: done (exit 0, 19 min)
-- 2026-11-04 23:24:34 published: 24 file(s) to branch results
-- 2026-11-04 23:24:34 local/18: start (uses ollama:http://127.0.0.1:11434, ollama:http://127.0.0.1:11435)
-- 2026-11-04 23:24:34 4 running: structure/10, structure/12, sonnet/14, local/18
 - 2026-11-04 23:24:34 sonnet/15 waiting: claude-plan in use by sonnet/14
 - 2026-11-04 23:26:54 local/18: done (exit 0, 2 min)
 - 2026-11-04 23:27:10 published: 25 file(s) to branch results
@@ -210,3 +207,8 @@ brief for the generators (718 chars): Two-stage programs: a transposition, then 
 - 2026-11-04 23:31:22 4 running: structure/10, sonnet/14, local/19, structure/13
 - 2026-11-04 23:31:22 sonnet/15 waiting: claude-plan in use by sonnet/14
 - 2026-11-04 23:31:52 local/19: done (exit 0, 2 min)
+- 2026-11-04 23:32:07 published: 28 file(s) to branch results
+- 2026-11-04 23:32:07 local/15: start (uses ollama:http://127.0.0.1:11434, ollama:http://127.0.0.1:11435)
+- 2026-11-04 23:32:07 4 running: structure/10, sonnet/14, structure/13, local/15
+- 2026-11-04 23:32:07 sonnet/15 waiting: claude-plan in use by sonnet/14
+- 2026-11-04 23:32:12 local/15: done (exit 0, 0 min)
