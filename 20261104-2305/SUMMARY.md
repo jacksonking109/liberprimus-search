@@ -1,6 +1,6 @@
 # Overnight run 20261104-2305
 
-Started 2026-11-04 23:05:16, updated 2026-11-05 03:01:12, status **running**. Jobs: pending 11, running 3, done 65
+Started 2026-11-04 23:05:16, updated 2026-11-05 03:04:38, status **running**. Jobs: pending 10, running 3, done 66
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -73,10 +73,10 @@ Started 2026-11-04 23:05:16, updated 2026-11-05 03:01:12, status **running**. Jo
 | deepseek/19 | done | 2026-11-05 02:41:34 | 2026-11-05 02:47:34 | DeepSeek (volume) |
 | deepseek/20 | done | 2026-11-05 02:47:49 | 2026-11-05 02:54:36 | DeepSeek (volume) |
 | deepseek/21 | done | 2026-11-05 02:54:51 | 2026-11-05 03:01:12 | DeepSeek (volume) |
-| deepseek/22 | pending |  |  | DeepSeek (volume) |
+| deepseek/22 | running | 2026-11-05 03:01:27 |  | DeepSeek (volume) |
 | deepseek/24 | pending |  |  | DeepSeek (volume) |
 | deepseek/25 | pending |  |  | DeepSeek (volume) |
-| sup1/14 | running | 2026-11-05 02:49:15 |  | added by supervisor. Long sections (1729, 1894 and 2474 runes) give the most reliable scoring. After about 45 jobs, ever |
+| sup1/14 | done | 2026-11-05 02:49:15 | 2026-11-05 03:04:38 | added by supervisor. Long sections (1729, 1894 and 2474 runes) give the most reliable scoring. After about 45 jobs, ever |
 | sup1/16 | pending |  |  | added by supervisor. Long sections (1729, 1894 and 2474 runes) give the most reliable scoring. After about 45 jobs, ever |
 | sup1/22 | pending |  |  | added by supervisor. Long sections (1729, 1894 and 2474 runes) give the most reliable scoring. After about 45 jobs, ever |
 | sup2/10 | pending |  |  | added by supervisor. Mid-length sections (693-1468 runes) are long enough to judge, but so far they have only had the ge |
@@ -103,18 +103,15 @@ note: short section (91 runes): many keys give plausible-looking text this short
 01:39:50 [model] codex (proposer) calling...
 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
 ```
-**sup1/14** (since 2026-11-05 02:49:15), latest log lines:
+**deepseek/22** (since 2026-11-05 03:01:27), latest log lines:
 ```
-02:49:53 [model] claude-sonnet (proposer) ok 20.9s, tokens in/out 6676/1428, reply 3080 chars
-round 1 [claude-sonnet] proposals=12 valid=11 attempts=8554 passes=0 near=0 invalid=1
-02:52:57 [model] claude-sonnet (proposer) calling...
-02:53:18 [model] claude-sonnet (proposer) ok 20.7s, tokens in/out 7842/2334, reply 3077 chars
-round 2 [claude-sonnet] proposals=12 valid=9 attempts=15611 passes=0 near=0 invalid=4
-02:56:54 [model] claude-sonnet (proposer) calling...
-02:57:17 [model] claude-sonnet (proposer) ok 23.4s, tokens in/out 8889/2547, reply 3250 chars
-round 3 [claude-sonnet] proposals=12 valid=12 attempts=25365 passes=0 near=0 invalid=4
-03:00:17 [model] claude-sonnet (proposer) calling...
-03:00:40 [model] claude-sonnet (proposer) ok 22.7s, tokens in/out 9823/2357, reply 2882 chars
+===== 2026-11-05 03:01:27 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 22 --gen
+== LP2:57.jpg-66.jpg/1  (2474 symbols)
+03:01:34 [model] deepseek (proposer) calling...
+03:01:51 [model] deepseek (proposer) ok 17.5s, tokens in/out 3910/2727, reply 7538 chars
+round 1 [deepseek] proposals=1 valid=1 attempts=2000 passes=0 near=0 invalid=0
+03:02:07 [model] deepseek (proposer) calling...
+03:02:17 [model] deepseek (proposer) ok 9.7s, tokens in/out 3988/2388, reply 7116 chars
 ```
 
 ## Results so far
@@ -251,10 +248,12 @@ round 3 [claude-sonnet] proposals=12 valid=12 attempts=25365 passes=0 near=0 inv
   - LP2:50.jpg/2-56.jpg/1: 60000 attempts, 43 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **deepseek/21** (done)
   - LP2:56.jpg/2: 60000 attempts, 59 hypotheses, **0 final pass(es)**, stopped: max_attempts
+- **sup1/14** (done)
+  - LP2:8.jpg-14.jpg - 25.jpg-31.jpg: 37873 attempts, 44 hypotheses, **0 final pass(es)**
 
 ## Model usage
 
-- deepseek: 31 call(s) in the last 5h (cap none), spent $0.3211
+- deepseek: 33 call(s) in the last 5h (cap none), spent $0.3296
 - qwen-local: 29 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 29 call(s) in the last 5h (cap none), spent $0.0000
 - granite: 45 call(s) in the last 5h (cap none), spent $0.0000
@@ -294,13 +293,6 @@ Prefer combinations missing from the section's history. A real hit should show s
 
 ## Events
 
-- 2026-11-05 02:47:49 published: 62 file(s) to branch results
-- 2026-11-05 02:47:49 deepseek/20: start (uses api:https://api.deepseek.com)
-- 2026-11-05 02:47:50 4 running: exhaustive/11, exhaustive/19, local/10, deepseek/20
-- 2026-11-05 02:47:50 exhaustive/21 waiting: codex-plan full (2/2: exhaustive/11, exhaustive/19)
-- 2026-11-05 02:48:45 local/10: running 35 min | stopped: max_attempts; final passes: 0
-- 2026-11-05 02:49:00 local/10: done (exit 0, 35 min)
-- 2026-11-05 02:49:15 published: 63 file(s) to branch results
 - 2026-11-05 02:49:15 sup1/14: start (uses claude-plan)
 - 2026-11-05 02:49:15 4 running: exhaustive/11, exhaustive/19, deepseek/20, sup1/14
 - 2026-11-05 02:49:15 exhaustive/21 waiting: codex-plan full (2/2: exhaustive/11, exhaustive/19)
@@ -319,3 +311,10 @@ Prefer combinations missing from the section's history. A real hit should show s
 - 2026-11-05 02:59:52 deepseek/21: running 5 min | 02:59:15 [model] deepseek (proposer) ok 8.9s, tokens in/out 5055/2236, reply 7547 chars
 - 2026-11-05 02:59:57 exhaustive/19: running 80 min | 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-05 03:01:12 deepseek/21: done (exit 0, 6 min)
+- 2026-11-05 03:01:27 published: 65 file(s) to branch results
+- 2026-11-05 03:01:27 deepseek/22: start (uses api:https://api.deepseek.com)
+- 2026-11-05 03:01:28 4 running: exhaustive/11, exhaustive/19, sup1/14, deepseek/22
+- 2026-11-05 03:01:28 exhaustive/21 waiting: codex-plan full (2/2: exhaustive/11, exhaustive/19)
+- 2026-11-05 03:01:43 exhaustive/11: running 90 min | 01:32:40 [model] codex (proposer) ok 67.6s, tokens in/out 18877/2766, reply 8967 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 03:04:18 sup1/14: running 15 min | 03:00:40 [model] claude-sonnet (proposer) ok 22.7s, tokens in/out 9823/2357, reply 2882 chars
+- 2026-11-05 03:04:38 sup1/14: done (exit 0, 15 min)
