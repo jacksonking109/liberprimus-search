@@ -1,6 +1,6 @@
 # Overnight run 20261104-2305
 
-Started 2026-11-04 23:05:16, updated 2026-11-05 01:00:47, status **running**. Jobs: pending 29, running 3, done 43
+Started 2026-11-04 23:05:16, updated 2026-11-05 01:03:11, status **running**. Jobs: pending 32, running 3, done 44
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -41,7 +41,7 @@ Started 2026-11-04 23:05:16, updated 2026-11-05 01:00:47, status **running**. Jo
 | local/19 | done | 2026-11-04 23:29:46 | 2026-11-04 23:31:52 | local models |
 | local/15 | done | 2026-11-04 23:32:07 | 2026-11-04 23:32:12 | local models |
 | local/20 | done | 2026-11-04 23:32:28 | 2026-11-05 00:37:57 | local models |
-| local/14 | running | 2026-11-05 00:38:13 |  | local models |
+| local/14 | done | 2026-11-05 00:38:13 | 2026-11-05 01:03:11 | local models |
 | local/21 | pending |  |  | local models |
 | local/13 | pending |  |  | local models |
 | local/22 | pending |  |  | local models |
@@ -63,7 +63,7 @@ Started 2026-11-04 23:05:16, updated 2026-11-05 01:00:47, status **running**. Jo
 | exhaustive/25 | pending |  |  | Codex: every periodic key up to length 4 |
 | deepseek/10 | done | 2026-11-05 00:52:56 | 2026-11-05 00:55:31 | DeepSeek (volume) |
 | deepseek/11 | done | 2026-11-05 00:55:47 | 2026-11-05 01:00:47 | DeepSeek (volume) |
-| deepseek/12 | pending |  |  | DeepSeek (volume) |
+| deepseek/12 | running | 2026-11-05 01:01:26 |  | DeepSeek (volume) |
 | deepseek/13 | pending |  |  | DeepSeek (volume) |
 | deepseek/14 | pending |  |  | DeepSeek (volume) |
 | deepseek/15 | pending |  |  | DeepSeek (volume) |
@@ -79,27 +79,15 @@ Started 2026-11-04 23:05:16, updated 2026-11-05 01:00:47, status **running**. Jo
 | sup1/14 | pending |  |  | added by supervisor. Long sections (1729, 1894 and 2474 runes) give the most reliable scoring. After about 45 jobs, ever |
 | sup1/16 | pending |  |  | added by supervisor. Long sections (1729, 1894 and 2474 runes) give the most reliable scoring. After about 45 jobs, ever |
 | sup1/22 | pending |  |  | added by supervisor. Long sections (1729, 1894 and 2474 runes) give the most reliable scoring. After about 45 jobs, ever |
+| sup2/10 | pending |  |  | added by supervisor. Mid-length sections (693-1468 runes) are long enough to judge, but so far they have only had the ge |
+| sup2/12 | pending |  |  | added by supervisor. Mid-length sections (693-1468 runes) are long enough to judge, but so far they have only had the ge |
+| sup2/17 | pending |  |  | added by supervisor. Mid-length sections (693-1468 runes) are long enough to judge, but so far they have only had the ge |
+| sup2/20 | pending |  |  | added by supervisor. Mid-length sections (693-1468 runes) are long enough to judge, but so far they have only had the ge |
 
 ## Now running
 
-**local/14** (since 2026-11-05 00:38:13), latest log lines:
-```
-round 2 [qwen-local] proposals=8 valid=4 attempts=2707 passes=0 near=0 invalid=6
-00:45:16 [model] granite (weighting) calling...
-00:45:17 [model] granite (weighting) ok 1.1s, tokens in/out 234/22, reply 30 chars
-round 2 [gemma-local] proposals=8 valid=7 attempts=42108 passes=0 near=0 invalid=2
-00:45:25 [model] qwen-local (proposer) calling...
-00:47:18 [model] qwen-local (proposer) ok 112.9s, tokens in/out 5930/885, reply 3268 chars
-00:47:18 [model] gemma-local (proposer) calling...
-00:47:58 [model] gemma-local (proposer) ok 40.6s, tokens in/out 5851/646, reply 1898 chars
-00:47:58 [model] granite (weighting) calling...
-00:47:59 [model] granite (weighting) ok 0.9s, tokens in/out 213/19, reply 27 chars
-```
 **structure/17** (since 2026-11-04 23:39:58), latest log lines:
 ```
-23:41:03 [model] codex (proposer) ok 61.9s, tokens in/out 19153/2539, reply 8548 chars, model not reported (pin one with model = "..." in the models config)
-round 1 [codex] proposals=32 valid=32 attempts=101648 passes=0 near=0 invalid=0
-00:01:34 [model] codex (proposer) calling...
 00:02:33 [model] codex (proposer) ok 58.7s, tokens in/out 21588/2719, reply 8973 chars, model not reported (pin one with model = "..." in the models config)
 round 2 [codex] proposals=32 valid=32 attempts=178332 passes=0 near=0 invalid=0
 00:38:31 [model] codex (proposer) calling...
@@ -107,10 +95,12 @@ round 2 [codex] proposals=32 valid=32 attempts=178332 passes=0 near=0 invalid=0
 round 3 [codex] proposals=32 valid=32 attempts=237441 passes=0 near=0 invalid=0
 00:57:02 [model] codex (proposer) calling...
 00:57:59 [model] codex (proposer) ok 56.5s, tokens in/out 21886/2626, reply 9151 chars, model not reported (pin one with model = "..." in the models config)
+round 4 [codex] proposals=1 valid=1 attempts=242154 passes=0 near=0 invalid=0
+01:02:11 [model] codex (proposer) calling...
+01:03:08 [model] codex (proposer) ok 57.8s, tokens in/out 21895/2716, reply 9254 chars, model not reported (pin one with model = "..." in the models config)
 ```
 **structure/18** (since 2026-11-04 23:40:19), latest log lines:
 ```
-===== 2026-11-04 23:40:19 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 18 --gen
 brief for the generators (718 chars): Two-stage programs: a transposition, then a substitution. Use the transpose field: grid widths (try the factors of the section length and their neighbours, e.g. 2
 == LP2:- - 44.jpg-49.jpg  (1433 symbols)
 23:40:22 [model] codex (proposer) calling...
@@ -118,6 +108,16 @@ brief for the generators (718 chars): Two-stage programs: a transposition, then 
 round 1 [codex] proposals=32 valid=32 attempts=148195 passes=0 near=0 invalid=0
 00:27:30 [model] codex (proposer) calling...
 00:28:32 [model] codex (proposer) ok 62.3s, tokens in/out 21212/2563, reply 8529 chars, model not reported (pin one with model = "..." in the models config)
+round 2 [codex] proposals=32 valid=32 attempts=250467 passes=0 near=0 invalid=0
+01:01:18 [model] codex (proposer) calling...
+01:02:22 [model] codex (proposer) ok 64.2s, tokens in/out 21388/2666, reply 8730 chars, model not reported (pin one with model = "..." in the models config)
+```
+**deepseek/12** (since 2026-11-05 01:01:26), latest log lines:
+```
+===== 2026-11-05 01:01:26 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 12 --gen
+== LP2:20.jpg/2-23.jpg/1 - 3.jpg/2-6.jpg/1  (693 symbols)
+01:01:33 [model] deepseek (proposer) calling...
+01:01:50 [model] deepseek (proposer) ok 17.7s, tokens in/out 4182/2288, reply 6807 chars
 ```
 
 ## Results so far
@@ -198,6 +198,8 @@ round 1 [codex] proposals=32 valid=32 attempts=148195 passes=0 near=0 invalid=0
   - skip LP2:15.jpg/1 - 32.jpg/1: only 9 symbols (minimum 20, --min-length); too short to judge
 - **local/20** (done)
   - LP2:50.jpg/2-56.jpg/1: 60000 attempts, 7 hypotheses, **0 final pass(es)**, stopped: max_attempts
+- **local/14** (done)
+  - LP2:8.jpg-14.jpg - 25.jpg-31.jpg: 60000 attempts, 26 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **structure/10** (done)
   - LP2:17.jpg, 18.jpg, 19.jpg - 0.jpg-2.jpg: 300000 attempts, 90 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **structure/12** (done)
@@ -213,14 +215,14 @@ round 1 [codex] proposals=32 valid=32 attempts=148195 passes=0 near=0 invalid=0
 
 ## Model usage
 
-- deepseek: 7 call(s) in the last 5h (cap none), spent $0.2165
+- deepseek: 8 call(s) in the last 5h (cap none), spent $0.2205
 - qwen-local: 9 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 9 call(s) in the last 5h (cap none), spent $0.0000
 - granite: 12 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 79 call(s) in the last 5h (cap 180), spent $0.0000
-- claude-sonnet: 79 call(s) in the last 5h (cap 180), spent $0.0000
-- claude-supervisor: 79 call(s) in the last 5h (cap 180), spent $0.0000
-- codex: 48 call(s) in the last 5h (cap 850), spent $0.0000
+- claude-opus: 80 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-sonnet: 80 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-supervisor: 80 call(s) in the last 5h (cap 180), spent $0.0000
+- codex: 50 call(s) in the last 5h (cap 850), spent $0.0000
 
 ## Current strategy note (read by every lane each round)
 
@@ -239,16 +241,17 @@ Night so far: every section shows passes=0 and near=0, including 300k-attempt st
 4. A transposition before the stream: reversed rune order across the section, reversed lines, columnar transposition with widths that divide the section length, or reading pages in reverse.
 5. An autokey (ciphertext- or plaintext-feedback) seeded with a short key such as DIVINITY, FIRFUMFERENFE or CIRCUMFERENCE, or a prime.
 Prefer variants that are absent from the section's history. Long sections should score honestly, so a real hit should show clear English (or Old English-style) word structure across hundreds of runes, not just fragments.
+- 2026-11-05 01:01:26: 01:01 check-in: about 50 jobs are done and every section still has 0 final passes and 0 near hits. That includes deepseek/10, deepseek/11 and sonnet/24 and /25. Structure jobs 17 and 18 and local/14 are still running, and sup1 (sonnet on 14, 16 and 22) is queued. I added one codex job on the mid-length sections 10, 12, 17 and 20. It tests transpositions and the Cicada-style unsolved-page tricks, which differ from the sup1 brief. The strategy note is unchanged because the results have not changed. Job budget used: 2 of 5.
+- 2026-11-05 01:01:26: brief for sup2 (codex): Every LP2 section has 0 passes and 0 near hits tonight. Bare prime, totient(prime) and Fibonacci shifts, simple Vigenere keys and plain atbash have all failed, so do not propose them or small offset tweaks of them. Put each proposal into programs where the ORDER of runes is changed, or two keys interact:
+1. Transposition first, then a stream. Try reversing the whole section. Try reading pages in reverse order. Try boustrophedon, where every other line is reversed. Try columnar read-out with widths that divide the section length, or widths of 29, 31 or 59. Try reading every k-th rune with k coprime to the length (decimation). After any of these, apply totient(prime) or a prime stream, with and without the F-rune skip.
+2. Two streams combined. Add or subtract a prime stream and a Fibonacci stream mod 29, or prime and totient(prime), or a stream plus a short repeating key such as DIVINITY, CIRCUMFERENCE or FIRFUMFERENFE.
+3. A stream indexed by word position rather than rune position: key advances once per word, or the key is the word length or word index.
+4. A key stream taken from LP1 solved plaintext as a running key, read backwards, or starting at an offset equal to the section's page number.
+5. Gematria-value tricks. Map each rune to its prime value, subtract a stream, reduce mod 29. Also try shifting by the previous ciphertext rune's index (ciphertext autokey).
+Prefer combinations missing from the section's history. A real hit should show sustained English word structure across hundreds of runes, so do not chase short fragments.
 
 ## Events
 
-- 2026-11-05 00:48:14 sonnet/24: start (uses claude-plan)
-- 2026-11-05 00:48:15 4 running: structure/17, structure/18, local/14, sonnet/24
-- 2026-11-05 00:49:50 sonnet/24: done (exit 0, 2 min)
-- 2026-11-05 00:50:05 published: 41 file(s) to branch results
-- 2026-11-05 00:50:05 sonnet/25: start (uses claude-plan)
-- 2026-11-05 00:50:05 4 running: structure/17, structure/18, local/14, sonnet/25
-- 2026-11-05 00:50:10 structure/17: running 70 min | 00:39:30 [model] codex (proposer) ok 59.4s, tokens in/out 21313/2698, reply 8362 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-05 00:50:30 structure/18: running 70 min | 00:28:32 [model] codex (proposer) ok 62.3s, tokens in/out 21212/2563, reply 8529 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-05 00:52:40 sonnet/25: done (exit 0, 3 min)
 - 2026-11-05 00:52:56 published: 42 file(s) to branch results
@@ -267,3 +270,10 @@ Prefer variants that are absent from the section's history. Long sections should
 - 2026-11-05 01:00:12 structure/17: running 80 min | 00:57:59 [model] codex (proposer) ok 56.5s, tokens in/out 21886/2626, reply 9151 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-05 01:00:32 structure/18: running 80 min | 00:28:32 [model] codex (proposer) ok 62.3s, tokens in/out 21212/2563, reply 8529 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-05 01:00:47 deepseek/11: done (exit 0, 5 min)
+- 2026-11-05 01:01:03 published: 44 file(s) to branch results
+- 2026-11-05 01:01:26 supervisor: note: 01:01 check-in: about 50 jobs are done and every section still has 0 final passes and 0 near hits. That includes deepseek/10, deepseek/11 and sonnet/24 and /25. Structure jobs 17 and 18 and local/14 are still running, and sup1 (sonnet on 14, 16 and 22) is queued. I added one codex job on the mid-...
+- 2026-11-05 01:01:26 supervisor: added sup2: swarm on 4 section(s) with codex; brief: Every LP2 section has 0 passes and 0 near hits tonight. Bare prime, totient(prime) and Fibonacci shifts, simple Vigenere keys and plain atbash have all failed, so do not propose them or small offset t...
+- 2026-11-05 01:01:26 deepseek/12: start (uses api:https://api.deepseek.com)
+- 2026-11-05 01:01:26 4 running: structure/17, structure/18, local/14, deepseek/12
+- 2026-11-05 01:01:26 local/21 waiting: ollama:http://127.0.0.1:11434 in use by local/14
+- 2026-11-05 01:03:11 local/14: done (exit 0, 25 min)
