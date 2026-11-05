@@ -10,3 +10,9 @@ claude-opus,3816107e36b2a62b,program,80,0,20000,,0,0,0,max_attempts,16.36,1,3143
 claude-opus,58faea5dcfe35cd2,program,80,0,20000,,0,0,0,max_attempts,27.11,1,3138,992,0.0
 claude-opus,d78d9a268b69a356,program,160,1,18292,1,0,0,0,pass_found,28.79,1,6857,949,0.0
 claude-opus,bc8b8091be0dc1a1,program,160,0,20000,,0,0,0,max_attempts,17.03,1,3386,789,0.0
+claude-opus,4a5ab969d2cfed61,program,160,0,20000,,0,0,0,max_attempts,15.52,1,3398,734,0.0
+claude-sonnet,51b8a3f474ce0583,program,80,1,20000,32,0,0,0,max_attempts,20.74,1,3201,1744,0.0
+claude-sonnet,3816107e36b2a62b,program,80,0,20000,,0,0,0,max_attempts,16.65,1,3206,1096,0.0
+claude-sonnet,58faea5dcfe35cd2,program,80,0,20000,,0,0,0,max_attempts,22.68,1,3200,1778,0.0
+claude-sonnet,d78d9a268b69a356,program,160,1,18614,1,0,0,0,pass_found,19.51,1,3458,1271,0.0
+claude-sonnet,bc8b8091be0dc1a1,program,160,0,20000,,0,0,0,max_attempts,16.58,1,3449,1123,0.0
