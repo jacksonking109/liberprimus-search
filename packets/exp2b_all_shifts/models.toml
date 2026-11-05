@@ -1,0 +1,6 @@
+# Scripted proposer: replays proposals.json, one reply per round. No keys, no model calls.
+[models.packet-exp2b_all_shifts]
+provider = "scripted"
+model = "exp2b_all_shifts"
+roles = ["proposer"]
+replies_file = "packets/exp2b_all_shifts/proposals.json"
