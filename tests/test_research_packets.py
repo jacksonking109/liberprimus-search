@@ -24,7 +24,9 @@ def test_packets_compile_have_exact_counts_and_are_stable(tmp_path, sections):
     res = {n: P.render_packet(n, a, sections) for n in P.PACKETS}
     res2 = {n: P.render_packet(n, b, sections) for n in P.PACKETS}
     assert {n: r["per_target"] for n, r in res.items()} == {"exp1_feedback": 261, "exp2_two_shear": 33,
-                                                           "exp2b_all_shifts": 957}
+                                                           "exp2b_all_shifts": 957,
+                                                           "exp3_progressive": 4873}
+    assert res["exp3_progressive"]["total"] == 4 * 4873            # 3 sequences x 2 combines x 28 x 29 + control
     assert res["exp1_feedback"]["total"] == 696 + 87            # Astra's 696 candidates + 87 controls
     assert res["exp2_two_shear"]["total"] == 96 + 3
     assert res["exp2b_all_shifts"]["total"] == 2784 + 87
@@ -152,3 +154,29 @@ def test_preflight_flags_a_planted_repeat_deficit_and_not_a_random_text(monkeypa
         assert rep["units"] == 24 and rep["shuffles_per_target"] == 99 and rep["complete"]
         assert (rep["p_max_over_all_units"] <= 0.05) == small
         assert D.to_markdown(rep).startswith("# Diagnostics: preflight")
+
+
+def test_progressive_packet_counts_and_covers_planted_arithmetic_and_triangular_keys(tmp_path, sections):
+    from lpswarm.alphabet import get_alphabet
+    from lpswarm.programs import compile_spec, decrypt, encrypt, expand
+    from lpswarm.textgen.synth import encoded_text
+    replies, table = P.exp3_replies()
+    assert len(replies) == 7 and sum(t["proposals"] for t in table) == 6 * 28 + 1
+    assert all(len(json.loads(r)["proposals"]) <= 28 for r in replies)
+    alpha = get_alphabet(P.ALPHABET)
+    packet = [c for r in replies for p in json.loads(r)["proposals"]
+              for c in expand(compile_spec(p["spec"], alpha), None)]
+    assert len(packet) == 4873
+    pt = encoded_text(alpha, "english", "train")[:300]
+    for seq, scale, off, combine in (("naturals", 7, 5, "sub"), ("naturals", 28, 0, "sub"),
+                                     ("triangular", 3, 11, "beaufort"), ("squares", 2, 20, "sub")):
+        planted = compile_spec({"stream": {"kind": "sequence", "name": seq, "scale": scale,
+                                           "offset": off, "add": 0}, "combine": combine}, alpha)
+        ct = encrypt(pt, planted, alpha.size)
+        assert any(np.array_equal(decrypt(ct, c, alpha.size), pt) for c in packet), (seq, scale, off)
+    # an arithmetic key k = d*t + b for any b is a naturals proposal with offset b/d mod 29
+    for d, b in ((4, 17), (13, 0), (27, 28)):
+        planted = compile_spec({"stream": {"kind": "constant", "value": 0}, "combine": "sub"}, alpha)
+        k = (d * np.arange(300) + b) % 29
+        ct = (pt + k) % 29                                          # p = c - k
+        assert any(np.array_equal(decrypt(ct, c, alpha.size), pt) for c in packet), (d, b)

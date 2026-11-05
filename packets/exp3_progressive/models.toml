@@ -1,0 +1,6 @@
+# Scripted proposer: replays proposals.json, one reply per round. No keys, no model calls.
+[models.packet-exp3_progressive]
+provider = "scripted"
+model = "exp3_progressive"
+roles = ["proposer"]
+replies_file = "packets/exp3_progressive/proposals.json"

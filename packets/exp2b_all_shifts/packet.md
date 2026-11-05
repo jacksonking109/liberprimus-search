@@ -16,7 +16,7 @@ As exp2_two_shear, for every b = 0..28.
 
 ## Counts
 
-Per target: **957** proposals in 30 rounds (of which controls: 29); **2871** over 3 targets. Distinct specs in the packet: 957 of 957.
+Per target: **957** candidate ciphers from 957 proposals in 30 rounds (of which controls: 29); **2871** over 3 targets. Distinct proposal specs: 957 of 957.
 
 | round | content | proposals |
 | ---: | --- | ---: |

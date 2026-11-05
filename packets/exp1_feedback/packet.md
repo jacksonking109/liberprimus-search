@@ -16,7 +16,7 @@ Decryption `p_i = z_i - b` where `z` is a single additive feedback stage over ei
 
 ## Counts
 
-Per target: **261** proposals in 9 rounds (of which controls: 29); **783** over 3 targets. Distinct specs in the packet: 261 of 261.
+Per target: **261** candidate ciphers from 261 proposals in 9 rounds (of which controls: 29); **783** over 3 targets. Distinct proposal specs: 261 of 261.
 
 | round | content | proposals |
 | ---: | --- | ---: |

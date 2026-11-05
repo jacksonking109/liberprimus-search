@@ -11,6 +11,7 @@ Packets (from the Astra research note, development SHA f822be5):
   exp1_feedback     invertible neighbour/chain feedback, with and without word reset
   exp2_two_shear    determinant-one 2x2 Hill blocks (two shears), offset 0
   exp2b_all_shifts  the same with all 29 constant offsets (needs its own approval)
+  exp3_progressive  progressive (arithmetic) keys: shift grows by a fixed step per rune
 """
 from __future__ import annotations
 
@@ -23,7 +24,7 @@ from pathlib import Path
 import numpy as np
 
 from lpswarm.alphabet import get_alphabet
-from lpswarm.programs import compile_spec, decrypt, spec_hash
+from lpswarm.programs import compile_spec, decrypt, expand, expansion_size, spec_hash
 from lpswarm.textio import read_text
 
 N = 29
@@ -102,6 +103,29 @@ def exp2_replies(all_shifts: bool) -> tuple[list[str], list[dict]]:
     return replies, table
 
 
+PROGRESSIVE_SEQUENCES = ("naturals", "squares", "triangular")
+
+
+def progressive_spec(seq: str, scale: int, combine: str) -> dict:
+    """Key k_t = scale * seq(offset + t) (+ 0), offset swept over 0..28 by `offset_range`, which
+    for `naturals` covers every constant b (scale is invertible mod 29)."""
+    return {"stream": {"kind": "sequence", "name": seq, "scale": scale, "offset": 0, "add": 0},
+            "combine": combine, "offset_range": [0, N - 1]}
+
+
+def exp3_replies() -> tuple[list[str], list[dict]]:
+    replies, table = [], []
+    for seq in PROGRESSIVE_SEQUENCES:
+        for combine in ("sub", "beaufort"):
+            replies.append(_reply([progressive_spec(seq, d, combine) for d in range(1, N)],
+                                  f"progressive key: {seq} x scale d, offsets 0-28, {combine}"))
+            table.append({"form": f"{seq}, {combine}, scale 1..28 x offset 0..28",
+                          "proposals": N - 1})
+    replies.append(_reply([_spec(0)], "control: identity (no mixing, no shift)"))
+    table.append({"form": "identity control", "proposals": 1})
+    return replies, table
+
+
 # -------------------------------------------------------------------- packets
 PACKETS = {
     "exp1_feedback": {
@@ -157,6 +181,28 @@ PACKETS = {
         "not_implemented": ["Do not expand to all a, t in 1..28 (136,416 candidates across these "
                             "targets with all shifts); that is a different envelope."],
     },
+    "exp3_progressive": {
+        "title": "Progressive keys: a shift that grows by a fixed step per rune",
+        "sections": [13, 24, 25, 16], "rounds": 7, "per_round": 28, "max_attempts": 5200,
+        "timeout": 900, "replies": lambda: exp3_replies(),
+        "approved": "NO: review first, then ask",
+        "mechanism": (
+            "Decryption `p_t = c_t - k_t` (`sub`) or `k_t - c_t` (`beaufort`) with `k_t = d * s(o + t)` "
+            "mod 29, where `s` is `naturals` (0, 1, 2, ...: an arithmetic progression, so each "
+            "rune's shift grows by d), `squares` or `triangular`; d = 1..28 and the start offset "
+            "o = 0..28. For `naturals` the offset sweep covers every constant term b, so this is "
+            "the complete family `k_t = d*t + b`. Each proposal expands to 29 ciphers."),
+        "overlap": [
+            "Single `naturals`, `squares` and `triangular` shifts with small scales may have been "
+            "proposed by earlier model lanes (triangular with scale 1 appears in the section 19 "
+            "near-miss list). Coverage is unknown until the local ledgers are compared.",
+            "`add` is not generated: `add` with scale d equals `sub` with scale 29-d."],
+        "not_implemented": [
+            "`squares` and `triangular` with a scale and a start offset are only a subfamily of "
+            "quadratic keys (`a*t^2 + b*t + c`): the general quadratic or cubic polynomial key "
+            "would need a new stream kind. It is not part of this packet.",
+            "Combined with skips, maps or transpositions: this packet is the bare key."],
+    },
 }
 
 
@@ -183,7 +229,8 @@ def load_sections(manifest: str = MANIFEST, alphabet_path: str = ALPHABET,
 def distinct_decryptions(replies: list[str], sections: dict[int, dict]) -> dict[int, dict]:
     """Per target: how many of the packet's candidate decryptions are identical (read-only)."""
     alpha = get_alphabet(ALPHABET)
-    specs = [compile_spec(p["spec"], alpha) for r in replies for p in json.loads(r)["proposals"]]
+    specs = [c for r in replies for p in json.loads(r)["proposals"]
+             for c in expand(compile_spec(p["spec"], alpha), None)]
     out = {}
     for idx, sec in sections.items():
         seen: dict[str, int] = {}
@@ -215,7 +262,10 @@ def render_packet(name: str, out_dir: Path, sections: dict[int, dict]) -> dict:
         odd = [i for i in cfg["sections"] if sections[i]["runes"] % 2]
         if odd:
             raise ValueError(f"sections {odd} have an odd length: not valid for the 2x2 Hill packet")
-    per_target = len(specs)
+    proposals = len(specs)
+    per_target = sum(expansion_size(s) for s in specs)      # concrete ciphers (= attempts)
+    if per_target > cfg["max_attempts"]:
+        raise ValueError(f"{name}: {per_target} ciphers exceed max_attempts {cfg['max_attempts']}")
     unique = len({spec_hash(s) for s in specs})
     pdir = out_dir / name
     pdir.mkdir(parents=True, exist_ok=True)
@@ -245,10 +295,11 @@ def render_packet(name: str, out_dir: Path, sections: dict[int, dict]) -> dict:
         L.append(f"| {i} | `{s['label']}` | {s['runes']} | `{(s['sha256'] or 'unknown')[:16]}` | "
                  f"{'yes' if s['clean'] else 'NO'} |")
     L += ["", "## Counts", "",
-          f"Per target: **{per_target}** proposals in {len(replies)} rounds "
+          f"Per target: **{per_target}** candidate ciphers from {proposals} proposals in "
+          f"{len(replies)} rounds "
           f"(of which controls: {sum(t['proposals'] for t in table if t['form'].startswith(('control', 'identity')))}); "
           f"**{per_target * len(cfg['sections'])}** over {len(cfg['sections'])} targets. "
-          f"Distinct specs in the packet: {unique} of {per_target}.", "",
+          f"Distinct proposal specs: {unique} of {proposals}.", "",
           "| round | content | proposals |", "| ---: | --- | ---: |"]
     L += [f"| {k + 1} | {t['form']} | {t['proposals']} |" for k, t in enumerate(table)]
     L += ["", "Duplicate check (apply every candidate to each target, count distinct decryptions):", ""]

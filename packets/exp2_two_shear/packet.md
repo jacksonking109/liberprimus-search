@@ -16,7 +16,7 @@ Blocks of two runes `(c_2j, c_2j+1)` starting at rune 0, across words, multiplie
 
 ## Counts
 
-Per target: **33** proposals in 2 rounds (of which controls: 1); **99** over 3 targets. Distinct specs in the packet: 33 of 33.
+Per target: **33** candidate ciphers from 33 proposals in 2 rounds (of which controls: 1); **99** over 3 targets. Distinct proposal specs: 33 of 33.
 
 | round | content | proposals |
 | ---: | --- | ---: |
