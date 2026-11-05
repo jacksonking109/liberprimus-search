@@ -1,13 +1,13 @@
 # Overnight run 20261104-2305
 
-Started 2026-11-04 23:05:16, updated 2026-11-04 23:16:12, status **running**. Jobs: pending 56, running 3, done 13
+Started 2026-11-04 23:05:16, updated 2026-11-04 23:17:08, status **running**. Jobs: pending 55, running 3, done 14
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
 | tier-claude | done | 2026-11-04 23:05:16 | 2026-11-04 23:09:58 | Claude Code proposers vs the random control |
 | sonnet/10 | done | 2026-11-04 23:10:14 | 2026-11-04 23:14:10 | Sonnet, briefed by Opus |
 | sonnet/11 | done | 2026-11-04 23:14:26 | 2026-11-04 23:15:32 | Sonnet, briefed by Opus |
-| sonnet/12 | running | 2026-11-04 23:15:47 |  | Sonnet, briefed by Opus |
+| sonnet/12 | done | 2026-11-04 23:15:47 | 2026-11-04 23:17:08 | Sonnet, briefed by Opus |
 | sonnet/13 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/14 | pending |  |  | Sonnet, briefed by Opus |
 | sonnet/15 | pending |  |  | Sonnet, briefed by Opus |
@@ -31,7 +31,7 @@ Started 2026-11-04 23:05:16, updated 2026-11-04 23:16:12, status **running**. Jo
 | codex/16 | done | 2026-11-04 23:14:05 | 2026-11-04 23:16:12 | Codex (exploratory) |
 | codex/15 | done | 2026-11-04 23:15:06 | 2026-11-04 23:15:11 | Codex (exploratory) |
 | codex/14 | running | 2026-11-04 23:15:27 |  | Codex (exploratory) |
-| codex/13 | pending |  |  | Codex (exploratory) |
+| codex/13 | running | 2026-11-04 23:16:28 |  | Codex (exploratory) |
 | codex/12 | pending |  |  | Codex (exploratory) |
 | codex/11 | pending |  |  | Codex (exploratory) |
 | codex/10 | pending |  |  | Codex (exploratory) |
@@ -79,22 +79,8 @@ Started 2026-11-04 23:05:16, updated 2026-11-04 23:16:12, status **running**. Jo
 
 ## Now running
 
-**sonnet/12** (since 2026-11-04 23:15:47), latest log lines:
-```
-  | 4. Other sequences with skip [0] and offset_range 0..2000: primes, fibonacci, pi_digits, e_digits, squares and triangular. Try scale 1 and -1 (28) and add 0, under sub and beaufort.
-  | 5. Exhaustive periodic keys, key_length 1, 2, 3 and 4, combine sub. Run each with map identity and map reverse, since Atbash plus a shift is a known LP method. Also run beaufort. Periodic keys are
-  | 6. Repeat words with offset_range 0..20 under sub, beaufort, and map reverse: DIVINITY, FIRFUMFERENFE, CIRCUMFERENCE, KOAN, PARABLE, INSTAR, EMERGE, CICADA. Also run each with skip [0].
-  | 7. Transposition plus stream:
-  |    - grid read "columns" and "columns_reversed", transpose_range 2..60, with constant exhaustive key_length 1.
-  |    - railfence 2..30 with prime_totients offset 0, sub, skip [0].
-  |    - decimate 2..100 with constant key.
-  |    - reverse_text true combined with directions 1 and 3.
-  | Do NOT repeat: single-o
-23:16:09 [model] claude-sonnet (proposer) calling...
-```
 **codex/14** (since 2026-11-04 23:15:27), latest log lines:
 ```
-23:15:28 [model] codex (proposer) calling...
 23:15:59 [model] codex (proposer) ok 30.7s, tokens in/out 18195/672, reply 1862 chars, model not reported (pin one with model = "..." in the models config)
 brief from codex (1862 chars):
   | 1. Start with map identity, combine sub, stream repeat exhaustive at key_length 1, 2, 3, then 4, each in a separate proposal; also test beaufort. IC 0.999 gives no simple substitution signal, but 
@@ -104,6 +90,20 @@ brief from codex (1862 chars):
   | 5. Repeat the strongest arithmetic families with skip [0], first skip_mode all, then resolve; compare no skip. F is a plausible literal rune, but its count of 66 is ordinary, so treat skipping as 
   | 6. Test pure transposition using constant value 0, combine sub: grid read modes individually over transpose_range [2,500], railfence [2,64], and decimate [2,1728]; repeat with reverse_text true se
 23:15:59 [model] codex (proposer) calling...
+23:16:38 [model] codex (proposer) ok 39.2s, tokens in/out 18038/1756, reply 5551 chars, model not reported (pin one with model = "..." in the models config)
+```
+**codex/13** (since 2026-11-04 23:16:28), latest log lines:
+```
+brief from codex (1893 chars):
+  | 1. Establish controls: repeat stream with exhaustive:true, key_length 1, 2, 3, then 4, each a separate proposal; combine sub, identity map, no skips or transposition. IC 0.991 favors a changing ke
+  | 2. Prioritize changing arithmetic keys: sequence naturals, squares, triangular, primes and prime_totients; offset_range [0,1999], scale 1, add 0. Submit sub and beaufort separately. The single adj
+  | 3. Test sequence pi_digits and e_digits with offset_range [0,1999], scale 1, add 0; separate sub, add and beaufort proposals. These cover irregular deterministic streams consistent with near-rando
+  | 4. Test fibonacci with offset_range [0,199], scale 1, add 0, separately under sub and beaufort. Follow with scale 2 and 28. Keep these separate from transposition sweeps so each result identifies 
+  | 5. Test autokey, both plaintext and ciphertext sources, combine sub then beaufort, no skips. Use explicit token primers [F,U,TH,O,R,C], [C,I,C,A,D,A], and [P,R,I,M,E,S]. These are thematic probes,
+  | 6. Probe interrupted keystreams: repeat exhaustive key_length 2, combine sub, skip one symbol at a time across all 29 symbols, first skip_mode all, then resolve. No symbol is established as a lite
+  | 7. Test order changes cheaply: constant value 0, combine sub; each grid read with width range [2,333], railfence [2,64], and decimate [1,332]. Then primes/sub offsets [0,49] with railfence [2,64] 
+  | Nothing has been tried. Do not repeat equivalent exhaustive add/sub spaces, duplicate width settings, or pad the missing 33 symbols; tests must use the full target.
+23:17:00 [model] codex (proposer) calling...
 ```
 **local/17** (since 2026-11-04 23:05:16), latest log lines:
 ```
@@ -127,6 +127,8 @@ brief from codex (1862 chars):
   - LP2:17.jpg, 18.jpg, 19.jpg - 0.jpg-2.jpg: 60000 attempts, 14 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **sonnet/11** (done)
   - LP2:20.jpg/1 - 3.jpg/1: 60000 attempts, 3 hypotheses, **0 final pass(es)**, stopped: max_attempts
+- **sonnet/12** (done)
+  - LP2:20.jpg/2-23.jpg/1 - 3.jpg/2-6.jpg/1: 60000 attempts, 2 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **codex/25** (done)
   - LP2:54.jpg-55.jpg - 71.jpg-72.jpg: 60000 attempts, 2 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **codex/24** (done)
@@ -154,10 +156,10 @@ brief from codex (1862 chars):
 - qwen-local: 1 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 1 call(s) in the last 5h (cap none), spent $0.0000
 - granite: 1 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 49 call(s) in the last 5h (cap 180), spent $0.0000
-- claude-sonnet: 49 call(s) in the last 5h (cap 180), spent $0.0000
-- claude-supervisor: 49 call(s) in the last 5h (cap 180), spent $0.0000
-- codex: 53 call(s) in the last 5h (cap 850), spent $0.0000
+- claude-opus: 50 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-sonnet: 50 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-supervisor: 50 call(s) in the last 5h (cap 180), spent $0.0000
+- codex: 55 call(s) in the last 5h (cap 850), spent $0.0000
 
 ## Supervisor notes
 
@@ -165,11 +167,6 @@ brief from codex (1862 chars):
 
 ## Events
 
-- 2026-11-04 23:12:45 sonnet/11 waiting: claude-plan in use by sonnet/10
-- 2026-11-04 23:13:50 codex/18: done (exit 0, 2 min)
-- 2026-11-04 23:14:05 published: 12 file(s) to branch results
-- 2026-11-04 23:14:05 codex/16: start (uses codex-plan)
-- 2026-11-04 23:14:05 4 running: local/17, sonnet/10, codex/17, codex/16
 - 2026-11-04 23:14:05 sonnet/11 waiting: claude-plan in use by sonnet/10
 - 2026-11-04 23:14:10 sonnet/10: done (exit 0, 4 min)
 - 2026-11-04 23:14:26 published: 13 file(s) to branch results
@@ -190,3 +187,8 @@ brief from codex (1862 chars):
 - 2026-11-04 23:15:47 sonnet/12: start (uses claude-plan)
 - 2026-11-04 23:15:47 4 running: local/17, codex/16, codex/14, sonnet/12
 - 2026-11-04 23:16:12 codex/16: done (exit 0, 2 min)
+- 2026-11-04 23:16:28 published: 16 file(s) to branch results
+- 2026-11-04 23:16:28 codex/13: start (uses codex-plan)
+- 2026-11-04 23:16:28 4 running: local/17, codex/14, sonnet/12, codex/13
+- 2026-11-04 23:16:28 sonnet/13 waiting: claude-plan in use by sonnet/12
+- 2026-11-04 23:17:08 sonnet/12: done (exit 0, 1 min)
