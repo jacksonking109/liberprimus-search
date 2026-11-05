@@ -1,6 +1,6 @@
 # Overnight run 20261104-2305
 
-Started 2026-11-04 23:05:16, updated 2026-11-05 01:39:29, status **running**. Jobs: pending 20, running 3, done 56
+Started 2026-11-04 23:05:16, updated 2026-11-05 01:42:30, status **running**. Jobs: pending 19, running 3, done 57
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -46,7 +46,7 @@ Started 2026-11-04 23:05:16, updated 2026-11-05 01:39:29, status **running**. Jo
 | local/13 | done | 2026-11-05 01:06:08 | 2026-11-05 01:20:21 | local models |
 | local/22 | done | 2026-11-05 01:20:37 | 2026-11-05 01:30:35 | local models |
 | local/12 | done | 2026-11-05 01:30:51 | 2026-11-05 01:37:13 | local models |
-| local/24 | running | 2026-11-05 01:37:29 |  | local models |
+| local/24 | done | 2026-11-05 01:37:29 | 2026-11-05 01:42:30 | local models |
 | local/11 | pending |  |  | local models |
 | local/25 | pending |  |  | local models |
 | local/10 | pending |  |  | local models |
@@ -58,7 +58,7 @@ Started 2026-11-04 23:05:16, updated 2026-11-05 01:39:29, status **running**. Jo
 | structure/18 | done | 2026-11-04 23:40:19 | 2026-11-05 01:08:08 | Codex: transposition then substitution |
 | structure/24 | done | 2026-11-05 01:08:24 | 2026-11-05 01:30:56 | Codex: transposition then substitution |
 | exhaustive/11 | running | 2026-11-05 01:31:28 |  | Codex: every periodic key up to length 4 |
-| exhaustive/19 | pending |  |  | Codex: every periodic key up to length 4 |
+| exhaustive/19 | running | 2026-11-05 01:39:45 |  | Codex: every periodic key up to length 4 |
 | exhaustive/21 | pending |  |  | Codex: every periodic key up to length 4 |
 | exhaustive/25 | pending |  |  | Codex: every periodic key up to length 4 |
 | deepseek/10 | done | 2026-11-05 00:52:56 | 2026-11-05 00:55:31 | DeepSeek (volume) |
@@ -86,17 +86,6 @@ Started 2026-11-04 23:05:16, updated 2026-11-05 01:39:29, status **running**. Jo
 
 ## Now running
 
-**local/24** (since 2026-11-05 01:37:29), latest log lines:
-```
-===== 2026-11-05 01:37:29 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 24 --gen
-== LP2:51.jpg/2-53.jpg - 68.jpg/2-70.jpg  (534 symbols)
-01:37:39 [model] qwen-local (proposer) calling...
-01:38:34 [model] qwen-local (proposer) ok 54.3s, tokens in/out 4523/890, reply 3225 chars
-01:38:34 [model] gemma-local (proposer) calling...
-01:39:13 [model] gemma-local (proposer) ok 39.1s, tokens in/out 4659/538, reply 1607 chars
-01:39:13 [model] granite (weighting) calling...
-01:39:14 [model] granite (weighting) ok 1.2s, tokens in/out 265/22, reply 30 chars
-```
 **exhaustive/11** (since 2026-11-05 01:31:28), latest log lines:
 ```
 ===== 2026-11-05 01:31:28 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 11 --gen
@@ -104,6 +93,15 @@ brief for the generators (354 chars): Use exhaustive repeat streams: {"kind": "r
 == LP2:20.jpg/1 - 3.jpg/1  (119 symbols)
 01:31:32 [model] codex (proposer) calling...
 01:32:40 [model] codex (proposer) ok 67.6s, tokens in/out 18877/2766, reply 8967 chars, model not reported (pin one with model = "..." in the models config)
+```
+**exhaustive/19** (since 2026-11-05 01:39:45), latest log lines:
+```
+===== 2026-11-05 01:39:45 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 19 --gen
+brief for the generators (354 chars): Use exhaustive repeat streams: {"kind": "repeat", "exhaustive": true, "key_length": m}. Propose m = 1, 2, 3 and 4 (one proposal each) with combine "sub" and with 
+note: short section (91 runes): many keys give plausible-looking text this short; treat any lead with extra caution
+== LP2:33.jpg - 50.jpg/1  (91 symbols)
+01:39:50 [model] codex (proposer) calling...
+01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
 ```
 **deepseek/17** (since 2026-11-05 01:30:15), latest log lines:
 ```
@@ -201,6 +199,8 @@ brief for the generators (354 chars): Use exhaustive repeat streams: {"kind": "r
   - LP2:57.jpg-66.jpg/1: 60000 attempts, 28 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **local/12** (done)
   - LP2:20.jpg/2-23.jpg/1 - 3.jpg/2-6.jpg/1: 60000 attempts, 17 hypotheses, **0 final pass(es)**, stopped: max_attempts
+- **local/24** (done)
+  - LP2:51.jpg/2-53.jpg - 68.jpg/2-70.jpg: 60000 attempts, 5 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **structure/10** (done)
   - LP2:17.jpg, 18.jpg, 19.jpg - 0.jpg-2.jpg: 300000 attempts, 90 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **structure/12** (done)
@@ -239,7 +239,7 @@ brief for the generators (354 chars): Use exhaustive repeat streams: {"kind": "r
 - claude-opus: 81 call(s) in the last 5h (cap 180), spent $0.0000
 - claude-sonnet: 81 call(s) in the last 5h (cap 180), spent $0.0000
 - claude-supervisor: 81 call(s) in the last 5h (cap 180), spent $0.0000
-- codex: 54 call(s) in the last 5h (cap 850), spent $0.0000
+- codex: 55 call(s) in the last 5h (cap 850), spent $0.0000
 
 ## Current strategy note (read by every lane each round)
 
@@ -270,13 +270,6 @@ Prefer combinations missing from the section's history. A real hit should show s
 
 ## Events
 
-- 2026-11-05 01:29:59 deepseek/16: done (exit 0, 2 min)
-- 2026-11-05 01:30:15 published: 52 file(s) to branch results
-- 2026-11-05 01:30:15 deepseek/17: start (uses api:https://api.deepseek.com)
-- 2026-11-05 01:30:15 4 running: structure/17, structure/24, local/22, deepseek/17
-- 2026-11-05 01:30:15 local/12 waiting: ollama:http://127.0.0.1:11434 in use by local/22
-- 2026-11-05 01:30:25 structure/17: running 110 min | 01:03:08 [model] codex (proposer) ok 57.8s, tokens in/out 21895/2716, reply 9254 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-05 01:30:35 local/22: done (exit 0, 10 min)
 - 2026-11-05 01:30:51 published: 53 file(s) to branch results
 - 2026-11-05 01:30:51 local/12: start (uses ollama:http://127.0.0.1:11434, ollama:http://127.0.0.1:11435)
 - 2026-11-05 01:30:51 4 running: structure/17, structure/24, deepseek/17, local/12
@@ -295,3 +288,10 @@ Prefer combinations missing from the section's history. A real hit should show s
 - 2026-11-05 01:37:29 local/24: start (uses ollama:http://127.0.0.1:11434, ollama:http://127.0.0.1:11435)
 - 2026-11-05 01:37:29 4 running: structure/17, deepseek/17, exhaustive/11, local/24
 - 2026-11-05 01:39:29 structure/17: done (exit 0, 120 min)
+- 2026-11-05 01:39:45 published: 56 file(s) to branch results
+- 2026-11-05 01:39:45 exhaustive/19: start (uses codex-plan)
+- 2026-11-05 01:39:45 4 running: deepseek/17, exhaustive/11, local/24, exhaustive/19
+- 2026-11-05 01:39:45 local/11 waiting: ollama:http://127.0.0.1:11434 in use by local/24
+- 2026-11-05 01:40:20 deepseek/17: running 10 min | 01:30:43 [model] deepseek (proposer) ok 17.9s, tokens in/out 4235/2463, reply 8320 chars
+- 2026-11-05 01:41:30 exhaustive/11: running 10 min | 01:32:40 [model] codex (proposer) ok 67.6s, tokens in/out 18877/2766, reply 8967 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 01:42:30 local/24: done (exit 0, 5 min)
