@@ -1,6 +1,6 @@
 # Overnight run 20261104-1523
 
-Started 2026-11-04 15:23:11, updated 2026-11-04 19:15:39, status **running**. Jobs: pending 3, running 2, done 64
+Started 2026-11-04 15:23:11, updated 2026-11-04 19:15:55, status **running**. Jobs: pending 3, running 1, done 65
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -70,7 +70,7 @@ Started 2026-11-04 15:23:11, updated 2026-11-04 19:15:39, status **running**. Jo
 | sup2/12 | done | 2026-11-04 18:39:26 | 2026-11-04 18:52:43 | added by supervisor. Transposition-before-substitution looks under-covered on sections whose lengths factor neatly; code |
 | sup2/13 | done | 2026-11-04 18:53:07 | 2026-11-04 19:00:32 | added by supervisor. Transposition-before-substitution looks under-covered on sections whose lengths factor neatly; code |
 | sup2/14 | done | 2026-11-04 18:54:12 | 2026-11-04 19:15:39 | added by supervisor. Transposition-before-substitution looks under-covered on sections whose lengths factor neatly; code |
-| sup3/11 | running | 2026-11-04 19:13:29 |  | added by supervisor. Short sections allow exhaustive sweeps of key spaces too large to test on long sections. Every pass |
+| sup3/11 | done | 2026-11-04 19:13:29 | 2026-11-04 19:15:55 | added by supervisor. Short sections allow exhaustive sweeps of key spaces too large to test on long sections. Every pass |
 | sup3/19 | pending |  |  | added by supervisor. Short sections allow exhaustive sweeps of key spaces too large to test on long sections. Every pass |
 | sup3/21 | pending |  |  | added by supervisor. Short sections allow exhaustive sweeps of key spaces too large to test on long sections. Every pass |
 
@@ -88,16 +88,6 @@ round 1 [claude-sonnet] proposals=12 valid=6 attempts=34 passes=0 near=0 invalid
 round 2 [claude-sonnet] proposals=12 valid=11 attempts=3614 passes=0 near=0 invalid=7
 19:15:23 [model] claude-sonnet (proposer) calling...
 19:15:33 [model] claude-sonnet (proposer) ok 10.1s, tokens in/out 8065/1325, reply 2819 chars
-```
-**sup3/11** (since 2026-11-04 19:13:29), latest log lines:
-```
-===== 2026-11-04 19:13:29 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 11 --gen
-brief for the generators (1365 chars): Sections: 11 = 119 runes (7*17), 19 = 91 runes (7*13), 21 = 121 runes (11*11). Sonnet, codex, deepseek and local passes (20-60k attempts each) all found 0 finals
-== LP2:20.jpg/1 - 3.jpg/1  (119 symbols)
-19:13:31 [model] codex (proposer) calling...
-19:14:09 [model] codex (proposer) ok 37.7s, tokens in/out 18764/1429, reply 4031 chars, model not reported (pin one with model = "..." in the models config)
-round 1 [codex] proposals=16 valid=11 attempts=12115 passes=0 near=0 invalid=5
-19:15:11 [model] codex (proposer) calling...
 ```
 
 ## Results so far
@@ -232,6 +222,8 @@ round 1 [codex] proposals=16 valid=11 attempts=12115 passes=0 near=0 invalid=5
   - LP2:6.jpg/2-7.jpg - 23.jpg/2-24.jpg: 50000 attempts, 31 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **sup2/14** (done)
   - LP2:8.jpg-14.jpg - 25.jpg-31.jpg: 44157 attempts, 30 hypotheses, **0 final pass(es)**, stopped: stop_file
+- **sup3/11** (done)
+  - LP2:20.jpg/1 - 3.jpg/1: 12115 attempts, 11 hypotheses, **0 final pass(es)**, stopped: stop_file
 
 ## Model usage
 
@@ -242,7 +234,7 @@ round 1 [codex] proposals=16 valid=11 attempts=12115 passes=0 near=0 invalid=5
 - claude-opus: 179 call(s) in the last 5h (cap 550), spent $0.0000
 - claude-sonnet: 179 call(s) in the last 5h (cap 550), spent $0.0000
 - claude-supervisor: 179 call(s) in the last 5h (cap 550), spent $0.0000
-- codex: 98 call(s) in the last 5h (cap 850), spent $0.0000
+- codex: 99 call(s) in the last 5h (cap 850), spent $0.0000
 - dry: 4 call(s) in the last 5h (cap none), spent $0.0000
 
 ## Current strategy note (read by every lane each round)
@@ -266,8 +258,6 @@ round 1 [codex] proposals=16 valid=11 attempts=12115 passes=0 near=0 invalid=5
 
 ## Events
 
-- 2026-11-04 18:58:07 sup2/13: running 5 min | 18:56:59 [model] codex (proposer) ok 31.5s, tokens in/out 20695/1386, reply 4164 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-04 18:59:12 sup2/14: running 5 min | 18:54:50 [model] codex (proposer) ok 35.2s, tokens in/out 19231/1550, reply 4359 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-04 19:00:02 sonnet/22: running 65 min | 18:49:59 [model] claude-sonnet (proposer) ok 15.3s, tokens in/out 9697/2102, reply 3196 chars
 - 2026-11-04 19:00:32 sup2/13: done (exit 0, 7 min)
 - 2026-11-04 19:00:48 published: 62 file(s) to branch results
@@ -291,3 +281,5 @@ round 1 [codex] proposals=16 valid=11 attempts=12115 passes=0 near=0 invalid=5
 - 2026-11-04 19:13:29 sup1/13 waiting: claude-plan in use by sonnet/25
 - 2026-11-04 19:14:14 sup2/14: running 20 min | 19:10:16 [model] codex (proposer) ok 32.2s, tokens in/out 21622/1431, reply 4190 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-04 19:15:39 sup2/14: done (exit 0, 21 min)
+- 2026-11-04 19:15:55 published: 64 file(s) to branch results
+- 2026-11-04 19:15:55 sup3/11: done (exit 0, 2 min)
