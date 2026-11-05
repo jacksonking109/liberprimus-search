@@ -7,6 +7,7 @@ diagnostic can and cannot see.
 
     python -m lpswarm.research_structure diffs  --out reports/diag
     python -m lpswarm.research_structure scans  --out reports/diag
+    python -m lpswarm.research_structure periods --out reports/diag
     python -m lpswarm.research_structure repeats --out reports/diag
     python -m lpswarm.research_structure power  --out reports/diag
     python -m lpswarm.research_structure all    --out reports/diag
@@ -15,6 +16,7 @@ diffs   differences d = c[i]-c[i-1] and sums s = c[i]+c[i-1] (mod 29), the 29x29
         whether the sections share one statistical process
 scans   mutual information between c[i] and c[i-k] (k = 1..64) and the index of coincidence of
         c[i] + r*c[i-k] (r = 1..28, k = 1..16)
+periods column index of coincidence for repeating-key periods 2..200, F treated three ways
 repeats where the adjacent equal runes fall (separator, rune, position in the section)
 power   what each of those can see (synthetic data only)
 
@@ -28,6 +30,7 @@ import argparse
 import json
 import sys
 import time
+import warnings
 from pathlib import Path
 
 import numpy as np
@@ -394,7 +397,8 @@ def mi_corr(obs_mi: np.ndarray, X: dict, use: list, lags: int) -> np.ndarray:
 
 # ------------------------------------------------------------------------------- power
 MECHANISMS = ("plaintext (no cipher)", "iid noise", "neighbour feedback (add)", "chain / plaintext autokey",
-              "progressive key (arithmetic)", "prime stream", "Hill 2x2 blocks", "periodic key, length 37")
+              "progressive key (arithmetic)", "prime stream", "Hill 2x2 blocks", "periodic key, length 37",
+              "periodic key, length 13, F literal")
 POWER_LENGTHS = (334, 534, 1022, 1434)
 
 
@@ -421,6 +425,18 @@ def _mechanism_ct(name: str, pt: np.ndarray, alpha, rng) -> np.ndarray:
     elif name == "Hill 2x2 blocks":
         spec = {"stream": const0, "combine": "sub", "mix": {"kind": "hill", "size": 2, "matrix": [3, 2, 1, 1],
                                                           "at": "before"}}
+    elif name == "periodic key, length 13, F literal":
+        # F in the plaintext stays F and the key does not advance there; other runes are shifted and the
+        # key advances, so a ciphertext F can be either (the ambiguity the real F-skip pages have)
+        key = rng.integers(0, N, size=13)
+        out, j = np.empty(len(pt), dtype=np.int64), 0
+        for t, v in enumerate(pt):
+            if v == 0:
+                out[t] = 0
+            else:
+                out[t] = (int(v) + int(key[j % 13])) % N
+                j += 1
+        return out
     elif name == "periodic key, length 37":
         spec = {"stream": {"kind": "repeat", "key": [int(v) for v in rng.integers(0, N, size=37)]},
                 "combine": "sub"}
@@ -451,7 +467,9 @@ def power(reps: int = POWER_REPS, seed: int = SEED, cap_s: float = CAP_SECONDS,
             d = diffs(secs, [0], reps=reps, seed=seed + mi_, cap_s=left / 2)
             s = scans(secs, [0], reps=reps, seed=seed + mi_, cap_s=left / 3)
             s2 = scans(secs, [0], reps=reps, seed=seed + mi_, cap_s=left / 3, exclude_equal=True)
-            if "error" in d or "error" in s or "error" in s2:
+            pr = periods(secs, [0], reps=reps, seed=seed + mi_, cap_s=left / 3, max_period=60)
+            pv = pr["sections"]["0"].get("variants", {})
+            if "error" in d or "error" in s or "error" in s2 or "error" in pr["sections"]["0"] or COMB_NAME not in pv:
                 complete = False
                 continue
             p = {"differences: any bin": d["differences"]["p_max_abs_z"],
@@ -461,7 +479,9 @@ def power(reps: int = POWER_REPS, seed: int = SEED, cap_s: float = CAP_SECONDS,
                  "dependence (MI)": s["dependence_per_section"]["p_max_over_units"],
                  "transform scan": s["transform_per_section"]["p_max_over_units"],
                  "dependence, repeats excluded": s2["dependence_per_section"]["p_max_over_units"],
-                 "transform, repeats excluded": s2["transform_per_section"]["p_max_over_units"]}
+                 "transform, repeats excluded": s2["transform_per_section"]["p_max_over_units"],
+                 "period scan, all runes": pv["all runes"]["p_max_over_periods"],
+                 "period scan, F-robust comb": pv[COMB_NAME]["p_max_over_periods"]}
             rows.append({"mechanism": name, "length": L, "p": p,
                          "detected_by": [k for k, v in p.items() if v < ALPHA]})
     return {"kind": "power", "label": "SYNTHETIC: English plaintext (training split) through known "
@@ -469,8 +489,150 @@ def power(reps: int = POWER_REPS, seed: int = SEED, cap_s: float = CAP_SECONDS,
             "shuffles": reps, "alpha": ALPHA, "complete": complete, "seed": seed, "rows": rows,
             "tests": ["differences: any bin", "differences: non-zero d", "differences: near-zero d",
                       "transitions", "dependence (MI)", "transform scan", "dependence, repeats excluded",
-                      "transform, repeats excluded"],
+                      "transform, repeats excluded", "period scan, all runes", "period scan, F-robust comb"],
             "seconds": round(time.monotonic() - t0, 2)}
+
+
+# ---------------------------------------------------------------------------- periods
+MAX_PERIOD = 200
+MIN_PER_COLUMN = 5
+COMB_NAME = "F-robust lag comb (pairs with no F between)"
+PERIOD_VARIANTS = ("all runes", "F skipped (key does not advance)", "F ignored (key advances)", COMB_NAME)
+MIN_VALID_PAIRS = 30
+LAG_CAP = 120
+CONTROL_PAGES = (4, 8)          # Vigenere pages per the manifest source notes (key lengths 8 and 13)
+
+
+def _period_stat(idx: np.ndarray, y: np.ndarray, max_period: int) -> np.ndarray:
+    """Coincidence rate among runes in the same column (index mod m), for m = 2..max_period."""
+    out = np.full(max_period - 1, np.nan)
+    for m in range(2, max_period + 1):
+        cnt = np.bincount((idx % m) * N + y, minlength=m * N).reshape(m, N)
+        tot = cnt.sum(axis=1)
+        pairs = float((tot * (tot - 1)).sum())
+        if pairs > 0:
+            out[m - 2] = float((cnt * (cnt - 1)).sum()) / pairs
+    return out
+
+
+def _variant_stats(x: np.ndarray, max_period: int) -> np.ndarray:
+    """(3, max_period-1): one row per PERIOD_VARIANTS entry."""
+    n = len(x)
+    keep = np.nonzero(x != 0)[0]
+    y_skip = x[keep]
+    return np.vstack([
+        _period_stat(np.arange(n), x, max_period),                       # all runes
+        _period_stat(np.arange(len(y_skip)), y_skip, max_period),        # F removed: key does not advance
+        _period_stat(keep, x[keep], max_period),                         # F kept in the count, ignored in the statistic
+    ])
+
+
+def _lag_profile(x: np.ndarray, max_lag: int) -> np.ndarray:
+    """Equality rate of c[i] vs c[i+d] for d = 2..max_lag over pairs with NO F rune from i to i+d.
+    Such pairs are unaffected by how an F is treated (literal or encrypted), because any ambiguity only
+    shifts the key phase after an F. NaN where fewer than MIN_VALID_PAIRS qualify."""
+    n = len(x)
+    cf = np.concatenate([[0], np.cumsum(x == 0)])
+    out = np.full(max_lag - 1, np.nan)
+    for d in range(2, min(max_lag, n - 1) + 1):
+        i = np.arange(0, n - d)
+        valid = (cf[i + d + 1] - cf[i]) == 0
+        v = int(valid.sum())
+        if v >= MIN_VALID_PAIRS:
+            out[d - 2] = float((x[:-d][valid] == x[d:][valid]).mean())
+    return out
+
+
+def _comb(z: np.ndarray, max_lag: int) -> tuple[np.ndarray, np.ndarray]:
+    """For each period m (2..max_lag//2) the sum of lag z-scores at m, 2m, 3m, ... / sqrt(count).
+    z is indexed by lag-2. Returns (periods, comb); NaN where fewer than two multiples are available."""
+    ms = np.arange(2, max_lag // 2 + 1)
+    out = np.full(len(ms), np.nan)
+    for k, m in enumerate(ms):
+        vals = z[[d - 2 for d in range(m, max_lag + 1, m) if d - 2 < len(z)]]
+        vals = vals[~np.isnan(vals)]
+        if len(vals) >= 2:
+            out[k] = vals.sum() / np.sqrt(len(vals))
+    return ms, out
+
+
+def periods(secs: dict, ids, reps: int = REPS, seed: int = SEED, cap_s: float = CAP_SECONDS,
+            max_period: int = MAX_PERIOD, control_ids=()) -> dict:
+    """Column index of coincidence for every period 2..max_period (a repeating key leaves a peak at its
+    length and multiples), per section, in three treatments of the F rune (rune 0): untouched, removed
+    (the documented F-skip: F is literal and the key does not advance) and ignored (F is literal but the
+    key advances). Exact Monte Carlo against shuffles; p is the maximum over the periods tried."""
+    t0 = time.monotonic()
+    out: dict = {"kind": "periods", "label": LABEL, "variants": list(PERIOD_VARIANTS),
+                 "max_period": max_period, "seed": seed, "min_per_column": MIN_PER_COLUMN,
+                 "sections": {}, "complete": True}
+    for sid in list(ids) + [c for c in control_ids if c not in ids]:
+        if sid not in secs:
+            continue
+        x = secs[sid]["ct"]
+        n = len(x)
+        rng = np.random.default_rng(seed + 31 * sid + 5)
+        mp = min(max_period, max(n // MIN_PER_COLUMN, 3))
+        obs = _variant_stats(x, mp)
+        null = []
+        for _ in range(reps):
+            if time.monotonic() - t0 >= cap_s:
+                out["complete"] = False
+                break
+            null.append(_variant_stats(rng.permutation(x), mp))
+        r = len(null)
+        entry: dict = {"runes": n, "f_runes": int((x == 0).sum()), "max_period": mp,
+                       "shuffles": r, "control": sid in control_ids and sid not in ids, "variants": {}}
+        if r < 20:
+            entry["error"] = "too few shuffles completed (time cap)"
+            out["sections"][str(sid)] = entry
+            continue
+        NU = np.array(null)                                   # (r, 3, mp-1)
+        # F-robust lag comb: z per lag from obs + shuffles, then combine each period's multiples
+        lag_cap = min(LAG_CAP, max(n // 8, 8))
+        rng2 = np.random.default_rng(seed + 31 * sid + 77)
+        prof_o = _lag_profile(x, lag_cap)
+        prof_n = np.array([_lag_profile(rng2.permutation(x), lag_cap) for _ in range(r)])
+        allp = np.vstack([prof_o[None, :], prof_n])
+        with warnings.catch_warnings():              # lags with too few qualifying pairs are all-NaN
+            warnings.simplefilter("ignore", RuntimeWarning)
+            mu, sdp = np.nanmean(allp, axis=0), np.maximum(np.nanstd(allp, axis=0, ddof=1), 1e-9)
+        zo, zn_l = (prof_o - mu) / sdp, (prof_n - mu) / sdp
+        ms, comb_o = _comb(zo, lag_cap)
+        comb_n = np.array([_comb(row, lag_cap)[1] for row in zn_l])
+        okc = ~np.isnan(comb_o) & ~np.isnan(comb_n).any(axis=0)
+        if okc.any():
+            co, cn = comb_o[okc], comb_n[:, okc]
+            allc = np.vstack([co[None, :], cn])
+            mc, sc = allc.mean(0), np.maximum(allc.std(0, ddof=1), 1e-9)
+            zc, zcn = (co - mc) / sc, (cn - mc) / sc
+            msk = ms[okc]
+            topc = np.argsort(-zc)[:5]
+            entry["variants"][COMB_NAME] = {
+                "max_z": float(zc.max()), "p_max_over_periods": _p_max(float(zc.max()), zcn.max(axis=1)),
+                "periods_tried": int(okc.sum()), "lag_cap": lag_cap,
+                "top": [{"period": int(msk[k]), "z": float(zc[k]),
+                         "rate": float(np.nanmean([prof_o[d - 2] for d in range(int(msk[k]), lag_cap + 1, int(msk[k]))]))}
+                        for k in topc]}
+        for vi, vname in enumerate(PERIOD_VARIANTS[:3]):
+            o = obs[vi]
+            ok = ~np.isnan(o)
+            nv = NU[:, vi, :]
+            ok &= ~np.isnan(nv).any(axis=0)
+            if not ok.any():
+                continue
+            allv = np.vstack([o[ok][None, :], nv[:, ok]])
+            mean, sd = allv.mean(0), np.maximum(allv.std(0, ddof=1), 1e-12)
+            z, zn = (o[ok] - mean) / sd, (nv[:, ok] - mean) / sd
+            periods_ok = np.arange(2, mp + 1)[ok]
+            top = np.argsort(-z)[:5]
+            entry["variants"][vname] = {
+                "max_z": float(z.max()), "p_max_over_periods": _p_max(float(z.max()), zn.max(axis=1)),
+                "periods_tried": int(ok.sum()),
+                "top": [{"period": int(periods_ok[k]), "z": float(z[k]), "rate": float(o[ok][k])} for k in top]}
+        out["sections"][str(sid)] = entry
+    out["seconds"] = round(time.monotonic() - t0, 2)
+    return out
 
 
 # ---------------------------------------------------------------------------- repeats
@@ -671,6 +833,26 @@ def to_markdown(rep: dict) -> str:
                           f"p (max over units) {_fmt(u['p_max_over_units'])}. Top units:", "",
                           "```", *[json.dumps(_jsonable(t), sort_keys=True) for t in u["top"][:5]], "```", ""]
             L += [s["note"], ""]
+    pr = rep.get("periods")
+    if pr:
+        L += ["## Period scan (repeating keys), with the F rune treated three ways", "",
+              f"Column index of coincidence for periods 2..{pr['max_period']} (at least {pr['min_per_column']} runes "
+              "per column); a repeating key leaves a peak at its length and multiples. p is the maximum over the "
+              "periods tried. " + ("" if pr["complete"] else "**PARTIAL: time cap.** ") +
+              "Sections marked (control) are the Vigenere pages in the manifest (key lengths 8 and 13 per the "
+              "source notes), included only to show what the scan recovers.", "",
+              "| section | runes | F runes | " + " | ".join(f"{v}: best period (z), p" for v in pr["variants"]) + " |",
+              "| ---: | ---: | ---: | " + " | ".join("---" for _ in pr["variants"]) + " |"]
+        for sid, e in pr["sections"].items():
+            if "error" in e:
+                L.append(f"| {sid} | {e['runes']} | {e['f_runes']} | " + " | ".join("n/a" for _ in pr["variants"]) + " |")
+                continue
+            cells = []
+            for v in pr["variants"]:
+                d = e["variants"].get(v)
+                cells.append("n/a" if not d else f"{d['top'][0]['period']} ({d['top'][0]['z']:.1f}), {_fmt(d['p_max_over_periods'])}")
+            L.append(f"| {sid}{' (control)' if e['control'] else ''} | {e['runes']} | {e['f_runes']} | " + " | ".join(cells) + " |")
+        L.append("")
     rp = rep.get("repeats")
     if rp:
         L += ["## Where the adjacent repeats fall", "",
@@ -702,7 +884,7 @@ def to_markdown(rep: dict) -> str:
     pw = rep.get("power")
     if pw:
         L += ["## What each diagnostic can see (synthetic)", "", f"{pw['label']}. {pw['shuffles']} shuffles per case, "
-              f"alpha {pw['alpha']}; no multiplicity correction across the eight columns.", "",
+              f"alpha {pw['alpha']}; no multiplicity correction across the ten columns.", "",
               "| mechanism | length | " + " | ".join(pw["tests"]) + " |",
               "| --- | ---: | " + " | ".join("---:" for _ in pw["tests"]) + " |"]
         for r in pw["rows"]:
@@ -716,7 +898,7 @@ def to_markdown(rep: dict) -> str:
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="python -m lpswarm.research_structure", description=__doc__.split("\n")[0])
-    ap.add_argument("command", choices=["diffs", "scans", "repeats", "power", "all"])
+    ap.add_argument("command", choices=["diffs", "scans", "periods", "repeats", "power", "all"])
     ap.add_argument("--sections", help="comma-separated manifest ids (default: unsolved sections of 300+ runes)")
     ap.add_argument("--reps", type=int, default=REPS)
     ap.add_argument("--seed", type=int, default=SEED)
@@ -732,6 +914,9 @@ def main(argv: list[str] | None = None) -> int:
         if args.command in ("scans", "all"):
             rep["scans"] = scans(secs, ids, args.reps, args.seed, args.cap)
             rep["scans_no_repeats"] = scans(secs, ids, args.reps, args.seed, args.cap, exclude_equal=True)
+    if args.command in ("periods", "all"):
+        psecs = load_sections(indexes=sorted(set(ids) | set(CONTROL_PAGES)))
+        rep["periods"] = periods(psecs, ids, args.reps, args.seed, args.cap, control_ids=CONTROL_PAGES)
     if args.command in ("repeats", "all"):
         rep["repeats"] = repeats(ids, seed=args.seed)
     if args.command in ("power", "all"):

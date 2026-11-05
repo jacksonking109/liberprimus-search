@@ -23,7 +23,7 @@ For `naturals` the exp3 packet is the complete arithmetic family `k_t = d*t + b`
 covers every b because d is invertible mod 29). `squares` and `triangular` with a scale and offset
 are only a subfamily of quadratic keys; a general polynomial key would need a new stream kind.
 
-## Structure diagnostics (`python -m lpswarm.research_structure {diffs,scans,repeats,power,all}`)
+## Structure diagnostics (`python -m lpswarm.research_structure {diffs,scans,periods,repeats,power,all}`)
 
 Deterministic (fixed seeds), bounded (wall-clock cap, partial results marked) and exploratory: the
 units were chosen after looking at the data and p-values calibrate a maximum over the inspected
@@ -42,6 +42,15 @@ with 199 shuffles is 0.005.
   so r = b/a covers every `a*c[i-k] + b*c[i]`). Run twice: on all pairs, and with equal pairs
   (`c[i] == c[i-k]`) excluded, which removes the known repeat shortage so that what is left is
   dependence beyond it.
+* `periods`: column index of coincidence for repeating-key periods 2..200, with the F rune (rune 0)
+  treated four ways: untouched; removed (the documented F-skip: F is literal and the key does not
+  advance); ignored but counted (F literal, key advances); and an F-robust lag comb that uses only
+  pairs with no F between them and combines each period's multiples. The F treatment matters: the
+  solved pages with F-skip only decode when each F is resolved separately (see
+  `docs/lp_baseline_run.md`), so a fixed treatment misaligns the columns after every F. The two
+  Vigenere pages in the manifest (4: key length 8, 8: key length 13) are included as detector
+  controls only; the scan recovers page 8 in every variant and page 4 only through the lag comb
+  (as period 4, a divisor of 8). Periods above 60 are only reached by the first three variants.
 * `repeats`: where the adjacent equal runes fall in the raw text: by what separates the two runes
   (nothing, a word dot, a line end, a quote), by rune, and by position in the section (deciles, and one
   permutation test of the mean relative position, which is a weak lead at most because it was chosen
@@ -68,5 +77,6 @@ Outputs: `diagnostics_structure.json` and `diagnostics_structure.md` in `--out` 
 * Word breaks are those of the transcription (the bullet separators). `diffs` and `scans` ignore line
   breaks; `repeats` reports them as a separate kind of gap.
 * The dependence scan did NOT recover the key length on the two Vigenere pages in the manifest
-  (sections 4 and 8, 300-500 runes, with the F-skip): short periodic keys are not reliably visible to
-  it. Do not read a flat scan as ruling out a periodic key.
+  (sections 4 and 8): pairwise dependence does not reliably show a short periodic key. Use `periods`
+  for that, and read its limits: with many F runes only the F-robust comb survives, and it reaches
+  periods up to about 60 on sections of a few hundred runes.

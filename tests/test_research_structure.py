@@ -209,3 +209,27 @@ def test_repeats_on_the_bundled_transcription_and_cli_output(tmp_path):
     assert R.main(["repeats", "--out", str(tmp_path)]) == 0
     md = (tmp_path / "diagnostics_structure.md").read_text(encoding="utf-8")
     assert "Where the adjacent repeats fall" in md and "word dot" in md
+
+
+def test_period_scan_finds_a_repeating_key_even_when_f_is_ambiguous_and_is_quiet_on_noise(english):
+    alpha, text = english
+    rng = np.random.default_rng(31)
+    ct = R._mechanism_ct("periodic key, length 13, F literal", text[5000:6500].astype(np.int64), alpha, rng)
+    res = R.periods(_sec(ct), [0], reps=REPS, max_period=60)
+    v = res["sections"]["0"]["variants"][R.COMB_NAME]
+    assert v["p_max_over_periods"] <= 0.05 and v["top"][0]["period"] % 13 == 0
+    flags = {name: 0 for name in R.PERIOD_VARIANTS}
+    for sd in (41, 42, 43, 44, 45, 46):
+        noise = _sec(np.random.default_rng(sd).integers(0, 29, size=1000))
+        for name, d in R.periods(noise, [0], reps=REPS, max_period=60)["sections"]["0"]["variants"].items():
+            flags[name] += d["p_max_over_periods"] <= 0.05
+    assert all(c <= 2 for c in flags.values()), flags
+
+
+def test_period_scan_time_cap_and_controls_are_reported(english):
+    sec = _sec(np.random.default_rng(7).integers(0, 29, size=400))
+    capped = R.periods(sec, [0], reps=REPS, cap_s=0, max_period=30)
+    assert capped["complete"] is False and "error" in capped["sections"]["0"]
+    both = {0: sec[0], 5: {**sec[0], "label": "c"}}
+    res = R.periods(both, [0], reps=REPS, max_period=30, control_ids=(5,))
+    assert res["sections"]["5"]["control"] is True and res["sections"]["0"]["control"] is False
