@@ -1,6 +1,6 @@
 # Overnight run 20261104-2305
 
-Started 2026-11-04 23:05:16, updated 2026-11-05 03:10:24, status **running**. Jobs: pending 9, running 3, done 67
+Started 2026-11-04 23:05:16, updated 2026-11-05 03:13:05, status **running**. Jobs: pending 8, running 3, done 68
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -57,7 +57,7 @@ Started 2026-11-04 23:05:16, updated 2026-11-05 03:10:24, status **running**. Jo
 | structure/17 | done | 2026-11-04 23:39:58 | 2026-11-05 01:39:29 | Codex: transposition then substitution |
 | structure/18 | done | 2026-11-04 23:40:19 | 2026-11-05 01:08:08 | Codex: transposition then substitution |
 | structure/24 | done | 2026-11-05 01:08:24 | 2026-11-05 01:30:56 | Codex: transposition then substitution |
-| exhaustive/11 | running | 2026-11-05 01:31:28 |  | Codex: every periodic key up to length 4 |
+| exhaustive/11 | done | 2026-11-05 01:31:28 | 2026-11-05 03:13:05 | Codex: every periodic key up to length 4 |
 | exhaustive/19 | running | 2026-11-05 01:39:45 |  | Codex: every periodic key up to length 4 |
 | exhaustive/21 | pending |  |  | Codex: every periodic key up to length 4 |
 | exhaustive/25 | pending |  |  | Codex: every periodic key up to length 4 |
@@ -78,7 +78,7 @@ Started 2026-11-04 23:05:16, updated 2026-11-05 03:10:24, status **running**. Jo
 | deepseek/25 | pending |  |  | DeepSeek (volume) |
 | sup1/14 | done | 2026-11-05 02:49:15 | 2026-11-05 03:04:38 | added by supervisor. Long sections (1729, 1894 and 2474 runes) give the most reliable scoring. After about 45 jobs, ever |
 | sup1/16 | done | 2026-11-05 03:04:53 | 2026-11-05 03:10:24 | added by supervisor. Long sections (1729, 1894 and 2474 runes) give the most reliable scoring. After about 45 jobs, ever |
-| sup1/22 | pending |  |  | added by supervisor. Long sections (1729, 1894 and 2474 runes) give the most reliable scoring. After about 45 jobs, ever |
+| sup1/22 | running | 2026-11-05 03:10:40 |  | added by supervisor. Long sections (1729, 1894 and 2474 runes) give the most reliable scoring. After about 45 jobs, ever |
 | sup2/10 | pending |  |  | added by supervisor. Mid-length sections (693-1468 runes) are long enough to judge, but so far they have only had the ge |
 | sup2/12 | pending |  |  | added by supervisor. Mid-length sections (693-1468 runes) are long enough to judge, but so far they have only had the ge |
 | sup2/17 | pending |  |  | added by supervisor. Mid-length sections (693-1468 runes) are long enough to judge, but so far they have only had the ge |
@@ -86,14 +86,6 @@ Started 2026-11-04 23:05:16, updated 2026-11-05 03:10:24, status **running**. Jo
 
 ## Now running
 
-**exhaustive/11** (since 2026-11-05 01:31:28), latest log lines:
-```
-===== 2026-11-05 01:31:28 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 11 --gen
-brief for the generators (354 chars): Use exhaustive repeat streams: {"kind": "repeat", "exhaustive": true, "key_length": m}. Propose m = 1, 2, 3 and 4 (one proposal each) with combine "sub" and with 
-== LP2:20.jpg/1 - 3.jpg/1  (119 symbols)
-01:31:32 [model] codex (proposer) calling...
-01:32:40 [model] codex (proposer) ok 67.6s, tokens in/out 18877/2766, reply 8967 chars, model not reported (pin one with model = "..." in the models config)
-```
 **exhaustive/19** (since 2026-11-05 01:39:45), latest log lines:
 ```
 ===== 2026-11-05 01:39:45 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 19 --gen
@@ -112,6 +104,14 @@ note: short section (91 runes): many keys give plausible-looking text this short
 round 1 [deepseek] proposals=1 valid=1 attempts=2000 passes=0 near=0 invalid=0
 03:02:07 [model] deepseek (proposer) calling...
 03:02:17 [model] deepseek (proposer) ok 9.7s, tokens in/out 3988/2388, reply 7116 chars
+```
+**sup1/22** (since 2026-11-05 03:10:40), latest log lines:
+```
+===== 2026-11-05 03:10:40 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 22 --gen
+brief for the generators (1562 chars): Sections 14, 16 and 22 are the longest in LP2 (1729, 1894 and 2474 runes). Across all sections tonight there are 0 passes and 0 near hits, including 300k-attempt
+== LP2:57.jpg-66.jpg/1  (2474 symbols)
+03:10:41 [model] claude-sonnet (proposer) calling...
+03:11:03 [model] claude-sonnet (proposer) ok 21.4s, tokens in/out 6463/2691, reply 3322 chars
 ```
 
 ## Results so far
@@ -224,6 +224,8 @@ round 1 [deepseek] proposals=1 valid=1 attempts=2000 passes=0 near=0 invalid=0
   - LP2:- - 44.jpg-49.jpg: 300000 attempts, 81 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **structure/24** (done)
   - LP2:51.jpg/2-53.jpg - 68.jpg/2-70.jpg: 300000 attempts, 65 hypotheses, **0 final pass(es)**, stopped: max_attempts
+- **exhaustive/11** (done)
+  - LP2:20.jpg/1 - 3.jpg/1: 5000000 attempts, 31 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **deepseek/10** (done)
   - LP2:17.jpg, 18.jpg, 19.jpg - 0.jpg-2.jpg: 60000 attempts, 19 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **deepseek/11** (done)
@@ -259,9 +261,9 @@ round 1 [deepseek] proposals=1 valid=1 attempts=2000 passes=0 near=0 invalid=0
 - qwen-local: 29 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 29 call(s) in the last 5h (cap none), spent $0.0000
 - granite: 45 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 89 call(s) in the last 5h (cap 180), spent $0.0000
-- claude-sonnet: 89 call(s) in the last 5h (cap 180), spent $0.0000
-- claude-supervisor: 89 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-opus: 90 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-sonnet: 90 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-supervisor: 90 call(s) in the last 5h (cap 180), spent $0.0000
 - codex: 55 call(s) in the last 5h (cap 850), spent $0.0000
 
 ## Current strategy note (read by every lane each round)
@@ -295,13 +297,6 @@ Prefer combinations missing from the section's history. A real hit should show s
 
 ## Events
 
-- 2026-11-05 02:54:51 4 running: exhaustive/11, exhaustive/19, sup1/14, deepseek/21
-- 2026-11-05 02:54:51 exhaustive/21 waiting: codex-plan full (2/2: exhaustive/11, exhaustive/19)
-- 2026-11-05 02:54:56 exhaustive/19: running 75 min | 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-05 02:56:42 exhaustive/11: running 85 min | 01:32:40 [model] codex (proposer) ok 67.6s, tokens in/out 18877/2766, reply 8967 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-05 02:59:17 sup1/14: running 10 min | 02:57:17 [model] claude-sonnet (proposer) ok 23.4s, tokens in/out 8889/2547, reply 3250 chars
-- 2026-11-05 02:59:52 deepseek/21: running 5 min | 02:59:15 [model] deepseek (proposer) ok 8.9s, tokens in/out 5055/2236, reply 7547 chars
-- 2026-11-05 02:59:57 exhaustive/19: running 80 min | 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-05 03:01:12 deepseek/21: done (exit 0, 6 min)
 - 2026-11-05 03:01:27 published: 65 file(s) to branch results
 - 2026-11-05 03:01:27 deepseek/22: start (uses api:https://api.deepseek.com)
@@ -320,3 +315,10 @@ Prefer combinations missing from the section's history. A real hit should show s
 - 2026-11-05 03:09:54 sup1/16: running 5 min | 03:09:43 [model] claude-sonnet (proposer) ok 28.6s, tokens in/out 7456/2849, reply 3439 chars
 - 2026-11-05 03:09:59 exhaustive/19: running 90 min | 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-05 03:10:24 sup1/16: done (exit 0, 6 min)
+- 2026-11-05 03:10:40 published: 67 file(s) to branch results
+- 2026-11-05 03:10:40 sup1/22: start (uses claude-plan)
+- 2026-11-05 03:10:40 4 running: exhaustive/11, exhaustive/19, deepseek/22, sup1/22
+- 2026-11-05 03:10:40 exhaustive/21 waiting: codex-plan full (2/2: exhaustive/11, exhaustive/19)
+- 2026-11-05 03:11:30 deepseek/22: running 10 min | 03:02:17 [model] deepseek (proposer) ok 9.7s, tokens in/out 3988/2388, reply 7116 chars
+- 2026-11-05 03:11:45 exhaustive/11: running 100 min | 01:32:40 [model] codex (proposer) ok 67.6s, tokens in/out 18877/2766, reply 8967 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 03:13:05 exhaustive/11: done (exit 0, 102 min)
