@@ -1,6 +1,6 @@
 # Overnight run 20261104-2305
 
-Started 2026-11-04 23:05:16, updated 2026-11-05 04:45:25, status **running**. Jobs: pending 5, running 1, done 73
+Started 2026-11-04 23:05:16, updated 2026-11-05 04:49:07, status **running**. Jobs: pending 7, running 2, done 74
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -60,7 +60,7 @@ Started 2026-11-04 23:05:16, updated 2026-11-05 04:45:25, status **running**. Jo
 | exhaustive/11 | done | 2026-11-05 01:31:28 | 2026-11-05 03:13:05 | Codex: every periodic key up to length 4 |
 | exhaustive/19 | running | 2026-11-05 01:39:45 |  | Codex: every periodic key up to length 4 |
 | exhaustive/21 | done | 2026-11-05 03:13:33 | 2026-11-05 04:45:25 | Codex: every periodic key up to length 4 |
-| exhaustive/25 | pending |  |  | Codex: every periodic key up to length 4 |
+| exhaustive/25 | running | 2026-11-05 04:45:57 |  | Codex: every periodic key up to length 4 |
 | deepseek/10 | done | 2026-11-05 00:52:56 | 2026-11-05 00:55:31 | DeepSeek (volume) |
 | deepseek/11 | done | 2026-11-05 00:55:47 | 2026-11-05 01:00:47 | DeepSeek (volume) |
 | deepseek/12 | done | 2026-11-05 01:01:26 | 2026-11-05 01:11:19 | DeepSeek (volume) |
@@ -83,6 +83,10 @@ Started 2026-11-04 23:05:16, updated 2026-11-05 04:45:25, status **running**. Jo
 | sup2/12 | pending |  |  | added by supervisor. Mid-length sections (693-1468 runes) are long enough to judge, but so far they have only had the ge |
 | sup2/17 | pending |  |  | added by supervisor. Mid-length sections (693-1468 runes) are long enough to judge, but so far they have only had the ge |
 | sup2/20 | pending |  |  | added by supervisor. Mid-length sections (693-1468 runes) are long enough to judge, but so far they have only had the ge |
+| sup3/13 | done | 2026-11-05 04:45:57 | 2026-11-05 04:49:07 | added by supervisor. No supervisor job has run on these medium and long sections yet. The families that have been tried  |
+| sup3/18 | pending |  |  | added by supervisor. No supervisor job has run on these medium and long sections yet. The families that have been tried  |
+| sup3/24 | pending |  |  | added by supervisor. No supervisor job has run on these medium and long sections yet. The families that have been tried  |
+| sup3/25 | pending |  |  | added by supervisor. No supervisor job has run on these medium and long sections yet. The families that have been tried  |
 
 ## Now running
 
@@ -94,6 +98,14 @@ note: short section (91 runes): many keys give plausible-looking text this short
 == LP2:33.jpg - 50.jpg/1  (91 symbols)
 01:39:50 [model] codex (proposer) calling...
 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
+```
+**exhaustive/25** (since 2026-11-05 04:45:57), latest log lines:
+```
+===== 2026-11-05 04:45:57 C:\Users\ihazp\liberprimus-search\.venv\Scripts\python.exe -m lpswarm swarm --manifest data/lp/manifest.json --alphabet data/alphabet/gematria_primus.json --sections 25 --gen
+brief for the generators (354 chars): Use exhaustive repeat streams: {"kind": "repeat", "exhaustive": true, "key_length": m}. Propose m = 1, 2, 3 and 4 (one proposal each) with combine "sub" and with 
+== LP2:54.jpg-55.jpg - 71.jpg-72.jpg  (308 symbols)
+04:45:59 [model] codex (proposer) calling...
+04:46:56 [model] codex (proposer) ok 57.6s, tokens in/out 19466/2624, reply 7679 chars, model not reported (pin one with model = "..." in the models config)
 ```
 
 ## Results so far
@@ -246,6 +258,8 @@ note: short section (91 runes): many keys give plausible-looking text this short
   - LP2:15.jpg/2- - 32.jpg/2-39.jpg: 50000 attempts, 22 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **sup1/22** (done)
   - LP2:57.jpg-66.jpg/1: 50000 attempts, 28 hypotheses, **0 final pass(es)**, stopped: max_attempts
+- **sup3/13** (done)
+  - LP2:6.jpg/2-7.jpg - 23.jpg/2-24.jpg: 50000 attempts, 24 hypotheses, **0 final pass(es)**, stopped: max_attempts
 
 ## Model usage
 
@@ -253,10 +267,10 @@ note: short section (91 runes): many keys give plausible-looking text this short
 - qwen-local: 23 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 23 call(s) in the last 5h (cap none), spent $0.0000
 - granite: 38 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 45 call(s) in the last 5h (cap 180), spent $0.0000
-- claude-sonnet: 45 call(s) in the last 5h (cap 180), spent $0.0000
-- claude-supervisor: 45 call(s) in the last 5h (cap 180), spent $0.0000
-- codex: 12 call(s) in the last 5h (cap 850), spent $0.0000
+- claude-opus: 47 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-sonnet: 47 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-supervisor: 47 call(s) in the last 5h (cap 180), spent $0.0000
+- codex: 13 call(s) in the last 5h (cap 850), spent $0.0000
 
 ## Current strategy note (read by every lane each round)
 
@@ -288,18 +302,11 @@ Prefer combinations missing from the section's history. A real hit should show s
 - 2026-11-05 02:41:33: 02:41 check-in: still 0 final passes and 0 near hits on every section. deepseek/18 finished with nothing (60k attempts, 15 hypotheses). Running: exhaustive/11, exhaustive/19 and local/10. The exhaustive jobs' last proposer calls were at 01:32 and 01:40, but they are still reporting, so they look like long scoring runs, not stalls. Sup1 (sonnet on 14, 16 and 22) and sup2 (codex on 10, 12, 17 and 20) have not reported yet. I added no jobs and left the strategy note unchanged until they do. Job budget used: 2 of 5.
 - 2026-11-05 03:13:33: 03:13 check-in: still 0 final passes and 0 near hits that matter. Sup1/14 (37.9k attempts) and sup1/16 (50k attempts) finished with nothing, so the combined stream+interrupter, atbash+shift, running-key, transposition and autokey programs did not help on the long sections either. Exhaustive/11 also finished with nothing after 5M attempts. The two near misses on section 19 (triangular stream) are at noise level. Running: exhaustive/19, deepseek/22 and sup1/22. Waiting for a codex-plan slot: exhaustive/21 and sup2 (codex on 10, 12, 17 and 20). I added no jobs and kept 3 in reserve until sup1/22 and sup2 report. Job budget used: 2 of 5.
 - 2026-11-05 03:13:33: strategy note set: Exhausted on every section (0 passes, 0 real near hits): bare prime, totient(prime) and Fibonacci shifts; short Vigenere keys; plain atbash; small offset tweaks. Sup1 on 14 and 16 also failed with the combined families: stream+F-skip, atbash+shift, LP1 running key, simple transposition then stream, and autokey seeded with DIVINITY or CIRCUMFERENCE. Favour directions not yet tried: (a) two streams added or subtracted mod 29; (b) a key that advances per word, or uses word length; (c) decimation (every k-th rune) or boustrophedon before the stream; (d) gematria prime-value arithmetic before reducing mod 29; (e) a key offset equal to the page or section's rune start index. Ignore short-fragment matches on sections under 150 runes.
+- 2026-11-05 04:45:57: 04:45 check-in: still 0 final passes and 0 real near hits on every section. Exhaustive/21 finished with nothing after 5M attempts in 92 min. Sup1/22 also finished with nothing (50k attempts), so sup1 failed on all three of its sections (14, 16, 22). Exhaustive/19 has been running 185 min, and its last proposer call was at 01:40. That is about twice as long as exhaustive/21 took, so the owner should check whether it has stalled. Sup2 (codex on 10, 12, 17 and 20) has not reported yet. I added sup3: claude-sonnet on 13, 18, 24 and 25, the medium and long sections that no supervisor job has covered, aimed at the directions in the strategy note that nobody has tried yet. Job budget used: 3 of 5.
+- 2026-11-05 04:45:57: brief for sup3 (claude-sonnet): Sections 13 (333 runes), 18 (1433), 24 (534) and 25 (308). Every lane on every section has failed with these, so do not propose them again: a bare prime, totient(prime) or Fibonacci shift; short Vigenere keys such as DIVINITY, CIRCUMFERENCE or FIRFUMFERENFE; plain atbash; atbash plus a shift; small offset tweaks; a single stream with the F-rune skip; the LP1 plaintext as a running key; simple transposition followed by a stream; autokey seeded with a keyword. Spend your proposals on directions nobody has tried yet. (1) Two different streams added or subtracted mod 29: prime with Fibonacci, prime with triangular, totient(prime) with square numbers, prime[i] minus prime[i-1] (the prime gaps), or a stream with its index doubled. Try both signs, with and without the F-rune skip. (2) A key that advances per word, not per rune: one stream value is used for every rune in a word, or the shift is the word's length, its word index, or the cumulative rune count at the start of the word. (3) Reorder the runes before applying the stream: take every k-th rune (k = 2, 3, 5, 7, 11, 13, coprime to the section length), read the lines alternately left-to-right and right-to-left (boustrophedon), or reverse the whole section. (4) Gematria arithmetic: map each rune to its prime value, subtract a stream value (or a prime), and reduce mod 29 to get a rune index. Also try the product of the rune's prime value and its position, mod 29. (5) Start the stream at an offset equal to the section's starting rune index within LP2, or at its page number. Only accept a candidate if it shows English word structure sustained across the whole section. Matches in short fragments are noise.
 
 ## Events
 
-- 2026-11-05 03:48:38 exhaustive/21: running 35 min | 03:14:24 [model] codex (proposer) ok 48.6s, tokens in/out 18365/2187, reply 7913 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-05 03:50:13 exhaustive/19: running 130 min | 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-05 03:53:38 exhaustive/21: running 40 min | 03:14:24 [model] codex (proposer) ok 48.6s, tokens in/out 18365/2187, reply 7913 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-05 03:55:13 exhaustive/19: running 135 min | 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-05 03:58:38 exhaustive/21: running 45 min | 03:14:24 [model] codex (proposer) ok 48.6s, tokens in/out 18365/2187, reply 7913 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-05 04:00:13 exhaustive/19: running 140 min | 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-05 04:03:38 exhaustive/21: running 50 min | 03:14:24 [model] codex (proposer) ok 48.6s, tokens in/out 18365/2187, reply 7913 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-05 04:05:13 exhaustive/19: running 145 min | 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
-- 2026-11-05 04:08:38 exhaustive/21: running 55 min | 03:14:24 [model] codex (proposer) ok 48.6s, tokens in/out 18365/2187, reply 7913 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-05 04:10:14 exhaustive/19: running 150 min | 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-05 04:13:39 exhaustive/21: running 60 min | 03:14:24 [model] codex (proposer) ok 48.6s, tokens in/out 18365/2187, reply 7913 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-05 04:15:14 exhaustive/19: running 155 min | 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
@@ -316,3 +323,12 @@ Prefer combinations missing from the section's history. A real hit should show s
 - 2026-11-05 04:43:39 exhaustive/21: running 90 min | 03:14:24 [model] codex (proposer) ok 48.6s, tokens in/out 18365/2187, reply 7913 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-05 04:45:14 exhaustive/19: running 185 min | 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-05 04:45:25 exhaustive/21: done (exit 0, 92 min)
+- 2026-11-05 04:45:40 published: 73 file(s) to branch results
+- 2026-11-05 04:45:57 supervisor: note: 04:45 check-in: still 0 final passes and 0 real near hits on every section. Exhaustive/21 finished with nothing after 5M attempts in 92 min. Sup1/22 also finished with nothing (50k attempts), so sup1 failed on all three of its sections (14, 16, 22). Exhaustive/19 has been running 185 min, and its...
+- 2026-11-05 04:45:57 supervisor: added sup3: swarm on 4 section(s) with claude-sonnet; brief: Sections 13 (333 runes), 18 (1433), 24 (534) and 25 (308). Every lane on every section has failed with these, so do not propose them again: a bare prime, totient(prime) or Fibonacci shift; short Vigen...
+- 2026-11-05 04:45:57 exhaustive/25: start (uses codex-plan)
+- 2026-11-05 04:45:57 2 running: exhaustive/19, exhaustive/25
+- 2026-11-05 04:45:57 sup3/13: start (uses claude-plan)
+- 2026-11-05 04:45:57 3 running: exhaustive/19, exhaustive/25, sup3/13
+- 2026-11-05 04:45:57 sup2/10 waiting: codex-plan full (2/2: exhaustive/19, exhaustive/25)
+- 2026-11-05 04:49:07 sup3/13: done (exit 0, 3 min)
