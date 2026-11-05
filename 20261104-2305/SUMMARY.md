@@ -1,6 +1,6 @@
 # Overnight run 20261104-2305
 
-Started 2026-11-04 23:05:16, updated 2026-11-05 05:01:19, status **running**. Jobs: pending 5, running 2, done 76
+Started 2026-11-04 23:05:16, updated 2026-11-05 05:05:56, status **running**. Jobs: pending 4, running 2, done 77
 
 | job | status | started | ended | note |
 | --- | --- | --- | --- | --- |
@@ -86,7 +86,7 @@ Started 2026-11-04 23:05:16, updated 2026-11-05 05:01:19, status **running**. Jo
 | sup3/13 | done | 2026-11-05 04:45:57 | 2026-11-05 04:49:07 | added by supervisor. No supervisor job has run on these medium and long sections yet. The families that have been tried  |
 | sup3/18 | done | 2026-11-05 04:49:23 | 2026-11-05 04:52:53 | added by supervisor. No supervisor job has run on these medium and long sections yet. The families that have been tried  |
 | sup3/24 | done | 2026-11-05 04:53:09 | 2026-11-05 05:01:19 | added by supervisor. No supervisor job has run on these medium and long sections yet. The families that have been tried  |
-| sup3/25 | pending |  |  | added by supervisor. No supervisor job has run on these medium and long sections yet. The families that have been tried  |
+| sup3/25 | done | 2026-11-05 05:01:35 | 2026-11-05 05:05:56 | added by supervisor. No supervisor job has run on these medium and long sections yet. The families that have been tried  |
 
 ## Now running
 
@@ -264,6 +264,8 @@ brief for the generators (354 chars): Use exhaustive repeat streams: {"kind": "r
   - LP2:- - 44.jpg-49.jpg: 50000 attempts, 12 hypotheses, **0 final pass(es)**, stopped: max_attempts
 - **sup3/24** (done)
   - LP2:51.jpg/2-53.jpg - 68.jpg/2-70.jpg: 48350 attempts, 44 hypotheses, **0 final pass(es)**
+- **sup3/25** (done)
+  - LP2:54.jpg-55.jpg - 71.jpg-72.jpg: 50000 attempts, 43 hypotheses, **0 final pass(es)**, stopped: max_attempts
 
 ## Model usage
 
@@ -271,10 +273,10 @@ brief for the generators (354 chars): Use exhaustive repeat streams: {"kind": "r
 - qwen-local: 23 call(s) in the last 5h (cap none), spent $0.0000
 - gemma-local: 23 call(s) in the last 5h (cap none), spent $0.0000
 - granite: 38 call(s) in the last 5h (cap none), spent $0.0000
-- claude-opus: 47 call(s) in the last 5h (cap 180), spent $0.0000
-- claude-sonnet: 47 call(s) in the last 5h (cap 180), spent $0.0000
-- claude-supervisor: 47 call(s) in the last 5h (cap 180), spent $0.0000
-- codex: 13 call(s) in the last 5h (cap 850), spent $0.0000
+- claude-opus: 48 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-sonnet: 48 call(s) in the last 5h (cap 180), spent $0.0000
+- claude-supervisor: 48 call(s) in the last 5h (cap 180), spent $0.0000
+- codex: 12 call(s) in the last 5h (cap 850), spent $0.0000
 
 ## Current strategy note (read by every lane each round)
 
@@ -311,11 +313,6 @@ Prefer combinations missing from the section's history. A real hit should show s
 
 ## Events
 
-- 2026-11-05 04:45:25 exhaustive/21: done (exit 0, 92 min)
-- 2026-11-05 04:45:40 published: 73 file(s) to branch results
-- 2026-11-05 04:45:57 supervisor: note: 04:45 check-in: still 0 final passes and 0 real near hits on every section. Exhaustive/21 finished with nothing after 5M attempts in 92 min. Sup1/22 also finished with nothing (50k attempts), so sup1 failed on all three of its sections (14, 16, 22). Exhaustive/19 has been running 185 min, and its...
-- 2026-11-05 04:45:57 supervisor: added sup3: swarm on 4 section(s) with claude-sonnet; brief: Sections 13 (333 runes), 18 (1433), 24 (534) and 25 (308). Every lane on every section has failed with these, so do not propose them again: a bare prime, totient(prime) or Fibonacci shift; short Vigen...
-- 2026-11-05 04:45:57 exhaustive/25: start (uses codex-plan)
 - 2026-11-05 04:45:57 2 running: exhaustive/19, exhaustive/25
 - 2026-11-05 04:45:57 sup3/13: start (uses claude-plan)
 - 2026-11-05 04:45:57 3 running: exhaustive/19, exhaustive/25, sup3/13
@@ -336,3 +333,8 @@ Prefer combinations missing from the section's history. A real hit should show s
 - 2026-11-05 05:00:19 exhaustive/19: running 201 min | 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-05 05:00:59 exhaustive/25: running 15 min | 04:46:56 [model] codex (proposer) ok 57.6s, tokens in/out 19466/2624, reply 7679 chars, model not reported (pin one with model = "..." in the models config)
 - 2026-11-05 05:01:19 sup3/24: done (exit 0, 8 min)
+- 2026-11-05 05:01:35 published: 76 file(s) to branch results
+- 2026-11-05 05:01:35 sup3/25: start (uses claude-plan)
+- 2026-11-05 05:01:36 3 running: exhaustive/19, exhaustive/25, sup3/25
+- 2026-11-05 05:05:21 exhaustive/19: running 206 min | 01:40:35 [model] codex (proposer) ok 45.1s, tokens in/out 18902/1977, reply 7175 chars, model not reported (pin one with model = "..." in the models config)
+- 2026-11-05 05:05:56 sup3/25: done (exit 0, 4 min)
