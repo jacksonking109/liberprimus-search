@@ -99,6 +99,7 @@ size 2-5.
 | Neighbour or chain feedback, Hill blocks, block permutations | Do not reproduce the signature (section 6) |
 | Binary, numbers or running-sum constructions | Nothing found |
 | Transcription errors causing the shortage | Ruled out (section 3) |
+| Running key (the key is a text, as on page 03's inner image) | An English key text independent of the plaintext gives lag-1 ratio 0.99-1.07, unigram IC 1.04, first-difference IC 1.00 against the real 0.19, 1.00, 1.03: it reproduces the flat letter statistics but not the repeat shortage, so any independent English key text is excluded on that signature. Specific key texts were therefore not searched; the Phase 1 baseline had skipped running keys (no key texts supplied) |
 | Hidden data in the page images (OutGuess) | Pages 17-72 cannot be vanilla OutGuess output by the header rule (section 11), so a passphrase sweep is not worth running; default-key extraction returns nothing real on them. Other steganography tools are not tested |
 | A rule on adjacent positions (non-zero step, or no repeated symbol) | Fits the data; no cipher construction found that gives it |
 
@@ -148,9 +149,11 @@ Codex / scripted-proposer swarm with brief refinement, research packets, structu
   MOURNFUL 199, CABAL 341; all 13 match), so the appended data adds nothing the page does not already encode. An earlier note here
   said 72,700 bytes after the last end marker; that came from taking the last FFD9 in the file, which is inside the reversed copy.
   `10.jpg` is pages 10-13 concatenated (the last three are byte-identical to `11.jpg`, `12.jpg`, `13.jpg`).
-* **Page 03's payload contains a small image:** a 587x109 grayscale JPEG (15,188 bytes, 400 dpi header, so not OutGuess output itself;
-  default-key extraction returns nothing from it) showing one line of runes with a digit 5 and a digit 3 in it. Read by shape matching
-  after scaling 2x: `TH M D EO F M A R  5  U AE NG R NG  3  EA M EO F IO` (18 runes in groups of 8, 5 and 5; the two digits are not
-  runes). Shifting or reversing each group, or all 18 together, gives nothing English, but strings that short cannot be tested well.
-  Not solved.
-* **Not done:** page 08's two-letter groups, and anything on the 18-rune line beyond the shift check above.
+* **Page 03's payload contains a small image, which is solved:** a 587x109 grayscale JPEG (15,188 bytes, 400 dpi header, so not
+  OutGuess output itself) showing one line of runes with a digit 5 and a digit 3. Read by shape matching after scaling 2x:
+  `TH M D EO F M A R  5  U AE NG R NG  3  EA M EO F IO`. The owner supplied the known plaintext `avowyfgl5lkzfj3nonion` (its first 16
+  characters are valid base32, the shape of a Tor v2 onion address; the owner says it led to an onion site; nothing was looked up or
+  contacted). Subtracting it from the runes on the Gematria indexes gives the key `WELCOME PILGRIM TO THE`, matching at all 18
+  positions (c = p + key; the digits pass through and use no key position). So this is a **running-key cipher with a phrase key**, not
+  a short repeating key. My first attempt (constant shifts and reversal of each group) found nothing because it tested the wrong family.
+* **Not done:** page 08's two-letter groups.
