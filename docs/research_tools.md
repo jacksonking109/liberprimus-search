@@ -237,6 +237,22 @@ independent solved pages (page 13 has 124 runes the manifest lacks, which decode
 `docs/avenues_explored.md` section 12 and `docs/diagnostics_sample/reader_audit.md`. Limits: the reader needs glyph height of about 100-130 px
 (rescale other images first), and page 05's small rune words in the number grid are not read.
 
+## Leak anatomy (`python -m lpswarm.lp_table`, `python -m lpswarm.research_leak`)
+
+`lp_table` writes `data/lp_derived/lp2_runes.csv`, one row per rune on pages 17-72 from the image reading (page, line, position, separators, colour,
+manifest section), so analyses run without the images. `research_leak` asks where the 86 adjacent equal runes sit, in five pre-specified families
+(layout, phase, spacing, context, alphabet class) against a null that places the same number of doubles uniformly among the valid pairs, with a
+calibration and power check. Reference run: no family below p = 0.05 (smallest 0.115), so the leak looks like random thinning; power is high for
+layout, spacing, context and alphabet effects and low (32%) for a period on a single residue. Details in `docs/avenues_explored.md` section 13.
+
+## Multiplicatively keyed running sums (`python -m lpswarm.research_muldiff`)
+
+c[t] = c[t-1] + a[t] * n[t] (mod 29): flat first differences whatever the plaintext is, and a zero step only where the plaintext number is zero. The
+module (1) screens the family against the four numbers of the repeat signature (it matches with EA as the zero rune), (2) tests whether the doubles'
+word positions look like that rune's (they do not: p < 0.0001 against EA, p = 0.66 against any rune), and (3) sweeps u[t] = a[t]^-1 x (c[t] - c[t-1]) and
+a[t] x (c[t] - c[t-1]) for position-keyed sequences by index of coincidence (no section flagged; planted controls recovered at IC 1.77). Details in
+`docs/avenues_explored.md` section 14.
+
 ## Limits
 
 * The power table uses English plaintext. If the true plaintext is another language, abbreviated or

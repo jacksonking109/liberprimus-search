@@ -100,6 +100,8 @@ size 2-5.
 | Binary, numbers or running-sum constructions | Nothing found |
 | Transcription errors causing the shortage | Ruled out (section 3) |
 | Running key (the key is a text, as on page 03's inner image) | An English key text independent of the plaintext gives lag-1 ratio 0.99-1.07, unigram IC 1.04, first-difference IC 1.00 against the real 0.19, 1.00, 1.03: it reproduces the flat letter statistics but not the repeat shortage, so any independent English key text is excluded on that signature. Specific key texts were therefore not searched; the Phase 1 baseline had skipped running keys (no key texts supplied) |
+| The 86 doubles are placed by some rule (leak anatomy, section 13) | No: nothing structured in layout, phase, spacing, context or alphabet class (all family p >= 0.115), with high power for most planted effects. The leak looks like random thinning |
+| A zero step triggered by a plaintext rune (multiplicatively keyed running sum, section 14) | Rejected: the family reproduces the signature if the zero rune is EA (English frequency 0.0065, the real double rate 0.0066), but the doubles' word positions do not match EA's (p < 0.0001) and are like any position's (p = 0.66); no section shows a language-like IC under a position-keyed multiplier |
 | Hidden data in the page images (OutGuess) | Pages 17-72 cannot be vanilla OutGuess output by the header rule (section 11), so a passphrase sweep is not worth running; default-key extraction returns nothing real on them. Other steganography tools are not tested |
 | A rule on adjacent positions (non-zero step, or no repeated symbol) | Fits the data; no cipher construction found that gives it |
 
@@ -116,7 +118,7 @@ size 2-5.
 * **Discrepancies on solved pages** between the manifest and the images, not yet adjudicated: page 73 second rune missing in the
   manifest, page 74 an Y/E difference and an extra E, the tails of pages 3-4, and page 13, where the manifest lacks 124 runes the images show (see section 12).
 * **Packets exp2b, exp3, exp4** still need review before any run.
-* **Planned next step:** `docs/plan_repeat_shortage.md` (leak anatomy of the 86 doubles, then constructions outside the cipher language).
+* **Planned next step:** `docs/plan_repeat_shortage.md` Phase 2 (constructions outside the cipher language). Phases 0 and 1 are done (sections 12 and 13); Phase 2 is partly done (section 14).
 
 ## 10. Tooling built along the way
 
@@ -177,3 +179,45 @@ inner image, which the reader gave as unknown at the wrong size).
 * **Separators:** the word dots and colon pairs agree with the text's word breaks on 99.63% of 12,360 aligned same-line pairs (the text has 45 breaks the
   image shows no dot for, the image 1 the text lacks).
 * **Disputed glyph:** page 41 line 8 is AE in the image (0 px) and not A (49 px); the scream314 text is wrong there.
+
+## 13. Leak anatomy of the 86 doubles (`python -m lpswarm.research_leak`)
+
+Phase 0 of the plan produced `data/lp_derived/lp2_runes.csv` (12,956 runes of pages 17-72 with page, line, separators, colour and section; it
+matches the manifest at all but one position and every section length). Phase 1 asked where the 86 doubles sit, with tests fixed in advance in
+five families against a null that draws the same number of doubles uniformly from the valid adjacent pairs (2,000 replicates):
+
+| family | statistics | family p |
+| --- | ---: | ---: |
+| layout (pair kind, gap type, position in word from start and end, word length, position in line, colour, line of page, drop cap) | 9 | 0.456 |
+| phase (index mod m, m = 2..200; global, per-page, per-section index) | 597 | 0.371 |
+| spacing (minimum gap, close pairs, dispersion, maximum gap) | 4 | 0.115 |
+| context (step before and after, rune before and after, the rune itself) | 5 | 0.763 |
+| alphabet (odd/even, lower/upper half, vowel/consonant) | 3 | 0.593 |
+
+* **Verdict under the rule fixed in the plan: random thinning.** No family is below 0.05. The doubles fall inside words, across word dots and over
+  line ends in proportion to the pairs available (82 / 4 / 0 against 82.1 / 3.6 / 0.4; no dot, word dot, colon pair 61 / 20 / 1 against 64.2 / 16.9 / 0.8).
+* **Power** (40 simulations with 86 doubles): under random placement the families reach p < 0.05 in 0-10% of runs (about 5% expected). With a structure planted
+  the matching family reaches p < 0.01 in 92% (half the doubles across word dots), 98% (half within 30 positions of ten centres), 100% (80% after a small step;
+  80% on vowel runes) and only 32% (20% of the doubles on one residue mod 17). So a layout, spacing, context or alphabet rule of that size would have shown;
+  a single-residue period would probably not.
+* **What it means:** the leak is not tied to word structure, line structure, page structure, the neighbouring runes or the alphabet. Together with the uniformity
+  across runes, pages and sections, the equal neighbours behave as if each position independently allows a zero step with probability about a fifth of chance.
+  Phase 2 asks which constructions produce that.
+
+## 14. A construction outside the cipher language: multiplicatively keyed running sums (`python -m lpswarm.research_muldiff`)
+
+Phase 1 said the leak is independent of position and neighbours, so a natural family is a running sum whose step is a keyed multiple of the
+plaintext rune number, c[t] = c[t-1] + a[t] * n[t] (mod 29), a[t] uniform on the non-zero residues. Its steps are flat whatever the plaintext is,
+and a zero step happens only where n[t] is zero.
+* **It can reproduce the signature.** English plaintext with 1-based rune numbers (the 29th rune, EA, is zero mod 29) gives lag 1 = 0.22, lags 2-8 = 0.98-1.07,
+  unigram IC 1.00, first-difference IC 1.02: a full match. The same family with F as the zero rune gives lag 1 = 0.70 and with N 1.80, no match. The match comes from
+  EA's English frequency (0.0065), which is almost exactly the real double rate (0.0066); it is the only rune in the interval, which I noticed after the fact.
+* **But EA is not the trigger.** If a zero step meant plaintext EA, the second rune of each double would sit in words where EA sits in English words (initial /
+  internal / final: 7% / 90% / 4%). The 86 doubles sit at 24% / 55% / 21%: chi-square 118.6, p < 0.0001; against the positions of all runes in the real text p = 0.66.
+  So the rate coincidence is not the mechanism, and no plaintext-triggered zero step works (EA is the only rune with a frequency in the observed interval).
+* **IC sweep for the family** (u[t] = a[t]^-1 x first difference and a[t] x first difference, 8 sequences x 3,000 offsets, first 600 runes; IC does not depend on which
+  rune is zero or on the alphabet labelling): no section flagged (best IC 1.07-1.20 against shuffled-section maxima of 1.07-1.15; the flag needs 1.25). Planted controls
+  (English through primes and through Fibonacci) are recovered at IC 1.77 against 1.06 for noise.
+* **What this narrows:** the zero steps are independent of the plaintext letter, of word, line and page position, and of the neighbouring runes, which fits a
+  key-driven or process-driven rate of about 0.0066 per position. The other Phase 2 constructions from the plan (a non-zero step stream with a keyed
+  28-symbol plaintext, a previous-output-excluded substitution, interleaved streams, leak variants) were not built.

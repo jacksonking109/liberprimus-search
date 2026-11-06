@@ -1,6 +1,6 @@
 # Plan: anatomy of the repeat shortage, then constructions outside the cipher language
 
-Status: planned, not started. Written 2026-11-06 after `docs/avenues_explored.md`. Everything here is deterministic and model-free
+Status: Phases 0 and 1 done; Phase 2 partly done (multiplicatively keyed running sum: signature reproducible, EA trigger rejected, no IC hit; the other generators are not built) (`data/lp_derived/lp2_runes.csv`, `docs/diagnostics_sample/leak_anatomy.md`; verdict: random thinning); Phase 2 next. Planned Written 2026-11-06 after `docs/avenues_explored.md`. Everything here is deterministic and model-free
 until Phase 3; nothing touches the oracle, thresholds, budgets or packets.
 
 ## Why this is the next step
