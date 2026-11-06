@@ -1,5 +1,7 @@
 # Research packets and structure diagnostics
 
+A one-page list of every avenue tried and what it found is in `docs/avenues_explored.md`.
+
 Tools for looking at the unsolved sections without guessing a key. None of them calls a model or
 the oracle, and none of them changes thresholds, null calibration or budgets.
 
