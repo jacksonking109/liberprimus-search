@@ -116,6 +116,7 @@ size 2-5.
 * **Discrepancies on solved pages** between the manifest and the images, not yet adjudicated: page 73 second rune missing in the
   manifest, page 74 an Y/E difference and an extra E, the tails of pages 3-4, and page 41 line 8 (AE vs A) on the unsolved pages.
 * **Packets exp2b, exp3, exp4** still need review before any run.
+* **Planned next step:** `docs/plan_repeat_shortage.md` (leak anatomy of the 86 doubles, then constructions outside the cipher language).
 
 ## 10. Tooling built along the way
 
