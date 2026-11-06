@@ -305,6 +305,8 @@ def read_page(path, shapes: Shapes, learn: bool = True) -> dict:
     glyphs.sort(key=lambda g: (g["line"], g["x0"]))
     # drop caps join the first line of their paragraph
     for dcap in built["drop"]:
+        if not lines:                                            # nothing was recognised as text (wrong scale, blank page)
+            break
         top = dcap["y"]
         j = int(np.argmin([abs((l["yc"] - 57) - top) for l in lines]))
         m = (black | red)[dcap["y"]:dcap["y"] + dcap["h"], dcap["x"]:dcap["x"] + dcap["w"]]

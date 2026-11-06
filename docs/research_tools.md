@@ -186,7 +186,7 @@ Reference run (`docs/diagnostics_sample/perrune.md`, `alignment.md`):
   property of adjacent positions, not a wider local effect.
 * **Alignment:** 12,955 of the 12,956 transcribed runes agree with the image reading in order (the reader labels shapes from
   sections 8 and 9 only, so this is an independent check of the transcription on the unsolved pages). One position differs: page 41
-  line 8, image AE, text A (not adjudicated; it is not part of a double). There are no text-only runes. The 75 extra image boxes are
+  line 8, where the image glyph is 0 px from the AE shape and 49 px from A, so the text is wrong there (it is not part of a double). There are no text-only runes. The 75 extra image boxes are
   all unknown-shape boxes sitting first or last in a line, on pages 25-31 (one each) and 57-72 (2-6 each); they are twig and vine
   drawings in the margins, so every rune on pages 17-72 was read and the 99.42% coverage figure undercounts the reader.
   Every double is in both sources.
@@ -225,6 +225,17 @@ Limits: English plaintext only, and the plaintext's own lag-1 level is uncertain
 the Hill and word-key families are samples, not exhaustive; single-stage mixers with one shift, no transpositions and no F-skip
 outside exp4. A match would be a necessary condition for a mechanism, not evidence for it. For a proposed cipher program the same
 numbers come from `screen_full(spec, english_windows(alpha))` and `classify(...)`; this is not wired into the swarm loop.
+
+## Reader audit (`python -m lpswarm.reader_audit`)
+
+Checks the image-to-rune reading itself: the stroke distance of every glyph to its own shape and to the nearest other rune (the typeface
+separates them by at least 14 px, the decision threshold is 8), agreement with the manifest on solved pages that were not used to label the
+shapes, what a wrong glyph size does (wrong runes, or only unknown ones), a short image read at many scales against a known answer, the
+word separators against the text's breaks, and every position where image and text differ. Reference run: no glyph within 14 px of a
+different rune; 0 wrong runes in 24 rescaled page reads (it fails to unknown, never to a wrong rune); manifest agreement 97-99% on the
+independent solved pages (page 13 has 124 runes the manifest lacks, which decode to English from the images alone). Details in
+`docs/avenues_explored.md` section 12 and `docs/diagnostics_sample/reader_audit.md`. Limits: the reader needs glyph height of about 100-130 px
+(rescale other images first), and page 05's small rune words in the number grid are not read.
 
 ## Limits
 

@@ -35,7 +35,7 @@ decrypted any unsolved section. Detail and commands for each tool are in `docs/r
 | Per rune (`research_doubles perrune`) | Uniform: chi-square 26.3 on 28 df, p = 0.56; every rune short, none different from the others after Holm. Power: five most frequent runes never doubling is caught 83% of the time, one mid-frequency rune at 3x 34%, at 2x 11% |
 | Per page and section | Uniform across 56 pages (p = 0.31) and 16 sections (p = 0.85) |
 | Lag profile | Only lag 1 is short (0.20). Lags 2-8 at chance (0.98-1.06) |
-| Transcription check | 12,955 of 12,956 transcribed runes agree with the image reading in order; one position differs (page 41 line 8, image AE, text A, unadjudicated); the 75 extra image boxes are margin art |
+| Transcription check | 12,955 of 12,956 transcribed runes agree with the image reading in order; one position differs (page 41 line 8): the image glyph is 0 px from the AE shape and 49 px from A, so the scream314 text has one error there; the 75 extra image boxes are margin art |
 
 Reading: a rule on adjacent positions (a non-zero step between neighbours, or never emitting the same symbol twice) fits; anything
 tied to specific runes or a wider window does not, with the power limits above.
@@ -114,7 +114,7 @@ size 2-5.
   polynomial keys (squares and triangular with a scale and offset are only a subfamily of quadratic keys), keys that are not
   words, autokey keys and transposition combinations.
 * **Discrepancies on solved pages** between the manifest and the images, not yet adjudicated: page 73 second rune missing in the
-  manifest, page 74 an Y/E difference and an extra E, the tails of pages 3-4, and page 41 line 8 (AE vs A) on the unsolved pages.
+  manifest, page 74 an Y/E difference and an extra E, the tails of pages 3-4, and page 13, where the manifest lacks 124 runes the images show (see section 12).
 * **Packets exp2b, exp3, exp4** still need review before any run.
 * **Planned next step:** `docs/plan_repeat_shortage.md` (leak anatomy of the 86 doubles, then constructions outside the cipher language).
 
@@ -158,3 +158,22 @@ Codex / scripted-proposer swarm with brief refinement, research packets, structu
   positions (c = p + key; the digits pass through and use no key position). So this is a **running-key cipher with a phrase key**, not
   a short repeating key. My first attempt (constant shifts and reversal of each group) found nothing because it tested the wrong family.
 * **Not done:** page 08's two-letter groups.
+
+## 12. Reader audit (is the image-to-rune reading reliable?)
+
+`python -m lpswarm.reader_audit`, reference output `docs/diagnostics_sample/reader_audit.md`. Run after the short-image episode (page 03's
+inner image, which the reader gave as unknown at the wrong size).
+* **Margins:** all 15,781 glyphs with a known shape were measured against every shape. On pages 17-72 (12,943 glyphs) the distance to the
+  assigned shape has median 0 and maximum 2; the nearest shape of a different rune has median 384 and minimum 14. The closest pair is W
+  against TH (65 glyphs under 15 px, all read correctly at 0 px). No glyph is within 14 px of a different rune, against a decision threshold of 8.
+* **Independent agreement with the manifest** (pages not used to label the shapes): 01 98.9%, 06-09 97.4%, 10-13 99.2% of the text, 73 98.8%, 74 98.9%;
+  03-04 94.2% (tails of the pages) and 05 51.6% (the number grid's small rune words are not read). Pages 14-16, 100%, are circular (labelling pages).
+* **Page 13:** the images show 124 glyphs on lines 3-9 that the manifest text lacks. Decoded from the image reading alone with the plain alphabet they
+  give English ("...SOME WISDOM AMASS GREAT WEALTH NEVER BECOME ATTACHED TO WHAT YOU OWN BE PREPARED TO DESTROY ALL THAT YOU OWN, AN INSTRUCTION PROGRAM YOUR
+  MIND PROGRAM REALITY"), which only happens if every rune is read correctly: the reader is right and the manifest has a gap. The unsolved sections have no such gap.
+* **Wrong glyph size:** pages 17, 33 and 58 rescaled by 0.8 to 1.2 and re-read with the same shapes gave 0 wrong runes (unknown glyphs or no glyphs
+  instead; about 6,000 glyph reads). The reader needs glyph height of about 100-130 px; the short image reads exactly only at 2.0x (1.9x and 2.1x nearly),
+  and never gave a wrong rune at any of 14 scales. A reader crash on a page where nothing is recognised was fixed.
+* **Separators:** the word dots and colon pairs agree with the text's word breaks on 99.63% of 12,360 aligned same-line pairs (the text has 45 breaks the
+  image shows no dot for, the image 1 the text lacks).
+* **Disputed glyph:** page 41 line 8 is AE in the image (0 px) and not A (49 px); the scream314 text is wrong there.
