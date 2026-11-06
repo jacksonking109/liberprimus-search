@@ -140,7 +140,17 @@ Codex / scripted-proposer swarm with brief refinement, research packets, structu
 * **Reading:** the header test needs no passphrase, so it also excludes passphrase-keyed OutGuess on the unsolved pages. Caveats: it assumes
   the repo files are unmodified copies (the nine payloads survived, so those at least were not re-encoded; the wiki independently lists
   about 400 ppi for the later originals), the wiki's analysis is exploratory, and other steganography tools are not excluded.
-* **File oddities, not explained:** `05.jpg` has 72,700 bytes after its last JPEG end marker (entropy 6.90 bits/byte, not zlib, gzip, bz2,
-  xz, zip or PGP armor) and ends with a dangling `FF D8 FF`; `10.jpg` is pages 10-13 concatenated (the last three are byte-identical to
-  `11.jpg`, `12.jpg`, `13.jpg`).
-* **Not done:** the tail of `05.jpg`, decoding the hex JPEG inside page 03's payload, page 08's two-letter groups.
+* **Page 05's appended data (explained):** `05.jpg` is three parts: the page JPEG (336,353 bytes), a 360-character text block, and a
+  byte-reversed copy of the same JPEG (336,353 bytes; it decodes to exactly the same pixels, and its end marker comes first and its
+  start marker last). The text block is the hex encoding of a 5x5 number grid whose rows, columns and both diagonals sum to 1033
+  (a prime); the visible page shows the same grid with 13 cells written as rune words. The 13 hidden numbers are the Gematria prime
+  sums of those words (SHADOWS 341, AETHEREAL 366, BUFFERS 199, VOID 130, CARNAL 320, OBSCURA 245, FORM 91, MOBIUS 226, ANALOG 320,
+  MOURNFUL 199, CABAL 341; all 13 match), so the appended data adds nothing the page does not already encode. An earlier note here
+  said 72,700 bytes after the last end marker; that came from taking the last FFD9 in the file, which is inside the reversed copy.
+  `10.jpg` is pages 10-13 concatenated (the last three are byte-identical to `11.jpg`, `12.jpg`, `13.jpg`).
+* **Page 03's payload contains a small image:** a 587x109 grayscale JPEG (15,188 bytes, 400 dpi header, so not OutGuess output itself;
+  default-key extraction returns nothing from it) showing one line of runes with a digit 5 and a digit 3 in it. Read by shape matching
+  after scaling 2x: `TH M D EO F M A R  5  U AE NG R NG  3  EA M EO F IO` (18 runes in groups of 8, 5 and 5; the two digits are not
+  runes). Shifting or reversing each group, or all 18 together, gives nothing English, but strings that short cannot be tested well.
+  Not solved.
+* **Not done:** page 08's two-letter groups, and anything on the 18-rune line beyond the shift check above.
