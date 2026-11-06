@@ -99,6 +99,7 @@ size 2-5.
 | Neighbour or chain feedback, Hill blocks, block permutations | Do not reproduce the signature (section 6) |
 | Binary, numbers or running-sum constructions | Nothing found |
 | Transcription errors causing the shortage | Ruled out (section 3) |
+| Hidden data in the page images (OutGuess) | Pages 17-72 cannot be vanilla OutGuess output by the header rule (section 11), so a passphrase sweep is not worth running; default-key extraction returns nothing real on them. Other steganography tools are not tested |
 | A rule on adjacent positions (non-zero step, or no repeated symbol) | Fits the data; no cipher construction found that gives it |
 
 ## 9. Open leads and not-yet-done work
@@ -121,3 +122,25 @@ The deterministic harness (oracle, ledger, comparison accounting), the cipher-pr
 Codex / scripted-proposer swarm with brief refinement, research packets, structure and view diagnostics, the page-image reader,
 `research_doubles` and `research_signature`. Page images are never committed (git-ignored; their SHA-256 sums are in
 `data/lp_images.sha256`); only counts and positions are published.
+
+## 11. Steganography checks on the page images (OutGuess)
+
+* **Default-key extraction** (OutGuess 0.4 from Debian, all 75 files). Control: page 01 returns the 2,899-byte PGP signed message the
+  owner got from the Boxentriq web extractor (anchor lines match). Nine pages return real payloads: 00, 01, 02 (2,899 B each, signed
+  messages), 03 (31,809 B: signed message "Let the text guide you", a hex-encoded JPEG and a signature), 08 (140 B of text) and 10-13
+  (1,234 B each, signed messages). Page 04's 7,524 bytes are random-looking (7.98 bits/byte, 38.6% printable, as random bytes) and its
+  header is the 400 ppi kind below, so it is a false positive. Every other page either decodes the same header (`seed 41408, len 58152`,
+  60 pages, so not a message; 19 of them return 58,152 random-looking bytes), crashes after printing that header (exit 136, 41 pages) or
+  reports "datalen too long" (5 pages, including 05, 15 and 73).
+* **Header fingerprint** (from the Uncovering Cicada wiki page "Outguess detection visual analysis", which says it is unfinished): OutGuess
+  writes its own JPEG header, JFIF unit 0 with density 1x1, and `-p` sets the JPEG quality (default 75; 100 gives an all-ones quantisation
+  table). All nine payload pages have JFIF 1.1, unit 0, 1x1, quality 75 (03, 08, 10, 11, 12) or 100 (00, 01, 02, 13). The other 66 pages,
+  including every page 17-72, have unit 1, 400x400 dpi, quality 92, so they cannot be vanilla OutGuess output by that rule. No
+  counterexample among the 75 files.
+* **Reading:** the header test needs no passphrase, so it also excludes passphrase-keyed OutGuess on the unsolved pages. Caveats: it assumes
+  the repo files are unmodified copies (the nine payloads survived, so those at least were not re-encoded; the wiki independently lists
+  about 400 ppi for the later originals), the wiki's analysis is exploratory, and other steganography tools are not excluded.
+* **File oddities, not explained:** `05.jpg` has 72,700 bytes after its last JPEG end marker (entropy 6.90 bits/byte, not zlib, gzip, bz2,
+  xz, zip or PGP armor) and ends with a dangling `FF D8 FF`; `10.jpg` is pages 10-13 concatenated (the last three are byte-identical to
+  `11.jpg`, `12.jpg`, `13.jpg`).
+* **Not done:** the tail of `05.jpg`, decoding the hex JPEG inside page 03's payload, page 08's two-letter groups.
