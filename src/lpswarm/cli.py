@@ -248,6 +248,17 @@ def cmd_baseline(args) -> int:
     return 0
 
 
+def _with_facts(args, text: str) -> str:
+    """Prepend the --facts-file text (established facts about the target) to `text`."""
+    path = getattr(args, "facts_file", None)
+    if path and Path(path).is_file():
+        from lpswarm.textio import read_text
+        facts = read_text(path).strip()
+        if facts:
+            return "ESTABLISHED FACTS (measured, not guesses):\n" + facts + ("\n\n" + text if text else "")
+    return text
+
+
 def _auto_brief(args, router, alphabet, ct, label, values) -> str:
     """Ask the --auto-brief model for a brief on this target; '' if it is unavailable."""
     import numpy as np
@@ -259,6 +270,7 @@ def _auto_brief(args, router, alphabet, ct, label, values) -> str:
     if args.brief_context and Path(args.brief_context).is_file():
         from lpswarm.textio import read_text
         context = read_text(args.brief_context).strip()
+    context = _with_facts(args, context)
     from lpswarm.swarm.generators import known_keywords
     ctx = GenContext(label, alphabet, np.asarray(ct), 0, 8, alphabet_values=values, task_id=label,
                      known_words=known_keywords(getattr(args, "manifest", None)))
@@ -343,12 +355,12 @@ def cmd_swarm(args) -> int:
     sc = _apply(SwarmConfig, conf.get("swarm", {}), {
         "rounds": args.rounds, "per_round": args.per_round, "max_attempts": args.max_attempts,
         "timeout_s": args.timeout, "parallel": False if args.serial else None,
-        "lean_threshold": args.lean_threshold})
+        "lean_threshold": args.lean_threshold, "signature_gate": True if args.signature_gate else None})
     with Ledger(args.ledger) as led:
         _record_run_meta(led, "swarm", oracle, args, targets,
                          {"rounds": sc.rounds, "per_round": sc.per_round, "max_attempts": sc.max_attempts,
                           "timeout_s": sc.timeout_s, "lean_threshold": sc.lean_threshold,
-                          "stop_on_pass": sc.stop_on_pass, "parallel": sc.parallel,
+                          "signature_gate": sc.signature_gate, "stop_on_pass": sc.stop_on_pass, "parallel": sc.parallel,
                           "min_length": args.min_length},
                          {"generators": list(names), "ranker": args.ranker or None})
         # Model calls are counted in one shared spend ledger (also used by tiertest and
@@ -372,7 +384,8 @@ def cmd_swarm(args) -> int:
                   + ("..." if len(brief) > 200 else ""))
         from lpswarm.swarm.generators import known_keywords
         shared_fn = None
-        if args.peer_ledger or args.strategy_file:
+        facts_text = _with_facts(args, "")
+        if args.peer_ledger or args.strategy_file or facts_text:
             from lpswarm.ledger.db import peer_tried
             from lpswarm.swarm.generators import build_shared_context
 
@@ -382,7 +395,8 @@ def cmd_swarm(args) -> int:
                     from lpswarm.textio import read_text
                     strategy = read_text(args.strategy_file)
                 rows = [r for p in args.peer_ledger for r in peer_tried(p, tid)]
-                return build_shared_context(rows, strategy)
+                shared = build_shared_context(rows, strategy) if (rows or strategy) else ""
+                return "\n\n".join(x for x in (facts_text, shared) if x)
         from dataclasses import asdict as _asdict
         from lpswarm.reports import default_report_dir, target_entry, write_run_report
         report_dir = Path(args.report_dir) if args.report_dir else default_report_dir("swarm")
@@ -420,6 +434,7 @@ def cmd_swarm(args) -> int:
                     if args.brief_context and Path(args.brief_context).is_file():
                         from lpswarm.textio import read_text
                         results = read_text(args.brief_context).strip()
+                    results = _with_facts(args, results)
                     auto = _refine_brief(args, router, alphabet, ct, label, values, auto, results)
                 tgt_brief = "\n\n".join(x for x in (auto, brief) if x)
             res = run_swarm(Target(alphabet, ct, label, page_range=page_range, is_synthetic=synthetic,
@@ -753,6 +768,11 @@ def build_parser() -> argparse.ArgumentParser:
                         "precedence (needs --auto-brief)")
     p.add_argument("--brief-context", help="text file with results so far on this target, shown "
                    "to the --auto-brief model (written by the overnight runner)")
+    p.add_argument("--facts-file", help="text file of established facts about the target (e.g. config/briefs/lp2_signature.md), "
+                   "shown to the --auto-brief model and to every proposer, ahead of everything else")
+    p.add_argument("--signature-gate", action="store_true",
+                   help="refuse programs that cannot reproduce the repeat signature of the unsolved LP2 text before they reach "
+                        "the oracle (sections 10-25 only; see swarm/signature_gate.py)")
     p.add_argument("--lean-threshold", type=int, default=None,
                    help="proposals expanding to at least this many ciphers run as lean sweeps: "
                         "failures are counted, not stored (default 50000; 0 = never)")

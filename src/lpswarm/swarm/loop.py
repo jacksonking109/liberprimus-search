@@ -42,6 +42,9 @@ class SwarmConfig:
     # A proposal that expands to more ciphers than this runs as a lean sweep: failed attempts
     # are counted but not stored (see Executor.run). 0 disables, 1 forces lean for everything.
     lean_threshold: int = 50_000
+    # Refuse programs that cannot reproduce the repeat signature of the unsolved LP2 text (swarm/signature_gate.py);
+    # off by default and only meaningful for sections 10-25.
+    signature_gate: bool = False
 
     def __post_init__(self) -> None:
         if self.rounds < 1 or self.per_round < 1:
@@ -69,6 +72,7 @@ class GeneratorStats:
     attempts: int = 0
     passes: int = 0
     near_misses: int = 0
+    gated: int = 0                            # refused by the signature gate before reaching the oracle
     model_errors: int = 0
     first_pass_attempt: int | None = None   # attempts on target when this generator first passed
     # Why proposals were invalid: normalised reason -> [count, one short example]. Kept in
@@ -218,6 +222,14 @@ def run_swarm(target: Target, ledger: Ledger, oracle: FullOracle, generators: Se
                           stop_file=cfg.stop_file)
             for spec, why in compiled:
                 desc = describe(spec, alpha)
+                if cfg.signature_gate:
+                    from lpswarm.swarm.signature_gate import gate_spec
+                    blocked, gate_why = gate_spec(spec, alpha)
+                    if blocked:
+                        gs.gated += 1
+                        gs.note_invalid(gate_why)
+                        errors[gen.model].append(f"{desc} -> {gate_why}")
+                        continue
                 hyp = ledger.add_hypothesis("program", desc + (f" | why: {why}" if why else ""),
                                             gen.model, gen.role)
                 try:

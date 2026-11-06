@@ -41,7 +41,10 @@ Add generators to `research_signature.py` (the screen and its four numbers alrea
 Pass criterion is the existing `full` match (lag-1 interval, lags 2-8 flat, both ICs <= 1.15) plus per-rune and per-page uniformity.
 A survivor becomes a parametrised family; its inversion is then a normal oracle-scored search over its parameters.
 
-## Phase 3: model budget (needs approval; not before Phase 1 and 2 report)
+## Phase 3: model budget (gate and brief built 2026-11-06; no model has been run)
+Built: `--signature-gate` and `--facts-file config/briefs/lp2_signature.md` (see `docs/research_tools.md`), and a commented `codex-signature` lane in the overnight example. Still needs the owner's go-ahead and keys: the Codex / DeepSeek runs themselves. Important limit: the program language cannot express anything the gate lets through, so the next code step is a new construction in the language (e.g. a keyed multiplicative running sum).
+
+Original text:
 Wire `screen_full` and `classify` in front of the oracle as a gate, so a proposed program that cannot reproduce the signature never
 reaches it. Brief Codex with the signature, the Phase 1 verdict and the Phase 2 survivors, and ask for constructions outside the DSL.
 No live model call, paid run or packet run without the owner's go-ahead.

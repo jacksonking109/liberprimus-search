@@ -68,6 +68,23 @@ args = ["--manifest", "data/lp/manifest.json", "--alphabet", "data/alphabet/gema
         "--per-round", "8", "--max-attempts", "60000"]
 note = "Codex (exploratory)"
 
+# Signature lane (commented out): the same Codex setup for the unsolved LP2 sections only, with the measured
+# facts of those sections shown to Opus's brief and to the proposer (--facts-file) and a gate that refuses programs
+# which cannot reproduce the repeat signature before they cost oracle budget (--signature-gate). Note: every family in
+# the current program language is refused by the gate (docs/avenues_explored.md section 6), so this lane can only
+# succeed with proposals the gate cannot evaluate until the language gains a construction that has the signature.
+# [[job]]
+# id = "codex-signature"
+# kind = "swarm"
+# auto_brief = true
+# refine_brief = "codex"
+# order = "reverse"
+# args = ["--manifest", "data/lp/manifest.json", "--alphabet", "data/alphabet/gematria_primus.json",
+#         "--sections", "10,12,13,14,16,17,18,20,22,24,25", "--generators", "codex", "--rounds", "6",
+#         "--per-round", "8", "--max-attempts", "60000",
+#         "--facts-file", "config/briefs/lp2_signature.md", "--signature-gate"]
+# note = "Codex, told the signature, gated"
+
 # Local lane (5060 Ti; qwen and gemma take turns on the one GPU). Granite orders each
 # round's proposals from port 11435 (the second GPU, or the CPU until there is one).
 [[job]]

@@ -253,6 +253,17 @@ word positions look like that rune's (they do not: p < 0.0001 against EA, p = 0.
 a[t] x (c[t] - c[t-1]) for position-keyed sequences by index of coincidence (no section flagged; planted controls recovered at IC 1.77). Details in
 `docs/avenues_explored.md` section 14.
 
+## Signature gate and facts file (`--signature-gate`, `--facts-file`)
+
+`swarm --signature-gate` runs each proposed program the other way (`programs.spec.encrypt`) on English and refuses it before the oracle if the
+ciphertext misses the unsolved LP2 signature (lag 1 outside 0.08-0.40, lags 2-8 outside 0.70-1.30, or unigram or first-difference IC above 1.25; wide
+bands on purpose). The numbers are fed back to the proposer and counted as `gated` in `report.json`, with the reason in `invalid_reasons`. It blocks only
+when every expanded member (at most 64) is evaluable and fails; programs it cannot evaluate (no inverse such as window mixes, more ciphers than 64) pass.
+It is specific to sections 10-25: never use it on solved or synthetic targets. `--facts-file config/briefs/lp2_signature.md` shows the measured facts of
+those sections to the `--auto-brief` model (Opus), to `--refine-brief` and to every proposer. A commented `codex-signature` lane is in
+`config/overnight.example.toml`. Limit: every family in the current program language is refused by the gate, so a lane can only get programs through that the gate
+cannot evaluate until the language gains a construction that has the signature (for example the multiplicatively keyed running sum of `research_muldiff`).
+
 ## Limits
 
 * The power table uses English plaintext. If the true plaintext is another language, abbreviated or
