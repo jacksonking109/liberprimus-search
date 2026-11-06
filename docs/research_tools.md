@@ -154,10 +154,40 @@ with page and line, for checking by eye; images stay local and are never committ
 the unsolved pages have a known shape, otherwise report the gap instead of counting.
 
 Reference run (`docs/diagnostics_sample/doubles.md`, counts only): pages 17-72 give 86 doubles in 12,842 pairs (0.67%, ratio
-0.18 to the frequency expectation, 0 disagreements between the two tests, coverage 99.42%), against 84 in 12,605 from the
-scream314 text, 2.4-2.5% on the solved pages and 3.4% for uniformly random text. The shortage is a property of the pages,
+0.18 to the frequency expectation, 0 disagreements between the two tests, coverage 99.42%; the unknown boxes are margin art, see below), against 84 in 12,605 from the
+scream314 text (all of sections 10-25 give 86 in 12,941, the same 86), 2.4-2.5% on the solved pages and 3.4% for uniformly random text. The shortage is a property of the pages,
 not of the transcription, and it holds across word dots (0.8%), line ends (0.8%) and plain gaps (0.6%). The montage
 was inspected by eye: every tile shows two identical glyphs.
+
+## Per-rune breakdown and transcription alignment (`python -m lpswarm.research_doubles {perrune,align,all}`)
+
+`perrune`: is the shortage of adjacent identical runes the same for every rune, page and lag? Expected counts are exact under
+a permutation of each unit's known runes among its known positions (the same null the shuffles use); the uniformity test
+conditions on the observed total (multinomial, Monte Carlo p, 20,000 draws) and reports its own power. A rune's `p deficit`
+is against chance; "is this rune different from the others" is its residual against the pooled rate, Holm-adjusted. Image and
+text are the same pages, so they are a consistency check, not two samples. `align`: manifest sections 10-25 against the glyph
+sequence of pages 17-72 (longest-matching-block alignment; image glyphs that have no counterpart are reported, not dropped).
+`--cache FILE` keeps the rune sequences (no images) as JSON; reading the images takes about 3 minutes.
+
+Reference run (`docs/diagnostics_sample/perrune.md`, `alignment.md`):
+
+* The image and the text both give **86 doubles** (12,842 and 12,941 pairs), the same 86 at the same positions. The earlier 84 in
+  12,605 was the 300+ rune sections only. With the exact shuffle expectation (437) the ratio is 0.20, not the 0.18 that the
+  simpler frequency-squared expectation (490) gave.
+* **Uniform across runes:** chi-square 26.3 on 28 df, Monte Carlo p = 0.56 (text 0.51). Every rune is short (ratios 0.00-0.48
+  around the pooled 0.20, B 0 of 14.6 expected, A 1 of 17.4) and none differs from the pooled rate after Holm. Power at 86
+  doubles: five most frequent runes never doubling is detected in 83% of simulations, one mid-frequency rune at 4x in 61%, a single
+  mid-frequency rune at 3x in 34% and at 2x in 11% (5% is the false-positive level). Rune-specific effects of that size or smaller
+  cannot be excluded at this sample size.
+* **Uniform across units:** 56 pages p = 0.31, 16 sections p = 0.85.
+* **Lag profile:** only lag 1 is short (ratio 0.20, z = -16.8). Lags 2-8 are at chance (ratios 0.98-1.06). The shortage is a
+  property of adjacent positions, not a wider local effect.
+* **Alignment:** 12,955 of the 12,956 transcribed runes agree with the image reading in order (the reader labels shapes from
+  sections 8 and 9 only, so this is an independent check of the transcription on the unsolved pages). One position differs: page 41
+  line 8, image AE, text A (not adjudicated; it is not part of a double). There are no text-only runes. The 75 extra image boxes are
+  all unknown-shape boxes sitting first or last in a line, on pages 25-31 (one each) and 57-72 (2-6 each); they are twig and vine
+  drawings in the margins, so every rune on pages 17-72 was read and the 99.42% coverage figure undercounts the reader.
+  Every double is in both sources.
 
 ## Limits
 
