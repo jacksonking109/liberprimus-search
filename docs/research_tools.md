@@ -189,6 +189,41 @@ Reference run (`docs/diagnostics_sample/perrune.md`, `alignment.md`):
   drawings in the margins, so every rune on pages 17-72 was read and the 99.42% coverage figure undercounts the reader.
   Every double is in both sources.
 
+## Signature screen (`python -m lpswarm.research_signature`)
+
+What the unsolved sections look like, as four numbers measured on the manifest text (sections 10-25): lag-1 equal-neighbour ratio
+0.19 (95% interval 0.15-0.24; `research_doubles`), lags 2-8 at chance (0.98-1.08), unigram IC x 29 = 0.999 and first-difference
+IC x 29 = 1.025 (uniform 1.0, language 1.6-2.0; the non-zero differences are flat, `research_structure diffs`). The screen puts
+synthetic English (training split) through every cipher it can enumerate in the DSL, with `programs.spec.encrypt`, and measures the
+same four numbers on the result. No oracle, no models, no ledger; fixed seeds; about 4 minutes on 4 cores.
+
+A `full` match is pre-specified: lag 1 inside the real interval, every lag 2-8 inside 0.85-1.15, both ICs <= 1.15. The first pass
+used only the lag conditions and let five feedback ciphers through whose first differences are the plaintext itself; the IC
+conditions were added after that, from statistics already reported, and the report shows `lag-only` and `full` separately. `loose`
+is a post-hoc sensitivity check for the plaintext level (the solved plain-substitution pages sit at 0.44, interval 0.29-0.65, below
+the synthetic English 0.58): the cipher must lower the plaintext's own lag-1 ratio by a factor in 0.24-0.83, with the same flat-lag and
+IC conditions.
+
+Reference run (`docs/diagnostics_sample/signature_screen.md`), 58,024 ciphers: the four packet families as the packets expand them
+(exp1 feedback 261, exp2b Hill 957, exp3 progressive 4,873, exp4 word keys 19,882), the other position-keyed sequences (840), and a
+wider sweep of the invertible mixers (neighbour and chain feedback x add/sub/rsub x lags 1-16 x both directions x 1-3 stages x word
+reset x before/after the shift x 29 shifts: 25,056; 6,000 random Hill blocks of size 2-4; every block permutation of size 2-5).
+
+* **No cipher is a full match, and none passes the loose check.** Lag 1 never gets below 0.46 for progressive keys and word keys
+  (the controls: English 0.58, random symbols 0.98), 0.35 for the Hill blocks, 0.56 for the random Hill sample.
+* Five distinct feedback ciphers (seven counting duplicates across families) match the lag statistics: all are lag-1 `neighbor`
+  with a word reset, shifts 7 or 15. Their first differences are language-like (IC 1.42-1.63), which the real text contradicts, so
+  those forms are out on this evidence. The closest cipher that also has flat symbols and differences reaches 0.55
+  (neighbor rsub lag 1, next, three stages, word reset, shift 18), three times the real ratio.
+* **Positive control:** a random walk whose zero steps are thinned to 20% (not a DSL cipher) has lag 1 0.20, lags 2-8 0.99-1.02, unigram
+  IC 1.00, first-difference IC 1.02, a full match, so the criteria can be met. It is a description of the data, not a mechanism: the
+  real text behaves as if each rune were the previous one plus a nearly uniform non-zero step, with a zero step 5 times too rare.
+
+Limits: English plaintext only, and the plaintext's own lag-1 level is uncertain (hence the loose check, which also finds nothing);
+the Hill and word-key families are samples, not exhaustive; single-stage mixers with one shift, no transpositions and no F-skip
+outside exp4. A match would be a necessary condition for a mechanism, not evidence for it. For a proposed cipher program the same
+numbers come from `screen_full(spec, english_windows(alpha))` and `classify(...)`; this is not wired into the swarm loop.
+
 ## Limits
 
 * The power table uses English plaintext. If the true plaintext is another language, abbreviated or
