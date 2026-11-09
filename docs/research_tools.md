@@ -264,6 +264,11 @@ those sections to the `--auto-brief` model (Opus), to `--refine-brief` and to ev
 `config/overnight.example.toml`. Limit: every family in the current program language is refused by the gate, so a lane can only get programs through that the gate
 cannot evaluate until the language gains a construction that has the signature (for example the multiplicatively keyed running sum of `research_muldiff`).
 
+## Literal readings (`python -m lpswarm.research_literal`)
+
+Readings of the 2016 hint's "their numbers are the direction" with the runes' Gematria prime values: a self-keyed cipher (each rune's prime value as the key for the
+next), steps through a page by prime values, and square pages as grids against the hint numbers. All negative so far; see `docs/avenues_explored.md` section 15.
+
 ## Limits
 
 * The power table uses English plaintext. If the true plaintext is another language, abbreviated or

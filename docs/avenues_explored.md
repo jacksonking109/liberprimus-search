@@ -244,3 +244,10 @@ community forum and are recorded as claims.
 * **Reading:** at least page 49 was built to carry numbers, which fits the 2016 hint's "their numbers are the direction" and page 05's words-for-numbers grid.
   That also allows a different account of the repeat shortage: a text partly composed or arranged under constraints, not only the output of a cipher.
   Untested speculation.
+* **Literal readings of "their numbers are the direction"** (`python -m lpswarm.research_literal`, `docs/diagnostics_sample/literal.md`):
+  (1) the prime value of a rune as the key for the next one (p = c -/+ prime(c[t-k]) mod 29, k = 1-3, or the running sum of all earlier primes): every variant
+  is at the shuffled level on the 300+ rune sections (best IC 1.01-1.04 against shuffled maxima 1.05-1.09). A first run flagged IC 2-3, all on section 15,
+  which has 9 runes; the module now uses only 300+ rune sections. English enciphered these ways gives lag 1 = 0.75-1.23, so none fits the repeat signature either.
+  (2) prime values as steps through each page (best walk of 30+ runes by English bigram score, against the same search on the page shuffled): 2 of 50 pages
+  at p <= 0.05, about what chance gives. (3) Square pages as grids against the hint numbers 563, 569, 1136, 1033, 3301, 121, 464: page 23 (14 x 14) has 3 hits
+  against 4.3 for its runes shuffled, so nothing; page 49 has 7 against 2.5, two of which are the known top row and left column.
