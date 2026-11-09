@@ -102,6 +102,7 @@ size 2-5.
 | Running key (the key is a text, as on page 03's inner image) | An English key text independent of the plaintext gives lag-1 ratio 0.99-1.07, unigram IC 1.04, first-difference IC 1.00 against the real 0.19, 1.00, 1.03: it reproduces the flat letter statistics but not the repeat shortage, so any independent English key text is excluded on that signature. Specific key texts were therefore not searched; the Phase 1 baseline had skipped running keys (no key texts supplied) |
 | The 86 doubles are placed by some rule (leak anatomy, section 13) | No: nothing structured in layout, phase, spacing, context or alphabet class (all family p >= 0.115), with high power for most planted effects. The leak looks like random thinning |
 | A zero step triggered by a plaintext rune (multiplicatively keyed running sum, section 14) | Rejected: the family reproduces the signature if the zero rune is EA (English frequency 0.0065, the real double rate 0.0066), but the doubles' word positions do not match EA's (p < 0.0001) and are like any position's (p = 0.66); no section shows a language-like IC under a position-keyed multiplier |
+| Pages built to carry numbers ("words or their numbers") | Supported on page 49 (community "page 32"): its 121 runes as an 11x11 grid give top-row and left-column Gematria sums 563 and 569, the 2016 hint image's dimensions; chance about 3 in 100,000 (section 15) |
 | Hidden data in the page images (OutGuess) | Pages 17-72 cannot be vanilla OutGuess output by the header rule (section 11), so a passphrase sweep is not worth running; default-key extraction returns nothing real on them. Other steganography tools are not tested |
 | A rule on adjacent positions (non-zero step, or no repeated symbol) | Fits the data; no cipher construction found that gives it |
 
@@ -221,3 +222,25 @@ and a zero step happens only where n[t] is zero.
 * **What this narrows:** the zero steps are independent of the plaintext letter, of word, line and page position, and of the neighbouring runes, which fits a
   key-driven or process-driven rate of about 0.0066 per position. The other Phase 2 constructions from the plan (a non-zero step stream with a keyed
   28-symbol plaintext, a previous-output-excluded substitution, interleaved streams, leak variants) were not built.
+
+## 15. Community leads checked against our transcription (2026-11-07 to 11-09)
+
+All numbers from `data/lp_derived/lp2_runes.csv` (our image reading) and Gematria prime values; the claims come from the owner reading the
+community forum and are recorded as claims.
+* **Repeated sequences table** (five 5-6 rune sequences seen twice, with positions): all five sit at exactly the claimed global positions in our stream
+  (0-based), so our rune order and numbering agree with theirs (one typo in theirs: B-M-R-N-M's gap is 6,553, not 6,533). Repeated n-gram pairs over the whole
+  stream are at chance: 4-grams 129 against 118 for shuffles (p 0.18), 5-grams 6 against 4.1 (p 0.26), 6-grams 1 against 0.15 (p 0.12). A Kasiski-style check on
+  repeated 3- and 4-grams within sections gives nothing beyond m = 27 at z 3.3, not significant after about 200 trials.
+* **The page 05 grid as the key** (the community's "box of primes": rows, columns and diagonals sum to the prime 1033): as a 5x5 Hill matrix (invertible mod 29;
+  both directions, transpose, five block offsets) and as an additive or multiplicative repeating key in five reading orders, all offsets, sections 10-25: best IC
+  x 29 is 1.13 on a short section, against 1.25 to flag and 1.7-2.0 for language (5,060 variants). Any repeating or linear use of the grid also fails the repeat
+  signature, so a grid key needs a mechanism with state or a lookup without fixed points.
+* **Page 49 (the community's "page 32"; older numbering 0 = image 17)** reproduces exactly: 121 runes; as an 11x11 grid the top row sums to 563 and the left
+  column to 569 (the 2016 hint image is 563 x 569); a 5x5 subgrid at row 4, column 4 has circumference 1136 (the hint's OutGuess payload length) with L A W
+  starting its 3x3 interior; pi(1136) = 189 = L 73 + A 97 + W 19. Against 2 million shuffles of page 49's own runes: top row 563 0.52%, left column 569 0.51%,
+  both 0.003% (58 hits); some 5x5 circumference exactly 1136 0.9%. The 563/569 pair is beyond chance even allowing for a few tries; the later steps are
+  fitted after the fact. Other rows and columns: 8 of 22 sums prime against 4.9 expected (p 0.09); diagonals and total unremarkable.
+* **Page 23** has 196 = 14 x 14 runes, the only other page whose count is a perfect square; untested against hint numbers (none supplied yet).
+* **Reading:** at least page 49 was built to carry numbers, which fits the 2016 hint's "their numbers are the direction" and page 05's words-for-numbers grid.
+  That also allows a different account of the repeat shortage: a text partly composed or arranged under constraints, not only the output of a cipher.
+  Untested speculation.
