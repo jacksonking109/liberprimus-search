@@ -103,6 +103,7 @@ size 2-5.
 | The 86 doubles are placed by some rule (leak anatomy, section 13) | No: nothing structured in layout, phase, spacing, context or alphabet class (all family p >= 0.115), with high power for most planted effects. The leak looks like random thinning |
 | A zero step triggered by a plaintext rune (multiplicatively keyed running sum, section 14) | Rejected: the family reproduces the signature if the zero rune is EA (English frequency 0.0065, the real double rate 0.0066), but the doubles' word positions do not match EA's (p < 0.0001) and are like any position's (p = 0.66); no section shows a language-like IC under a position-keyed multiplier |
 | Pages built to carry numbers ("words or their numbers") | Supported on page 49 (community "page 32"): its 121 runes as an 11x11 grid give top-row and left-column Gematria sums 563 and 569, the 2016 hint image's dimensions; chance about 3 in 100,000 (section 15) |
+| Stateful generators outside the cipher language (table walk, permuting alphabet, non-zero step; section 16) | None passes: 57 of 78 variants fail, 21 are near misses with exactly zero repeats; the one variant that hits lag 1 (0.20) is plaintext-triggered by EA and has uneven lags 2-8. Raises the weight on "generated stream, nothing to decrypt" |
 | Hidden data in the page images (OutGuess) | Pages 17-72 cannot be vanilla OutGuess output by the header rule (section 11), so a passphrase sweep is not worth running; default-key extraction returns nothing real on them. Other steganography tools are not tested |
 | A rule on adjacent positions (non-zero step, or no repeated symbol) | Fits the data; no cipher construction found that gives it |
 
@@ -119,7 +120,7 @@ size 2-5.
 * **Discrepancies on solved pages** between the manifest and the images, not yet adjudicated: page 73 second rune missing in the
   manifest, page 74 an Y/E difference and an extra E, the tails of pages 3-4, and page 13, where the manifest lacks 124 runes the images show (see section 12).
 * **Packets exp2b, exp3, exp4** still need review before any run.
-* **Planned next step:** `docs/plan_repeat_shortage.md` Phase 2 (constructions outside the cipher language). Phases 0 and 1 are done (sections 12 and 13); Phase 2 is partly done (section 14).
+* **Planned next step:** `docs/plan_repeat_shortage.md` Phase 2 (constructions outside the cipher language). Phases 0 and 1 are done (sections 12 and 13); Phase 2: sections 14 and 16.
 
 ## 10. Tooling built along the way
 
@@ -252,3 +253,25 @@ community forum and are recorded as claims.
   at p <= 0.05, about what chance gives. (3) Square pages as grids against the hint numbers 563, 569, 1136, 1033, 3301, 121, 464: page 23 (14 x 14) has 3 hits
   against 4.3 for its runes shuffled, so nothing; page 49 has 7 against 2.5, two of which are the known top row and left column.
 * **Page 73** (see `docs/community_state.md`): the full text decodes from the images, the 128-hex-character hash printed on it was read and matches no SHA-512, SHA3-512, BLAKE2b or SM3 digest of anything we hold (880 comparisons), and it carries five black dots.
+
+## 16. Phase 2 generators: three stateful families (`python -m lpswarm.research_generators`)
+
+Brief: three families of stateful ciphers outside the cipher language, run with English plaintext (6 windows of 5,000 runes) through the same four numbers as
+`research_signature` plus the step-stream IC x 28 (real 1.001), with each variant's invertibility, source of zeros and the word positions of its zeros. No model,
+no oracle, no key text, no added leak. Full table (78 variants): `docs/diagnostics_sample/generators.md`. Each machine has a decrypt and a round-trip test.
+
+| family | variants | result | where its zeros come from |
+| --- | ---: | --- | --- |
+| 1 table walk (cyclic and keyed Latin squares, a random 29x29 table, page 05's grid 5x5 and tiled; moves: row, rook, diagonal, near list; wrap or reflect) | 40 | 38 fail. Two give exactly zero repeats (keyed Latin with rook moves) but are **not invertible** (invertible share 0.00: a message cannot be carried). Only 3 variants are fully invertible, all with row or diagonal moves: lag 1 = 0.69, and the cyclic ones have first differences IC 1.76 | a "stay" move for plaintext rune 0 (F) in every invertible one; page 05's grid as a table has 13 distinct values and fails the letter frequencies |
+| 2 permuting alphabet (emitted rune to slot 0 / 7 / 14 / 21 / 28, both alphabets, keyed swaps, Chaocipher) | 14 | none passes. **Slot 28 reaches lag 1 = 0.20** with flat letters and differences (unigram IC 1.00, difference IC 1.02), but lags 2-8 run from 0.03 to 2.08, and every zero is plaintext rune 28 (EA): word-position p = 0.0002 against the real doubles. The Chaocipher gives lag 1 = 1.03 | slot k: always plaintext rune k (100% of zeros), so a plaintext trigger; the rest depend on the state |
+| 3 non-zero step (c[t] = c[t-1] + s[t], s in 1..28 from an LCG, lagged Fibonacci, a 2x2 matrix power or plaintext feedback; rune 28, 0 or 14 skipped or folded) | 24 | 21 near misses, all invertible, all with step IC x 28 = 1.000-1.004 and flat letters and differences, and **exactly zero repeats** (lag 1 = 0.00) by construction; the other 3 (plaintext feedback) fail | none: a non-zero step cannot repeat |
+
+* **Nothing passes.** No variant has lag 1 in the real interval (0.15-0.24) together with flat lags 2-8, flat letters and flat differences. The closest, family 2 slot 28, is a
+  plaintext-triggered EA rule (the same coincidence as in section 14) with an uneven lag profile.
+* **What the near misses say.** A non-zero-step machine reproduces everything except the 86 zeros. Adding a leak to match would be a free parameter, not a mechanism,
+  so none was added. No construction here produces a zero step at a rate of about 0.0066 that is independent of the plaintext and of word position: where zeros appear
+  they are tied to one plaintext rune (families 1 and 2), and where they are state-dependent they are far too frequent (lag 1 = 0.45-1.45).
+* **Weight.** Together with section 13 (the zeros look like random thinning), section 14 (a keyed multiplicative step needs EA as trigger, which fails) and this section, the
+  evidence now leans further toward a generated or edited stream with an independent per-position process, not a cipher with a rule that happens to forbid repeats.
+  That is a lean, not a proof: the families tried are a few of many, and a stateful machine with an unusual leak was not found, not excluded.
+* **Not run:** Task 2 of the brief (parameter space of a passing family) because nothing passed.

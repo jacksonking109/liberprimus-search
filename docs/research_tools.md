@@ -269,6 +269,12 @@ cannot evaluate until the language gains a construction that has the signature (
 Readings of the 2016 hint's "their numbers are the direction" with the runes' Gematria prime values: a self-keyed cipher (each rune's prime value as the key for the
 next), steps through a page by prime values, and square pages as grids against the hint numbers. All negative so far; see `docs/avenues_explored.md` section 15.
 
+## Stateful generators (`python -m lpswarm.research_generators`)
+
+Table walks, permuting alphabets (including Chaocipher) and non-zero-step machines, each with a decrypt function, run on English through the four signature numbers
+plus the step-stream IC, with the source of zeros and a word-position test. 78 variants, none passes; see `docs/avenues_explored.md` section 16 and
+`docs/diagnostics_sample/generators.md`.
+
 ## Limits
 
 * The power table uses English plaintext. If the true plaintext is another language, abbreviated or
