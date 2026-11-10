@@ -30,6 +30,7 @@ against its terms), so claims are recorded as claims, and only the numbers marke
 | 3301 and 464 | Arithmetic confirmed: 3301 is prime, pi(3301) = 464 = 16 x 29. Word counts of the solved sections in the manifest text (1: 44, 3: 30, 4: 123, 5: 193, 6: 7, 7: 153, 8: 86, 9: 17, 26: 26, 27: 19) have no four that sum to 464 (closest 462, sections 3, 5, 7, 8); inconclusive, because the manifest lacks about 124 runes of page 13 and counts line ends as breaks |
 | page 32 alignment | **Reproduced on our transcription** (their "page 32" is our image 49, 121 runes): top row 563, left column 569, a 5x5 circumference of 1,136 with L A W inside. Chance level about 3 in 100,000 for the 563/569 pair (`docs/avenues_explored.md` section 15) |
 | repeated-sequence table | All five sequences sit at exactly the claimed positions in our stream; repeats are at chance. One typo in theirs (B-M-R-N-M gap 6,553, not 6,533) |
+| the five dots point somewhere in LP2 (relayed; people are comparing them with constellations, paintings and other images, nothing found yet) | Two mechanical overlays, both negative. (1) Laid on each of the 75 pages at their own pixel coordinates, no page has all five on a rune: at most 4 (on 11 pages), hits per page 0/1/2/3/4 = 17/12/25/10/11, about chance. (2) At any shift, the number of placements where all five land on runes, against 142 rotated and reflected copies of the pattern: page 05 is highest (1,161 placements against a null mean of 148, p 0.007 for that page, about 0.5 after trying 75 pages); the rest are unremarkable. A test of the five dots against the cells of page 05's grid was inconclusive (my crude cell segmentation found 20 clusters, not 25, and no fit for any orientation). Not tested: constellations, paintings, non-rune art |
 | the page 05 grid as the key | Not as a Hill matrix or repeating key (5,060 variants, nothing); any repeating or linear use also fails the repeat signature. A use with state or a lookup is untested because the use is unknown |
 
 ## Where we may add something (we cannot know what they already have)
@@ -47,7 +48,8 @@ against its terms), so claims are recorded as claims, and only the numbers marke
 2. What exactly is the 2014 "magic squares into input fields" mechanism, and is page 05's grid (rows, columns and diagonals sum to the prime 1033) the same kind of object?
 3. Is the repeat shortage known, and does anyone have a construction (a table lookup without fixed points, a walk on a graph, a rule on adjacent symbols) that gives it?
 4. Which hint numbers beyond 563, 569, 1136 and 3301 are established, and for which pages?
-5. What do the five dots on page 73 mean, if anything?
+5. What do the five dots on page 73 mean, if anything? Which images or patterns have already been compared with them?
+6. Onion v2 services have been retired since 2021, so the 2014-era pages cannot be fetched; has anyone kept an archived copy of any of those pages (or the 2016 onion page) that could be hashed against the digest?
 
 ## Roles from here
 
