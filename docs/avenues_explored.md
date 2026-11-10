@@ -251,3 +251,4 @@ community forum and are recorded as claims.
   (2) prime values as steps through each page (best walk of 30+ runes by English bigram score, against the same search on the page shuffled): 2 of 50 pages
   at p <= 0.05, about what chance gives. (3) Square pages as grids against the hint numbers 563, 569, 1136, 1033, 3301, 121, 464: page 23 (14 x 14) has 3 hits
   against 4.3 for its runes shuffled, so nothing; page 49 has 7 against 2.5, two of which are the known top row and left column.
+* **Page 73** (see `docs/community_state.md`): the full text decodes from the images, the 128-hex-character hash printed on it was read and matches no SHA-512, SHA3-512, BLAKE2b or SM3 digest of anything we hold (880 comparisons), and it carries five black dots.
