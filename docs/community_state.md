@@ -56,3 +56,32 @@ against its terms), so claims are recorded as claims, and only the numbers marke
 
 Formalise and test concrete hypotheses from the forum against our data with a calibrated null and report back; stop open-ended sweeps, packet runs and model
 spend until a hypothesis calls for them (the Codex and DeepSeek lanes and the signature gate stay built but idle).
+
+## Lead: Blake's "A Poison Tree" and the grey tree page (2026-11-11, from a relayed suggestion)
+Question: are the withered tree of Blake's plate (Songs of Experience, 1794), the OutGuess images and a Liber Primus page
+near 52-56 connected?
+
+Checked from our own data
+* Community page numbers are our image number minus 17, so community pages 52-56 are our images 69-73. Our images 52-56 hold
+  runes only and have no tree.
+* **Our image 72 (community page 55) is the page with the tree.** It is a pale grey outline of a bare, many-branched tree
+  (about 1065 x 1042 px on a 2400 x 3600 page, grey level about 190, edge-traced look with jagged contours), above the black
+  cicada. Rune text sits above it. The tree sits between the two black vine borders. No figure lies under it, and no poem text
+  surrounds it.
+* Header test: image 72 is the same type as the other pages 17-72 (400 dpi, quality 92), so it is not OutGuess output and the
+  tree is not a hidden payload of that kind.
+* The OutGuess payloads we have are runic text, PGP-signed messages and, on page 03, an inner runic image. None is a tree and
+  none is a low-quality picture. The "low-quality OutGuess images" in the suggestion are not in our data, so that comparison
+  could not be made here.
+
+Not checked (blocked)
+* This environment cannot reach Wikipedia, Wikimedia, the Blake Archive, the Uncovering Cicada wiki or the Substack write-up
+  (no DNS). I did not compare against the Blake plate image itself, and the visual similarity is untested. A web search found
+  no page tying "A Poison Tree" to Cicada 3301. It found only that Blake appears in other Cicada material (The Marriage of
+  Heaven and Hell; a collage of four Blake paintings on the 2012 onion page), and one secondary blog mentioning a bare oak tree
+  image in a later release. I did not read it, so treat the oak mention as unverified.
+
+Dead ends so far: no poem text on or near page 72; no figure under the tree; tree is not OutGuess output; no online link found.
+What would settle it: (1) the plate image and the OutGuess images from the user's side, side by side with our crop of image 72;
+(2) a trace of the tree outline and a shape comparison; (3) whether the poem's runes via Gematria (or its word-sum numbers) relate
+to the page's rune text or to the page 49 numbers. Not done: 3 needs a decision on which numbers count.
