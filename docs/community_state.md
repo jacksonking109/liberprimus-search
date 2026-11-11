@@ -85,3 +85,23 @@ Dead ends so far: no poem text on or near page 72; no figure under the tree; tre
 What would settle it: (1) the plate image and the OutGuess images from the user's side, side by side with our crop of image 72;
 (2) a trace of the tree outline and a shape comparison; (3) whether the poem's runes via Gematria (or its word-sum numbers) relate
 to the page's rune text or to the page 49 numbers. Not done: 3 needs a decision on which numbers count.
+
+### Addendum: the lying figure, and a second tree (2026-11-11)
+Looked at every page 17-73 as a thumbnail sheet. Pictures that are not borders or text:
+* **Image 39 (community page 22, the eight-dot page):** a traced-outline figure of a person lying flat on their back, head to the
+  right, legs to the left. It spans the full page width (x 0-2399) at the very bottom (y 3142-3598 of 3600) and is cut by the
+  bottom edge. Above it is a black cross-shaped mark, the eight dots and one rune block. It is drawn as a high-contrast edge trace,
+  the same traced look as the grey tree.
+* **Image 49 (community page 32, the 11 x 11 grid page):** a **second tree**, a dark, heavily blurred bare tree, x 765-1569,
+  y 2234-3137, under the 121-rune block. No figure under it.
+* **Image 72 (community page 55):** the grey outline tree described above, with no figure.
+* Pages 25-30 (community 8-13) have thin bare-tree borders along the margin. Those are decoration, not a lone tree.
+
+Does the figure pair with a tree as the two halves of the poem's ending? On the page evidence, **no pairing on one page**: the
+figure (image 39) and each tree (images 49 and 72) are on different pages, 10 and 33 images apart. Nothing in the pictures marks
+them as a pair (no shared composition, no text). The figure's page and the page 49 tree page are both pages with designed numbers
+and dots, which is a coincidence worth noting but not evidence. The poem's ending (the foe outstretched beneath the tree) would
+need the figure placed under a tree, and none of our pages shows that. Untested: the figure against the Blake plate (the plate
+cannot be fetched from here), and whether the three pictures are one image split across pages (a quick check would stack the
+figure under each tree at matching scale and see if outlines continue; not done).
+Dead ends: no text link; no shared page; blurred tree on 49 is not the grey outline tree on 72 (different rendering).
