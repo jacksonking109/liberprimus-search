@@ -275,3 +275,17 @@ no oracle, no key text, no added leak. Full table (78 variants): `docs/diagnosti
   evidence now leans further toward a generated or edited stream with an independent per-position process, not a cipher with a rule that happens to forbid repeats.
   That is a lean, not a proof: the families tried are a few of many, and a stateful machine with an unusual leak was not found, not excluded.
 * **Not run:** Task 2 of the brief (parameter space of a passing family) because nothing passed.
+
+## 17. Cicada identifiers as autokey primers and repeating keys (`research_primers`)
+Prompted by the community view that only communications signed with PGP key `7A35090F` are genuine. Our own OutGuess payloads (pages 00-03) carry
+signatures from RSA key `181F01E57A35090F`, so the key ID is a fact from the data, not from memory. The 160-bit fingerprint is not recoverable without the
+public key (not fetched; the network does not reach key servers).
+* **Tried:** 7 strings (`7A35090F`, `181F01E57A35090F`, `845145127`, `3301`, `CICADA`, `CICADA3301`, `CICADA3301845145127`), each forward and reversed, turned into
+  numbers six ways (base 36, ASCII mod 29, letter position, Gematria letters, hex bytes, the number mod 29) = 57 distinct key lists; each as a **plaintext autokey
+  primer** and as a **repeating key**, with sub / add / beaufort, identity or reversed alphabet, F literal or keyed = 1,368 candidates per section. Score: mean English
+  bigram log-likelihood, against the best candidate on the section shuffled 40 times.
+* **Result:** none of the 11 sections of 300+ runes has a best candidate above every shuffle (0 of 11; about 0.3 expected). Best p values 0.12 and 0.24. The planted
+  control (English, autokey, primer `7A35090F`) is recovered as the top candidate. `docs/diagnostics_sample/primers.md`.
+* **Limits:** a ciphertext autokey does not depend on the primer after its first m symbols, so it is not part of this test (the lag-k scan of section 4 covers it,
+  unvalidated on a planted autokey). Conventions for turning an identifier into numbers are open-ended; only six were tried. Primers with unknown conventions, the
+  full fingerprint, `skip_mode: resolve` with autokey (unsupported in the language), and key sources other than the plaintext are not covered.

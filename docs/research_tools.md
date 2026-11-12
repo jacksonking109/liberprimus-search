@@ -275,6 +275,11 @@ Table walks, permuting alphabets (including Chaocipher) and non-zero-step machin
 plus the step-stream IC, with the source of zeros and a word-position test. 78 variants, none passes; see `docs/avenues_explored.md` section 16 and
 `docs/diagnostics_sample/generators.md`.
 
+## Cicada identifiers as keys (`python -m lpswarm.research_primers`)
+Tries the PGP key ID `7A35090F` (and the long ID, 845145127, 3301, CICADA ...) as plaintext-autokey primers and repeating keys under six number conventions and 24
+cipher settings, scored by English bigram log-likelihood against the shuffled-section best. Writes `primers.json` and `primers.md`; a planted control must rank first.
+Reference output: `docs/diagnostics_sample/primers.md`. Exploratory, no models.
+
 ## Limits
 
 * The power table uses English plaintext. If the true plaintext is another language, abbreviated or
