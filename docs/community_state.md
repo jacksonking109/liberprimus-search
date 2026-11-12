@@ -105,3 +105,20 @@ need the figure placed under a tree, and none of our pages shows that. Untested:
 cannot be fetched from here), and whether the three pictures are one image split across pages (a quick check would stack the
 figure under each tree at matching scale and see if outlines continue; not done).
 Dead ends: no text link; no shared page; blurred tree on 49 is not the grey outline tree on 72 (different rendering).
+
+## Page 32 (image 32, community page "15.jpg"): the number table is the Fibonacci sequence (checked 2026-11-12)
+Relayed by the owner (not in our notes before). Table read from image 32 (4 x 4, the grey/red cell is 3299):
+```
+3258 3222 3152 3038
+3278 3299 3298 2838
+3288 3294 3296 2472
+4516 1206  708 1820
+```
+Claim: start at 3299, go clockwise outward in a spiral with 3301 as the pivot; most entries are 3301 - n, the last two are 3301 + n; replace each prime by its
+zero-based prime index. **Confirmed.** Spiral order 3299, 3298, 3296, 3294, 3288, 3278, 3258, 3222, 3152, 3038, 2838, 2472, 1820, 708, 1206, 4516 gives
+the primes 2, 3, 5, 7, 13, 23, 43, 79, 149, 263, 463, 829, 1481, 2593 (3301 - entry) and 4507, 7817 (3301 + entry), all prime, with zero-based indices
+**0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987**: the Fibonacci numbers (`tests/test_page32_table.py`). The chance of 16 table-derived primes landing on Fibonacci indices is nil,
+so this is a designed object, like page 05's grid and page 49's numbers.
+What it does not tell us: what the Fibonacci sequence is for. Earlier sweeps already tried Fibonacci as a key stream (scales, offsets, F-skip treatments, over all
+sections; sections 5 and 14 of `avenues_explored.md`) with no hit, but not tied to this page: a Fibonacci key that restarts at pages after image 32, or that is
+indexed by the page numbers (the table is on community page 15), has not been tested.
