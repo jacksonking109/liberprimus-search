@@ -309,3 +309,15 @@ Sharing, Diffie-Hellman, RSA, factorisation) is what prompted looking at them.
 * **Coincidence noted, not tested further:** page 69 has 263 runes and the largest token value is 263. Under the pointer reading above it gives nothing.
 * **Weight:** 256 uniform draws from 0-263 and no link to the rune text. If the tokens are a hint they are a number table whose use is not in our data (shares, a key stream, a
   reference to something outside the book). The forum should be asked what 264 or 256 values could mean.
+
+## 19. Fibonacci keys that restart or follow the page number (`research_fibpage`)
+Prompted by image 32's number table (the Fibonacci numbers as prime indices; `docs/community_state.md`). Fibonacci mod 29 has period 14, so an unbroken Fibonacci key is a
+period-14 repeating key, already excluded by the period scan (section 4). Only a key that **restarts** (every page, line or word) or whose phase depends on the page number
+could have been missed, so those were tested: continuous (baseline), restart per page / line / word, one shift per page, and a page-dependent phase, each with sub / add / beaufort,
+identity or reversed alphabet, F literal or keyed, scales 1-28, all 29 constant shifts and phases 0-13 (about 42,000 candidates per body).
+* **Result:** no candidate stands out. Pages 33-72 (after the table): best bigram score -4.8696 against a shuffled-page best of -4.8745 (null max -4.8527), p = 0.31. All pages 17-72:
+  -4.8772 against -4.8877 (null max -4.8688), p = 0.066 (the unadjusted best, not below 0.05, and the table's page is in this body, so it is not the intended test).
+* **Control:** English over the real page structure encrypted with a restart key (page, line and word versions) is recovered at its true score (-2.605) in each case.
+* **Limits:** the test scores with an English bigram model, so it needs the plaintext to be English in the same alphabet and orientation; it covers Fibonacci mod 29 only (not the primes or indices
+  as numbers, not scaled by page length), restarts at page, line and word boundaries as our table defines them (the line and word breaks come from the image reading), and not a restart at other points.
+  `docs/diagnostics_sample/fibpage.md`.

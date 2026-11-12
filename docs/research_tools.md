@@ -285,6 +285,10 @@ Reference output: `docs/diagnostics_sample/primers.md`. Exploratory, no models.
 `data/lp_derived/tokens_66_68.csv`; `analyse` gives the plain statistics (uniformity over 0-263 as base 62, repeats, lag counts, a pointer reading into page runes).
 Exploratory, no models. Results in `docs/avenues_explored.md` section 18.
 
+## Fibonacci restart keys (`python -m lpswarm.research_fibpage`)
+Fibonacci mod 29 (period 14) as a key that restarts per page, line or word, or follows the page number; sub / add / beaufort, both alphabets, F literal or keyed, scales and shifts;
+best English bigram score against the same search on page-shuffled runes, with a planted control. Reference output `docs/diagnostics_sample/fibpage.md`. Exploratory, no models.
+
 ## Limits
 
 * The power table uses English plaintext. If the true plaintext is another language, abbreviated or
