@@ -280,6 +280,11 @@ Tries the PGP key ID `7A35090F` (and the long ID, 845145127, 3301, CICADA ...) a
 cipher settings, scored by English bigram log-likelihood against the shuffled-section best. Writes `primers.json` and `primers.md`; a planted control must rank first.
 Reference output: `docs/diagnostics_sample/primers.md`. Exploratory, no models.
 
+## Token tables on images 66-68 (`python -m lpswarm.research_tokens read|analyse`)
+`read` cuts the 256 two-character tokens (digit 0-4 plus digit/letter) out of the page images by identical-shape grouping and a hand-checked label table, writing
+`data/lp_derived/tokens_66_68.csv`; `analyse` gives the plain statistics (uniformity over 0-263 as base 62, repeats, lag counts, a pointer reading into page runes).
+Exploratory, no models. Results in `docs/avenues_explored.md` section 18.
+
 ## Limits
 
 * The power table uses English plaintext. If the true plaintext is another language, abbreviated or

@@ -289,3 +289,23 @@ public key (not fetched; the network does not reach key servers).
 * **Limits:** a ciphertext autokey does not depend on the primer after its first m symbols, so it is not part of this test (the lag-k scan of section 4 covers it,
   unvalidated on a planted autokey). Conventions for turning an identifier into numbers are open-ended; only six were tried. Primers with unknown conventions, the
   full fingerprint, `skip_mode: resolve` with autokey (unsupported in the language), and key sources other than the plaintext are not covered.
+
+## 18. The two-character token tables on images 66-68 (`research_tokens`)
+Images 66, 67 and 68 (community pages 49-51) hold tables of two-character tokens, 8 per row, in a computer typeface (not runes): 256 tokens in all
+(page 66: 10 rows, 67: 13 rows, 68: 9 rows; pages 66 and 68 also carry a few rune lines, 66 and 92 runes). The Wikipedia reference list (Shamir's Secret
+Sharing, Diffie-Hellman, RSA, factorisation) is what prompted looking at them.
+* **Transcription** (`data/lp_derived/tokens_66_68.csv`, reproducible with `python -m lpswarm.research_tokens read`): the typeface renders each character as identical
+  pixels, so 515 connected components fall into 60 shape groups, each labelled by eye from one example. Every row came out as exactly 8 tokens and every token starts with a
+  digit 0-4, which is a check that no group was mislabelled in that position. Known judgement calls: capital I told from l by height, Q from O by a pixel difference, one
+  merged pair (0J) split by hand. Not checked against a second reader.
+* **Structure:** first character 0-4 (counts 60, 58, 65, 56, 17); second character a digit or letter. Read as base 62 in the order 0-9, A-Z, a-z, the value is
+  62 x first + second, **0 to 263**: the largest token is 4F = 263 and no token beyond it appears (the first-character-4 tokens only go up to F, as they should under
+  this order). 12 values exceed 255, so they are not bytes. Letters f, y and z never appear as a second character (about 1 absent expected by chance).
+* **Looks random:** 161 distinct tokens of 256 (164 expected for 256 draws from 264 values); values flat over 0-263 (eighths: 26, 36, 35, 30, 33, 31, 34, 31);
+  equal-pair counts at lags 1-128 at chance (max 4, p 0.56; lag 1 has 0 equal pairs, 1 expected); residues mod 2..64 at chance after the min-p correction (mod 29 alone p 0.04,
+  not corrected); no ordering inside rows.
+* **Pointer reading:** each value as an index into the runes of each page (base 0 or 1, forward or reversed): best IC x 29 = 1.28, against 1.33 (null best mean) for random
+  values. Nothing.
+* **Coincidence noted, not tested further:** page 69 has 263 runes and the largest token value is 263. Under the pointer reading above it gives nothing.
+* **Weight:** 256 uniform draws from 0-263 and no link to the rune text. If the tokens are a hint they are a number table whose use is not in our data (shares, a key stream, a
+  reference to something outside the book). The forum should be asked what 264 or 256 values could mean.
