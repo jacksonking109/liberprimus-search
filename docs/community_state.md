@@ -137,3 +137,14 @@ their numbers are the direction. Seek and you will be found. Good luck. 3301. Be
   the grey outline tree on image 72 less well (0.63; that one is an edge trace, a different rendering). The correlation alone is weak evidence (a generic bare tree against a clip-art silhouette gave 0.86-0.88),
   so the claim rests on the visual match, which is good but one reader's. The faint tree is low resolution, so a pixel-level match is not possible.
 * So the page-32 tree is probably the 2016 message's tree, which ties the 11 x 11 page (563 / 569 / 1136 numbers) to the 2016 hint about numbers. It does not say what the number is for.
+
+### The original 2016 image (`2016/01/4gq25.jpg` in the public archive repo rtkd/iddqd; fetched 2026-11-12, not committed here)
+* File: 26,342 bytes, SHA-256 `a8340ad04b83fb3130e7ed9172867a440812e87089d6aa2b932d97c6ae38aebe`, baseline JPEG, **563 x 569 pixels**, JFIF density unit 0 (1 x 1), quality 75, nothing after the end marker. That is the
+  same header fingerprint as our nine OutGuess payload pages (00-03, 08, 10-13), as expected for an OutGuess output.
+* **OutGuess with the default key (no key given) extracts a 1,136-byte file**: the clear-signed message above, with a signature made on 2016-01-01 00:01:07 UTC by RSA key `181F01E57A35090F`
+  (payload SHA-256 `fe89e77519dfaca998a257ed39c2861303029de2a49183db00eea0fda3a28010`). Keys `7A35090F`, `3301` and `cicada` extract nothing. The signature cannot be verified here (no public key).
+* **The numbers 563, 569 and 1136 are this image's width, height and payload length.** They are the hint numbers that page 49 (community page 32) carries: top row sums to 563, left column to 569, the
+  5 x 5 circumference to 1136 (chance of the 563 / 569 pair about 3e-5, `docs/avenues_explored.md` section 15). The page-49 tree is the faint tree in this image (below). So the 11 x 11 page points at this image.
+  Likely known to the forum; the origin of the "hint numbers" in our notes. It is the same pattern as 2012, where the image's prime dimensions (509 x 503) multiplied by 3301 gave the next address.
+* **Tree and a cicada:** enhancing the original shows, behind the text, the bare tree (bounding box x 206-349, y 314-465) and a faint **cicada with open wings** between the lines "road, and their numbers" and
+  "will be found" (the second figure I could not identify earlier). Original tree against the page-49 blurred tree: density-map correlation 0.97 (left-right flip 0.68, up-down flip 0.65), aspect ratio 0.95 against 0.93.
