@@ -126,3 +126,14 @@ indexed by the page numbers (the table is on community page 15), has not been te
 Status from the owner (2026-11-12): cicadasolvers.com reports the 15.jpg square as mathematically reconstructed (a prime-index recurrence of pseudo-Fibonacci form; also reconstructable by
 Zeckendorf's theorem), but **the page is not solved**: no rule for using the square is known. Our checks agree with the reconstruction (index list above) and add nothing on its use.
 Plain facts for image 32 (community page 15) from our table: 159 runes in 8 lines of 9, 21, 17, 22, 23, 23, 22, 22 runes; 20 red heading runes; 31 words; no Fibonacci pattern in line or word lengths.
+
+## The 2016 message and its background tree (owner's screenshot, 2026-11-12)
+Text of the message (white on black): "Hello. The path lies empty; epiphany seeks the devoted. Liber Primus is the way. Its words are the map, their meaning is the road, and
+their numbers are the direction. Seek and you will be found. Good luck. 3301. Beware false paths. Verify OpenPGP 7A35090F." The owner's note: everything Cicada has said is deliberate.
+* `7A35090F` is the short ID of the key that signed our OutGuess payloads (long ID 181F01E57A35090F), so the message and the payloads agree on the signer.
+* **Background tree:** behind the text, near-black on black, is a faint bare tree (trunk with a flared base, a left arm curving up, a central fork, a right branch rising and a lower right arm),
+  and a second faint figure near the top, between the lines "road, and their numbers" and "will be found" (wings or legs, not identified). Enhanced and compared with the trees in the book: the
+  2016 tree matches the **blurred dark tree on image 49 (community page 32, under the 11 x 11 block)** by eye (same trunk, same arm layout), density-map correlation 0.96 (left-right flipped copy 0.77); it matches
+  the grey outline tree on image 72 less well (0.63; that one is an edge trace, a different rendering). The correlation alone is weak evidence (a generic bare tree against a clip-art silhouette gave 0.86-0.88),
+  so the claim rests on the visual match, which is good but one reader's. The faint tree is low resolution, so a pixel-level match is not possible.
+* So the page-32 tree is probably the 2016 message's tree, which ties the 11 x 11 page (563 / 569 / 1136 numbers) to the 2016 hint about numbers. It does not say what the number is for.
