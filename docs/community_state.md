@@ -122,3 +122,7 @@ so this is a designed object, like page 05's grid and page 49's numbers.
 What it does not tell us: what the Fibonacci sequence is for. Earlier sweeps already tried Fibonacci as a key stream (scales, offsets, F-skip treatments, over all
 sections; sections 5 and 14 of `avenues_explored.md`) with no hit, but not tied to this page: a Fibonacci key that restarts at pages after image 32, or that is
 indexed by the page numbers (the table is on community page 15), has not been tested.
+
+Status from the owner (2026-11-12): cicadasolvers.com reports the 15.jpg square as mathematically reconstructed (a prime-index recurrence of pseudo-Fibonacci form; also reconstructable by
+Zeckendorf's theorem), but **the page is not solved**: no rule for using the square is known. Our checks agree with the reconstruction (index list above) and add nothing on its use.
+Plain facts for image 32 (community page 15) from our table: 159 runes in 8 lines of 9, 21, 17, 22, 23, 23, 22, 22 runes; 20 red heading runes; 31 words; no Fibonacci pattern in line or word lengths.
