@@ -148,3 +148,19 @@ their numbers are the direction. Seek and you will be found. Good luck. 3301. Be
   Likely known to the forum; the origin of the "hint numbers" in our notes. It is the same pattern as 2012, where the image's prime dimensions (509 x 503) multiplied by 3301 gave the next address.
 * **Tree and a cicada:** enhancing the original shows, behind the text, the bare tree (bounding box x 206-349, y 314-465) and a faint **cicada with open wings** between the lines "road, and their numbers" and
   "will be found" (the second figure I could not identify earlier). Original tree against the page-49 blurred tree: density-map correlation 0.97 (left-right flip 0.68, up-down flip 0.65), aspect ratio 0.95 against 0.93.
+
+### The public archive rtkd/iddqd: default-key OutGuess over the other Cicada images (2026-11-14)
+Cloned read-only (sparse). The repo holds the 2012-2016 puzzle images, the Liber Primus page images, a master transcription, and `lp_outguessed/` (OutGuess results over all 75 pages). Not committed here: any image.
+* **`lp_outguessed` agrees with our own OutGuess sweep exactly:** real payloads on pages 00, 01, 02, 03, 08, 10, 11, 12, 13; every other page either empty or the same 58,152-byte noise file (the false positive we also saw), page 04 7,524 bytes of noise.
+  So the nine-payload-page result stands independently.
+* Default-key (no key) OutGuess over the older images, run here:
+  | image | size | payload |
+  | --- | --- | --- |
+  | `2012/01/final.jpg` (SHA-256 `870353b8...1ead`) | 509 x 503 | 535 bytes of text: "Here is a book code. To find the book, and more information, go to http://www.reddit.com/r/a2e7j6ic78h0j/" and 76 numbers (the 2012 book code) |
+  | `2013/03/gematria-primus.jpg` (`d4736b09...eb35d`) | 598 x 842 | 1,443-byte PGP-signed message (signed 2013-01-04 by key `181F01E57A35090F`) whose body is spaces and tabs; space = 0, tab = 1, eight bits per character decodes to "Come to emiwp4muu2ktwknf.onion We shall await you there. Good luck. 3301" |
+  | `2016/01/4gq25.jpg` | 563 x 569 | 1,136-byte signed message (above) |
+  | 2012/03 (five images), `2012/01/m9sYK.jpg` | various | nothing (the Miami image gives 26,922 bytes of noise, entropy 7.99) |
+  This is a pipeline check on known steps: it recovers each public payload with the method we used on the Liber Primus pages.
+* **Pattern worth noting, not tested:** the 2012 image is 509 x 503 (both prime) and 509 x 503 x 3301 = 845145127 (the number in Cicada's PGP user ID, the 2012 address number). The 2016 image is 563 x 569 (both prime):
+  563 x 569 = 320,347 and 563 x 569 x 3301 = **1,057,465,447**. If the 2012 construction repeats, 1057465447 would be a key, address or index for the 2016 step. We cannot test it here (no network access to the
+  relevant hosts); the forum may already have tried it. The 2013 image (598 x 842) does not follow the pattern.
