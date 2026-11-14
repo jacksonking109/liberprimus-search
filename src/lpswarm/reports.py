@@ -1,0 +1,146 @@
+"""Report files for swarm and baseline runs (Markdown + JSON), rewritten after every
+target so an interrupted run still leaves its results on disk."""
+from __future__ import annotations
+
+import json
+import time
+from pathlib import Path
+
+from lpswarm.ledger import Ledger
+
+
+def default_report_dir(command: str) -> Path:
+    return Path("reports") / f"{command}-{time.strftime('%Y%m%d-%H%M%S')}"
+
+
+MIN_TARGET_SYMBOLS = 20     # shorter sections are skipped by swarm/baseline (--min-length)
+SHORT_TARGET_SYMBOLS = 100  # below this a lead says little: flagged in reports and SUMMARY
+
+
+def _cell(text) -> str:
+    """A table cell: no pipes or newlines."""
+    return str(text).replace("|", "/").replace("\n", " ")
+
+
+def short_note(symbols: int) -> str:
+    """'' for a normal-length target, else a caution for reports."""
+    if symbols >= SHORT_TARGET_SYMBOLS:
+        return ""
+    return (f"short section ({symbols} runes): many keys give plausible-looking text this short; "
+            "treat any lead with extra caution")
+
+
+def chance_text(chance: float | None) -> str:
+    """Plain reading of a lead's chance level (see FullOracle.chance_level)."""
+    if chance is None:
+        return ""
+    if chance >= 0.05:
+        return f"chance {chance:.2g}: noise level (pure noise does this well that often)"
+    if chance >= 0.01:
+        return f"chance {chance:.2g}: unusual, but not significant"
+    return f"chance {chance:.2g}: unlikely to be noise"
+
+
+def _chance(led: Ledger, oracle, target_id: str, row: dict, symbols: int) -> float | None:
+    if oracle is None or row.get("combined") is None:
+        return None
+    try:
+        info = led.target_info(target_id) or {}
+        breaks = json.loads(info["word_breaks"]) if info.get("word_breaks") else None
+        return oracle.chance_level(row["combined"], symbols, led.attempt_count(target_id),
+                                   breaks=breaks, variant=row.get("null_variant"))
+    except Exception:  # noqa: BLE001 - a report must never fail over this
+        return None
+
+
+def _confirmable(led: Ledger, oracle, target_id: str, symbols: int) -> bool:
+    """False if, at this many attempts, even a perfect decryption could not clear the
+    end-of-search (Bonferroni) threshold, so a silent miss would not be a negative result."""
+    if oracle is None:
+        return True
+    try:
+        n = max(1, led.attempt_count(target_id))
+        return bool(oracle.final_threshold(symbols, n)[1] < oracle._max_combined)
+    except Exception:  # noqa: BLE001
+        return True
+
+
+def target_entry(led: Ledger, target_id: str, label: str, symbols: int, *, stopped: str | None = None,
+                 stats: dict | None = None, top: int = 10, elapsed_s: float | None = None,
+                 oracle=None) -> dict:
+    leads = led.leads(target_id, include_near_miss=True, limit=top)
+    finals = [r for r in leads if r.get("passed_final")]
+    tried = led.tried(target_id)
+    return {
+        "label": label, "symbols": symbols, "short": bool(short_note(symbols)),
+        "confirmable": _confirmable(led, oracle, target_id, symbols),
+        "attempts": led.attempt_count(target_id),
+        "hypotheses": len(tried), "final_passes": len(finals), "stopped": stopped,
+        "elapsed_s": round(elapsed_s, 1) if elapsed_s is not None else None,
+        "generators": stats or {},
+        "leads": [{"final": bool(r.get("passed_final")), "verdict": r["verdict"],
+                   "family": r["cipher_family"], "key": r["key_preview"], "params": r["params_json"],
+                   "margin": round(r["combined"] - r["threshold"], 3), "by": r["proposer_model"],
+                   "chance": _chance(led, oracle, target_id, r, symbols),
+                   "plaintext": r["plaintext_preview"]} for r in leads],
+    }
+
+
+def write_run_report(out_dir: str | Path, title: str, command: str, entries: list[dict],
+                     extra_lines: list[str] | None = None) -> Path:
+    out = Path(out_dir)
+    out.mkdir(parents=True, exist_ok=True)
+    data = {"title": title, "command": command, "updated": time.strftime("%Y-%m-%d %H:%M:%S"),
+            "targets": entries}
+    (out / "report.json").write_text(json.dumps(data, indent=2, default=str), encoding="utf-8")
+    total_final = sum(e["final_passes"] for e in entries)
+    lines = [f"# {title}", "", f"Updated {data['updated']}. Command: `{command}`", "",
+             f"**{len(entries)} target(s), {total_final} final pass(es).** A FINAL lead survived "
+             "the end-of-search check (Bonferroni over every attempt on that target); read the "
+             "text before trusting it. A lead's *chance* is how many attempts at least this good "
+             "pure noise would produce among this target's attempts: about 1 or more is "
+             "noise level, whatever the margin or section length.", ""]
+    lines += list(extra_lines or [])
+    lines += ["| target | symbols | attempts | hypotheses | final passes | stopped |",
+              "| --- | ---: | ---: | ---: | ---: | --- |"]
+    for e in entries:
+        sym = f"{e['symbols']} (short)" if short_note(e["symbols"]) else e["symbols"]
+        lines.append(f"| {e['label']} | {sym} | {e['attempts']} | {e['hypotheses']} | "
+                     f"{e['final_passes']} | {e['stopped'] or ''} |")
+    for e in entries:
+        lines += ["", f"## {e['label']}", ""]
+        if short_note(e["symbols"]):
+            lines += [f"**Caution: {short_note(e['symbols'])}.**", ""]
+        if e.get("confirmable") is False:
+            lines += [f"**Search too large to confirm: with {e['attempts']} attempts on a text of "
+                      f"{e['symbols']} symbols, even a perfect decryption could not pass the "
+                      "end-of-search test, so finding nothing here proves nothing.**", ""]
+        if e["generators"]:
+            lines.append("| generator | proposals | invalid | attempts | passes | near misses | model errors |")
+            lines.append("| --- | ---: | ---: | ---: | ---: | ---: | ---: |")
+            for name, g in e["generators"].items():
+                lines.append(f"| {name} | {g.get('proposals', 0)} | {g.get('invalid', 0)} | "
+                             f"{g.get('attempts', 0)} | {g.get('passes', 0)} | "
+                             f"{g.get('near_misses', 0)} | {g.get('model_errors', 0)} |")
+            lines.append("")
+            for name, g in e["generators"].items():
+                rs = g.get("invalid_reasons") or {}
+                if not rs:
+                    continue
+                lines += [f"Invalid proposals by reason ({name}; reasons are grouped, the example is "
+                          "the first one seen):", "", "| count | reason | example |", "| ---: | --- | --- |"]
+                for reason, (cnt, ex) in sorted(rs.items(), key=lambda kv: -kv[1][0])[:8]:
+                    lines.append(f"| {cnt} | {_cell(reason)} | {_cell(ex)} |")
+                lines.append("")
+        if not e["leads"]:
+            lines.append("No passes or near misses: everything tried is recorded as ruled out.")
+            continue
+        for ld in e["leads"]:
+            tag = "**FINAL**" if ld["final"] else ld["verdict"]
+            ch = chance_text(ld.get("chance"))
+            lines.append(f"- {tag} ({ld['family']}, by {ld['by']}, margin {ld['margin']:+.2f}"
+                         + (f"; {ch}" if ch else "") + "): "
+                         f"`{ld['key']}` {ld['params'] if ld['params'] != '{}' else ''}")
+            lines.append(f"  `{ld['plaintext']}`")
+    (out / "report.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    return out / "report.md"

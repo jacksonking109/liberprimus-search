@@ -1,0 +1,147 @@
+# Phase 3 models config. Copy to config/models.toml and edit. No secrets ever go in this file.
+#
+# Model tags below are placeholders: confirm local tags with `ollama list`, and the
+# DeepSeek model id and prices against DeepSeek's own docs before use.
+#
+# API keys: put the NAME of an environment variable in api_key_env. The harness reads
+# it at call time and never stores or logs the value. A config containing `api_key`
+# is rejected.
+#   PowerShell (current session):  $env:DEEPSEEK_API_KEY = "..."
+#   PowerShell (persist for user): [Environment]::SetEnvironmentVariable("DEEPSEEK_API_KEY", "...", "User")
+#
+# Fields:
+#   provider    ollama | openai_compatible | command | scripted
+#   roles       any of "proposer" (proposes cipher programs), "weighting" (ranks
+#               proposals), "triage" (reserved)
+#   max_usd     spend cap per model, checked against logged spend before every call.
+#               It counts spend in one ledger: the --ledger of `lpswarm swarm`, or
+#               reports/model_spend.sqlite for `lpswarm tiertest`. A single call can
+#               overshoot by its own cost.
+#   price_in_per_mtok / price_out_per_mtok   USD per million tokens, used for cost
+#               tracking and max_usd. Leave 0 for local models. If you leave them 0
+#               for a paid API, max_usd cannot protect you.
+#   json_mode   ask the server for JSON output (Ollama `format: json`, OpenAI
+#               `response_format: json_object`)
+#   timeout     seconds per call
+#   think       Ollama only: false turns off hidden reasoning for thinking models (Qwen3);
+#               leave it out for models that don't think
+
+[models.deepseek]
+provider = "openai_compatible"
+endpoint = "https://api.deepseek.com"
+model = "deepseek-chat"            # placeholder; confirm
+api_key_env = "DEEPSEEK_API_KEY"
+roles = ["proposer"]
+max_usd = 10.0
+price_in_per_mtok = 0.0            # FILL IN from DeepSeek's pricing page (unattended runs refuse 0)
+price_out_per_mtok = 0.0           # FILL IN
+json_mode = true
+timeout = 180
+style = "volume"                   # brute-force style prompts (wide offset ranges)
+per_round = 16                     # proposals per round for this model
+# DeepSeek thinks by default and bills the hidden reasoning as output tokens: turn it off.
+# extra_body is sent as extra JSON fields with every request to this model.
+extra_body = { thinking = { type = "disabled" } }
+
+[models.qwen-local]
+provider = "ollama"
+endpoint = "http://localhost:11434"
+model = "qwen3:8b"                 # placeholder; confirm with `ollama list`
+roles = ["proposer"]
+json_mode = true
+timeout = 600
+options = { num_ctx = 16384 }      # context window; default 16384 if omitted
+think = false                      # Qwen3 is a thinking model: skip hidden reasoning
+style = "volume"                   # sweep offset ranges: cheap calls, many attempts
+
+[models.gemma-local]
+provider = "ollama"
+endpoint = "http://localhost:11434"
+model = "gemma3:12b"               # placeholder; confirm with `ollama list`
+roles = ["proposer"]
+json_mode = true
+timeout = 600
+style = "volume"
+
+# The ranker: always port 11435, which start_ollama.ps1 puts on the second GPU, or on the
+# CPU when there is only one GPU (slower, but it leaves the big GPU to the proposers).
+[models.granite]
+provider = "ollama"
+endpoint = "http://127.0.0.1:11435"
+model = "granite4:tiny-h"          # or granite3.3:2b
+roles = ["weighting", "triage"]
+json_mode = true
+timeout = 300
+
+# Offline dry run: no network, canned reply. Lets you check a whole run end to end.
+[models.dry]
+provider = "scripted"
+model = "dry"
+roles = ["proposer", "weighting"]
+replies = ['{"proposals": [{"spec": {"stream": {"kind": "sequence", "name": "primes"}, "combine": "sub"}, "why": "dry run"}]}']
+
+# ---- Subscription CLIs (use your plan, not API billing) ---------------------------
+# Runs the official, unmodified CLI signed in with your own account, as a chat model:
+# fresh empty temp folder per call, tools off (Claude Code) / read-only sandbox (Codex),
+# API-key env vars removed so calls always use the plan. The harness never reads or
+# stores the CLI's login. Sign in once in a terminal first (`claude`, `codex login`).
+#
+# Usage limits: the harness counts its own calls per rolling window and pauses at
+# max_calls_per_window; when the CLI reports a usage limit it pauses until the reset
+# (or a 30 min cool-down if no time is given). Your other use of the plan (chat, IDE)
+# shares the same real limit. The cap is checked live, so raising it takes effect on the
+# next call. Check status: lpswarm doctor (it shows the whole group's calls)
+#
+# All Claude models share ONE plan quota: quota_group makes their calls count together
+# and a usage limit hit by any of them pauses all. max_calls_per_window is the shared
+# total (set the same on every member); model_max_calls_per_window caps one model's share
+# of it. Below: Opus proposer 60, the supervisor 100 (check-ins plus a brief per Sonnet
+# section), Sonnet the rest. Raise them freely: edits apply to a running run.
+# [models.claude-opus]
+# provider = "claude_code"
+# model = "opus"
+# roles = ["proposer"]
+# quota_group = "claude-plan"
+# max_calls_per_window = 250
+# model_max_calls_per_window = 60
+# window_hours = 5
+#
+# [models.claude-sonnet]
+# provider = "claude_code"
+# model = "sonnet"                  # Claude Code's alias for the current Sonnet
+# roles = ["proposer"]
+# quota_group = "claude-plan"
+# max_calls_per_window = 250
+# window_hours = 5
+# style = "exploratory"
+# per_round = 12                    # more proposals per call = fewer Claude calls
+#
+# Supervisor for `lpswarm overnight` (answers with menu actions only; tools stay off).
+# [models.claude-supervisor]
+# provider = "claude_code"
+# model = "opus"
+# roles = ["supervisor"]
+# quota_group = "claude-plan"
+# max_calls_per_window = 250
+# model_max_calls_per_window = 100
+# window_hours = 5
+#
+# Codex on your ChatGPT plan: the explorer.
+# [models.codex]
+# provider = "codex"
+# model = "default"                # or a model name accepted by `codex -m`
+# roles = ["proposer"]
+# quota_group = "codex-plan"
+# max_calls_per_window = 90
+# window_hours = 5
+# style = "exploratory"
+# per_round = 16                    # Codex has more quota headroom than Claude
+# timeout = 600
+
+# Any other CLI that reads a prompt on stdin and prints the reply (no isolation,
+# no usage tracking; prefer the providers above for Claude Code and Codex).
+# [models.other-cli]
+# provider = "command"
+# model = "other-cli"
+# command = ["some-cli", "--flag"]
+# roles = ["proposer"]

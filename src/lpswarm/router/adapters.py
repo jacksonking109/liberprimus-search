@@ -1,0 +1,209 @@
+"""Model adapters. The ONLY module in lpswarm that opens network connections.
+
+- OllamaAdapter:            local models (Qwen, Gemma, Granite) via Ollama's /api/chat.
+- OpenAICompatibleAdapter:  hosted chat-completions APIs (DeepSeek). The API key is
+                            read from the environment variable named in the config,
+                            at call time, and is never stored, logged or echoed.
+- CommandAdapter:           any CLI that reads a prompt on stdin and prints a reply.
+- ScriptedAdapter:          canned replies, for tests and dry runs.
+
+Errors never include request headers.
+"""
+from __future__ import annotations
+
+import json
+import os
+import shutil
+import subprocess
+import time
+import urllib.error
+import urllib.parse
+import urllib.request
+from dataclasses import dataclass, field
+from typing import Callable, Sequence
+
+Message = dict  # {"role": "system"|"user"|"assistant", "content": str}
+
+
+class AdapterError(RuntimeError):
+    """`transient` errors (timeouts, connection problems, 408/429/5xx) may be retried."""
+
+    def __init__(self, msg: str, transient: bool = False):
+        super().__init__(msg)
+        self.transient = transient
+
+
+@dataclass
+class Completion:
+    text: str
+    model: str
+    tokens_in: int = 0
+    tokens_out: int = 0
+    usd: float = 0.0
+    latency_s: float = 0.0
+    raw: dict = field(default_factory=dict, repr=False)
+
+
+def _post_json(url: str, body: dict, headers: dict[str, str], timeout: float,
+               secret: str | None = None) -> dict:
+    data = json.dumps(body).encode("utf-8")
+    req = urllib.request.Request(url, data=data, method="POST",
+                                 headers={"Content-Type": "application/json", **headers})
+    try:
+        with _opener(url).open(req, timeout=timeout) as resp:
+            return json.loads(resp.read().decode("utf-8"))
+    except urllib.error.HTTPError as exc:
+        detail = ""
+        try:
+            detail = exc.read().decode("utf-8", errors="replace")[:300]
+        except Exception:  # noqa: BLE001
+            pass
+        if secret:
+            detail = detail.replace(secret, "[redacted]")
+        transient = exc.code in (408, 429) or exc.code >= 500
+        raise AdapterError(f"HTTP {exc.code} from {url}: {detail}", transient) from None
+    except (urllib.error.URLError, TimeoutError, OSError) as exc:
+        raise AdapterError(f"cannot reach {url}: {getattr(exc, 'reason', exc)}", True) from None
+    except json.JSONDecodeError:
+        raise AdapterError(f"non-JSON reply from {url}") from None
+
+
+def _opener(url: str):
+    host = (urllib.parse.urlsplit(url).hostname or "").lower()
+    # Never send local model traffic (Ollama) through a system HTTP proxy.
+    if host in ("localhost", "127.0.0.1", "::1"):
+        return urllib.request.build_opener(urllib.request.ProxyHandler({}))
+    return urllib.request.build_opener()
+
+
+def ollama_tags(endpoint: str, timeout: float = 5.0) -> list[str]:
+    """Names of the models an Ollama server has pulled (GET /api/tags)."""
+    url = endpoint.rstrip("/") + "/api/tags"
+    try:
+        with _opener(url).open(urllib.request.Request(url, method="GET"), timeout=timeout) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+    except urllib.error.HTTPError as exc:
+        raise AdapterError(f"HTTP {exc.code} from {url}") from None
+    except (urllib.error.URLError, TimeoutError, OSError) as exc:
+        raise AdapterError(f"cannot reach {url}: {getattr(exc, 'reason', exc)}", True) from None
+    except json.JSONDecodeError:
+        raise AdapterError(f"non-JSON reply from {url}") from None
+    return [m.get("name") or m.get("model") for m in data.get("models", []) if isinstance(m, dict)]
+
+
+class OllamaAdapter:
+    def __init__(self, model: str, endpoint: str = "http://localhost:11434", timeout: float = 300,
+                 json_mode: bool = False, options: dict | None = None, think: bool | None = None):
+        self.model, self.endpoint, self.timeout = model, endpoint.rstrip("/"), timeout
+        # Thinking models (e.g. Qwen3) spend output tokens on hidden reasoning; think=False
+        # asks Ollama to skip it. None leaves the model's default (sent only when configured).
+        self.think = think
+        # Ollama's default context window can silently cut long prompts (long sections
+        # plus history); ask for a larger one unless the config sets num_ctx.
+        self.json_mode, self.options = json_mode, {"num_ctx": 16384, **(options or {})}
+
+    def complete(self, messages: Sequence[Message], temperature: float = 0.7,
+                 max_tokens: int = 2048, schema: dict | None = None) -> Completion:
+        body = {"model": self.model, "messages": list(messages), "stream": False,
+                "options": {"temperature": temperature, "num_predict": max_tokens, **self.options}}
+        if self.think is not None:
+            body["think"] = bool(self.think)
+        if schema is not None:
+            body["format"] = schema       # structured output: reply must match the JSON schema
+        elif self.json_mode:
+            body["format"] = "json"
+        t0 = time.monotonic()
+        r = _post_json(f"{self.endpoint}/api/chat", body, {}, self.timeout)
+        text = (r.get("message") or {}).get("content", "")
+        return Completion(text, self.model, int(r.get("prompt_eval_count") or 0),
+                          int(r.get("eval_count") or 0), 0.0, time.monotonic() - t0, r)
+
+
+class OpenAICompatibleAdapter:
+    def __init__(self, model: str, endpoint: str, api_key_env: str | None, timeout: float = 120,
+                 price_in_per_mtok: float = 0.0, price_out_per_mtok: float = 0.0,
+                 json_mode: bool = False, extra_body: dict | None = None):
+        self.model, self.endpoint, self.timeout = model, endpoint.rstrip("/"), timeout
+        # Extra JSON fields sent with every request, e.g. DeepSeek's
+        # {"thinking": {"type": "disabled"}}. The core fields cannot be overridden.
+        bad = set(extra_body or {}) & {"model", "messages", "stream", "max_tokens", "temperature"}
+        if bad:
+            raise ValueError(f"extra_body cannot set {sorted(bad)}")
+        self.extra_body = dict(extra_body or {})
+        self.api_key_env = api_key_env
+        self.price_in, self.price_out = price_in_per_mtok, price_out_per_mtok
+        self.json_mode = json_mode
+
+    def _key(self) -> str:
+        if not self.api_key_env:
+            raise AdapterError("no api_key_env configured for this model")
+        key = os.environ.get(self.api_key_env)
+        if not key:
+            raise AdapterError(f"environment variable {self.api_key_env} is not set")
+        return key
+
+    def complete(self, messages: Sequence[Message], temperature: float = 0.7,
+                 max_tokens: int = 2048, schema: dict | None = None) -> Completion:
+        body = {"model": self.model, "messages": list(messages), "temperature": temperature,
+                "max_tokens": max_tokens, "stream": False}
+        if self.json_mode or schema is not None:
+            body["response_format"] = {"type": "json_object"}
+        body.update(self.extra_body)
+        url = self.endpoint + ("/chat/completions" if not self.endpoint.endswith("/chat/completions")
+                               else "")
+        t0 = time.monotonic()
+        key = self._key()
+        r = _post_json(url, body, {"Authorization": f"Bearer {key}"}, self.timeout, secret=key)
+        try:
+            text = r["choices"][0]["message"]["content"] or ""
+        except (KeyError, IndexError, TypeError):
+            raise AdapterError("unexpected reply shape (no choices[0].message.content)") from None
+        u = r.get("usage") or {}
+        tin, tout = int(u.get("prompt_tokens") or 0), int(u.get("completion_tokens") or 0)
+        usd = tin / 1e6 * self.price_in + tout / 1e6 * self.price_out
+        return Completion(text, self.model, tin, tout, usd, time.monotonic() - t0, r)
+
+
+class CommandAdapter:
+    """Runs `command` (a list, no shell), writes the prompt to stdin, reads stdout."""
+
+    def __init__(self, model: str, command: Sequence[str], timeout: float = 600):
+        if not command:
+            raise AdapterError("command adapter needs a non-empty command list")
+        exe = shutil.which(command[0]) or command[0]  # resolves .cmd/.exe on Windows
+        self.command = [exe, *command[1:]]
+        self.model, self.timeout = model, timeout
+
+    def complete(self, messages: Sequence[Message], temperature: float = 0.7,
+                 max_tokens: int = 2048) -> Completion:
+        prompt = "\n\n".join(f"[{m['role']}]\n{m['content']}" for m in messages)
+        t0 = time.monotonic()
+        try:
+            r = subprocess.run(self.command, input=prompt, capture_output=True, text=True,
+                               encoding="utf-8", errors="replace", timeout=self.timeout)
+        except FileNotFoundError:
+            raise AdapterError(f"command not found: {self.command[0]}") from None
+        except subprocess.TimeoutExpired:
+            raise AdapterError(f"command timed out after {self.timeout}s") from None
+        if r.returncode != 0:
+            raise AdapterError(f"command exited {r.returncode}: {r.stderr[:300]}")
+        return Completion(r.stdout, self.model, 0, 0, 0.0, time.monotonic() - t0)
+
+
+class ScriptedAdapter:
+    """Replies from a list (cycled) or a callable(messages) -> str. Optional fake usage."""
+
+    def __init__(self, model: str, replies: Sequence[str] | Callable[[Sequence[Message]], str],
+                 usd_per_call: float = 0.0, tokens: tuple[int, int] = (0, 0)):
+        self.model, self.replies = model, replies
+        self.usd_per_call, self.tokens = usd_per_call, tokens
+        self.calls: list[list[Message]] = []
+
+    def complete(self, messages: Sequence[Message], temperature: float = 0.7,
+                 max_tokens: int = 2048) -> Completion:
+        self.calls.append(list(messages))
+        if callable(self.replies):
+            text = self.replies(messages)
+        else:
+            text = self.replies[(len(self.calls) - 1) % len(self.replies)]
+        return Completion(text, self.model, self.tokens[0], self.tokens[1], self.usd_per_call)

@@ -1,0 +1,163 @@
+-- lpswarm ledger schema (SQLite). Negative results are first-class data.
+PRAGMA foreign_keys = ON;
+
+CREATE TABLE IF NOT EXISTS corpus_item (
+    id INTEGER PRIMARY KEY,
+    work TEXT NOT NULL,
+    author TEXT,
+    edition TEXT,
+    translation TEXT,
+    page_line_structure TEXT,
+    source_url TEXT,
+    confidence_tag TEXT NOT NULL DEFAULT 'speculative'
+        CHECK (confidence_tag IN ('confirmed', 'inferred', 'speculative')),
+    ring INTEGER NOT NULL DEFAULT 3 CHECK (ring BETWEEN 0 AND 3),
+    content_hash TEXT UNIQUE,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+-- A ciphertext under attack (real page range or a synthetic case).
+CREATE TABLE IF NOT EXISTS target (
+    id TEXT PRIMARY KEY,               -- sha256 of alphabet + ciphertext (+ word breaks if used)
+    label TEXT NOT NULL,
+    alphabet TEXT NOT NULL,
+    length INTEGER NOT NULL,
+    page_range TEXT,
+    is_synthetic INTEGER NOT NULL DEFAULT 0,
+    word_breaks TEXT,                  -- JSON list of word-start indices, NULL if not used
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS hypothesis (
+    id INTEGER PRIMARY KEY,
+    cipher_family TEXT NOT NULL,
+    description TEXT NOT NULL,
+    proposer_model TEXT NOT NULL,      -- 'human' / 'baseline' in Phase 1
+    proposer_role TEXT NOT NULL,
+    parent_id INTEGER REFERENCES hypothesis(id),
+    status TEXT NOT NULL DEFAULT 'open'
+        CHECK (status IN ('open', 'running', 'ruled_out', 'lead', 'confirmed', 'abandoned')),
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS key_candidate (
+    id INTEGER PRIMARY KEY,
+    corpus_item_id INTEGER REFERENCES corpus_item(id),
+    derivation TEXT NOT NULL,          -- e.g. 'wordlist:<name>', 'enumerate', 'synthetic'
+    value_hash TEXT NOT NULL,          -- sha256(family, key); same key from two sources = two rows
+    value_preview TEXT,
+    value_json TEXT,                   -- full key as canonical JSON when small enough
+    edition_id TEXT,
+    UNIQUE (value_hash, derivation)
+);
+
+CREATE TABLE IF NOT EXISTS attempt (
+    id INTEGER PRIMARY KEY,
+    hypothesis_id INTEGER NOT NULL REFERENCES hypothesis(id),
+    key_candidate_id INTEGER NOT NULL REFERENCES key_candidate(id),
+    target_id TEXT NOT NULL REFERENCES target(id),
+    cipher_family TEXT NOT NULL,
+    params_json TEXT NOT NULL,
+    page_range TEXT,
+    executor_version TEXT NOT NULL,
+    runtime_ms REAL,
+    cost_usd REAL NOT NULL DEFAULT 0,
+    dedupe_hash TEXT NOT NULL UNIQUE,  -- sha256(target, family, params, key value_hash)
+    output_hash TEXT,                  -- sha256 of the decryption: equal keys share it
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS attempt_target ON attempt(target_id);
+CREATE INDEX IF NOT EXISTS attempt_output ON attempt(target_id, output_hash);
+CREATE INDEX IF NOT EXISTS attempt_hyp ON attempt(hypothesis_id);
+
+CREATE TABLE IF NOT EXISTS result (
+    attempt_id INTEGER PRIMARY KEY REFERENCES attempt(id),
+    stage TEXT NOT NULL,               -- 'screen' or 'full'
+    verdict TEXT NOT NULL,             -- 'fail' / 'near_miss' / 'pass'
+    ic REAL,
+    ngram_score REAL,
+    dict_score REAL,
+    lm_loglik REAL,
+    combined REAL,
+    screen_score REAL,
+    threshold REAL,
+    null_percentile REAL,
+    passed INTEGER NOT NULL,
+    attempt_count_at_scoring INTEGER NOT NULL,
+    alpha_eff REAL NOT NULL,
+    unreachable INTEGER NOT NULL DEFAULT 0,  -- threshold above the best possible score
+    word_score REAL,                   -- share of symbols in dictionary words (with breaks)
+    null_variant TEXT,                 -- null calibration used (e.g. skip resolution), NULL = standard
+    plaintext_preview TEXT
+);
+CREATE INDEX IF NOT EXISTS result_verdict ON result(verdict);
+
+-- Order-independent final decision: every in-run pass re-scored against the
+-- total number of attempts on its target (Bonferroni over the whole search).
+CREATE TABLE IF NOT EXISTS final_check (
+    attempt_id INTEGER PRIMARY KEY REFERENCES attempt(id),
+    attempt_count_final INTEGER NOT NULL,
+    alpha_eff_final REAL NOT NULL,
+    threshold_final REAL NOT NULL,
+    passed_final INTEGER NOT NULL,
+    checked_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+-- Lean sweeps (huge expansions): failed attempts are only counted, not stored row by row.
+-- Passes and near misses of such a sweep are stored as ordinary attempts. The counts below are
+-- part of the target's attempt total (Bonferroni N), and `sweep_id` lets a finished sweep be
+-- skipped whole when the same proposal comes up again.
+CREATE TABLE IF NOT EXISTS sweep_summary (
+    id INTEGER PRIMARY KEY,
+    target_id TEXT NOT NULL REFERENCES target(id),
+    hypothesis_id INTEGER NOT NULL REFERENCES hypothesis(id),
+    family TEXT NOT NULL,
+    sweep_id TEXT NOT NULL,            -- hash of the proposal (spec) that was swept
+    attempts INTEGER NOT NULL,         -- attempts counted but not stored (failures)
+    screened INTEGER NOT NULL DEFAULT 0,
+    best_margin REAL,                  -- best (combined - threshold) among them
+    complete INTEGER NOT NULL DEFAULT 0,
+    -- checkpoint (added later; NULL in older rows = unknown): the proposal, the order it was
+    -- expanded in, and how far the enumeration got, so the completed prefix can be reconstructed
+    spec_json TEXT,                    -- canonical compiled spec of the proposal (the template)
+    expansion_version INTEGER,         -- version of the deterministic expansion order
+    text_length INTEGER,               -- text length used when expanding (decimation depends on it)
+    requested INTEGER,                 -- upper bound on the number of expanded ciphers
+    cursor INTEGER,                    -- expanded ciphers fully processed, in expansion order
+    equivalent INTEGER,                -- of those, skipped as the same decryption as an earlier one
+    stop_reason TEXT,                  -- exhausted | max_attempts | timeout | stop_file | stop_event
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    UNIQUE (target_id, sweep_id)
+);
+
+-- What a run was evaluated with: one row per swarm/baseline invocation on this ledger. Never
+-- holds credentials, prompts or configuration files; absent in older ledgers (= unknown).
+CREATE TABLE IF NOT EXISTS run_meta (
+    id INTEGER PRIMARY KEY,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    config_hash TEXT NOT NULL,         -- sha256 of the canonical oracle configuration
+    meta_json TEXT NOT NULL
+);
+
+-- Usage limits hit by subscription CLIs; a model is paused until resume_at.
+CREATE TABLE IF NOT EXISTS rate_limit_event (
+    id INTEGER PRIMARY KEY,
+    model TEXT NOT NULL,
+    hit_at REAL NOT NULL,              -- epoch seconds
+    resume_at REAL NOT NULL,           -- epoch seconds
+    source TEXT NOT NULL,              -- 'reply' (CLI said so) or 'window' (local call cap)
+    parsed INTEGER NOT NULL DEFAULT 0, -- 1 if the reset time came from the CLI's message
+    message TEXT
+);
+CREATE INDEX IF NOT EXISTS rate_limit_model ON rate_limit_event(model, resume_at);
+
+CREATE TABLE IF NOT EXISTS budget_event (
+    id INTEGER PRIMARY KEY,
+    vendor TEXT NOT NULL,
+    model TEXT NOT NULL,
+    tokens_in INTEGER NOT NULL DEFAULT 0,
+    tokens_out INTEGER NOT NULL DEFAULT 0,
+    usd REAL NOT NULL DEFAULT 0,
+    task_id TEXT,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);

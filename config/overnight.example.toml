@@ -1,0 +1,127 @@
+# Unattended queue for `lpswarm overnight` (copy to config/overnight.toml and edit).
+# Re-running the same command resumes an unfinished run. Create a file named STOP in the
+# repo folder to stop cleanly. Results: reports/overnight/<run>/SUMMARY.md (and, with
+# publish = true, the `results` branch on GitHub).
+
+[overnight]
+models = "config/models.toml"
+spend_ledger = "reports/model_spend.sqlite"   # shared call/spend counts and usage pauses
+supervisor = "claude-supervisor"              # a model with roles = ["supervisor"]; "" to disable
+tick_minutes = 120                            # supervisor check-ins (also after jobs, see below)
+min_checkin_minutes = 30                      # after-job check-ins at least this far apart
+# Models the supervisor may put in jobs it adds: it plans, cheaper models do the volume.
+supervisor_generators = ["codex", "claude-sonnet", "qwen-local", "gemma-local"]
+publish = true                                # push report files to the `results` branch
+results_branch = "results"
+max_added_jobs = 5                            # cap on jobs the supervisor may add per run
+min_free_gb = 15                              # no new jobs below this much free disk; the run stops
+                                              # cleanly (resumable) below a third of it. See: lpswarm disk
+max_parallel = 4                              # jobs at once; only jobs on different backends
+                                              # (Claude plan, Codex plan, each GPU, an API) run
+                                              # side by side, others wait in queue order
+capacity = { "codex-plan" = 2 }               # jobs allowed on one backend at once (default 1):
+                                              # two Codex sections at a time
+# until = "08:30"                             # optional stop time (HH:MM, local)
+
+# Each job can also set lane = "name": jobs with the same lane never run at the same time.
+#
+# 1. Tier test with Claude Code on your plan (paced by the claude-plan quota; pauses at limits).
+#    The Sonnet lane below waits for it (same Claude quota); Codex and local run alongside.
+[[job]]
+id = "tier-claude"
+kind = "tiertest"
+args = ["--arms", "random_program:40,claude-opus,claude-sonnet", "--lengths", "80,160",
+        "--cases", "3", "--word-breaks"]
+note = "Claude Code proposers vs the random control"
+
+# 2-4. Unsolved sections in three lanes that run side by side, each starting on a different
+# section (order = forward / reverse / middle). One sub-job per section; sections under 20
+# runes are skipped.
+#
+# Sonnet lane: before each section, the supervisor model (Opus) writes a brief from what
+# has been tried on that section so far (auto_brief), and Sonnet proposes from it.
+[[job]]
+id = "sonnet"
+kind = "swarm"
+auto_brief = true
+order = "forward"
+args = ["--manifest", "data/lp/manifest.json", "--alphabet", "data/alphabet/gematria_primus.json",
+        "--sections", "unsolved", "--generators", "claude-sonnet", "--rounds", "6",
+        "--per-round", "8", "--max-attempts", "60000"]
+note = "Sonnet, briefed by Opus"
+
+# Codex lane (its own plan quota). Before each section the supervisor (Opus) writes the brief,
+# exactly as for Sonnet, from the digest of every lane's best leads on that section (Codex's own
+# earlier sections included). refine_brief = "codex" then lets Codex tune that brief for itself
+# (concrete parameters, up to 3 labelled extras) without altering or overriding Opus's text.
+# Remove refine_brief to skip that Codex call; set auto_brief = "codex" (and no refine_brief)
+# to have Codex brief itself from the same digest and save the Claude quota.
+[[job]]
+id = "codex"
+kind = "swarm"
+auto_brief = true
+refine_brief = "codex"      # Codex tunes Opus's brief for itself (one extra Codex call per section);
+                            # Opus's directions stay in force and take precedence
+order = "reverse"
+args = ["--manifest", "data/lp/manifest.json", "--alphabet", "data/alphabet/gematria_primus.json",
+        "--sections", "unsolved", "--generators", "codex", "--rounds", "6",
+        "--per-round", "8", "--max-attempts", "60000"]
+note = "Codex (exploratory)"
+
+# Local lane (5060 Ti; qwen and gemma take turns on the one GPU). Granite orders each
+# round's proposals from port 11435 (the second GPU, or the CPU until there is one).
+[[job]]
+id = "local"
+kind = "swarm"
+order = "middle"
+args = ["--manifest", "data/lp/manifest.json", "--alphabet", "data/alphabet/gematria_primus.json",
+        "--sections", "unsolved", "--generators", "qwen-local,gemma-local", "--ranker", "granite",
+        "--rounds", "6", "--per-round", "8", "--max-attempts", "60000"]
+note = "local models"
+
+# Structure lane (Codex): two-stage programs, a transposition first and then a substitution, on
+# the sections whose lengths factor neatly (729 = 27x27, 693 = 7x9x11, 333 = 9x37, 1729 = 7x13x19,
+# 1021, 1433, 534). Sweeps the grid width / rail count / step in one proposal.
+[[job]]
+id = "structure"
+kind = "swarm"
+order = "forward"
+brief = """Two-stage programs: a transposition, then a substitution. Use the transpose field: grid widths (try the factors of the section length and their neighbours, e.g. 27 for 729, 7/9/11/63/77/99 for 693, 9/37 for 333, 7/13/19/91/133 for 1729) with every read order (columns, columns_reversed, boustrophedon_rows, boustrophedon_columns, diagonal, spiral_in, spiral_out, rows_reversed), railfence with transpose_range [2, 40], and decimate with transpose_range [2, 400]. Put transpose_range sweeps in the proposal instead of single widths. After the transposition use a short substitution sweep: constant shifts 0-28 with sub/add, and prime or p-1 streams with offset_range. Each proposal should expand to hundreds of ciphers."""
+args = ["--manifest", "data/lp/manifest.json", "--alphabet", "data/alphabet/gematria_primus.json",
+        "--sections", "10,12,13,14,17,18,24", "--generators", "codex", "--rounds", "6",
+        "--per-round", "12", "--max-attempts", "300000"]
+note = "Codex: transposition then substitution"
+
+# Exhaustive lane (Codex): every periodic key of length 1-4 on the short sections, where it is
+# affordable (29^4 is about 700,000 ciphers, a few minutes and ~700 MB of ledger per section).
+[[job]]
+id = "exhaustive"
+kind = "swarm"
+order = "forward"
+brief = """Use exhaustive repeat streams: {"kind": "repeat", "exhaustive": true, "key_length": m}. Propose m = 1, 2, 3 and 4 (one proposal each) with combine "sub" and with "beaufort" (sub and add cover the same keys, so do not send both). Add a second family per length: the same with "reverse_text": true, and with "map": "reverse". No other proposals are needed."""
+args = ["--manifest", "data/lp/manifest.json", "--alphabet", "data/alphabet/gematria_primus.json",
+        "--sections", "11,19,21,25", "--generators", "codex", "--rounds", "2",
+        "--per-round", "12", "--max-attempts", "5000000"]
+note = "Codex: every periodic key up to length 4"
+
+# Transmute lane (Codex): neighbour sums/products, running sums, Hill blocks and block orders.
+# Cheap in code (the 2x2 Hill sweep is ~680,000 ciphers, a couple of minutes, and runs lean so it
+# leaves almost no ledger). Every unsolved section.
+[[job]]
+id = "transmute"
+kind = "swarm"
+order = "reverse"
+brief = """Use the mix stage (a transformation that combines a rune with its neighbours, or works on small groups). One proposal each, in this order: (1) {"kind": "hill", "size": 2, "exhaustive": true} with a constant 0 stream and combine sub; then the same with reverse_text true. (2) {"kind": "block_perm", "size": g, "exhaustive": true} for g = 2, 3, 4, 5, 6 (constant 0 stream). (3) neighbor mixes with a constant 0 stream: op add, sub, rsub, mul, div, rdiv; lag 1 to 8; dir next and prev; once with reset "none" and once with reset "word"; also "times": 2. (4) chain mixes: op add, sub, rsub, mul, div; lag 1 to 4; dir prev and next; reset none and word. (5) window sums of size 2 to 8. (6) the best families again with "at": "after" and with a prime or p-1 stream (offset_range [0, 200]) as the key. Keep each proposal small enough that it expands to a few thousand ciphers, except the exhaustive ones. Do not send equivalent proposals (neighbor sub lag 1 prev equals a ciphertext autokey; chain sub lag 1 prev equals a plaintext autokey)."""
+args = ["--manifest", "data/lp/manifest.json", "--alphabet", "data/alphabet/gematria_primus.json",
+        "--sections", "unsolved", "--generators", "codex", "--rounds", "6",
+        "--per-round", "12", "--max-attempts", "5000000"]
+note = "Codex: neighbour mixes, running sums, Hill blocks, block orders"
+
+# 5. DeepSeek brute force: refused until its prices and DEEPSEEK_API_KEY are set.
+[[job]]
+id = "deepseek"
+kind = "swarm"
+args = ["--manifest", "data/lp/manifest.json", "--alphabet", "data/alphabet/gematria_primus.json",
+        "--sections", "unsolved", "--generators", "deepseek", "--rounds", "6",
+        "--per-round", "16", "--max-attempts", "60000"]
+note = "DeepSeek (volume)"

@@ -1,0 +1,140 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  tests:
+    name: tests (${{ matrix.os }}, py${{ matrix.python }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            python: "3.11"
+          - os: ubuntu-latest
+            python: "3.13"
+          - os: ubuntu-latest
+            python: "3.14"
+          - os: windows-latest
+            python: "3.12"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install
+        run: python -m pip install -e ".[dev]"
+      - name: Tests
+        run: python -m pytest -q
+
+  windows-scripts:
+    name: PowerShell scripts (Windows)
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Parse scripts with Windows PowerShell 5.1
+        shell: powershell
+        run: |
+          $bad = 0
+          foreach ($f in Get-ChildItem scripts\*.ps1) {
+            $tokens = $null; $errors = $null
+            [void][System.Management.Automation.Language.Parser]::ParseFile($f.FullName, [ref]$tokens, [ref]$errors)
+            foreach ($e in $errors) { Write-Host "$($f.Name):$($e.Extent.StartLineNumber): $($e.Message)"; $bad++ }
+          }
+          if ($bad) { exit 1 } else { Write-Host "all scripts parse (5.1)" }
+      - name: Parse scripts with PowerShell 7
+        shell: pwsh
+        run: |
+          $bad = 0
+          foreach ($f in Get-ChildItem scripts/*.ps1) {
+            $tokens = $null; $errors = $null
+            [void][System.Management.Automation.Language.Parser]::ParseFile($f.FullName, [ref]$tokens, [ref]$errors)
+            foreach ($e in $errors) { Write-Host "$($f.Name):$($e.Extent.StartLineNumber): $($e.Message)"; $bad++ }
+          }
+          if ($bad) { exit 1 } else { Write-Host "all scripts parse (7)" }
+      - name: Run setup_windows.ps1 without models (Windows PowerShell 5.1)
+        shell: powershell
+        run: |
+          powershell -NoProfile -ExecutionPolicy Bypass -File scripts\setup_windows.ps1 -SkipModels -SkipTests
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Get-Content config\models.toml
+          .\.venv\Scripts\lpswarm.exe doctor --models config\models.toml
+          if (-not (Test-Path reports\dry\tiertest.md)) { Write-Host "dry run report missing"; exit 1 }
+      - name: Overnight queue with a scripted supervisor (no publish)
+        shell: powershell
+        run: |
+          @'
+          [models.sup]
+          provider = "scripted"
+          model = "sup"
+          roles = ["supervisor"]
+          replies = ['{"actions": [{"type": "note", "text": "ci tick"}]}']
+          '@ | Set-Content -Encoding ascii config\ci_models.toml
+          @'
+          [overnight]
+          models = "config/ci_models.toml"
+          supervisor = "sup"
+          publish = false
+          min_free_gb = 0
+          [[job]]
+          id = "sw"
+          kind = "swarm"
+          args = ["--manifest", "data/lp/manifest.json", "--alphabet", "data/alphabet/gematria_primus.json", "--sections", "9", "--generators", "random_program", "--rounds", "1", "--null-samples", "200"]
+          '@ | Set-Content -Encoding ascii config\ci_overnight.toml
+          .\.venv\Scripts\lpswarm.exe overnight --config config\ci_overnight.toml --no-publish
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $sum = Get-ChildItem reports\overnight -Recurse -Filter SUMMARY.md | Select-Object -First 1
+          Get-Content $sum.FullName
+          if (-not (Select-String -Path $sum.FullName -Pattern "ci tick" -Quiet)) { Write-Host "supervisor note missing"; exit 1 }
+      - name: start_ollama.ps1 -Stop runs cleanly without Ollama
+        shell: powershell
+        run: |
+          powershell -NoProfile -ExecutionPolicy Bypass -File scripts\start_ollama.ps1 -Stop
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: start_ollama.ps1 with fake GPUs (ranker on CPU, then re-detect a second GPU)
+        shell: powershell
+        run: |
+          $fake = Join-Path $env:RUNNER_TEMP "fakebin"
+          New-Item -ItemType Directory -Force $fake | Out-Null
+          Set-Content "$fake\nvidia-smi.cmd" "@echo off`r`ntype `"%FAKE_GPUS%`"" -Encoding ascii
+          Set-Content "$fake\fake_ollama.py" -Encoding ascii -Value @'
+          import os, http.server, socketserver
+          host, port = os.environ["OLLAMA_HOST"].split(":")
+          with open(os.path.join(os.environ["FAKE_OUT"], "cuda-%s.txt" % port), "w") as f:
+              f.write(os.environ.get("CUDA_VISIBLE_DEVICES", "<unset>"))
+          class H(http.server.BaseHTTPRequestHandler):
+              def do_GET(self):
+                  self.send_response(200); self.end_headers(); self.wfile.write(b'{"models": []}')
+              def log_message(self, *a):
+                  pass
+          socketserver.TCPServer((host, int(port)), H).serve_forever()
+          '@
+          Set-Content "$fake\ollama.cmd" "@echo off`r`npython `"$fake\fake_ollama.py`"" -Encoding ascii
+          $env:PATH = "$fake;$env:PATH"
+          $env:FAKE_OUT = $fake
+          Remove-Item config\gpus.json -ErrorAction SilentlyContinue
+          # 1) one GPU: proposer pinned to it, ranker on the CPU
+          Set-Content "$fake\gpus.txt" "0, GPU-AAA, NVIDIA GeForce RTX 5060 Ti, 16311" -Encoding ascii
+          $env:FAKE_GPUS = "$fake\gpus.txt"
+          powershell -NoProfile -ExecutionPolicy Bypass -File scripts\start_ollama.ps1
+          if ($LASTEXITCODE -ne 0) { Write-Host "start failed (one GPU)"; exit 1 }
+          if ((Get-Content "$fake\cuda-11434.txt") -ne "GPU-AAA") { Write-Host "11434 not pinned to the GPU"; exit 1 }
+          if ((Get-Content "$fake\cuda-11435.txt") -ne "-1") { Write-Host "11435 not CPU-only"; exit 1 }
+          Get-Process python -ErrorAction SilentlyContinue | Stop-Process -Force
+          Start-Sleep -Seconds 2
+          # 2) a second GPU appears: re-detected without deleting gpus.json; ranker moves to it
+          Set-Content "$fake\gpus.txt" "0, GPU-AAA, NVIDIA GeForce RTX 5060 Ti, 16311`r`n1, GPU-BBB, NVIDIA GeForce RTX 2060, 6144" -Encoding ascii
+          powershell -NoProfile -ExecutionPolicy Bypass -File scripts\start_ollama.ps1
+          if ($LASTEXITCODE -ne 0) { Write-Host "start failed (two GPUs)"; exit 1 }
+          if ((Get-Content "$fake\cuda-11435.txt") -ne "GPU-BBB") { Write-Host "11435 not moved to the second GPU"; exit 1 }
+          if ((Get-Content config\gpus.json -Raw | ConvertFrom-Json).ranker.uuid -ne "GPU-BBB") { Write-Host "gpus.json not re-detected"; exit 1 }
+          Get-Process python -ErrorAction SilentlyContinue | Stop-Process -Force

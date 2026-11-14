@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lpswarm"
+version = "0.1.0"
+description = "Multi-model research harness: LLMs propose cipher programs, a deterministic null-calibrated oracle decides, a ledger records everything."
+license = {text = "GPL-3.0-only"}
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = ["numpy>=1.24"]
+
+[project.optional-dependencies]
+images = ["pillow>=10", "scipy>=1.10"]
+dev = ["pytest>=7", "pillow>=10", "scipy>=1.10"]
+
+[project.scripts]
+lpswarm = "lpswarm.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+lpswarm = ["fixtures/*.txt", "fixtures/*.md", "ledger/schema.sql"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

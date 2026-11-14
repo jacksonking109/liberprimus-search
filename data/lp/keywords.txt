@@ -1,0 +1,4 @@
+# Keywords you have verified from the puzzle's solved pages or trusted sources, one per line.
+# Lines starting with # are ignored. DIVINITY and FIRFUMFERENFE are read automatically from the
+# manifest's notes; add others here only if you are sure they are real. The models try these first and
+# label any other word they try as a guess, with its source.
